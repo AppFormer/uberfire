@@ -62,8 +62,8 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
 
         ioService.onNewFileSystem( new IOService.NewFileSystemListener() {
-            
-			@Override
+
+            @Override
             public void execute( final FileSystem newFileSystem,
                                  final String scheme,
                                  final String name,
@@ -82,7 +82,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Override
     public Collection<Repository> getRepositories() {
-        return new ArrayList<Repository>(configuredRepositories.values());
+        return new ArrayList<Repository>( configuredRepositories.values() );
     }
 
     @Override
@@ -123,9 +123,11 @@ public class RepositoryServiceImpl implements RepositoryService {
                                     repository );
         return repository;
     }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void addRole(Repository repository, String role) {
+    @Override
+    public void addRole( Repository repository,
+                         String role ) {
         final ConfigGroup thisRepositoryConfig = findRepositoryConfig( repository.getAlias() );
 
         if ( thisRepositoryConfig != null ) {
@@ -141,9 +143,10 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
     }
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void removeRole(Repository repository, String role) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public void removeRole( Repository repository,
+                            String role ) {
         final ConfigGroup thisRepositoryConfig = findRepositoryConfig( repository.getAlias() );
 
         if ( thisRepositoryConfig != null ) {
@@ -171,14 +174,14 @@ public class RepositoryServiceImpl implements RepositoryService {
         return null;
     }
 
-	@Override
-	public void removeRepository(String alias) {
-		final ConfigGroup thisRepositoryConfig = findRepositoryConfig( alias );
+    @Override
+    public void removeRepository( String alias ) {
+        final ConfigGroup thisRepositoryConfig = findRepositoryConfig( alias );
 
         if ( thisRepositoryConfig != null ) {
-        	configurationService.removeConfiguration(thisRepositoryConfig);
-        	configuredRepositories.remove(alias);
+            configurationService.removeConfiguration( thisRepositoryConfig );
+            configuredRepositories.remove( alias );
         }
-		
-	}
+
+    }
 }
