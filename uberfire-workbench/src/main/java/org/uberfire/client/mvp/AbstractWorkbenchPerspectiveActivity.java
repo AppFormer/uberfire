@@ -15,6 +15,7 @@
  */
 package org.uberfire.client.mvp;
 
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 
