@@ -18,7 +18,6 @@ package org.uberfire.client.resources.i18n;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Messages;
-import org.uberfire.mvp.Command;
 
 /**
  *
@@ -46,23 +45,4 @@ public interface CommonConstants
 
     String AbstractTableFileURI();
 
-    String ReOpen();
-
-    String Ignore();
-
-    String ForceSave();
-
-    String Cancel();
-
-    String ConcurrentIssue();
-
-    String ConcurrentUpdate( String identity,
-                             String pathURI );
-
-    String ConcurrentRename( String identity,
-                             String sourceURI,
-                             String targetURI );
-
-    String ConcurrentDelete( String identity,
-                             String pathURI );
 }

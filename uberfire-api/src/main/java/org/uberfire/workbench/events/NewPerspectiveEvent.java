@@ -1,5 +1,7 @@
 package org.uberfire.workbench.events;
 
+import com.google.gwt.codegen.server.StringGenerator;
+
 /**
  * Created with IntelliJ IDEA.
  * Date: 6/25/13

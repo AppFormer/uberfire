@@ -6,7 +6,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.uberfire.backend.vfs.FileSystem;
-import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
@@ -52,7 +51,7 @@ public class AbstractWorkbenchEditorActivityTest extends BaseWorkbenchTest {
             }
         } );
 
-        final ObservablePath path = mock( ObservablePath.class );
+        final Path path = mock( Path.class );
         doReturn( uri ).when( path ).toURI();
         final WorkbenchEditorActivity activity = new MockWorkbenchEditorActivity( placeManager );
         final WorkbenchEditorActivity spy = spy( activity );
@@ -105,7 +104,7 @@ public class AbstractWorkbenchEditorActivityTest extends BaseWorkbenchTest {
         } );
         final PlaceRequest somewhereTheSame = somewhere.clone();
 
-        final ObservablePath path = mock( ObservablePath.class );
+        final Path path = mock( Path.class );
         doReturn( uri ).when( path ).toURI();
         final WorkbenchEditorActivity activity = new MockWorkbenchEditorActivity( placeManager );
         final WorkbenchEditorActivity spy = spy( activity );
@@ -186,13 +185,13 @@ public class AbstractWorkbenchEditorActivityTest extends BaseWorkbenchTest {
         } );
 
         //The first place
-        final ObservablePath path1 = mock( ObservablePath.class );
+        final Path path1 = mock( Path.class );
         doReturn( uri1 ).when( path1 ).toURI();
         final WorkbenchEditorActivity activity1 = new MockWorkbenchEditorActivity( placeManager );
         final WorkbenchEditorActivity spy1 = spy( activity1 );
 
         //The second place
-        final ObservablePath path2 = mock( ObservablePath.class );
+        final Path path2 = mock( Path.class );
         doReturn( uri2 ).when( path2 ).toURI();
         final WorkbenchEditorActivity activity2 = new MockWorkbenchEditorActivity( placeManager );
         final WorkbenchEditorActivity spy2 = spy( activity2 );
@@ -232,18 +231,18 @@ public class AbstractWorkbenchEditorActivityTest extends BaseWorkbenchTest {
 
     }
 
-    private class EqualPaths extends ArgumentMatcher<ObservablePath> {
+    private class EqualPaths extends ArgumentMatcher<Path> {
 
         private Path path;
 
-        private EqualPaths( final ObservablePath path ) {
+        private EqualPaths( final Path path ) {
             this.path = path;
         }
 
         @Override
         public boolean matches( Object argument ) {
-            if ( argument instanceof ObservablePath ) {
-                final ObservablePath that = (ObservablePath) argument;
+            if ( argument instanceof Path ) {
+                final Path that = (Path) argument;
                 return that.toURI().equals( path.toURI() );
             }
             return false;

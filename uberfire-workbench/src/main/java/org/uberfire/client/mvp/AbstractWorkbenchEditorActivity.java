@@ -17,9 +17,7 @@ package org.uberfire.client.mvp;
 
 import java.util.HashMap;
 
-import org.jboss.errai.ioc.client.container.IOC;
-import org.uberfire.backend.vfs.ObservablePath;
-import org.uberfire.backend.vfs.impl.ObservablePathImpl;
+import org.uberfire.backend.vfs.Path;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.PathPlaceRequest;
@@ -32,7 +30,7 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
         implements
         WorkbenchEditorActivity {
 
-    protected ObservablePath path;
+    protected Path path;
 
     public AbstractWorkbenchEditorActivity( final PlaceManager placeManager ) {
         super( placeManager );
@@ -71,12 +69,12 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
     }
 
     @Override
-    public void onStartup( final ObservablePath path ) {
+    public void onStartup( final Path path ) {
         this.path = path;
     }
 
     @Override
-    public void onStartup( final ObservablePath path,
+    public void onStartup( final Path path,
                            final PlaceRequest place ) {
         this.path = path;
     }

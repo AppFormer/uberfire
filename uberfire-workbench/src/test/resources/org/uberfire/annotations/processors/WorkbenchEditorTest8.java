@@ -1,6 +1,5 @@
 package org.uberfire.annotations.processors;
 
-import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnFocus;
@@ -30,7 +29,7 @@ public class WorkbenchEditorTest8 {
     }
 
     @OnStartup
-    public void onStartup(final ObservablePath path) {
+    public void onStartup(final Path path) {
     }
 
     @OnMayClose

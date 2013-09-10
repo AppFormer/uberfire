@@ -1,10 +1,8 @@
 package org.uberfire.workbench.events;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
+import org.kie.commons.validation.PortablePreconditions;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.rpc.SessionInfo;
-
-import static org.kie.commons.validation.PortablePreconditions.*;
 
 /**
  * An Event indicating a Resource has been opened
@@ -13,23 +11,17 @@ import static org.kie.commons.validation.PortablePreconditions.*;
 public class ResourceOpenedEvent {
 
     private Path path;
-    private SessionInfo sessionInfo;
 
     public ResourceOpenedEvent() {
         //Empty constructor for Errai marshalling
     }
 
-    public ResourceOpenedEvent( final Path path,
-                                final SessionInfo sessionInfo ) {
-        this.path = checkNotNull( "path", path );
-        this.sessionInfo = checkNotNull( "sessionInfo", sessionInfo );
+    public ResourceOpenedEvent( final Path path ) {
+        this.path = PortablePreconditions.checkNotNull( "path", path );
     }
 
     public Path getPath() {
         return this.path;
     }
 
-    public SessionInfo getSessionInfo() {
-        return sessionInfo;
-    }
 }

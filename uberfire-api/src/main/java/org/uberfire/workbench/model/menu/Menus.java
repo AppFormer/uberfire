@@ -16,7 +16,6 @@
 package org.uberfire.workbench.model.menu;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Menus that includes permission
@@ -24,7 +23,5 @@ import java.util.Map;
 public interface Menus {
 
     public List<MenuItem> getItems();
-
-    public Map<Object, MenuItem> getItemsMap();
 
 }
