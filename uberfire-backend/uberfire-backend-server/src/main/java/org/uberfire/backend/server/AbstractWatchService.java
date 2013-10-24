@@ -78,7 +78,7 @@ public abstract class AbstractWatchService implements IOWatchService {
         fileSystems.add( fs );
         watchServices.add( ws );
 
-        new Thread( "IOWatchServiceAllImpl(" + ws.toString() + ")" ) {
+        new Thread( this.getClass().getName() + "(" + ws.toString() + ")" ) {
             @Override
             public void run() {
                 while ( !isDisposed ) {
