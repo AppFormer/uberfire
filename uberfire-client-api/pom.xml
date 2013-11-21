@@ -36,13 +36,8 @@
 
     <dependency>
       <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-security-client</artifactId>
+      <artifactId>uberfire-api</artifactId>
     </dependency>
-
-    <dependency>
-			<groupId>org.uberfire</groupId>
-			<artifactId>uberfire-api</artifactId>
-		</dependency>
 
     <dependency>
 			<groupId>javax.inject</groupId>
