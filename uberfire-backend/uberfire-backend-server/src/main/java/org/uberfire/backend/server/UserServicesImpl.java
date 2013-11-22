@@ -36,5 +36,12 @@ public class UserServicesImpl {
                            final String relativePath ) {
         return userServicesBackend.buildPath( identity.getName(), serviceType, relativePath );
     }
+    
+    public Path buildPath( final String userName, 
+                           final String serviceType, 
+                           final String relativePath ) {
+        return userServicesBackend.buildPath( userName, serviceType, relativePath );
+    }
+    
 
 }
