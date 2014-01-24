@@ -75,10 +75,11 @@ public abstract class BaseWorkbenchTest {
                                              statusBar );
         final PanelDefinition root = new PanelDefinitionImpl( ROOT_SIMPLE );
 
-        panelManager.setRoot( root );
+        //FIXME eder (ainda nao precisei disto)
+        // /panelManager.setRoot( root );
 
         //Dummy Place Manager
-        placeManager = new PlaceManagerImpl(  );
+        placeManager = new PlaceManagerImpl();
     }
 
 }

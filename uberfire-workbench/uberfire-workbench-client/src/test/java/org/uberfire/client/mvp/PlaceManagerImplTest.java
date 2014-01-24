@@ -17,19 +17,21 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.*;
 
-@Ignore
+
 public class PlaceManagerImplTest extends BaseWorkbenchTest {
 
     @Test
-    //Test PlaceManager calls an Activities launch method
     public void testGoToSomeWhere() throws Exception {
         final PlaceRequest somewhere = new DefaultPlaceRequest( "Somewhere" );
-
         final WorkbenchEditorActivity activity = mock( WorkbenchEditorActivity.class );
-        when( activity.getDefaultPosition() ).thenReturn( Position.ROOT );
-        when( activityManager.getActivities( somewhere ) ).thenReturn( new HashSet<Activity>( 1 ) {{
+        HashSet<Activity> activities = new HashSet<Activity>( 1 ) {{
             add( activity );
-        }} );
+        }};
+
+        when( activity.getDefaultPosition() ).thenReturn( Position.ROOT );
+        when( activityManager.getActivities( somewhere ) ).thenReturn(activities);
+
+        placeManager = new PlaceManagerImplFake(activity,panelManager);
 
         placeManager.goTo( somewhere );
 
@@ -49,12 +51,14 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
     }
 
     @Test
+    @Ignore
     public void testPlaceManagerGetInitializedToADefaultPlace() throws Exception {
         verify( placeHistoryHandler ).register( any( PlaceManager.class ),
                                                 any( EventBus.class ),
                                                 any( PlaceRequest.class ) );
     }
 
+    @Ignore
     @Test
     //Test PlaceManager only calls an Activities launch method once if re-visited
     public void testGoToPreviouslyOpenedPlace() throws Exception {
@@ -88,5 +92,7 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
 
     // TODO: Close
     // TODO: History
+
+
 
 }
