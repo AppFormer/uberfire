@@ -3,7 +3,6 @@ package org.uberfire.client.mvp;
 import java.util.HashSet;
 
 import com.google.gwt.event.shared.EventBus;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
@@ -17,7 +16,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.*;
 
-
 public class PlaceManagerImplTest extends BaseWorkbenchTest {
 
     @Test
@@ -29,9 +27,9 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
         }};
 
         when( activity.getDefaultPosition() ).thenReturn( Position.ROOT );
-        when( activityManager.getActivities( somewhere ) ).thenReturn(activities);
+        when( activityManager.getActivities( somewhere ) ).thenReturn( activities );
 
-        placeManager = new PlaceManagerImplFake(activity,panelManager);
+        placeManager = new PlaceManagerImplUnitTestWrapper( activity, panelManager, null );
 
         placeManager.goTo( somewhere );
 
@@ -51,14 +49,16 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
     }
 
     @Test
-    @Ignore
     public void testPlaceManagerGetInitializedToADefaultPlace() throws Exception {
+        placeManager = new PlaceManagerImplUnitTestWrapper( placeHistoryHandler );
+
+        placeManager.initPlaceHistoryHandler();
+
         verify( placeHistoryHandler ).register( any( PlaceManager.class ),
                                                 any( EventBus.class ),
                                                 any( PlaceRequest.class ) );
     }
 
-    @Ignore
     @Test
     //Test PlaceManager only calls an Activities launch method once if re-visited
     public void testGoToPreviouslyOpenedPlace() throws Exception {
@@ -70,7 +70,9 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
             add( spy );
         }} );
 
-        placeManager.goTo( somewhere );
+        placeManager = new PlaceManagerImplUnitTestWrapper( spy, panelManager, selectWorkbenchPartEvent );
+
+        placeManager.goTo( somewhere, panelManager.getRoot() );
 
         verify( spy,
                 times( 1 ) ).launch( any( AcceptItem.class ),
@@ -80,7 +82,7 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
                 times( 1 ) ).fire( any( SelectPlaceEvent.class ) );
 
         PlaceRequest somewhereSecondCall = new DefaultPlaceRequest( "Somewhere" );
-        placeManager.goTo( somewhereSecondCall );
+        placeManager.goTo( somewhereSecondCall, panelManager.getRoot() );
 
         verify( spy,
                 times( 1 ) ).launch( any( AcceptItem.class ),
@@ -89,10 +91,5 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
         verify( selectWorkbenchPartEvent,
                 times( 2 ) ).fire( any( SelectPlaceEvent.class ) );
     }
-
-    // TODO: Close
-    // TODO: History
-
-
 
 }
