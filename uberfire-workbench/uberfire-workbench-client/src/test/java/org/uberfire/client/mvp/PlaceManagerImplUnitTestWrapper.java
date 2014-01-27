@@ -3,7 +3,9 @@ package org.uberfire.client.mvp;
 import javax.enterprise.event.Event;
 
 import org.uberfire.client.workbench.PanelManager;
+import org.uberfire.client.workbench.events.NewSplashScreenActiveEvent;
 import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.workbench.events.PerspectiveChange;
 import org.uberfire.workbench.events.SelectPlaceEvent;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.Position;
@@ -14,6 +16,7 @@ public class PlaceManagerImplUnitTestWrapper extends PlaceManagerImpl {
     private PlaceHistoryHandler placeHistoryHandler;
     private Activity activity;
     private PanelManager panelManagerFake;
+    private SplashScreenActivity splashScreenActivity;
 
     public PlaceManagerImplUnitTestWrapper( Activity activity,
                                             PanelManager panelManagerFake,
@@ -24,9 +27,16 @@ public class PlaceManagerImplUnitTestWrapper extends PlaceManagerImpl {
     }
 
     public PlaceManagerImplUnitTestWrapper( Activity activity,
-                                            PanelManager panelManagerFake ) {
+                                                PanelManager panelManagerFake ) {
         this.activity = activity;
         this.panelManagerFake = panelManagerFake;
+    }
+
+    public PlaceManagerImplUnitTestWrapper( Activity activity,
+                                            PanelManager panelManagerFake, SplashScreenActivity splashScreenActivity ) {
+        this.activity = activity;
+        this.panelManagerFake = panelManagerFake;
+        this.splashScreenActivity = splashScreenActivity;
     }
 
     public PlaceManagerImplUnitTestWrapper( PlaceHistoryHandler placeHistoryHandler ) {
@@ -55,11 +65,20 @@ public class PlaceManagerImplUnitTestWrapper extends PlaceManagerImpl {
     }
 
     SplashScreenActivity getSplashScreenInterceptor( PlaceRequest place ) {
-        return null;
+        return splashScreenActivity;
     }
 
     Event<SelectPlaceEvent> getSelectWorkbenchPartEvent() {
         return selectWorkbenchPartEvent;
     }
+
+
+    void fireNewSplashScreenActiveEvent() {
+    }
+
+    void firePerspectiveChangeEvent( PerspectiveActivity activity ) {
+    }
+
+
 
 }

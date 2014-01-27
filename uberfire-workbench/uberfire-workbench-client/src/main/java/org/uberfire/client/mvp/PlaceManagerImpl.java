@@ -567,7 +567,7 @@ public class PlaceManagerImpl
                                                     activity.contextId() );
                 if ( splashScreen != null ) {
                     activeSplashScreens.put( place.getIdentifier(), splashScreen );
-                    newSplashScreenActiveEvent.fire( new NewSplashScreenActiveEvent() );
+                    fireNewSplashScreenActiveEvent();
                     splashScreen.launch( place, null );
                 }
             }
@@ -576,10 +576,6 @@ public class PlaceManagerImpl
 
     PanelManager getPanelManager() {
         return panelManager;
-    }
-
-    SplashScreenActivity getSplashScreenInterceptor( PlaceRequest place ) {
-        return activityManager.getSplashScreenInterceptor( place );
     }
 
     private void checkPathDelete( final PlaceRequest place ) {
@@ -616,15 +612,27 @@ public class PlaceManagerImpl
                                  final Command callback ) {
         loadingPerspective.startLoading();
         activeSplashScreens.clear();
-        perspectiveChangeEvent.fire( new PerspectiveChange( activity.getPerspective(), activity.getMenus(), activity.getIdentifier() ) );
-        final SplashScreenActivity splashScreen = activityManager.getSplashScreenInterceptor( place );
+        firePerspectiveChangeEvent( activity );
+        final SplashScreenActivity splashScreen = getSplashScreenInterceptor( place );
         activity.launch( place, callback );
         if ( splashScreen != null ) {
             activeSplashScreens.put( place.getIdentifier(), splashScreen );
             splashScreen.launch( place, null );
         }
-        newSplashScreenActiveEvent.fire( new NewSplashScreenActiveEvent() );
+        fireNewSplashScreenActiveEvent();
         loadingPerspective.endLoading();
+    }
+
+    SplashScreenActivity getSplashScreenInterceptor( PlaceRequest place ) {
+        return activityManager.getSplashScreenInterceptor( place );
+    }
+
+    void fireNewSplashScreenActiveEvent() {
+        newSplashScreenActiveEvent.fire( new NewSplashScreenActiveEvent() );
+    }
+
+    void firePerspectiveChangeEvent( PerspectiveActivity activity ) {
+        perspectiveChangeEvent.fire( new PerspectiveChange( activity.getPerspective(), activity.getMenus(), activity.getIdentifier() ) );
     }
 
     public void updateHistory( PlaceRequest request ) {
