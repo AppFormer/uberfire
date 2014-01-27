@@ -1,72 +1,38 @@
 package org.uberfire.client.mvp;
 
+import java.util.HashSet;
+
 import org.junit.Test;
+import org.uberfire.mvp.Command;
+import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.workbench.model.Position;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-public class AbstractPopupActivityTest {
+public class AbstractPopupActivityTest  extends BaseWorkbenchTest {
 
-
-//    private AbstractPopupActivity activity;
-//
-//    @Before
-//    public void setUp() throws Exception {
-//        PlaceManager placeManager = mock(PlaceManager.class);
-//        activity = spy(createTestActivity(placeManager));
-//    }
 
     @Test
-    public void testLaunchOrder() throws Exception {
+    public void testPopUpLaunch() throws Exception {
 
-        // .getPopupPanel() needs to return something that is unit testable.
+        final PlaceRequest somewhere = new DefaultPlaceRequest( "Somewhere" );
 
-        assertTrue(true);
-//        PlaceRequest placeRequest = mock(PlaceRequest.class);
-//        Command revealCallback = mock(Command.class);
-//
-//        verify(activity, never()).getPopupPanel();
-//        verify(activity, never()).onStartup();
-//        verify(activity, never()).onStartup(any(PlaceRequest.class));
-//
-//        activity.launch(placeRequest, revealCallback);
+        final AbstractPopupActivity activity = mock( AbstractPopupActivity.class );
+        HashSet<Activity> activities = new HashSet<Activity>( 1 ) {{
+            add( activity );
+        }};
+
+        when( activityManager.getActivities( somewhere ) ).thenReturn( activities );
+
+        placeManager = new PlaceManagerImplUnitTestWrapper( activity, panelManager );
+
+        placeManager.goTo( somewhere );
+
+        verify( activity ).launch( eq( somewhere ), any(Command.class));
 
     }
 
-//    private AbstractPopupActivity createTestActivity(final PlaceManager placeManager) {
-//        return new AbstractPopupActivity(placeManager) {
-//
-//            @Override
-//            public PopupPanel getPopupPanel() {
-//                PopupPanel panel = mock(PopupPanel.class);
-//                return panel;
-//            }
-//
-//            @Override
-//            public String getSignatureId() {
-//                return null;
-//            }
-//
-//            @Override
-//            public Collection<String> getRoles() {
-//                return null;
-//            }
-//
-//            @Override
-//            public void onStartup() {
-//                // onStartup should not be called before getPopupPanel()
-//                verify(activity, never()).getPopupPanel();
-//            }
-//
-//            @Override
-//            public void onStartup(final PlaceRequest place) {
-//                // onStartup should not be called before getPopupPanel()
-//                verify(activity, never()).getPopupPanel();
-//            }
-//
-//            @Override
-//            public Collection<String> getTraits() {
-//                return null;
-//            }
-//        };
-//    }
 }
