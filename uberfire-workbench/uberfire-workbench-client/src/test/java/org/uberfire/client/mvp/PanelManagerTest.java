@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
  * when DecoratedWorkbenchPanel(s) and/or WorkbenchPart(s) are added to or removed from
  * the Workbench.
  */
-@Ignore
 public class PanelManagerTest extends BaseWorkbenchTest {
 
     @Test
@@ -35,9 +34,13 @@ public class PanelManagerTest extends BaseWorkbenchTest {
             add( spy );
         }} );
 
-        placeManager.goTo( somewhere );
+        placeManager = new PlaceManagerImplUnitTestWrapper( spy, panelManager, null );
 
         final PanelDefinition root = panelManager.getRoot();
+
+        placeManager.goTo( somewhere, root );
+
+
         assertNotNull( root );
         assertTrue( root.isRoot() );
         assertEquals( 1,
@@ -65,10 +68,14 @@ public class PanelManagerTest extends BaseWorkbenchTest {
             add( spy );
         }} );
 
-        //Goto Place once
-        placeManager.goTo( somewhere );
+        placeManager = new PlaceManagerImplUnitTestWrapper( spy, panelManager, selectWorkbenchPartEvent );
 
         final PanelDefinition root = panelManager.getRoot();
+
+        //Goto Place once
+        placeManager.goTo( somewhere, root );
+
+
         assertNotNull( root );
         assertTrue( root.isRoot() );
         assertEquals( 1,
@@ -83,7 +90,7 @@ public class PanelManagerTest extends BaseWorkbenchTest {
                                0 ).getPlace() );
 
         //Goto Place again
-        placeManager.goTo( somewhere );
+        placeManager.goTo( somewhere ,root );
 
         assertNotNull( root );
         assertTrue( root.isRoot() );
@@ -120,10 +127,15 @@ public class PanelManagerTest extends BaseWorkbenchTest {
             add( spy2 );
         }} );
 
-        //Goto first Place
-        placeManager.goTo( somewhere );
+
+        placeManager = new PlaceManagerImplUnitTestWrapper( spy1, panelManager, null );
 
         final PanelDefinition root = panelManager.getRoot();
+
+        //Goto first Place
+        placeManager.goTo( somewhere, root );
+
+
         assertNotNull( root );
         assertTrue( root.isRoot() );
         assertEquals( 1,
@@ -138,7 +150,7 @@ public class PanelManagerTest extends BaseWorkbenchTest {
                                0 ).getPlace() );
 
         //Goto second Place
-        placeManager.goTo( elsewhere );
+        placeManager.goTo( elsewhere , root);
 
         assertNotNull( root );
         assertTrue( root.isRoot() );
@@ -152,7 +164,7 @@ public class PanelManagerTest extends BaseWorkbenchTest {
         assertEquals( somewhere,
                       getPart( root.getParts(),
                                0 ).getPlace() );
-        assertEquals( elsewhere,
+         assertEquals( elsewhere,
                       getPart( root.getParts(),
                                1 ).getPlace() );
     }
