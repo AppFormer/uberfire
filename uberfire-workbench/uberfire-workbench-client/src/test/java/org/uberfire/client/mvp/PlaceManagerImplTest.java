@@ -29,7 +29,7 @@ public class PlaceManagerImplTest extends BaseWorkbenchTest {
         when( activity.getDefaultPosition() ).thenReturn( Position.ROOT );
         when( activityManager.getActivities( somewhere ) ).thenReturn( activities );
 
-        placeManager = new PlaceManagerImplUnitTestWrapper( activity, panelManager, null );
+        placeManager = new PlaceManagerImplUnitTestWrapper( activity, panelManager );
 
         placeManager.goTo( somewhere );
 

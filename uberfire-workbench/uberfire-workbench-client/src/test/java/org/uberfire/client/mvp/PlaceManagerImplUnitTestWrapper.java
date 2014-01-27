@@ -23,6 +23,12 @@ public class PlaceManagerImplUnitTestWrapper extends PlaceManagerImpl {
         this.selectWorkbenchPartEvent = selectWorkbenchPartEvent;
     }
 
+    public PlaceManagerImplUnitTestWrapper( Activity activity,
+                                            PanelManager panelManagerFake ) {
+        this.activity = activity;
+        this.panelManagerFake = panelManagerFake;
+    }
+
     public PlaceManagerImplUnitTestWrapper( PlaceHistoryHandler placeHistoryHandler ) {
         this.placeHistoryHandler = placeHistoryHandler;
     }
