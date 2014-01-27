@@ -117,7 +117,7 @@ public class AbstractWorkbenchScreenActivityTest extends BaseWorkbenchTest {
         final PanelDefinition root = panelManager.getRoot();
 
         placeManager.goTo( somewhere, root );
-
+        //just to change the activity mock
         placeManager = new PlaceManagerImplUnitTestWrapper( spy2, panelManager, selectWorkbenchPartEvent );
         placeManager.goTo( somewhereElse, root  );
 
