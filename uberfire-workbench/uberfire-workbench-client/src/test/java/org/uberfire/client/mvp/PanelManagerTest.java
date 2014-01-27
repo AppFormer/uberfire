@@ -1,9 +1,10 @@
 package org.uberfire.client.mvp;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
@@ -161,12 +162,20 @@ public class PanelManagerTest extends BaseWorkbenchTest {
         assertNull( root.getChild( Position.EAST ) );
         assertNull( root.getChild( Position.WEST ) );
 
-        assertEquals( somewhere,
-                      getPart( root.getParts(),
-                               0 ).getPlace() );
-         assertEquals( elsewhere,
-                      getPart( root.getParts(),
-                               1 ).getPlace() );
+        final List<PlaceRequest> places =  toPlaces( root.getParts() );
+
+        assertTrue( places.contains( somewhere ) );
+        assertTrue( places.contains( elsewhere ) );
+
+    }
+
+    private List<PlaceRequest> toPlaces( Set<PartDefinition> parts ) {
+
+        List<PlaceRequest> places = new ArrayList<PlaceRequest>( );
+        for (PartDefinition part: parts ){
+            places.add( part.getPlace() );
+        }
+        return places;
     }
 
     private PartDefinition getPart( final Set<PartDefinition> parts,
