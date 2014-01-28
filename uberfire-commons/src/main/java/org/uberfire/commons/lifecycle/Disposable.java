@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package org.uberfire.metadata.search;
+package org.uberfire.commons.lifecycle;
 
-import java.util.Date;
+public interface Disposable {
 
-/**
- *
- */
-public interface DateRange {
-
-    Date before();
-
-    Date after();
+    public void dispose();
 
 }
