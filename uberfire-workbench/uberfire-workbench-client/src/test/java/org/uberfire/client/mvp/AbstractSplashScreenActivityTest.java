@@ -40,10 +40,10 @@ public class AbstractSplashScreenActivityTest extends BaseWorkbenchTest {
 
         final PlaceRequest somewhere = new DefaultPlaceRequest( "Somewhere" );
 
-        final AbstractSplashScreenActivity perspectiveActivity = mock( AbstractSplashScreenActivity.class );
+        final AbstractSplashScreenActivity splashScreenActivity = mock( AbstractSplashScreenActivity.class );
 
 
-        final AbstractWorkbenchPerspectiveActivity splashScreenActivity = mock( AbstractWorkbenchPerspectiveActivity.class );
+        final AbstractWorkbenchPerspectiveActivity perspectiveActivity = mock( AbstractWorkbenchPerspectiveActivity.class );
 
         HashSet<Activity> activities = new HashSet<Activity>( 1 ) {{
             add( perspectiveActivity );
@@ -52,7 +52,7 @@ public class AbstractSplashScreenActivityTest extends BaseWorkbenchTest {
 
         when( activityManager.getActivities( somewhere ) ).thenReturn( activities );
 
-        placeManager = new PlaceManagerImplUnitTestWrapper( splashScreenActivity, panelManager, perspectiveActivity );
+        placeManager = new PlaceManagerImplUnitTestWrapper( perspectiveActivity, panelManager, splashScreenActivity );
 
         placeManager.goTo( somewhere );
 
