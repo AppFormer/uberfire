@@ -16,8 +16,6 @@ import javax.inject.Inject;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.client.workbench.annotations.AssociatedResources;
-import org.uberfire.client.workbench.annotations.Priority;
 import org.uberfire.client.workbench.type.ClientResourceType;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.workbench.events.NewPerspectiveEvent;
@@ -63,18 +61,22 @@ public class ActivityBeansCache {
             if ( isSplashScreen( activityBean.getQualifiers() ) ) {
                 splashScreens.add( (SplashScreenActivity) activityBean.getInstance() );
             } else {
-                final Pair<Integer, List<Class<? extends ClientResourceType>>> metaInfo = ActivityMetaInfo.generate( activityBean );
+                final Pair<Integer, List<Class<? extends ClientResourceType>>> metaInfo = generateActivityMetaInfo( activityBean );
                 if ( metaInfo != null ) {
                     activities.add( new ActivityAndMetaInfo( activityBean, metaInfo.getK1(), metaInfo.getK2() ) );
                 }
             }
         }
 
-        sortActivities();
+        sortActivitiesByPriority();
     }
 
-    void sortActivities() {
-        sort( activities, new Comparator<ActivityAndMetaInfo>() {
+    Pair<Integer, List<Class<? extends ClientResourceType>>> generateActivityMetaInfo( IOCBeanDef<Activity> activityBean ) {
+        return ActivityMetaInfo.generate( activityBean );
+    }
+
+    void sortActivitiesByPriority() {
+        sort( getActivities(), new Comparator<ActivityAndMetaInfo>() {
             @Override
             public int compare( final ActivityAndMetaInfo o1,
                                 final ActivityAndMetaInfo o2 ) {
@@ -88,6 +90,10 @@ public class ActivityBeansCache {
                 }
             }
         } );
+    }
+
+    List<ActivityAndMetaInfo> getActivities() {
+        return activities;
     }
 
     IOCBeanDef<Activity> reLookupBean( IOCBeanDef<Activity> baseBean ) {
@@ -166,15 +172,15 @@ public class ActivityBeansCache {
         return null;
     }
 
-    private class ActivityAndMetaInfo {
+    class ActivityAndMetaInfo {
 
         private final IOCBeanDef<Activity> activityBean;
         private final int priority;
         private final ClientResourceType[] resourceTypes;
 
-        private ActivityAndMetaInfo( final IOCBeanDef<Activity> activityBean,
-                                     final int priority,
-                                     final List<Class<? extends ClientResourceType>> resourceTypes ) {
+        ActivityAndMetaInfo( final IOCBeanDef<Activity> activityBean,
+                             final int priority,
+                             final List<Class<? extends ClientResourceType>> resourceTypes ) {
             this.activityBean = activityBean;
             this.priority = priority;
             this.resourceTypes = new ClientResourceType[ resourceTypes.size() ];
