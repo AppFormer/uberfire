@@ -1,27 +1,16 @@
 package org.uberfire.client.workbench.panels.impl;
 
-import javax.enterprise.event.Event;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.junit.GWTMockUtilities;
-import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwtmockito.GwtMock;
-import com.google.gwtmockito.GwtMockito;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.omg.DynamicAny._DynAnyFactoryStub;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.widgets.dnd.WorkbenchDragAndDropManager;
 import org.uberfire.client.workbench.widgets.listbar.ListBarWidget;
 import org.uberfire.client.workbench.widgets.panel.RequiresResizeFlowPanel;
 import org.uberfire.mvp.Command;
-import org.uberfire.workbench.events.MaximizePlaceEvent;
-import org.uberfire.workbench.events.MinimizePlaceEvent;
-import org.uberfire.workbench.model.PartDefinition;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
