@@ -1,51 +1,44 @@
 package org.uberfire.client.workbench.panels.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
-
 import javax.enterprise.event.Event;
 
-import org.jboss.errai.ioc.client.container.IOCBeanDef;
+import com.google.gwtmockito.GwtMock;
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.uberfire.client.mvp.ActivityMetaInfo;
+import org.junit.runner.RunWith;
 import org.uberfire.client.workbench.PanelManager;
-import org.uberfire.client.workbench.type.ClientResourceType;
-import org.uberfire.commons.data.Pair;
 import org.uberfire.workbench.events.MaximizePlaceEvent;
 import org.uberfire.workbench.events.MinimizePlaceEvent;
-import org.uberfire.workbench.model.PanelDefinition;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-
+@RunWith(GwtMockitoTestRunner.class)
 public class SimpleWorkbenchPanelPresenterTest {
 
     private SimpleWorkbenchPanelView view;
 
+    @GwtMock
     private PanelManager panelManager;
-
-    private Event<MaximizePlaceEvent> maximizePanelEvent;
-
-    private Event<MinimizePlaceEvent> minimizePanelEvent;
 
     private SimpleWorkbenchPanelPresenter presenter;
 
     @Before
     public void setup() {
-    /*    view = mock( SimpleWorkbenchPanelView.class );
-        panelManager = mock( PanelManager.class );
-        maximizePanelEvent = (Event<MaximizePlaceEvent>) mock( MaximizePlaceEvent.class );
-        minimizePanelEvent = (Event<MinimizePlaceEvent>) mock( MaximizePlaceEvent.class );
-        presenter = new SimpleWorkbenchPanelPresenter(view, panelManager, maximizePanelEvent, minimizePanelEvent);*/
+        view = new SimpleWorkbenchPanelView();
+        presenter = new SimpleWorkbenchPanelPresenter( view, panelManager, null,null);
     }
 
     @Test
-    public void oQueTestarei() {
+    public void init() {
+
+        presenter.init();
+
+        assertEquals( presenter, view.getPresenter() );
 
     }
+
+
 
 }
