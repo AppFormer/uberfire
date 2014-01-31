@@ -18,8 +18,8 @@ import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.workbench.type.ClientResourceType;
 import org.uberfire.commons.data.Pair;
-import org.uberfire.workbench.events.NewPerspectiveEvent;
-import org.uberfire.workbench.events.NewWorkbenchScreenEvent;
+import org.uberfire.client.workbench.events.NewPerspectiveEvent;
+import org.uberfire.client.workbench.events.NewWorkbenchScreenEvent;
 
 import static java.util.Collections.*;
 
