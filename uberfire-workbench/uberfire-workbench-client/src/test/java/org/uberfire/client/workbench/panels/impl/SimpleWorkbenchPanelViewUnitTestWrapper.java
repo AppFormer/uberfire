@@ -9,37 +9,44 @@ import org.uberfire.client.workbench.widgets.panel.RequiresResizeFlowPanel;
 
 import static org.mockito.Mockito.*;
 
-public class SimpleWorkbenchPanelViewUnitTestWrapper extends  SimpleWorkbenchPanelView {
-
+public class SimpleWorkbenchPanelViewUnitTestWrapper extends SimpleWorkbenchPanelView {
 
     private Widget widget;
 
     public void setupMocks( ListBarWidget listBar,
                             RequiresResizeFlowPanel container,
                             WorkbenchDragAndDropManager dndManager,
-                            SimpleWorkbenchPanelPresenter presenter ){
+                            SimpleWorkbenchPanelPresenter presenter ) {
         this.listBar = listBar;
         this.container = container;
         this.dndManager = dndManager;
-        widget =  mock( Widget.class );
-        when( widget.getOffsetWidth()).thenReturn( 0 );
-        when( widget.getOffsetHeight()).thenReturn( 0 );
+        widget = mock( Widget.class );
+        when( widget.getOffsetWidth() ).thenReturn( 0 );
+        when( widget.getOffsetHeight() ).thenReturn( 0 );
+        this.presenter = presenter;
+    }
+
+    public void setupPresenterAndParentMock(
+            SimpleWorkbenchPanelPresenter presenter ) {
         this.presenter = presenter;
     }
 
     @Override
     void setListBarOverFlow() {
     }
+
     void resizeSuper() {
     }
+
     @Override
     public Widget getParent() {
         return widget;
     }
 
-    public void changeWidgetSizeMock(int width, int height){
-        when( widget.getOffsetWidth()).thenReturn( width );
-        when( widget.getOffsetHeight()).thenReturn( height );
+    public void changeWidgetSizeMock( int width,
+                                      int height ) {
+        when( widget.getOffsetWidth() ).thenReturn( width );
+        when( widget.getOffsetHeight() ).thenReturn( height );
     }
 
 }
