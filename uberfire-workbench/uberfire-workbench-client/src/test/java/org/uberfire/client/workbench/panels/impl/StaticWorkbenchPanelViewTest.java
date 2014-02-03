@@ -1,13 +1,8 @@
 package org.uberfire.client.workbench.panels.impl;
 
-import com.apple.laf.AquaTabbedPaneCopyFromBasicUI;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwtmockito.GwtMock;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.uberfire.client.mvp.PlaceManager;
