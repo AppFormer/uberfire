@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(GwtMockitoTestRunner.class)
-public class ListBarWidgetTest {
+    public class ListBarWidgetTest {
 
     private ListBarWidgetUnitTestWrapper widget;
 
