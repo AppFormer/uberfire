@@ -35,15 +35,7 @@ public class MultiTabWorkbenchPanelView
 
     @Override
     protected MultiPartWidget setupWidget() {
-        final UberTabPanel tabPanel = new UberTabPanel();
-
-//        //Selecting a tab causes the previously selected tab to receive a Lost Focus event
-//        widget.addBeforeSelectionHandler( new BeforeSelectionHandler<PartDefinition>() {
-//            @Override
-//            public void onBeforeSelection( final BeforeSelectionEvent<PartDefinition> event ) {
-//
-//            }
-//        } );
+        final UberTabPanel tabPanel = getUberTabPanel();
 
         //When a tab is selected ensure content is resized and set focus
         tabPanel.addSelectionHandler( new SelectionHandler<PartDefinition>() {
@@ -62,5 +54,9 @@ public class MultiTabWorkbenchPanelView
         } );
 
         return tabPanel;
+    }
+
+    UberTabPanel getUberTabPanel() {
+        return new UberTabPanel();
     }
 }
