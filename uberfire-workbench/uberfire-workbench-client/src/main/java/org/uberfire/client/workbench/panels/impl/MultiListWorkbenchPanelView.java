@@ -40,14 +40,15 @@ public class MultiListWorkbenchPanelView
     @Override
     protected MultiPartWidget setupWidget() {
         if ( contextWidget != null ) {
-            listBar.setExpanderCommand( new Command() {
-                @Override
-                public void execute() {
-                    contextWidget.toogleDisplay();
-                }
-            } );
+            setExpanderCommandOnListBar();
         }
 
+        addHandlersOn( listBar );
+
+        return listBar;
+    }
+
+    private void addHandlersOn( ListBarWidget listBar ) {
         //When a tab is selected ensure content is resized and set focus
         listBar.addSelectionHandler( new SelectionHandler<PartDefinition>() {
             @Override
@@ -63,7 +64,14 @@ public class MultiListWorkbenchPanelView
                 panelManager.onPanelFocus( presenter.getDefinition() );
             }
         } );
+    }
 
-        return listBar;
+    private void setExpanderCommandOnListBar() {
+        listBar.setExpanderCommand( new Command() {
+            @Override
+            public void execute() {
+                contextWidget.toogleDisplay();
+            }
+        } );
     }
 }
