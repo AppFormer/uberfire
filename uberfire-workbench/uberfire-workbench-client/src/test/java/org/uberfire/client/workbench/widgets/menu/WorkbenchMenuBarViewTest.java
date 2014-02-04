@@ -36,7 +36,7 @@ public class WorkbenchMenuBarViewTest {
         menuBarCenter = GWT.create( Nav.class );
         menuBarRight = GWT.create( Nav.class );
 
-        menuTopLevel = WorkbenchMenuBarViewUnitTestWrapper.buildTopLevelMenu();
+        menuTopLevel = MenusFixture.buildTopLevelMenu();
 
         workbenchMenuBarViewUnitTestWrapper = new WorkbenchMenuBarViewUnitTestWrapper();
         workbenchMenuBarViewUnitTestWrapper.setupMocks( menuBarLeft, menuBarCenter, menuBarRight );
@@ -68,7 +68,7 @@ public class WorkbenchMenuBarViewTest {
     @Test
     public void makeMenuItemCommand() {
         WorkbenchMenuBarViewUnitTestWrapper spy = spy( workbenchMenuBarViewUnitTestWrapper );
-        MenuItem item = WorkbenchMenuBarViewUnitTestWrapper.buildMenuItemCommand();
+        MenuItem item = MenusFixture.buildMenuItemCommand();
         Widget widget = spy.makeItem( item );
         verify( spy, Mockito.times( 1 ) ).makeMenuItemCommand(item );
 
@@ -77,7 +77,7 @@ public class WorkbenchMenuBarViewTest {
     @Test
     public void makeMenuGroup() {
         WorkbenchMenuBarViewUnitTestWrapper spy = spy( workbenchMenuBarViewUnitTestWrapper );
-        MenuItem item = WorkbenchMenuBarViewUnitTestWrapper.buildMenuGroup();
+        MenuItem item = MenusFixture.buildMenuGroupItem();
         Widget widget = spy.makeItem( item );
         verify( spy, Mockito.times( 1 ) ).makeMenuGroup( (MenuGroup) item );
 
@@ -86,7 +86,7 @@ public class WorkbenchMenuBarViewTest {
     @Test
     public void makeMenuCustom() {
         WorkbenchMenuBarViewUnitTestWrapper spy = spy( workbenchMenuBarViewUnitTestWrapper );
-        MenuItem item = WorkbenchMenuBarViewUnitTestWrapper.buildCustomMenu();
+        MenuItem item = MenusFixture.buildCustomMenu();
         Widget widget = spy.makeItem(item );
         verify( spy, Mockito.times( 1 ) ).makeMenuCustom( (MenuCustom) item );
     }
