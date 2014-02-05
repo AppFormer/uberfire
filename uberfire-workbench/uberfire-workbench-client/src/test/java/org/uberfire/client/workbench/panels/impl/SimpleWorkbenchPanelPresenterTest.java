@@ -12,6 +12,8 @@ import static org.junit.Assert.*;
 @RunWith(GwtMockitoTestRunner.class)
 public class SimpleWorkbenchPanelPresenterTest {
 
+
+
     private SimpleWorkbenchPanelView view;
 
     @GwtMock

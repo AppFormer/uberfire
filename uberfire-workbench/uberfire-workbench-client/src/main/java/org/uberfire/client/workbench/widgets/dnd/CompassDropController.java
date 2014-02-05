@@ -42,15 +42,19 @@ public class CompassDropController
         implements
         DropController {
 
-    private final CompassWidget compass = CompassWidget.getInstance();
+    private final CompassWidget compass = getCompassWidgetInstance();
 
-    private WorkbenchPanelView dropTarget;
+    CompassWidget getCompassWidgetInstance() {
+        return CompassWidget.getInstance();
+    }
+
+    WorkbenchPanelView dropTarget;
 
     @Inject
-    private PanelManager panelManager;
+    PanelManager panelManager;
 
     @Inject
-    private WorkbenchDragAndDropManager dndManager;
+    WorkbenchDragAndDropManager dndManager;
 
     @Inject
     private Event<DropPlaceEvent> workbenchPartDroppedEvent;
@@ -91,15 +95,9 @@ public class CompassDropController
         final WorkbenchDragContext workbenchContext = dndManager.getWorkbenchContext();
         final Menus menus = workbenchContext.getMenus();
 
-        final UIPart uiPart = workbenchContext.getUiPart();
-        final PlaceRequest place = workbenchContext.getPlace();
-        final PartDefinition sourcePart = workbenchContext.getSourcePart();
-        final PanelDefinition sourcePanel = workbenchContext.getSourcePanel();
-        final Integer height = null;
-        final Integer width = null;
-        final Integer minHeight = workbenchContext.getMinHeight();
-        final Integer minWidth = workbenchContext.getMinWidth();
 
+
+        final PanelDefinition sourcePanel = workbenchContext.getSourcePanel();
         final PanelDefinition dropPanel = dropTarget.getPresenter().getDefinition();
 
         //If the Target Panel is the same as the Source we're trying to reposition the 
@@ -114,19 +112,35 @@ public class CompassDropController
             }
         }
 
-        workbenchPartDroppedEvent.fire( new DropPlaceEvent( place ) );
+        final PlaceRequest place = workbenchContext.getPlace();
+
+        firePartDroppedEvent( place );
+
+
+        final Integer height = null;
+        final Integer width = null;
+        final Integer minHeight = workbenchContext.getMinHeight();
+        final Integer minWidth = workbenchContext.getMinWidth();
+
         final PanelDefinition targetPanel = panelManager.addWorkbenchPanel( dropPanel,
                                                                             p,
                                                                             height,
                                                                             width,
                                                                             minHeight,
                                                                             minWidth );
+        final UIPart uiPart = workbenchContext.getUiPart();
+        final PartDefinition sourcePart = workbenchContext.getSourcePart();
+
         panelManager.addWorkbenchPart( place,
                                        sourcePart,
                                        targetPanel,
                                        menus,
                                        uiPart,
                                        workbenchContext.getContextId() );
+    }
+
+    void firePartDroppedEvent( PlaceRequest place ) {
+        workbenchPartDroppedEvent.fire( new DropPlaceEvent( place ) );
     }
 
     @Override

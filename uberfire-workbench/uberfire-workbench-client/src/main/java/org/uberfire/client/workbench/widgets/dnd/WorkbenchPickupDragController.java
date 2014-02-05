@@ -41,11 +41,11 @@ public class WorkbenchPickupDragController extends PickupDragController {
     private final Image dragProxy = new Image( WorkbenchResources.INSTANCE.images().workbenchPanelDragProxy() );
 
     @Inject
-    private WorkbenchDragAndDropManager dndManager;
+    WorkbenchDragAndDropManager dndManager;
 
     public WorkbenchPickupDragController() {
         super( new AbsolutePanel(),
-               false );
+                               false );
         setBehaviorDragProxy( true );
         setBehaviorDragStartSensitivity( 1 );
     }
