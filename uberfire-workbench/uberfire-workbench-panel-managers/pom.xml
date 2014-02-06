@@ -19,22 +19,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.uberfire</groupId>
-    <artifactId>uberfire-parent-with-dependencies</artifactId>
+    <artifactId>uberfire-workbench</artifactId>
     <version>0.4.0-SNAPSHOT</version>
-    <relativePath>../uberfire-parent-with-dependencies/pom.xml</relativePath>
   </parent>
 
-  <artifactId>uberfire-workbench</artifactId>
+  <artifactId>uberfire-panel-managers</artifactId>
   <packaging>pom</packaging>
 
-  <name>UberFire Workbench</name>
+  <name>UberFire Widgets</name>
 
   <modules>
-    <module>uberfire-workbench-client</module>
-    <module>uberfire-workbench-client-backend</module>
-    <module>uberfire-workbench-processors</module>
-    <module>uberfire-workbench-processors-tests</module>
-    <module>uberfire-workbench-panel-managers</module>
+    <module>uberfire-nswe-manager</module>
   </modules>
-
 </project>
