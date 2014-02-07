@@ -17,6 +17,7 @@ package org.uberfire.client.mvp;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.uberfire.client.workbench.BeanFactory;
+import org.uberfire.client.workbench.NSWEExtendedBeanFactory;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.HorizontalSplitterPanel;
@@ -33,7 +34,7 @@ import org.uberfire.workbench.model.menu.Menus;
  */
 public class MockBeanFactory
         implements
-        BeanFactory {
+        NSWEExtendedBeanFactory {
 
     @Override
     public WorkbenchPartPresenter newWorkbenchPart( final Menus menus,
@@ -58,24 +59,6 @@ public class MockBeanFactory
     }
 
     @Override
-    public HorizontalSplitterPanel newHorizontalSplitterPanel( final WorkbenchPanelView eastPanel,
-                                                               final WorkbenchPanelView westPanel,
-                                                               final Position position,
-                                                               final Integer preferredSize,
-                                                               final Integer preferredMinSize ) {
-        return null;
-    }
-
-    @Override
-    public VerticalSplitterPanel newVerticalSplitterPanel( final WorkbenchPanelView northPanel,
-                                                           final WorkbenchPanelView southPanel,
-                                                           final Position position,
-                                                           final Integer preferredSize,
-                                                           final Integer preferredMinSize ) {
-        return null;
-    }
-
-    @Override
     public CompassDropController newDropController( final WorkbenchPanelView view ) {
         return null;
     }
@@ -84,4 +67,21 @@ public class MockBeanFactory
     public void destroy( final Object o ) {
     }
 
+    @Override
+    public HorizontalSplitterPanel newHorizontalSplitterPanel( WorkbenchPanelView eastPanel,
+                                                               WorkbenchPanelView westPanel,
+                                                               Position position,
+                                                               Integer preferredSize,
+                                                               Integer preferredMinSize ) {
+        return null;
+    }
+
+    @Override
+    public VerticalSplitterPanel newVerticalSplitterPanel( WorkbenchPanelView northPanel,
+                                                           WorkbenchPanelView southPanel,
+                                                           Position position,
+                                                           Integer preferredSize,
+                                                           Integer preferredMinSize ) {
+        return null;
+    }
 }

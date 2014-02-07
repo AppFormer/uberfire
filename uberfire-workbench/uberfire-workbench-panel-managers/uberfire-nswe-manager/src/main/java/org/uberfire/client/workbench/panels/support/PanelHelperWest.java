@@ -23,7 +23,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.workbench.BeanFactory;
+import org.uberfire.client.workbench.NSWEExtendedBeanFactory;
 import org.uberfire.client.workbench.annotations.WorkbenchPosition;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.HorizontalSplitterPanel;
@@ -40,7 +40,7 @@ public class PanelHelperWest
         PanelHelper {
 
     @Inject
-    private BeanFactory factory;
+    private NSWEExtendedBeanFactory factory;
 
     @Override
     public void add( final WorkbenchPanelView newPanel,

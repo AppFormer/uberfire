@@ -51,7 +51,7 @@ import org.uberfire.workbench.model.menu.Menus;
 public class PanelManagerImpl implements PanelManager {
 
     @Inject
-    private BeanFactory factory;
+    private NSWEExtendedBeanFactory factory;
 
     @Inject
     private Event<BeforeClosePlaceEvent> beforeClosePlaceEvent;
@@ -84,7 +84,7 @@ public class PanelManagerImpl implements PanelManager {
     }
 
     //constructor for unit testing
-    public PanelManagerImpl( final BeanFactory factory,
+    public PanelManagerImpl( final NSWEExtendedBeanFactory factory,
                              final Event<BeforeClosePlaceEvent> beforeClosePlaceEvent,
                              final Event<PlaceGainFocusEvent> placeGainFocusEvent,
                              final Event<PlaceLostFocusEvent> placeLostFocusEvent,

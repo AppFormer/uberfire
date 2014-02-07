@@ -26,7 +26,7 @@
   <artifactId>uberfire-panel-managers</artifactId>
   <packaging>pom</packaging>
 
-  <name>UberFire Widgets</name>
+  <name>UberFire Panel Manager</name>
 
   <modules>
     <module>uberfire-nswe-manager</module>

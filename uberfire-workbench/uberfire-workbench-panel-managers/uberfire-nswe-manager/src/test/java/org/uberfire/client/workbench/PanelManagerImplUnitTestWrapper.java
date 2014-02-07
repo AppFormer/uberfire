@@ -14,7 +14,7 @@ public class PanelManagerImplUnitTestWrapper extends PanelManagerImpl {
 
     private final WorkbenchPanelPresenter workbenchPanelPresenter;
 
-    public PanelManagerImplUnitTestWrapper( final BeanFactory factory,
+    public PanelManagerImplUnitTestWrapper( final NSWEExtendedBeanFactory factory,
                                             final Event<BeforeClosePlaceEvent> beforeClosePlaceEvent,
                                             final Event<PlaceGainFocusEvent> placeGainFocusEvent,
                                             final Event<PlaceLostFocusEvent> placeLostFocusEvent,

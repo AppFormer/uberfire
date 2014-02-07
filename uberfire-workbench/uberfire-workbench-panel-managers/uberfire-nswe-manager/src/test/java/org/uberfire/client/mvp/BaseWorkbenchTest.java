@@ -19,6 +19,7 @@ import javax.enterprise.event.Event;
 
 import org.junit.Before;
 import org.uberfire.client.workbench.BeanFactory;
+import org.uberfire.client.workbench.NSWEExtendedBeanFactory;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.PanelManagerImplUnitTestWrapper;
 import org.uberfire.client.workbench.events.BeforeClosePlaceEvent;
@@ -44,7 +45,7 @@ public abstract class BaseWorkbenchTest {
     protected PanelManager panelManager;
     protected PlaceManagerImpl placeManager;
 
-    protected BeanFactory factory;
+    protected NSWEExtendedBeanFactory factory;
     protected Event<BeforeClosePlaceEvent> workbenchPartBeforeCloseEvent;
     protected Event<PlaceGainFocusEvent> workbenchPartOnFocusEvent;
     protected Event<PlaceLostFocusEvent> workbenchPartLostFocusEvent;

@@ -23,24 +23,24 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.workbench.BeanFactory;
+import org.uberfire.client.workbench.NSWEExtendedBeanFactory;
 import org.uberfire.client.workbench.annotations.WorkbenchPosition;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.VerticalSplitterPanel;
 import org.uberfire.workbench.model.Position;
 
 /**
- * Helper to add or remove WorkbenchPanels from the North of a
+ * Helper to add or remove WorkbenchPanels from the South of a
  * VerticalSplitterPanel.
  */
 @ApplicationScoped
-@WorkbenchPosition(position = Position.NORTH)
-public class PanelHelperNorth
+@WorkbenchPosition(position = Position.SOUTH)
+public class PanelHelperSouth
         implements
         PanelHelper {
 
     @Inject
-    private BeanFactory factory;
+    private NSWEExtendedBeanFactory factory;
 
     @Override
     public void add( final WorkbenchPanelView newPanel,
@@ -53,9 +53,9 @@ public class PanelHelperNorth
         if ( parent instanceof SimplePanel ) {
 
             final SimplePanel sp = (SimplePanel) parent;
-            final VerticalSplitterPanel vsp = factory.newVerticalSplitterPanel( newPanel,
-                                                                                targetPanel,
-                                                                                Position.NORTH,
+            final VerticalSplitterPanel vsp = factory.newVerticalSplitterPanel( targetPanel,
+                                                                                newPanel,
+                                                                                Position.SOUTH,
                                                                                 preferredSize,
                                                                                 preferredMinSize );
 
@@ -74,17 +74,17 @@ public class PanelHelperNorth
     public void remove( final WorkbenchPanelView panel ) {
         final VerticalSplitterPanel vsp = (VerticalSplitterPanel) panel.asWidget().getParent().getParent().getParent();
         final Widget parent = vsp.getParent();
-        final Widget southWidget = vsp.getWidget( Position.SOUTH );
+        final Widget northWidget = vsp.getWidget( Position.NORTH );
 
         vsp.clear();
 
-        //Set parent's content to the SOUTH widget
+        //Set parent's content to the NORTH widget
         if ( parent instanceof SimplePanel ) {
-            ( (SimplePanel) parent ).setWidget( southWidget );
+            ( (SimplePanel) parent ).setWidget( northWidget );
         }
 
-        if ( southWidget instanceof RequiresResize ) {
-            scheduleResize( (RequiresResize) southWidget );
+        if ( northWidget instanceof RequiresResize ) {
+            scheduleResize( (RequiresResize) northWidget );
         }
     }
 

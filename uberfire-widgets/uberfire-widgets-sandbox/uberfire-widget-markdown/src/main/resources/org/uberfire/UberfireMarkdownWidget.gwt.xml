@@ -9,5 +9,6 @@
 
   <inherits name="org.uberfire.UberfireWidgetsCommons"/>
   <inherits name="org.uberfire.UberfireWorkbench"/>
+  <inherits name="org.uberfire.UberfireNSWEManager"/>
 
 </module>

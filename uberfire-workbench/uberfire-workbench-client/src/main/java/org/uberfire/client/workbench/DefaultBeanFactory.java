@@ -22,17 +22,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
-import org.uberfire.client.workbench.panels.impl.HorizontalSplitterPanel;
 import org.uberfire.client.workbench.panels.impl.MultiListWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
-import org.uberfire.client.workbench.panels.impl.VerticalSplitterPanel;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
-import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.menu.Menus;
 
 /**
@@ -44,7 +41,7 @@ public class DefaultBeanFactory
         BeanFactory {
 
     @Inject
-    private SyncBeanManager iocManager;
+    SyncBeanManager iocManager;
 
     @Override
     public WorkbenchPartPresenter newWorkbenchPart( final Menus menus,
@@ -97,35 +94,6 @@ public class DefaultBeanFactory
         return panel;
     }
 
-    @Override
-    public HorizontalSplitterPanel newHorizontalSplitterPanel( final WorkbenchPanelView eastPanel,
-                                                               final WorkbenchPanelView westPanel,
-                                                               final Position position,
-                                                               final Integer preferredSize,
-                                                               final Integer preferredMinSize ) {
-        final HorizontalSplitterPanel hsp = iocManager.lookupBean( HorizontalSplitterPanel.class ).getInstance();
-        hsp.setup( eastPanel,
-                   westPanel,
-                   position,
-                   preferredSize,
-                   preferredMinSize );
-        return hsp;
-    }
-
-    @Override
-    public VerticalSplitterPanel newVerticalSplitterPanel( final WorkbenchPanelView northPanel,
-                                                           final WorkbenchPanelView southPanel,
-                                                           final Position position,
-                                                           final Integer preferredSize,
-                                                           final Integer preferredMinSize ) {
-        final VerticalSplitterPanel vsp = iocManager.lookupBean( VerticalSplitterPanel.class ).getInstance();
-        vsp.setup( northPanel,
-                   southPanel,
-                   position,
-                   preferredSize,
-                   preferredMinSize );
-        return vsp;
-    }
 
     @Override
     public CompassDropController newDropController( final WorkbenchPanelView view ) {
