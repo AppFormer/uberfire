@@ -25,10 +25,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
@@ -92,6 +94,24 @@ public class Workbench
 
     @Inject
     private Caller<VFSService> vfsService;
+
+    private WorkbenchCloseHandler workbenchCloseHandler = GWT.create( WorkbenchCloseHandler.class );
+
+    private Command workbenchCloseCommand = new Command() {
+        @Override
+        public void execute() {
+            final PerspectiveDefinition perspective = panelManager.getPerspective();
+            if ( perspective != null ) {
+                wbServices.call( new RemoteCallback<Void>() {
+                    @Override
+                    public void callback( Void response ) {
+                        //Nothing to do. Window is closing.
+                    }
+                } ).save( perspective );
+            }
+        }
+
+    };
 
     @PostConstruct
     public void setup() {
@@ -174,15 +194,7 @@ public class Workbench
 
             @Override
             public void onWindowClosing( ClosingEvent event ) {
-                final PerspectiveDefinition perspective = panelManager.getPerspective();
-                if ( perspective != null ) {
-                    wbServices.call( new RemoteCallback<Void>() {
-                        @Override
-                        public void callback( Void response ) {
-                            //Nothing to do. Window is closing.
-                        }
-                    } ).save( perspective );
-                }
+                workbenchCloseHandler.onWindowClose( workbenchCloseCommand );
             }
 
         } );
