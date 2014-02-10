@@ -8,8 +8,8 @@ import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 
-@Dependent
-@WorkbenchScreen(identifier = "HelloWorldScreen")
+//@Dependent
+//@WorkbenchScreen(identifier = "HelloWorldScreen")
 public class HelloWorldScreen {
 
     private static final String ORIGINAL_TEXT = "Hello UberFire!";

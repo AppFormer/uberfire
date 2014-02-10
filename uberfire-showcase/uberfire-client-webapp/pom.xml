@@ -67,6 +67,12 @@
       <artifactId>errai-cdi-jetty</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-javaee-all</artifactId>
+      <version>2.4.3.Final</version>
+    </dependency>
+
     <!-- CDI Development Utils -->
     <!-- This must be placed above com.google.gwt:gwt-dev to override the Jetty that is present there -->
     <dependency>

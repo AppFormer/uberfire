@@ -13,7 +13,7 @@ import org.uberfire.client.annotations.WorkbenchSplashScreen;
 import org.uberfire.workbench.model.SplashScreenFilter;
 import org.uberfire.workbench.model.impl.SplashScreenFilterImpl;
 
-@WorkbenchSplashScreen(identifier = "demo.splash")
+//@WorkbenchSplashScreen(identifier = "demo.splash")
 public class DemoSplashScreen {
 
     @WorkbenchPartTitle
