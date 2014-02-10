@@ -1,10 +1,13 @@
 package org.uberfire.rpc.impl;
 
+import javax.enterprise.inject.Alternative;
+
 import org.uberfire.rpc.SessionInfo;
 import org.uberfire.security.Identity;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
 
+@Alternative
 public class SessionInfoImpl implements SessionInfo {
 
     private String id;

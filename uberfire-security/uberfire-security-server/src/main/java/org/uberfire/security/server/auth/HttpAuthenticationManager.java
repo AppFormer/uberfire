@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.inject.Alternative;
 import javax.servlet.RequestDispatcher;
 
 import org.uberfire.security.ResourceManager;
@@ -47,6 +48,7 @@ import static org.uberfire.commons.validation.Preconditions.*;
 import static org.uberfire.security.Role.*;
 import static org.uberfire.security.auth.AuthenticationStatus.*;
 
+@Alternative
 public class HttpAuthenticationManager implements AuthenticationManager {
 
     private final List<AuthenticationScheme> authSchemes;
