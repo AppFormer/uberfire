@@ -44,7 +44,6 @@ import org.uberfire.client.workbench.events.RestorePlaceEvent;
 import org.uberfire.client.workbench.events.SelectPlaceEvent;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
-import org.uberfire.client.workbench.panels.impl.TemplateMultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.statusbar.WorkbenchStatusBarPresenter;
 import org.uberfire.mvp.PlaceRequest;
@@ -90,7 +89,6 @@ public class PanelManagerImpl implements PanelManager {
 
     @Inject
     SyncBeanManager iocManager;
-
 
     public PanelManagerImpl() {
     }
@@ -138,8 +136,6 @@ public class PanelManagerImpl implements PanelManager {
         WorkbenchPanelPresenter newPresenter = getWorkbenchPanelPresenter( newRoot );
         if ( newPresenter == null ) {
             newPresenter = factory.newPerspectiveWorkbenchPanel( newRoot );
-            TemplateMultiTabWorkbenchPanelPresenter templatePresenter = (TemplateMultiTabWorkbenchPanelPresenter) newPresenter;
-            templatePresenter.setContainer(container);
             mapPanelDefinitionToPresenter.put( newRoot, newPresenter );
         }
         if ( container != null ) {
@@ -147,17 +143,16 @@ public class PanelManagerImpl implements PanelManager {
                 oldPresenter.removePanel();
             }
             //colocar duas perspectivas
-            if(true&&perspective.getName().contains( "Home" )){
+            if ( true && perspective.getName().contains( "Home" ) ) {
 
-                //procurar aqui um modo de já pegar a activity
-              //activite do perpsective atual
-                PerspectiveActivity defaultPerspectiveActivity = getDefaultPerspectiveActivity();
-                Composite realPresenterWidget = (Composite) defaultPerspectiveActivity.getRealPresenterWidget().asWidget();
-                realPresenterWidget.getElement().appendChild( newPresenter.getPanelView().asWidget().getElement() );
-                //deve ir pra dentro da activity
-                container.setWidget( defaultPerspectiveActivity.getRealPresenterWidget() );
-            }
-            else{
+//                //procurar aqui um modo de já pegar a activity
+//                //activite do perpsective atual
+//                PerspectiveActivity defaultPerspectiveActivity = getDefaultPerspectiveActivity();
+//                Composite realPresenterWidget = (Composite) defaultPerspectiveActivity.getRealPresenterWidget().asWidget();
+//                realPresenterWidget.getElement().appendChild( newPresenter.getPanelView().asWidget().getElement() );
+//                //deve ir pra dentro da activity
+                container.setWidget( newPresenter.getPanelView() );
+            } else {
                 container.setWidget( newPresenter.getPanelView() );
             }
 
@@ -201,11 +196,11 @@ public class PanelManagerImpl implements PanelManager {
 
     //@Override
     public void addWorkbenchPartOld( final PlaceRequest place,
-                                  final PartDefinition part,
-                                  final PanelDefinition panel,
-                                  final Menus menus,
-                                  final UIPart uiPart,
-                                  final String contextId ) {
+                                     final PartDefinition part,
+                                     final PanelDefinition panel,
+                                     final Menus menus,
+                                     final UIPart uiPart,
+                                     final String contextId ) {
         WorkbenchPartPresenter partPresenter = mapPartDefinitionToPresenter.get( part );
         if ( partPresenter == null ) {
             partPresenter = factory.newWorkbenchPart( menus, uiPart.getTitle(), uiPart.getTitleDecoration(), part );
@@ -218,23 +213,22 @@ public class PanelManagerImpl implements PanelManager {
             statusBar.addMinimizedPlace( part.getPlace() );
         } else {
             final WorkbenchPanelPresenter panelPresenter = getWorkbenchPanelPresenter( panel );
-            WorkbenchPartPresenter.View view =  partPresenter.getPartView();
+            WorkbenchPartPresenter.View view = partPresenter.getPartView();
             if ( panelPresenter == null ) {
                 throw new IllegalArgumentException( "Unable to add Part to Panel. Panel has not been created." );
             }
             //ederign olhar aqui como esta o anterior, tem que mudar o add panel, ver o tipo que for e jogar as widget dentro add Panel
-            if(false){
+            if ( false ) {
                 //maneira de jogar no presenter (aqui ta tudo beleza)
                 //volta a logica esta tem que ficar no addWorkbenchPanel
-                PerspectiveActivity perspectiveActivity =  getDefaultPerspectiveActivity();
+                PerspectiveActivity perspectiveActivity = getDefaultPerspectiveActivity();
                 WorkbenchPartPresenter.View partView = partPresenter.getPartView();
                 Widget widget = partView.asWidget();
                 String title = partPresenter.getTitle();
                 //tem que virar algo como panelPresenter duas linhas abaixo
-                perspectiveActivity.setWidget(title, uiPart.getWidget().asWidget());
+                perspectiveActivity.setWidget( title, uiPart.getWidget().asWidget() );
 
-            }
-            else{
+            } else {
                 panelPresenter.addPart( partPresenter.getPartView(), contextId );
             }
 
@@ -250,6 +244,7 @@ public class PanelManagerImpl implements PanelManager {
         //Select newly inserted part
         selectPlaceEvent.fire( new SelectPlaceEvent( place ) );
     }
+
     @Override
     public void addWorkbenchPart( final PlaceRequest place,
                                   final PartDefinition part,
@@ -340,54 +335,23 @@ public class PanelManagerImpl implements PanelManager {
                                               final Position position ) {
 
         PanelDefinition newPanel = null;
-        //ederign
-        WorkbenchPanelPresenter targetPanelPresenter = getWorkbenchPanelPresenter( targetPanel );
+
+        WorkbenchPanelPresenter targetPanelPresenter = mapPanelDefinitionToPresenter.get( targetPanel );
         if ( targetPanelPresenter == null ) {
-            targetPanelPresenter = factory.newPerspectiveWorkbenchPanel( targetPanel );
+            targetPanelPresenter = factory.newWorkbenchPanel( targetPanel );
             mapPanelDefinitionToPresenter.put( targetPanel,
                                                targetPanelPresenter );
         }
 
-        //set widget
+        final WorkbenchPanelPresenter childPanelPresenter = factory.newWorkbenchPanel( childPanel );
+        mapPanelDefinitionToPresenter.put( childPanel,
+                                           childPanelPresenter );
 
-        PerspectiveActivity perspectiveActivity = getDefaultPerspectiveActivity();
+        targetPanelPresenter.addPanel( childPanel,
+                                       childPanelPresenter.getPanelView(),
+                                       position );
+        newPanel = childPanel;
 
-        //tem que virar algo como panelPresenter duas linhas abaixo
-        // title  = view.getPresenter().getTitle();
-        //tem que virar algo como panelPresenter duas linhas abaixo
-         perspectiveActivity.setWidget("hello1", targetPanelPresenter.getPanelView().asWidget().asWidget());
-
-
-       /* switch ( position ) {
-            case ROOT:
-                newPanel = root;
-                break;
-
-            case SELF:
-                newPanel = targetPanelPresenter.getDefinition();
-                break;
-
-            case NORTH:
-            case SOUTH:
-            case EAST:
-            case WEST:
-
-                if ( !childPanel.isMinimized() ) {
-                    final WorkbenchPanelPresenter childPanelPresenter = factory.newWorkbenchPanel( childPanel );
-                    mapPanelDefinitionToPresenter.put( childPanel,
-                                                       childPanelPresenter );
-
-                    targetPanelPresenter.addPanel( childPanel,
-                                                   childPanelPresenter.getPanelView(),
-                                                   position );
-                }
-                newPanel = childPanel;
-                break;
-
-            default:
-                throw new IllegalArgumentException( "Unhandled Position. Expect subsequent errors." );
-        }
-*/
         onPanelFocus( newPanel );
         return newPanel;
     }

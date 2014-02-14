@@ -18,7 +18,7 @@ import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 import org.uberfire.workbench.model.impl.PartDefinitionImpl;
-import org.uberfire.workbench.model.impl.TemplatePerspectiveDefinitionImpl;
+import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
 
 @ApplicationScoped
 @WorkbenchPerspective(

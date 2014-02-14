@@ -14,14 +14,7 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
-import org.uberfire.workbench.model.PanelDefinition;
-import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
-import org.uberfire.workbench.model.Position;
-import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
-import org.uberfire.workbench.model.impl.PartDefinitionImpl;
-import org.uberfire.workbench.model.impl.TemplatePerspectiveDefinitionImpl;
 
 @ApplicationScoped
 @WorkbenchPerspective(
@@ -36,9 +29,15 @@ public class HomePerspective extends Composite {
     TextBox resultText = new TextBox();
 
     @DataField
+    @UFPanel(type = TAB)
+    @UFPart("HelloWorldScreen1")
     FlowPanel hello1 = new FlowPanel();
+
     @DataField
+    @UFPanel(type = TEMPLATE)
+    @UFPart("HelloWorldScreen2")
     FlowPanel hello2 = new FlowPanel();
+
     @DataField
     FlowPanel hello3 = new FlowPanel();
 
@@ -59,29 +58,24 @@ public class HomePerspective extends Composite {
 
     @Perspective
     public PerspectiveDefinition getPerspective() {
-        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this );
-        //final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( PanelType.ROOT_LIST );
-        p.setName( getClass().getName() );
-
-/*        p.getRoot().addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest( "HelloWorldScreen1" ) ) );
-        p.getRoot().addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest( "HelloWorldScreen2" ) ) );*/
-
-        PanelDefinition panelDefinition = new PanelDefinitionImpl( PanelType.MULTI_TAB );
-        panelDefinition.addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest( "HelloWorldScreen1" ) ) {
-                } );
-        panelDefinition.addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest( "HelloWorldScreen2" ) ) {
-                } );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
-
-        return p;
+//        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this );
+//        p.setName( getClass().getName() );
+//
+//        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.MULTI_TAB );
+//        panelDefinition.addPart(
+//                new PartDefinitionImpl(
+//                        new DefaultPlaceRequest( "HelloWorldScreen1" ) ) {
+//                }
+//                               );
+//        panelDefinition.addPart(
+//                new PartDefinitionImpl(
+//                        new DefaultPlaceRequest( "HelloWorldScreen2" ) ) {
+//                }
+//                               );
+//        p.getRoot().appendChild( Position.EAST, panelDefinition );
+//
+//        return p;
+        return null;
     }
 
 }

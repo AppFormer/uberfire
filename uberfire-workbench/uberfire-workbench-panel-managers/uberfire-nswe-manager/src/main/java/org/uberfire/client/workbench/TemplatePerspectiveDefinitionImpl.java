@@ -13,29 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uberfire.workbench.model.impl;
+package org.uberfire.client.workbench;
 
-import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.annotations.Portable;
+import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PerspectiveDefinition;
+import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
 import static org.uberfire.workbench.model.ContextDisplayMode.*;
 import static org.uberfire.workbench.model.impl.PanelTypeHelper.*;
 
 /**
- *  Implementation of TemplatePerspectiveDefinition
+ * Implementation of TemplatePerspectiveDefinition
  */
-@Portable
 public class TemplatePerspectiveDefinitionImpl
         implements
         PerspectiveDefinition {
 
-    private Widget perspective;
+    private transient PerspectiveActivity perspective;
     private String name;
 
     private boolean isTransient = false;
@@ -45,7 +45,7 @@ public class TemplatePerspectiveDefinitionImpl
     private ContextDisplayMode contextDisplayMode = SHOW;
 
     public TemplatePerspectiveDefinitionImpl() {
-        System.out.println("log");
+        System.out.println( "log" );
         this.root = new PanelDefinitionImpl( PanelType.ROOT_TAB );
     }
 
@@ -56,12 +56,12 @@ public class TemplatePerspectiveDefinitionImpl
         }
 
         this.root = new PanelDefinitionImpl( type );
-        System.out.println("log");
+        System.out.println( "log" );
     }
 
-    public TemplatePerspectiveDefinitionImpl( Widget perspective ) {
+    public TemplatePerspectiveDefinitionImpl( final PerspectiveActivity perspective ) {
         this.perspective = perspective;
-        this.root = new PanelDefinitionImpl(perspective,  PanelType.ROOT_TAB);
+        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB );
     }
 
     @Override
@@ -111,8 +111,8 @@ public class TemplatePerspectiveDefinitionImpl
 
     @Override
     public String toString() {
-      return "TemplatePerspectiveDefinitionImpl [name=" + name + ", contextDefinition=" + contextDefinition
-              + ", contextDisplayMode=" + contextDisplayMode + "]";
+        return "TemplatePerspectiveDefinitionImpl [name=" + name + ", contextDefinition=" + contextDefinition
+                + ", contextDisplayMode=" + contextDisplayMode + "]";
     }
 
 }

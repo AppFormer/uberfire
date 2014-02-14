@@ -542,17 +542,17 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.uberfire.build</groupId>
-            <artifactId>uberfire-build-config</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
+        <!--<dependencies>-->
+          <!--<dependency>-->
+            <!--<groupId>org.uberfire.build</groupId>-->
+            <!--<artifactId>uberfire-build-config</artifactId>-->
+            <!--<version>${project.version}</version>-->
+          <!--</dependency>-->
+        <!--</dependencies>-->
+      <!--</plugin>-->
 
       <plugin>
         <groupId>org.jboss.errai</groupId>
@@ -622,20 +622,20 @@
           </releases>
         </pluginRepository>
       </pluginRepositories>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.fusesource.mvnplugins</groupId>
-            <artifactId>maven-graph-plugin</artifactId>
-            <version>1.10</version>
+      <!--<build>-->
+        <!--<plugins>-->
+          <!--<plugin>-->
+            <!--<groupId>org.fusesource.mvnplugins</groupId>-->
+            <!--<artifactId>maven-graph-plugin</artifactId>-->
+            <!--<version>1.10</version>-->
 
-            <configuration>
-              <hideExternal>true</hideExternal>
-            </configuration>
+            <!--<configuration>-->
+              <!--<hideExternal>true</hideExternal>-->
+            <!--</configuration>-->
 
-          </plugin>
-        </plugins>
-      </build>
+          <!--</plugin>-->
+        <!--</plugins>-->
+      <!--</build>-->
     </profile>
   </profiles>
 

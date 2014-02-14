@@ -15,9 +15,6 @@
  */
 package org.uberfire.workbench.model.impl;
 
-import static org.uberfire.workbench.model.ContextDisplayMode.SHOW;
-import static org.uberfire.workbench.model.impl.PanelTypeHelper.getDefaultChildType;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
@@ -33,6 +29,9 @@ import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PartDefinition;
 import org.uberfire.workbench.model.Position;
+
+import static org.uberfire.workbench.model.ContextDisplayMode.*;
+import static org.uberfire.workbench.model.impl.PanelTypeHelper.*;
 
 /**
  * Default implementation of PanelDefinition
@@ -42,7 +41,6 @@ public class PanelDefinitionImpl
         implements
         PanelDefinition {
 
-    public Widget perspective;
     private Integer height = null;
     private Integer width = null;
 
@@ -82,13 +80,6 @@ public class PanelDefinitionImpl
             this.isRoot = true;
         }
         this.defaultChildPanelType = defaultChildPanelType;
-    }
-
-    public PanelDefinitionImpl( Widget perspective,
-                                PanelType type ) {
-
-        this.panelType = type;
-        this.perspective = perspective;
     }
 
     @Override
@@ -281,8 +272,8 @@ public class PanelDefinitionImpl
 
     @Override
     public String toString() {
-      return "PanelDefinitionImpl [parts=" + parts + ", children=" + children + ", panelType=" + panelType
-              + ", contextDefinition=" + contextDefinition + ", contextDisplayMode=" + contextDisplayMode + "]";
+        return "PanelDefinitionImpl [parts=" + parts + ", children=" + children + ", panelType=" + panelType
+                + ", contextDefinition=" + contextDefinition + ", contextDisplayMode=" + contextDisplayMode + "]";
     }
 
 }

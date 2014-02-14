@@ -16,19 +16,24 @@
 
 package ${packageName};
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import javax.annotation.Generated;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Named;
-import org.uberfire.workbench.model.PerspectiveDefinition;
+
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.mvp.AbstractWorkbenchPerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
-
-import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.client.workbench.TemplatePanelDefinitionImpl;
+import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.workbench.model.PanelDefinition;
+import org.uberfire.workbench.model.PanelType;
+import org.uberfire.workbench.model.PerspectiveDefinition;
+import org.uberfire.workbench.model.Position;
+import org.uberfire.workbench.model.impl.PartDefinitionImpl;
 
 <#if getMenuBarMethodName??>
 import org.uberfire.workbench.model.menu.Menus;
@@ -121,7 +126,23 @@ public class ${className} extends AbstractWorkbenchPerspectiveActivity {
     <#if getPerspectiveMethodName??>
     @Override
     public PerspectiveDefinition getPerspective() {
-        return realPresenter.${getPerspectiveMethodName}();
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this );
+        p.setName( getClass().getName() );
+
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.STATIC );
+        panelDefinition.addPart(
+        new PartDefinitionImpl(
+        new DefaultPlaceRequest( "HelloWorldScreen1" ) ) {
+        }
+        );
+        panelDefinition.addPart(
+        new PartDefinitionImpl(
+        new DefaultPlaceRequest( "HelloWorldScreen2" ) ) {
+        }
+        );
+        p.getRoot().appendChild( Position.EAST, panelDefinition );
+
+        return p;
     }
 
     @Override
