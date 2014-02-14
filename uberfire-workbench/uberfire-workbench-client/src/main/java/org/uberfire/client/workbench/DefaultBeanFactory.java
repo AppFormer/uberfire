@@ -18,18 +18,23 @@ package org.uberfire.client.workbench;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
+import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.MultiListWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
+import org.uberfire.client.workbench.panels.impl.TemplateMultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
+import org.uberfire.client.workbench.part.WorkbenchPartView;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
+import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 import org.uberfire.workbench.model.menu.Menus;
 
 /**
@@ -42,6 +47,9 @@ public class DefaultBeanFactory
 
     @Inject
     SyncBeanManager iocManager;
+
+   // @Inject
+   // PanelManager panelManager;
 
     @Override
     public WorkbenchPartPresenter newWorkbenchPart( final Menus menus,
@@ -89,7 +97,23 @@ public class DefaultBeanFactory
                 throw new IllegalArgumentException( "Unhandled PanelType. Expect subsequent errors." );
         }
 
+
         panel.setDefinition( definition );
+
+        return panel;
+    }
+
+    @Override
+    public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition ) {
+        final WorkbenchPanelPresenter panel;
+
+        panel = iocManager.lookupBean( TemplateMultiTabWorkbenchPanelPresenter.class ).getInstance();
+
+        panel.setDefinition( definition );
+        
+        PanelDefinitionImpl definitionImpl = (PanelDefinitionImpl) definition;
+
+        definitionImpl.perspective.asWidget().getElement().appendChild( panel.getPanelView().asWidget().getElement());
 
         return panel;
     }

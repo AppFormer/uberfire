@@ -8,17 +8,17 @@ import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 
-//@Dependent
-//@WorkbenchScreen(identifier = "HelloWorldScreen")
-public class HelloWorldScreen {
+@Dependent
+@WorkbenchScreen(identifier = "HelloWorldScreen1")
+public class HelloWorldScreen1 {
 
-    private static final String ORIGINAL_TEXT = "Hello UberFire!";
+    private static final String ORIGINAL_TEXT = "Hello UberFire1!";
 
     private Label label = new Label( ORIGINAL_TEXT );
 
     @WorkbenchPartTitle
     public String getTitle() {
-        return "Greetings";
+        return "hello1";
     }
 
     @WorkbenchPartView

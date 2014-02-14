@@ -3,6 +3,7 @@ package org.uberfire.client;
 import java.util.Collection;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
@@ -56,6 +57,16 @@ public class JSWorkbenchPerspectiveActivity implements PerspectiveActivity {
     @Override
     public PerspectiveDefinition getPerspective() {
         return nativePerspective.buildPerspective();
+    }
+
+    @Override
+    public void setWidget( String fieldName, Widget widget ) {
+
+    }
+
+    @Override
+    public Widget getRealPresenterWidget( ) {
+        return null;
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
@@ -41,6 +42,7 @@ public class PanelDefinitionImpl
         implements
         PanelDefinition {
 
+    public Widget perspective;
     private Integer height = null;
     private Integer width = null;
 
@@ -80,6 +82,13 @@ public class PanelDefinitionImpl
             this.isRoot = true;
         }
         this.defaultChildPanelType = defaultChildPanelType;
+    }
+
+    public PanelDefinitionImpl( Widget perspective,
+                                PanelType type ) {
+
+        this.panelType = type;
+        this.perspective = perspective;
     }
 
     @Override

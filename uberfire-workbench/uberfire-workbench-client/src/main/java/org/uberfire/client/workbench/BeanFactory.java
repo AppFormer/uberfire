@@ -36,9 +36,10 @@ public interface BeanFactory {
 
     public WorkbenchPanelPresenter newWorkbenchPanel( final PanelDefinition definition );
 
-
     public CompassDropController newDropController( final WorkbenchPanelView view );
 
     public void destroy( final Object o );
+
+    public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition );
 
 }

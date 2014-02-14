@@ -49,7 +49,7 @@ import static org.uberfire.workbench.model.toolbar.IconType.*;
  * A Perspective to show File Explorer
  */
 @ApplicationScoped
-@WorkbenchPerspective(identifier = "FileExplorerPerspective")
+//@WorkbenchPerspective(identifier = "FileExplorerPerspective")
 public class FileExplorerPerspective {
 
     @Inject

@@ -20,16 +20,19 @@ import javax.annotation.PostConstruct;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Widget;
+import org.jboss.errai.ui.nav.client.local.Navigation;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import com.google.gwt.user.client.ui.RootPanel;
-import org.jboss.errai.ioc.client.api.EntryPoint;
 import com.google.gwt.user.client.ui.Composite;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import com.google.gwt.user.client.ui.Button;
+import org.uberfire.client.screens.HelloWorldScreen1;
+
 import javax.inject.Inject;
 
 @Templated("#template")
-@EntryPoint
+//@EntryPoint
 public class UberfireShowcaseClient extends Composite{
 
     @DataField
@@ -39,11 +42,17 @@ public class UberfireShowcaseClient extends Composite{
     private TextBox resultText = new TextBox();
 
     @Inject
+    private Navigation navigation;
+
+    @DataField
+    private Widget teste = new HelloWorldScreen1(  ).getView().asWidget();
+
+    @Inject
     @DataField
     private Button sendMessage;
 
     @PostConstruct
-    public void setup()
+    public void buildUI()
     {
         sendMessage.addClickHandler(new ClickHandler() {
             @Override
@@ -51,7 +60,8 @@ public class UberfireShowcaseClient extends Composite{
             {
                 resultText.setText( messageText.getText() );
             }
-        });  
+        });
+
         RootPanel.get().add(this);
     }
 

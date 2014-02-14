@@ -542,6 +542,8 @@ public class PlaceManagerImpl
         checkPathDelete( place );
 
         revealActivityWithCalBackToAttachToWorkbench( place, activity, part, panel, callback );
+
+        panelManager.getPerspective();
     }
 
     private void revealActivityWithCalBackToAttachToWorkbench( final PlaceRequest place,

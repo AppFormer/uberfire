@@ -22,7 +22,7 @@ import java.util.Collections;
 import javax.annotation.Generated;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-
+import com.google.gwt.user.client.ui.Widget;
 import javax.inject.Named;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 import org.uberfire.client.mvp.AbstractWorkbenchPerspectiveActivity;
@@ -122,6 +122,25 @@ public class ${className} extends AbstractWorkbenchPerspectiveActivity {
     @Override
     public PerspectiveDefinition getPerspective() {
         return realPresenter.${getPerspectiveMethodName}();
+    }
+
+    @Override
+    public void setWidget( String fieldName,
+        Widget widget ) {
+        if ( fieldName.equalsIgnoreCase( "hello1" ) ) {
+           realPresenter.hello1.add( widget.asWidget() );
+        }
+        if ( fieldName.equalsIgnoreCase( "hello2" ) ) {
+           realPresenter.hello2.add( widget.asWidget() );
+        }
+        if ( fieldName.equalsIgnoreCase( "hello3" ) ) {
+           realPresenter.hello3.add( widget.asWidget() );
+        }
+    }
+
+    @Override
+    public Widget getRealPresenterWidget( ) {
+        return realPresenter.asWidget();
     }
 
     </#if>

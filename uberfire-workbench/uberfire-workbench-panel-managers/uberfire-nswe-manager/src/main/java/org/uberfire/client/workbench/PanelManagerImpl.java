@@ -15,15 +15,22 @@
  */
 package org.uberfire.client.workbench;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import org.jboss.errai.ioc.client.container.IOCBeanDef;
+import org.jboss.errai.ioc.client.container.SyncBeanManager;
+import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.mvp.UIPart;
 import org.uberfire.client.workbench.events.BeforeClosePlaceEvent;
 import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
@@ -37,6 +44,7 @@ import org.uberfire.client.workbench.events.RestorePlaceEvent;
 import org.uberfire.client.workbench.events.SelectPlaceEvent;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
+import org.uberfire.client.workbench.panels.impl.TemplateMultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.statusbar.WorkbenchStatusBarPresenter;
 import org.uberfire.mvp.PlaceRequest;
@@ -80,6 +88,10 @@ public class PanelManagerImpl implements PanelManager {
     private Map<PanelDefinition, WorkbenchPanelPresenter> mapPanelDefinitionToPresenter = new HashMap<PanelDefinition, WorkbenchPanelPresenter>();
     private PartDefinition activePart = null;
 
+    @Inject
+    SyncBeanManager iocManager;
+
+
     public PanelManagerImpl() {
     }
 
@@ -108,26 +120,47 @@ public class PanelManagerImpl implements PanelManager {
         final PanelDefinition newRoot = perspective.getRoot();
 
         final WorkbenchPanelPresenter oldPresenter = mapPanelDefinitionToPresenter.remove( root );
-        final SimplePanel container;
+        SimplePanel container;
         if ( oldPresenter != null && oldPresenter.getPanelView().asWidget().getParent() != null ) {
             container = (SimplePanel) oldPresenter.getPanelView().asWidget().getParent();
         } else {
             container = null;
         }
+//
+//        if(oldPresenter instanceof TemplateMultiTabWorkbenchPanelPresenter){
+//            TemplateMultiTabWorkbenchPanelPresenter templatePresenter = (TemplateMultiTabWorkbenchPanelPresenter) oldPresenter;
+//            container = templatePresenter.getContainer();
+//        }
         factory.destroy( root );
 
         this.root = newRoot;
         this.perspective = perspective;
         WorkbenchPanelPresenter newPresenter = getWorkbenchPanelPresenter( newRoot );
         if ( newPresenter == null ) {
-            newPresenter = factory.newWorkbenchPanel( newRoot );
+            newPresenter = factory.newPerspectiveWorkbenchPanel( newRoot );
+            TemplateMultiTabWorkbenchPanelPresenter templatePresenter = (TemplateMultiTabWorkbenchPanelPresenter) newPresenter;
+            templatePresenter.setContainer(container);
             mapPanelDefinitionToPresenter.put( newRoot, newPresenter );
         }
         if ( container != null ) {
             if ( oldPresenter != null ) {
                 oldPresenter.removePanel();
             }
-            container.setWidget( newPresenter.getPanelView() );
+            //colocar duas perspectivas
+            if(true&&perspective.getName().contains( "Home" )){
+
+                //procurar aqui um modo de já pegar a activity
+              //activite do perpsective atual
+                PerspectiveActivity defaultPerspectiveActivity = getDefaultPerspectiveActivity();
+                Composite realPresenterWidget = (Composite) defaultPerspectiveActivity.getRealPresenterWidget().asWidget();
+                realPresenterWidget.getElement().appendChild( newPresenter.getPanelView().asWidget().getElement() );
+                //deve ir pra dentro da activity
+                container.setWidget( defaultPerspectiveActivity.getRealPresenterWidget() );
+            }
+            else{
+                container.setWidget( newPresenter.getPanelView() );
+            }
+
         }
     }
 
@@ -166,6 +199,57 @@ public class PanelManagerImpl implements PanelManager {
         addWorkbenchPart( place, part, panel, menus, uiPart, null );
     }
 
+    //@Override
+    public void addWorkbenchPartOld( final PlaceRequest place,
+                                  final PartDefinition part,
+                                  final PanelDefinition panel,
+                                  final Menus menus,
+                                  final UIPart uiPart,
+                                  final String contextId ) {
+        WorkbenchPartPresenter partPresenter = mapPartDefinitionToPresenter.get( part );
+        if ( partPresenter == null ) {
+            partPresenter = factory.newWorkbenchPart( menus, uiPart.getTitle(), uiPart.getTitleDecoration(), part );
+            partPresenter.setWrappedWidget( uiPart.getWidget() );
+            partPresenter.setContextId( contextId );
+            mapPartDefinitionToPresenter.put( part, partPresenter );
+        }
+
+        if ( part.isMinimized() ) {
+            statusBar.addMinimizedPlace( part.getPlace() );
+        } else {
+            final WorkbenchPanelPresenter panelPresenter = getWorkbenchPanelPresenter( panel );
+            WorkbenchPartPresenter.View view =  partPresenter.getPartView();
+            if ( panelPresenter == null ) {
+                throw new IllegalArgumentException( "Unable to add Part to Panel. Panel has not been created." );
+            }
+            //ederign olhar aqui como esta o anterior, tem que mudar o add panel, ver o tipo que for e jogar as widget dentro add Panel
+            if(false){
+                //maneira de jogar no presenter (aqui ta tudo beleza)
+                //volta a logica esta tem que ficar no addWorkbenchPanel
+                PerspectiveActivity perspectiveActivity =  getDefaultPerspectiveActivity();
+                WorkbenchPartPresenter.View partView = partPresenter.getPartView();
+                Widget widget = partView.asWidget();
+                String title = partPresenter.getTitle();
+                //tem que virar algo como panelPresenter duas linhas abaixo
+                perspectiveActivity.setWidget(title, uiPart.getWidget().asWidget());
+
+            }
+            else{
+                panelPresenter.addPart( partPresenter.getPartView(), contextId );
+            }
+
+        }
+
+        getPerspective();
+
+        //The model for a Perspective is already fully populated. Don't go adding duplicates.
+        if ( !panel.getParts().contains( part ) ) {
+            panel.addPart( part );
+        }
+
+        //Select newly inserted part
+        selectPlaceEvent.fire( new SelectPlaceEvent( place ) );
+    }
     @Override
     public void addWorkbenchPart( final PlaceRequest place,
                                   final PartDefinition part,
@@ -199,6 +283,25 @@ public class PanelManagerImpl implements PanelManager {
 
         //Select newly inserted part
         selectPlaceEvent.fire( new SelectPlaceEvent( place ) );
+    }
+
+    @Override
+    public PerspectiveActivity getDefaultPerspectiveActivity() {
+        PerspectiveActivity defaultPerspective = null;
+        final Collection<IOCBeanDef<PerspectiveActivity>> perspectives = iocManager.lookupBeans( PerspectiveActivity.class );
+        final Iterator<IOCBeanDef<PerspectiveActivity>> perspectivesIterator = perspectives.iterator();
+
+        while ( perspectivesIterator.hasNext() ) {
+            final IOCBeanDef<PerspectiveActivity> perspective = perspectivesIterator.next();
+            final PerspectiveActivity instance = perspective.getInstance();
+            if ( instance.isDefault() ) {
+                defaultPerspective = instance;
+                break;
+            } else {
+                iocManager.destroyBean( instance );
+            }
+        }
+        return defaultPerspective;
     }
 
     WorkbenchPanelPresenter getWorkbenchPanelPresenter( PanelDefinition panel ) {
@@ -237,15 +340,25 @@ public class PanelManagerImpl implements PanelManager {
                                               final Position position ) {
 
         PanelDefinition newPanel = null;
-
+        //ederign
         WorkbenchPanelPresenter targetPanelPresenter = getWorkbenchPanelPresenter( targetPanel );
         if ( targetPanelPresenter == null ) {
-            targetPanelPresenter = factory.newWorkbenchPanel( targetPanel );
+            targetPanelPresenter = factory.newPerspectiveWorkbenchPanel( targetPanel );
             mapPanelDefinitionToPresenter.put( targetPanel,
                                                targetPanelPresenter );
         }
 
-        switch ( position ) {
+        //set widget
+
+        PerspectiveActivity perspectiveActivity = getDefaultPerspectiveActivity();
+
+        //tem que virar algo como panelPresenter duas linhas abaixo
+        // title  = view.getPresenter().getTitle();
+        //tem que virar algo como panelPresenter duas linhas abaixo
+         perspectiveActivity.setWidget("hello1", targetPanelPresenter.getPanelView().asWidget().asWidget());
+
+
+       /* switch ( position ) {
             case ROOT:
                 newPanel = root;
                 break;
@@ -274,7 +387,7 @@ public class PanelManagerImpl implements PanelManager {
             default:
                 throw new IllegalArgumentException( "Unhandled Position. Expect subsequent errors." );
         }
-
+*/
         onPanelFocus( newPanel );
         return newPanel;
     }
