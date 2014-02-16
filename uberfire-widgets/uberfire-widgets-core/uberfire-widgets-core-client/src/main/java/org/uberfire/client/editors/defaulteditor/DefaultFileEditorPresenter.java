@@ -12,17 +12,18 @@ import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.context.DefaultWorkbenchContext;
+import org.uberfire.client.resources.i18n.CoreConstants;
 import org.uberfire.client.workbench.type.AnyResourceType;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnStartup;
 
 @Dependent
-@WorkbenchEditor(identifier = "DefaultFileEditor", supportedTypes = {AnyResourceType.class}, priority = Integer.MIN_VALUE)
+@WorkbenchEditor(identifier = "DefaultFileEditor", supportedTypes = { AnyResourceType.class }, priority = Integer.MIN_VALUE)
 public class DefaultFileEditorPresenter {
 
     interface View {
 
-        void setPath(Path path);
+        void setPath( Path path );
 
     }
 
@@ -40,7 +41,7 @@ public class DefaultFileEditorPresenter {
     @OnStartup
     public void onStartup( final ObservablePath path ) {
         this.path = path;
-        view.setPath(path);
+        view.setPath( path );
     }
 
     @OnClose
@@ -50,7 +51,7 @@ public class DefaultFileEditorPresenter {
 
     @WorkbenchPartTitle
     public String getTitle() {
-        return "Default Editor [" + path.getFileName() + "]";
+        return CoreConstants.INSTANCE.DefaultEditor() + " [" + path.getFileName() + "]";
     }
 
     @WorkbenchPartView
