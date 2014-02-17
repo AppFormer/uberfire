@@ -16,6 +16,7 @@
 package org.uberfire.client.workbench;
 
 import org.uberfire.client.mvp.PerspectiveActivity;
+import org.uberfire.client.mvp.TemplatePerspectiveActivity;
 import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 
@@ -25,15 +26,28 @@ import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 public class TemplatePanelDefinitionImpl
         extends PanelDefinitionImpl {
 
-    public transient PerspectiveActivity perspective;
+
+    public transient TemplatePerspectiveActivity perspective;
+
+    private String fieldName;
 
     public TemplatePanelDefinitionImpl() {
         super();
     }
 
-    public TemplatePanelDefinitionImpl( PerspectiveActivity perspective,
-                                        PanelType type ) {
+    public TemplatePanelDefinitionImpl( TemplatePerspectiveActivity perspective,
+                                        PanelType type, String fieldName ) {
         super( type );
         this.perspective = perspective;
+        this.fieldName = fieldName;
+    }
+
+
+    public String getFieldName() {
+        //ederign
+        if (fieldName == null){
+            return perspective.getDefaultFieldName();
+        }
+        return fieldName;
     }
 }

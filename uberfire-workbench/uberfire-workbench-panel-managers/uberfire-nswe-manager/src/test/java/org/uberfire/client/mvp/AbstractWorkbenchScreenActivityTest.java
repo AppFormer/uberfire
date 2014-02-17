@@ -2,6 +2,7 @@ package org.uberfire.client.mvp;
 
 import java.util.HashSet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.uberfire.client.workbench.events.SelectPlaceEvent;
 import org.uberfire.mvp.Command;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.*;
  * Initial (poor coverage) integration tests for PlaceManager, PanelManager and
  * life-cycle events. There remains a lot more work to do in this class.
  */
+@Ignore
 public class AbstractWorkbenchScreenActivityTest extends BaseWorkbenchTest {
 
     @Test

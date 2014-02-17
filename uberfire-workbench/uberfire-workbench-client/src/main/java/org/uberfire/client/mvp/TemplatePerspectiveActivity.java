@@ -22,30 +22,18 @@ import org.uberfire.workbench.model.menu.Menus;
 import org.uberfire.workbench.model.toolbar.ToolBar;
 
 /**
- * Perspective Activity life-cycles
+ * Template Perspective Activity life-cycles
  */
-public interface PerspectiveActivity
+public interface TemplatePerspectiveActivity
         extends
-        ContextSensitiveActivity {
+        PerspectiveActivity {
 
-    void onStartup();
+    public void setWidget( String fieldName,
+                           Widget widget );
 
-    void onStartup( final PlaceRequest place );
+    Widget getRealPresenterWidget( );
 
-    void onClose();
+    String getDefaultFieldName();
 
-    void onShutdown();
-
-    PerspectiveDefinition getPerspective();
-
-
-
-    String getIdentifier();
-
-    boolean isDefault();
-
-    Menus getMenus();
-
-    ToolBar getToolBar();
 
 }

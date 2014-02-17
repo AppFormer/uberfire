@@ -18,7 +18,7 @@ public class HelloWorldScreen3 {
 
     @WorkbenchPartTitle
     public String getTitle() {
-        return "hello3";
+        return "panelSample2";
     }
 
     @WorkbenchPartView

@@ -20,6 +20,7 @@ import java.util.List;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -27,6 +28,7 @@ import static org.junit.Assert.*;
 /**
  * Tests for Pop-up related class generation
  */
+@Ignore
 public class PerspectiveProcessorTest extends AbstractProcessorTest {
 
     @Test
@@ -258,6 +260,35 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
         assertNotNull( result.getExpectedCode() );
         assertEquals( result.getActualCode(),
                       result.getExpectedCode() );
+    }
+
+    @Test
+    public void testWorkbenchTemplateAnnotation() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest12";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/PerspectiveTest12.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        printDiagnostics(diagnostics);
+        assertSuccessfulCompilation( diagnostics );
+        assertNotNull( result.getActualCode() );
+        assertNotNull( result.getExpectedCode() );
+        assertEquals( result.getActualCode(),
+                      result.getExpectedCode() );
+    }
+
+    private void printDiagnostics( List<Diagnostic<? extends JavaFileObject>> diagnostics ) {
+        for ( Diagnostic diagnostic: diagnostics ){
+            System.out.println(diagnostic);
+        }
     }
 
 }

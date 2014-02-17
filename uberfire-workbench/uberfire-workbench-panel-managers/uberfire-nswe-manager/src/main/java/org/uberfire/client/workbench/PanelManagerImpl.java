@@ -217,20 +217,8 @@ public class PanelManagerImpl implements PanelManager {
             if ( panelPresenter == null ) {
                 throw new IllegalArgumentException( "Unable to add Part to Panel. Panel has not been created." );
             }
-            //ederign olhar aqui como esta o anterior, tem que mudar o add panel, ver o tipo que for e jogar as widget dentro add Panel
-            if ( false ) {
-                //maneira de jogar no presenter (aqui ta tudo beleza)
-                //volta a logica esta tem que ficar no addWorkbenchPanel
-                PerspectiveActivity perspectiveActivity = getDefaultPerspectiveActivity();
-                WorkbenchPartPresenter.View partView = partPresenter.getPartView();
-                Widget widget = partView.asWidget();
-                String title = partPresenter.getTitle();
-                //tem que virar algo como panelPresenter duas linhas abaixo
-                perspectiveActivity.setWidget( title, uiPart.getWidget().asWidget() );
 
-            } else {
-                panelPresenter.addPart( partPresenter.getPartView(), contextId );
-            }
+            panelPresenter.addPart( partPresenter.getPartView(), contextId );
 
         }
 

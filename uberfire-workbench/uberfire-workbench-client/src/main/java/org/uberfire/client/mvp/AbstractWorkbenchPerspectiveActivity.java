@@ -99,11 +99,6 @@ public abstract class AbstractWorkbenchPerspectiveActivity extends AbstractActiv
     }
 
     @Override
-    public Widget getRealPresenterWidget( ) {
-        return null;
-    }
-
-    @Override
     public ToolBar getToolBar() {
         return null;
     }

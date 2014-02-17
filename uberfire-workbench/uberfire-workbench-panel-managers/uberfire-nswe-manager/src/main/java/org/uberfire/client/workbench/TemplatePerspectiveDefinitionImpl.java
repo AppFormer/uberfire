@@ -17,6 +17,7 @@ package org.uberfire.client.workbench;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.client.mvp.PerspectiveActivity;
+import org.uberfire.client.mvp.TemplatePerspectiveActivity;
 import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
 import org.uberfire.workbench.model.PanelDefinition;
@@ -59,9 +60,10 @@ public class TemplatePerspectiveDefinitionImpl
         System.out.println( "log" );
     }
 
-    public TemplatePerspectiveDefinitionImpl( final PerspectiveActivity perspective ) {
+    //ederign
+    public TemplatePerspectiveDefinitionImpl( final TemplatePerspectiveActivity perspective ) {
         this.perspective = perspective;
-        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB );
+        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB, null );
     }
 
     @Override

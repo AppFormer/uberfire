@@ -45,12 +45,6 @@ public class StandaloneEditorPerspective extends AbstractWorkbenchPerspectiveAct
         p.setTransient( true );
         return p;
     }
-
-    @Override
-    public void setWidget(String fieldName,
-                          Widget widget ) {
-    }
-
     @Override
     public String getIdentifier() {
         return "StandaloneEditorPerspective";

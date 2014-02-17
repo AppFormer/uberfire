@@ -21,30 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Classes annotated with this are considered Perspective providers.
- * <p>
- * Developers will need to provide a zero-argument method annotated with
- * {@code @Perspective} with return type
- * {@code org.uberfire.client.workbench.model.PerspectiveDefinition}.
- * </p>
- * <p>
- * WorkbenchPerspectives can receive the following life-cycle calls:
- * <ul>
- * <li>{@code @OnClose}</li>
- * <li>{@code @OnStartup}</li>
- * <li>{@code @OnOpen}</li>
- * </p>
- */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface WorkbenchPerspective {
+@Target({ElementType.FIELD})
+public @interface UFPanel {
 
-    String identifier();
-
-    boolean isDefault() default false;
-
-    boolean isTemplate() default false;
 
 }

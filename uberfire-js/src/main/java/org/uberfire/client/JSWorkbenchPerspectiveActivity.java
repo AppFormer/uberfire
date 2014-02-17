@@ -60,16 +60,6 @@ public class JSWorkbenchPerspectiveActivity implements PerspectiveActivity {
     }
 
     @Override
-    public void setWidget( String fieldName, Widget widget ) {
-
-    }
-
-    @Override
-    public Widget getRealPresenterWidget( ) {
-        return null;
-    }
-
-    @Override
     public String getIdentifier() {
         return nativePerspective.getId();
     }

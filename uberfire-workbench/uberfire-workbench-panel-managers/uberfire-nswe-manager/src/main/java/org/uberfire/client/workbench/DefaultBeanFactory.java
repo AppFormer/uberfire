@@ -139,7 +139,8 @@ public class DefaultBeanFactory
                                   WorkbenchPanelView view,
                                   Position position ) {
                 if ( def instanceof TemplatePanelDefinitionImpl ) {
-                    ( (TemplatePanelDefinitionImpl) def ).perspective.setWidget( "hello1", view.asWidget() );
+                    TemplatePanelDefinitionImpl templateDefinition = (TemplatePanelDefinitionImpl) def;
+                    templateDefinition.perspective.setWidget( templateDefinition.getFieldName(), view.asWidget() );
                 }
             }
 

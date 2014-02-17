@@ -1,9 +1,13 @@
 package org.uberfire.annotations.processors.facades;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
@@ -18,11 +22,11 @@ import org.uberfire.annotations.processors.exceptions.GenerationException;
  */
 public class ClientAPIModule {
 
-
     private static final Logger logger = LoggerFactory.getLogger( ClientAPIModule.class );
 
     public static final String IDENTIFIER = "identifier";
     public static final String IS_DEFAULT = "isDefault";
+    public static final String IS_TEMPLATE = "isTemplate";
     private static Class<? extends Annotation> workbenchSplashScreen;
     private static Class<? extends Annotation> workbenchPerspective;
     private static Class<? extends Annotation> workbenchPopup;
@@ -40,10 +44,12 @@ public class ClientAPIModule {
     private static Class<? extends Annotation> splashFilter;
     private static Class<? extends Annotation> splashBodySize;
     private static Class<? extends Annotation> intercept;
+    private static Class<? extends Annotation> ufPart;
+    private static Class<? extends Annotation> ufPanel;
 
-    private ClientAPIModule() {}
-    
-    
+    private ClientAPIModule() {
+    }
+
     static {
 
         try {
@@ -64,13 +70,13 @@ public class ClientAPIModule {
             splashFilter = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashFilter" );
             splashBodySize = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashBodySize" );
             intercept = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.Intercept" );
+            ufPart = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.UFPart" );
+            ufPanel = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.UFPanel" );
 
         } catch ( ClassNotFoundException e ) {
-            logger.error(e.getMessage());
+            logger.error( e.getMessage() );
         }
     }
-
-
 
     public static Class<? extends Annotation> getWorkbenchScreenClass() {
         return workbenchScreen;
@@ -140,9 +146,17 @@ public class ClientAPIModule {
         return workbenchPerspective;
     }
 
+    public static Class<? extends Annotation> getUfPart() {
+        return ufPart;
+    }
+
+    public static Class<? extends Annotation> getUfPanel() {
+        return ufPanel;
+    }
+
     private static String getAnnotationIdentifierValueOnClass( TypeElement o,
-                                                        String className,
-                                                        String annotationName ) throws GenerationException {
+                                                               String className,
+                                                               String annotationName ) throws GenerationException {
         try {
             String identifierValue = "";
             for ( final AnnotationMirror am : o.getAnnotationMirrors() ) {
@@ -185,5 +199,39 @@ public class ClientAPIModule {
 
     public static String getWbContextIdentifierValueOnClass( TypeElement classElement ) throws GenerationException {
         return getAnnotationIdentifierValueOnClass( classElement, workbenchContext.getName(), IDENTIFIER );
+    }
+
+    public static boolean getWbPerspectiveScreenIsTemplateValueOnClass( TypeElement classElement ) throws GenerationException {
+        String bool = ( getAnnotationIdentifierValueOnClass( classElement, workbenchPerspective.getName(), IS_TEMPLATE ) );
+        return Boolean.valueOf( bool );
+    }
+
+    public static String getWbPerspectiveScreenUFPanelOnClass( TypeElement classElement ) throws GenerationException {
+        //ederign this should return more than one
+        String ufPanelFieldName = "";
+        for ( Element element : classElement.getEnclosedElements() ) {
+            if ( element.getAnnotation( ufPanel ) != null ) {
+                ufPanelFieldName = element.getSimpleName().toString();
+                return ufPanelFieldName;
+            }
+
+        }
+        throw new GenerationException( "Missing ufpart on perspective" );
+    }
+
+    public static String getWbPerspectiveScreenUFPartOnClass( TypeElement classElement ) throws GenerationException {
+        //ederign this should return more than one
+        String identifierValue = "";
+        for ( Element element : classElement.getEnclosedElements() ) {
+            if ( element.getAnnotation( ufPart ) != null ) {
+                try {
+                    Method identifier = ufPart.getDeclaredMethod( "identifier" );
+                    identifierValue = String.valueOf( identifier.invoke( element.getAnnotation( ufPart ) ) );
+                } catch ( Exception e ) {
+                    throw new GenerationException( e.getMessage(), e.getCause() );
+                }
+            }
+        }
+        return identifierValue;
     }
 }
