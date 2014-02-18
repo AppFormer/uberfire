@@ -60,10 +60,10 @@ public class TemplatePerspectiveDefinitionImpl
         System.out.println( "log" );
     }
 
-    //ederign
-    public TemplatePerspectiveDefinitionImpl( final TemplatePerspectiveActivity perspective ) {
+    public TemplatePerspectiveDefinitionImpl( final TemplatePerspectiveActivity perspective,
+                                              String fieldName ) {
         this.perspective = perspective;
-        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB, null );
+        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB, fieldName );
     }
 
     @Override

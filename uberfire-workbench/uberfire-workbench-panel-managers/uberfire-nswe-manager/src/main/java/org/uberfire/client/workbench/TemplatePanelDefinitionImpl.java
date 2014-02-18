@@ -31,9 +31,7 @@ public class TemplatePanelDefinitionImpl
 
     private String fieldName;
 
-    public TemplatePanelDefinitionImpl() {
-        super();
-    }
+
 
     public TemplatePanelDefinitionImpl( TemplatePerspectiveActivity perspective,
                                         PanelType type, String fieldName ) {
@@ -44,10 +42,6 @@ public class TemplatePanelDefinitionImpl
 
 
     public String getFieldName() {
-        //ederign
-        if (fieldName == null){
-            return perspective.getDefaultFieldName();
-        }
         return fieldName;
     }
 }

@@ -180,17 +180,20 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
             realPresenter.${ufPanel}.add( widget.asWidget() );
         }
     }
+
     @Override
     @Perspective
     public PerspectiveDefinition getPerspective() {
-        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this );
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${ufPanel}" );
         p.setName( getClass().getName() );
-        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.STATIC,"${ufPanel}"  );
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, ${ufType},"${ufPanel}"  );
+        <#list ufParts as ufPart>
         panelDefinition.addPart(
         new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        </#list>
         p.getRoot().appendChild( Position.EAST, panelDefinition );
         return p;
-   }
+    }
 
     @Override
     public String getDefaultFieldName() {

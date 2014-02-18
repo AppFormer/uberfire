@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -167,16 +168,17 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
     private static void setupTemplateElements( Map<String, Object> root,
                                                TypeElement classElement ) throws GenerationException {
 
-        String ufPanel = "";
-        String ufPart = "";
 
-        ufPart = ClientAPIModule.getWbPerspectiveScreenUFPartOnClass( classElement );
-        ufPanel = ClientAPIModule.getWbPerspectiveScreenUFPanelOnClass( classElement );
+        List<String> ufParts = ClientAPIModule.getWbPerspectiveScreenUFPartsOnClass( classElement );
+        String ufType = ClientAPIModule.getWbPerspectiveScreenUFPanelTypeOnClass( classElement );
+        String ufPanel = ClientAPIModule.getWbPerspectiveScreenUFPanelOnClass( classElement );
 
+        root.put( "ufType",
+                  ufType );
         root.put( "ufPanel",
                   ufPanel );
-        root.put( "ufPart",
-                  ufPart );
+        root.put( "ufParts",
+                  ufParts );
     }
 
 }

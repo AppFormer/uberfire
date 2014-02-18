@@ -30,7 +30,7 @@ public class HomePerspective1 extends Composite {
 
     @DataField
     @UFPanel
-    @UFPart(identifier = "HelloWorldScreen3")
+    @UFPart("HelloWorldScreen3")
     FlowPanel panelSample2 = new FlowPanel();
 
     @PostConstruct

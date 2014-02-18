@@ -21,14 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.uberfire.workbench.model.PanelType;
-
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
-public @interface UFPanel {
+@Target({ElementType.FIELD})
+public @interface UFParts {
 
-    //ederign
-    String value() default "PanelType.STATIC";
-
+    UFPart[] value();
 }
