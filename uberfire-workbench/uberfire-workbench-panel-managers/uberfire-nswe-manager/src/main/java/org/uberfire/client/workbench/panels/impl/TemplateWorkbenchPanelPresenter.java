@@ -12,7 +12,7 @@ import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
 import org.uberfire.workbench.model.Position;
 
-public class TemplateWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
+    public class TemplateWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
 
     protected TemplateWorkbenchPanelView view;

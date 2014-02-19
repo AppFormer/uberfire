@@ -32,6 +32,7 @@ import static org.uberfire.workbench.model.impl.PanelTypeHelper.*;
 /**
  * Implementation of TemplatePerspectiveDefinition
  */
+@Portable
 public class TemplatePerspectiveDefinitionImpl
         implements
         PerspectiveDefinition {

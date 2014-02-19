@@ -17,6 +17,7 @@ package org.uberfire.client.workbench;
 
 import java.util.Set;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.mvp.TemplatePerspectiveActivity;
 import org.uberfire.workbench.model.PanelDefinition;
@@ -28,12 +29,17 @@ import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 /**
  * Default implementation of PanelDefinition
  */
+@Portable
 public class TemplatePanelDefinitionImpl
         extends PanelDefinitionImpl {
 
     public transient TemplatePerspectiveActivity perspective;
 
     private String fieldName;
+
+    public TemplatePanelDefinitionImpl(){
+
+    }
 
     public TemplatePanelDefinitionImpl( TemplatePerspectiveActivity perspective,
                                         PanelType type,
