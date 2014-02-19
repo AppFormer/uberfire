@@ -30,18 +30,18 @@ public class HomePerspective1 extends Composite {
 
 
     @DataField
-    @UFPanel
+    @UFPanel(panelType = " PanelType.MULTI_TAB")
     @UFPart("HelloWorldScreen1")
     FlowPanel panelSample1 = new FlowPanel();
 
     @DataField
-    @UFPanel(panelType = "PanelType.MULTI_TAB", isDefault =  true)
-    @UFPart("HelloWorldScreen3")
+    @UFPanel( panelType = " PanelType.MULTI_TAB", isDefault =  true)
+    @UFPart("HelloWorldScreen2")
     FlowPanel panelSample2 = new FlowPanel();
 
     @DataField
-    @UFPanel(panelType = "PanelType.MULTI_TAB")
-    @UFPart("HelloWorldScreen2")
+    @UFPanel(panelType = " PanelType.MULTI_TAB")
+    @UFPart("HelloWorldScreen3")
     FlowPanel panelSample3 = new FlowPanel();
 
     @PostConstruct

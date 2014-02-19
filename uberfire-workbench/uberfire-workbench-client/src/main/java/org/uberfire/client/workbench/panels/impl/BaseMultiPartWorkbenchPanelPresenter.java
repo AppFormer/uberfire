@@ -99,10 +99,6 @@ public class BaseMultiPartWorkbenchPanelPresenter implements WorkbenchPanelPrese
     @Override
     public void addPart( final WorkbenchPartPresenter.View view,
                          final String contextId ) {
-        //acho que é aqui
-
-       // pegar o painel e colocar na perspectiva
-
         getPanelView().addPart( view );
 
         if ( panelManager.getPerspective().getContextDisplayMode() == SHOW

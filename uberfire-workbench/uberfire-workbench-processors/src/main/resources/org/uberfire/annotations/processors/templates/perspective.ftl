@@ -135,7 +135,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
     @Perspective
     @Override
     public PerspectiveDefinition getPerspective() {
-        return realPresenter.getPerspective();
+        return realPresenter.${getPerspectiveMethodName}();
     }
 
     </#if>
@@ -198,12 +198,12 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         p.getRoot().appendChild( Position.EAST, panelDefinition );
 
         <#list ufPanels as ufPanel>
-        panelDefinition = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
+        PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
         <#list ufPanel.uFParts as ufPart>
-        panelDefinition.addPart(
+        panelDefinition${ufPanel_index}.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
         </#list>
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        p.getRoot().appendChild( Position.EAST, panelDefinition${ufPanel_index} );
         </#list>
         return p;
     }

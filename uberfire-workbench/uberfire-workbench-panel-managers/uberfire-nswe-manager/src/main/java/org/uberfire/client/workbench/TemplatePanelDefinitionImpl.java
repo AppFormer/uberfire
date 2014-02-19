@@ -15,9 +15,14 @@
  */
 package org.uberfire.client.workbench;
 
+import java.util.Set;
+
 import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.mvp.TemplatePerspectiveActivity;
+import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
+import org.uberfire.workbench.model.PartDefinition;
+import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 
 /**
@@ -26,22 +31,33 @@ import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 public class TemplatePanelDefinitionImpl
         extends PanelDefinitionImpl {
 
-
     public transient TemplatePerspectiveActivity perspective;
 
     private String fieldName;
 
-
-
     public TemplatePanelDefinitionImpl( TemplatePerspectiveActivity perspective,
-                                        PanelType type, String fieldName ) {
+                                        PanelType type,
+                                        String fieldName ) {
         super( type );
         this.perspective = perspective;
         this.fieldName = fieldName;
     }
 
-
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public void appendChild( final Position position,
+                             final PanelDefinition panel ) {
+
+       super.appendChild( position,panel );
+    }
+
+
+    @Override
+    public PanelDefinition getChild( final Position position ) {
+        //ederign  if ( existingChild == null ) on       super.appendChild( position,panel );
+        return null;
     }
 }

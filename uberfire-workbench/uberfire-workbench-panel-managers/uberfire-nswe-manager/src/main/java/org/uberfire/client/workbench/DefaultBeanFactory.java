@@ -27,6 +27,7 @@ import org.uberfire.client.workbench.panels.impl.MultiListWorkbenchPanelPresente
 import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
+import org.uberfire.client.workbench.panels.impl.TemplateWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
@@ -90,6 +91,10 @@ public class DefaultBeanFactory
                 panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
                 break;
 
+            case TEMPLATE:
+                panel = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
+                break;
+
             default:
                 throw new IllegalArgumentException( "Unhandled PanelType. Expect subsequent errors." );
         }
@@ -101,180 +106,7 @@ public class DefaultBeanFactory
 
     @Override
     public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition ) {
-        final WorkbenchPanelPresenter panel = new WorkbenchPanelPresenter() {
-            {
-                def = definition;
-            }
-
-            private PanelDefinition def;
-
-            @Override
-            public PanelDefinition getDefinition() {
-                return def;
-            }
-
-            @Override
-            public void setDefinition( PanelDefinition definition ) {
-                this.def = definition;
-            }
-
-            @Override
-            public void addPart( WorkbenchPartPresenter.View view ) {
-
-            }
-
-            @Override
-            public void addPart( WorkbenchPartPresenter.View view,
-                                 String contextId ) {
-
-            }
-
-            @Override
-            public void removePart( PartDefinition part ) {
-
-            }
-
-            @Override
-            public void addPanel( PanelDefinition panel,
-                                  WorkbenchPanelView view,
-                                  Position position ) {
-                if ( def instanceof TemplatePanelDefinitionImpl ) {
-                    TemplatePanelDefinitionImpl templateDefinition = (TemplatePanelDefinitionImpl) def;
-                    templateDefinition.perspective.setWidget( templateDefinition.getFieldName(), view.asWidget() );
-                }
-            }
-
-            @Override
-            public void removePanel() {
-
-            }
-
-            @Override
-            public void changeTitle( PartDefinition part,
-                                     String title,
-                                     IsWidget titleDecoration ) {
-
-            }
-
-            @Override
-            public void setFocus( boolean hasFocus ) {
-
-            }
-
-            @Override
-            public void selectPart( PartDefinition part ) {
-
-            }
-
-            @Override
-            public void onPartFocus( PartDefinition part ) {
-
-            }
-
-            @Override
-            public void onPartLostFocus() {
-
-            }
-
-            @Override
-            public void onPanelFocus() {
-
-            }
-
-            @Override
-            public void onBeforePartClose( PartDefinition part ) {
-
-            }
-
-            @Override
-            public void maximize() {
-
-            }
-
-            @Override
-            public void minimize() {
-
-            }
-
-            @Override
-            public WorkbenchPanelView getPanelView() {
-                if ( def instanceof TemplatePanelDefinitionImpl ) {
-                    return new WorkbenchPanelView() {
-                        @Override
-                        public WorkbenchPanelPresenter getPresenter() {
-                            return null;
-                        }
-
-                        @Override
-                        public void clear() {
-
-                        }
-
-                        @Override
-                        public void addPart( WorkbenchPartPresenter.View view ) {
-
-                        }
-
-                        @Override
-                        public void addPanel( PanelDefinition panel,
-                                              WorkbenchPanelView view,
-                                              Position position ) {
-
-                        }
-
-                        @Override
-                        public void changeTitle( PartDefinition part,
-                                                 String title,
-                                                 IsWidget titleDecoration ) {
-
-                        }
-
-                        @Override
-                        public void selectPart( PartDefinition part ) {
-
-                        }
-
-                        @Override
-                        public void removePart( PartDefinition part ) {
-
-                        }
-
-                        @Override
-                        public void removePanel() {
-
-                        }
-
-                        @Override
-                        public void setFocus( boolean hasFocus ) {
-
-                        }
-
-                        @Override
-                        public void onResize() {
-
-                        }
-
-                        @Override
-                        public void init( Object presenter ) {
-
-                        }
-
-                        @Override
-                        public Widget asWidget() {
-                            return ( (TemplatePanelDefinitionImpl) def ).perspective.getRealPresenterWidget();
-                        }
-                    };
-                }
-                return null;
-            }
-
-            @Override
-            public void onResize( int width,
-                                  int height ) {
-
-            }
-        };
-
+        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter(definition);
         return panel;
     }
 

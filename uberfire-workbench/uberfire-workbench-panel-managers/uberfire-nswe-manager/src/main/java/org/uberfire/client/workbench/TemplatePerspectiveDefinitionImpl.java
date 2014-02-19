@@ -46,7 +46,6 @@ public class TemplatePerspectiveDefinitionImpl
     private ContextDisplayMode contextDisplayMode = SHOW;
 
     public TemplatePerspectiveDefinitionImpl() {
-        System.out.println( "log" );
         this.root = new PanelDefinitionImpl( PanelType.ROOT_TAB );
     }
 

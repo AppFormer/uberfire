@@ -60,7 +60,7 @@ public class PanelDefinitionImpl
     private ContextDisplayMode contextDisplayMode = SHOW;
 
     public PanelDefinitionImpl() {
-        this( PanelType.ROOT_TAB );
+        this( PanelType.ROOT_STATIC );
     }
 
     public PanelDefinitionImpl( final PanelType type ) {
@@ -123,6 +123,7 @@ public class PanelDefinitionImpl
     @Override
     public void appendChild( final Position position,
                              final PanelDefinition panel ) {
+
         if ( panel == null ) {
             return;
         }

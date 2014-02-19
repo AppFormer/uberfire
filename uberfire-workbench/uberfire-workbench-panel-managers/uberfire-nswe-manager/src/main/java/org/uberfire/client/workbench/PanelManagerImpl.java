@@ -124,11 +124,7 @@ public class PanelManagerImpl implements PanelManager {
         } else {
             container = null;
         }
-//
-//        if(oldPresenter instanceof TemplateMultiTabWorkbenchPanelPresenter){
-//            TemplateMultiTabWorkbenchPanelPresenter templatePresenter = (TemplateMultiTabWorkbenchPanelPresenter) oldPresenter;
-//            container = templatePresenter.getContainer();
-//        }
+
         factory.destroy( root );
 
         this.root = newRoot;
@@ -142,20 +138,7 @@ public class PanelManagerImpl implements PanelManager {
             if ( oldPresenter != null ) {
                 oldPresenter.removePanel();
             }
-            //colocar duas perspectivas
-            if ( true && perspective.getName().contains( "Home" ) ) {
-
-//                //procurar aqui um modo de já pegar a activity
-//                //activite do perpsective atual
-//                PerspectiveActivity defaultPerspectiveActivity = getDefaultPerspectiveActivity();
-//                Composite realPresenterWidget = (Composite) defaultPerspectiveActivity.getRealPresenterWidget().asWidget();
-//                realPresenterWidget.getElement().appendChild( newPresenter.getPanelView().asWidget().getElement() );
-//                //deve ir pra dentro da activity
-                container.setWidget( newPresenter.getPanelView() );
-            } else {
-                container.setWidget( newPresenter.getPanelView() );
-            }
-
+            container.setWidget( newPresenter.getPanelView() );
         }
     }
 
@@ -260,7 +243,7 @@ public class PanelManagerImpl implements PanelManager {
         }
 
         //The model for a Perspective is already fully populated. Don't go adding duplicates.
-        if ( !panel.getParts().contains( part ) ) {
+        if ( !panel. getParts().contains( part ) ) {
             panel.addPart( part );
         }
 
