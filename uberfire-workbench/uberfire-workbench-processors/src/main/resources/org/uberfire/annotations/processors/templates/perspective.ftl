@@ -176,28 +176,37 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
     @Override
     public void setWidget( String fieldName,
         Widget widget ) {
-        if ( fieldName.equalsIgnoreCase( "${ufPanel}" ) ) {
-            realPresenter.${ufPanel}.add( widget.asWidget() );
+
+        if ( fieldName.equalsIgnoreCase( "${defaultPanel.fieldName}" ) ) {
+            realPresenter.${defaultPanel.fieldName}.add( widget.asWidget() );
         }
+        <#list ufPanels as ufPanel>
+        if ( fieldName.equalsIgnoreCase( "${ufPanel.fieldName}" ) ) {
+            realPresenter.${ufPanel.fieldName}.add( widget.asWidget() );
+        }
+        </#list>
     }
 
-    @Override
     @Perspective
     public PerspectiveDefinition getPerspective() {
-        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${ufPanel}" );
-        p.setName( getClass().getName() );
-        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, ${ufType},"${ufPanel}"  );
-        <#list ufParts as ufPart>
-        panelDefinition.addPart(
-        new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, ${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
+        <#list defaultPanel.uFParts as ufPart>
+            panelDefinition.addPart(
+            new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
         </#list>
         p.getRoot().appendChild( Position.EAST, panelDefinition );
+
+        <#list ufPanels as ufPanel>
+        panelDefinition = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
+        <#list ufPanel.uFParts as ufPart>
+        panelDefinition.addPart(
+                new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        </#list>
+        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        </#list>
         return p;
     }
 
-    @Override
-    public String getDefaultFieldName() {
-        return "${ufPanel}";
-    }
     </#if>
 }

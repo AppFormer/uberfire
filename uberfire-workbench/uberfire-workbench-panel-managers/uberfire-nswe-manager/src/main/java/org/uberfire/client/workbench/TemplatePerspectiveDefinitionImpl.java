@@ -61,9 +61,10 @@ public class TemplatePerspectiveDefinitionImpl
     }
 
     public TemplatePerspectiveDefinitionImpl( final TemplatePerspectiveActivity perspective,
-                                              String fieldName ) {
+                                              String fieldName, String name ) {
         this.perspective = perspective;
         this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB, fieldName );
+        setName( name );
     }
 
     @Override

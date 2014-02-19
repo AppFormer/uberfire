@@ -33,7 +33,4 @@ public interface TemplatePerspectiveActivity
 
     Widget getRealPresenterWidget( );
 
-    String getDefaultFieldName();
-
-
 }

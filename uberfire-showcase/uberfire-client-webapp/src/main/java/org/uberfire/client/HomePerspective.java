@@ -20,14 +20,14 @@ import org.uberfire.client.annotations.WorkbenchPerspective;
 public class HomePerspective extends Composite {
 
     @DataField
-    @UFPanel("PanelType.MULTI_TAB")
+    @UFPanel(panelType = "PanelType.MULTI_TAB", isDefault =  true)
     @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("HelloWorldScreen2")})
     FlowPanel hello1 = new FlowPanel();
 
-    //@DataFiel
-    //@UFPanel
-    //@UFPart("HelloWorldScreen2")
-    //FlowPanel hello2 = new FlowPanel();
+    @DataField
+    @UFPanel
+    @UFPart("HelloWorldScreen2")
+    FlowPanel hello2 = new FlowPanel();
 
     @PostConstruct
     public void setup() {

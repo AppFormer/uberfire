@@ -28,10 +28,21 @@ import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
 @Templated("template1.html")
 public class HomePerspective1 extends Composite {
 
+
     @DataField
     @UFPanel
+    @UFPart("HelloWorldScreen1")
+    FlowPanel panelSample1 = new FlowPanel();
+
+    @DataField
+    @UFPanel(panelType = "PanelType.MULTI_TAB", isDefault =  true)
     @UFPart("HelloWorldScreen3")
     FlowPanel panelSample2 = new FlowPanel();
+
+    @DataField
+    @UFPanel(panelType = "PanelType.MULTI_TAB")
+    @UFPart("HelloWorldScreen2")
+    FlowPanel panelSample3 = new FlowPanel();
 
     @PostConstruct
     public void setup() {

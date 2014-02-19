@@ -1,13 +1,9 @@
 package org.uberfire.annotations.processors.facades;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
@@ -153,6 +149,10 @@ public class ClientAPIModule {
         return ufPart;
     }
 
+    public static Class<? extends Annotation> getUfParts() {
+        return ufParts;
+    }
+
     public static Class<? extends Annotation> getUfPanel() {
         return ufPanel;
     }
@@ -207,101 +207,6 @@ public class ClientAPIModule {
     public static boolean getWbPerspectiveScreenIsTemplateValueOnClass( TypeElement classElement ) throws GenerationException {
         String bool = ( getAnnotationIdentifierValueOnClass( classElement, workbenchPerspective.getName(), IS_TEMPLATE ) );
         return Boolean.valueOf( bool );
-    }
-
-    public static String getWbPerspectiveScreenUFPanelOnClass( TypeElement classElement ) throws GenerationException {
-        //ederign this should return more than one
-        String ufPanelFieldName = "";
-        for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( ufPanel ) != null ) {
-                ufPanelFieldName = element.getSimpleName().toString();
-                return ufPanelFieldName;
-            }
-
-        }
-        throw new GenerationException( "Missing ufpart on perspective" );
-    }
-
-    public static List<String> getWbPerspectiveScreenUFPartsOnClass( TypeElement classElement ) throws GenerationException {
-        List<String> parts = new ArrayList<String>();
-        if ( thereIsUFParts( classElement ) ) {
-            Annotation[] annotations = extractAnnotationsFromAnnotation( classElement, ufParts, VALUE );
-            for ( Annotation annotation : annotations ) {
-                String value = extractAnnotationStringValue( annotation );
-                parts.add( value );
-            }
-        } else {
-            parts.add( extractMethodValueFromAnnotation( classElement, ufPart, VALUE ) );
-        }
-        return parts;
-    }
-
-    private static String extractAnnotationStringValue( Annotation annotation ) throws GenerationException {
-        String value;
-        try {
-            Class<? extends Annotation> aClass = annotation.annotationType();
-            Method identifier = aClass.getDeclaredMethod( VALUE );
-            value = String.valueOf( identifier.invoke( annotation ) );
-        } catch ( Exception e ) {
-            throw new GenerationException( e.getMessage(), e.getCause() );
-        }
-        return value;
-    }
-
-    private static boolean thereIsUFParts( TypeElement classElement ) {
-        for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( ufParts ) != null ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static String getWbPerspectiveScreenUFPanelTypeOnClass( TypeElement classElement ) throws GenerationException {
-        return extractMethodValueFromAnnotation( classElement, ufPanel, VALUE );
-    }
-
-    private static Annotation[] extractAnnotationsFromAnnotation( TypeElement classElement,
-                                                                  Class<? extends Annotation> annotation,
-                                                                  String methodName ) throws GenerationException {
-        Annotation[] annotations = { };
-        for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( annotation ) != null ) {
-                try {
-                    Method identifier = annotation.getDeclaredMethod( methodName );
-                    annotations = (Annotation[]) identifier.invoke( element.getAnnotation( annotation ) );
-                } catch ( Exception e ) {
-                    throw new GenerationException( e.getMessage(), e.getCause() );
-                }
-            }
-        }
-        return annotations;
-    }
-
-    private static String extractMethodValueFromAnnotation( TypeElement classElement,
-
-                                                            Class<? extends Annotation> annotation,
-                                                            String methodName ) throws GenerationException {
-        String identifierValue = "";
-        for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( annotation ) != null ) {
-                identifierValue = getElementAnnotationStringValue( annotation, methodName, element );
-            }
-        }
-        return identifierValue;
-    }
-
-    private static String getElementAnnotationStringValue( Class<? extends Annotation> annotation,
-                                                           String methodName,
-                                                           Element element ) throws GenerationException {
-        String identifierValue;
-        try {
-            Method identifier = annotation.getDeclaredMethod( methodName );
-            identifierValue = String.valueOf( identifier.invoke( element.getAnnotation( annotation ) ) );
-        } catch ( Exception e ) {
-            throw new GenerationException( e.getMessage(), e.getCause() );
-        }
-        return identifierValue;
     }
 
 }
