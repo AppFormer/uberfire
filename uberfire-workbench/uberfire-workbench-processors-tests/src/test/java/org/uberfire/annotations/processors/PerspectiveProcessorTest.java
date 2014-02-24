@@ -28,7 +28,6 @@ import static org.junit.Assert.*;
 /**
  * Tests for Pop-up related class generation
  */
-@Ignore
 public class PerspectiveProcessorTest extends AbstractProcessorTest {
 
     @Test

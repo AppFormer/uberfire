@@ -543,7 +543,7 @@ public class PlaceManagerImpl
 
         revealActivityWithCalBackToAttachToWorkbench( place, activity, part, panel, callback );
 
-        panelManager.getPerspective();
+        getPanelManager().getPerspective();
     }
 
     private void revealActivityWithCalBackToAttachToWorkbench( final PlaceRequest place,

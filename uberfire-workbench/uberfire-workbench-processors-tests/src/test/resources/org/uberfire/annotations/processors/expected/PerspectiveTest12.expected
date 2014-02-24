@@ -29,6 +29,8 @@ import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.mvp.AbstractTemplateWorkbenchPerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
 
+import org.uberfire.mvp.PlaceRequest;
+
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.workbench.TemplatePanelDefinitionImpl;
 import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
@@ -115,18 +117,18 @@ public class PerspectiveTest12Activity extends  AbstractTemplateWorkbenchPerspec
             new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen2" ) ) );
         p.getRoot().appendChild( Position.EAST, panelDefinition );
 
-        panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste2"  );
-        panelDefinition.addPart(
+        PanelDefinition panelDefinition0 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste2"  );
+        panelDefinition0.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen3" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
-        panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste3"  );
-        panelDefinition.addPart(
+        p.getRoot().appendChild( Position.EAST, panelDefinition0 );
+        PanelDefinition panelDefinition1 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste3"  );
+        panelDefinition1.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen4" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
-        panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste4"  );
-        panelDefinition.addPart(
+        p.getRoot().appendChild( Position.EAST, panelDefinition1 );
+        PanelDefinition panelDefinition2 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste4"  );
+        panelDefinition2.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen5" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        p.getRoot().appendChild( Position.EAST, panelDefinition2 );
         return p;
     }
 

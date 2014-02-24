@@ -17,7 +17,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.*;
 
-@Ignore
 public class PlaceManagerImplTest extends BaseWorkbenchTest {
 
     @Test

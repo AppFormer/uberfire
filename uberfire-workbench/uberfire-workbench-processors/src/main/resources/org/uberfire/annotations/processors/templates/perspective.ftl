@@ -25,13 +25,15 @@ import javax.inject.Inject;
 
 import javax.inject.Named;
 import org.uberfire.workbench.model.PerspectiveDefinition;
-import org.uberfire.client.annotations.Perspective;
 <#if isTemplate>
+import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.mvp.AbstractTemplateWorkbenchPerspectiveActivity;
 <#else>
 import org.uberfire.client.mvp.AbstractWorkbenchPerspectiveActivity;
 </#if>
 import org.uberfire.client.mvp.PlaceManager;
+
+import org.uberfire.mvp.PlaceRequest;
 
 <#if getMenuBarMethodName??>
 import org.uberfire.workbench.model.menu.Menus;
@@ -132,13 +134,12 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
 
     </#if>
     <#if getPerspectiveMethodName??>
-    @Perspective
     @Override
     public PerspectiveDefinition getPerspective() {
         return realPresenter.${getPerspectiveMethodName}();
     }
 
-    </#if>
+</#if>
     <#if getMenuBarMethodName??>
     @Override
     public Menus getMenus() {
