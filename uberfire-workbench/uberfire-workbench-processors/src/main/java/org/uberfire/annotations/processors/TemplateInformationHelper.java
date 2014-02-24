@@ -30,7 +30,7 @@ public class TemplateInformationHelper {
         if ( !template.thereIsTemplateFields() ) {
             return template;
         }
-        throw new GenerationException( "Missing ufpart on perspective" );
+        throw new GenerationException( "The Template WorkbenchPerspective must provide a @UFPanel annotated field." );
     }
 
     private static void extractInformationFromUFPanel( TemplateInformation template,
@@ -42,12 +42,18 @@ public class TemplateInformationHelper {
         ufPanel.setFieldName( element.getSimpleName().toString() );
         ufPanel.setUFParts( getUFPartsFrom( element ) );
         ufPanel.setPanelType( extractPanelType( element ) );
-        if (ufPanel.isDefault()){
-            template.setDefaultPanel(ufPanel);
-        }
-        else{
+        if ( ufPanel.isDefault() ) {
+            if ( shouldHaveOnlyOneDefaultPanel( template ) ) {
+                throw new GenerationException( "The Template WorkbenchPerspective must provide only one @UFPanel annotated field." );
+            }
+            template.setDefaultPanel( ufPanel );
+        } else {
             template.addTemplateField( ufPanel );
         }
+    }
+
+    private static boolean shouldHaveOnlyOneDefaultPanel( TemplateInformation template ) {
+        return template.getDefaultPanel() != null;
     }
 
     private static String extractPanelType( Element element ) throws GenerationException {

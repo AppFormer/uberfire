@@ -307,6 +307,49 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
                       result.getExpectedCode() );
     }
 
+    @Test
+    public void testWorkbenchTemplateAnnotationMustHaveUFPanels() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest14";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        assertCompilationError( diagnostics,
+                                "The Template WorkbenchPerspective must provide a @UFPanel annotated field." );
+        assertNull( result.getActualCode() );
+    }
+
+
+
+    @Test
+    public void testWorkbenchTemplateAnnotationShouldNotAllowTwoDefaultUFPanels() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest15";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        assertCompilationError( diagnostics,
+                                "The Template WorkbenchPerspective must provide only one @UFPanel annotated field." );
+        assertNull( result.getActualCode() );
+    }
+
+
     private void printDiagnostics( List<Diagnostic<? extends JavaFileObject>> diagnostics ) {
         for ( Diagnostic diagnostic: diagnostics ){
             System.out.println(diagnostic);
