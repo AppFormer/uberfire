@@ -26,11 +26,6 @@ public class HomePerspective extends Composite {
     @UFParts({@UFPart("HelloWorldScreen0"),@UFPart("HelloWorldScreen1"),@UFPart("MoodScreen")})
     FlowPanel hello1 = new FlowPanel();
 
-    @DataField
-    @UFPanel(panelType = " PanelType.MULTI_TAB")
-    @UFPart("HelloWorldScreen2")
-    FlowPanel hello2 = new FlowPanel();
-
     @PostConstruct
     public void setup() {
 

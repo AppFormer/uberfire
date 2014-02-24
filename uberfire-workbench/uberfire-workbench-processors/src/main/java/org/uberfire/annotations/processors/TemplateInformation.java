@@ -25,4 +25,8 @@ public class TemplateInformation {
     public UFPanelInformation getDefaultPanel() {
         return defaultPanel;
     }
+
+    public boolean thereIsTemplateFields() {
+        return  (getTemplateFields().isEmpty()&&defaultPanel==null);
+    }
 }

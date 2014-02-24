@@ -27,7 +27,7 @@ public class TemplateInformationHelper {
             }
 
         }
-        if ( !template.getTemplateFields().isEmpty() ) {
+        if ( !template.thereIsTemplateFields() ) {
             return template;
         }
         throw new GenerationException( "Missing ufpart on perspective" );
