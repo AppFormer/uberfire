@@ -18,7 +18,7 @@ import org.uberfire.workbench.model.PanelType;
 @WorkbenchPerspective(
         identifier = "HomePerspective",
         isDefault = true, isTemplate = true)
-@Templated("template.html")
+@Templated
 public class HomePerspective extends Composite {
 
     @DataField

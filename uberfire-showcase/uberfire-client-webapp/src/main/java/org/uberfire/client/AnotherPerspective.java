@@ -24,9 +24,9 @@ import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
 
 @ApplicationScoped
 @WorkbenchPerspective(
-        identifier = "HomePerspective1", isTemplate = true)
-@Templated("template1.html")
-public class HomePerspective1 extends Composite {
+        identifier = "AnotherPerspective", isTemplate = true)
+@Templated("another_template.html")
+public class AnotherPerspective extends Composite {
 
 
     @DataField
