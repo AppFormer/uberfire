@@ -19,8 +19,6 @@ public class SimplePanel
         implements HasSelectionHandlers<PartDefinition>,
                    HasFocusHandlers {
 
-    //ederign
-    // private RequiresResizeFocusPanel container = new RequiresResizeFocusPanel();
     private FocusPanel container = new FocusPanel();
 
     private PartDefinition partDefinition;

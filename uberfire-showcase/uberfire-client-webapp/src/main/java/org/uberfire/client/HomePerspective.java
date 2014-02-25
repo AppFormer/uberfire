@@ -23,7 +23,7 @@ public class HomePerspective extends Composite {
 
     @DataField
     @UFPanel(panelType = "PanelType.TEMPLATE", isDefault =  true)
-    @UFPart("HelloWorldScreen0")
+    @UFParts({@UFPart("HelloWorldScreen0")})
     FlowPanel hello1 = new FlowPanel();
 
 

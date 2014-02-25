@@ -29,6 +29,7 @@ public class WorkbenchPartView
 
     private WorkbenchPartPresenter presenter;
 
+    //ederign
     private final ScrollPanel sp = new ScrollPanel();
 
     @Override

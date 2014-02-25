@@ -54,6 +54,7 @@ public class DefaultBeanFactory
                                                     final String title,
                                                     final IsWidget titleDecoration,
                                                     final PartDefinition definition ) {
+        //ederign
         final WorkbenchPartPresenter part = iocManager.lookupBean( WorkbenchPartPresenter.class ).getInstance();
         part.setTitle( title );
         part.setMenus( menus );

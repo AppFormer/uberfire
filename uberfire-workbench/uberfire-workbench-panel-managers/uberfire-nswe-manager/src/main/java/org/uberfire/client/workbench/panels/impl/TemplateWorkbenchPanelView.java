@@ -20,7 +20,7 @@ import org.uberfire.workbench.model.PartDefinition;
 
 @Dependent
 @Named("TemplateWorkbenchPanelView")
-public class TemplateWorkbenchPanelView extends BaseWorkbenchPanelView<TemplateWorkbenchPanelPresenter> {
+public class TemplateWorkbenchPanelView extends BaseWorkbenchTemplatePanelView<TemplateWorkbenchPanelPresenter> {
 
     private PanelDefinition def;
     private boolean root;
@@ -28,8 +28,7 @@ public class TemplateWorkbenchPanelView extends BaseWorkbenchPanelView<TemplateW
     //@Inject
     //PlaceManager placeManager;
 
-    StaticFocusedResizePanel panel = new StaticFocusedResizePanel();
-    //SimplePanel panel = new SimplePanel();
+    SimplePanel panel = new SimplePanel();
 
     public TemplateWorkbenchPanelView() {
         initWidget( panel );
@@ -138,9 +137,9 @@ public class TemplateWorkbenchPanelView extends BaseWorkbenchPanelView<TemplateW
 //        }
     }
 
-    void resizeSuper() {
-        super.onResize();
-    }
+//    void resizeSuper() {
+//        super.onResize();
+//    }
 
     @Override
     public Widget asWidget() {
