@@ -22,13 +22,13 @@ import org.uberfire.workbench.model.PanelType;
 public class HomePerspective extends Composite {
 
     @DataField
-    @UFPanel(panelType = " PanelType.MULTI_TAB", isDefault =  true)
-    @UFParts({@UFPart("HelloWorldScreen0"),@UFPart("HelloWorldScreen1"),@UFPart("MoodScreen")})
+    @UFPanel(panelType = "PanelType.TEMPLATE", isDefault =  true)
+    @UFPart("HelloWorldScreen0")
     FlowPanel hello1 = new FlowPanel();
+
 
     @PostConstruct
     public void setup() {
-
     }
 
 }

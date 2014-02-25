@@ -131,6 +131,7 @@ public class PanelManagerImpl implements PanelManager {
         this.perspective = perspective;
         WorkbenchPanelPresenter newPresenter = getWorkbenchPanelPresenter( newRoot );
         if ( newPresenter == null ) {
+            //ederign
             newPresenter = factory.newPerspectiveWorkbenchPanel( newRoot );
             mapPanelDefinitionToPresenter.put( newRoot, newPresenter );
         }
@@ -313,7 +314,6 @@ public class PanelManagerImpl implements PanelManager {
             mapPanelDefinitionToPresenter.put( targetPanel,
                                                targetPanelPresenter );
         }
-
         final WorkbenchPanelPresenter childPanelPresenter = factory.newWorkbenchPanel( childPanel );
         mapPanelDefinitionToPresenter.put( childPanel,
                                            childPanelPresenter );

@@ -47,23 +47,14 @@ public class TemplatePerspectiveDefinitionImpl
     private ContextDisplayMode contextDisplayMode = SHOW;
 
     public TemplatePerspectiveDefinitionImpl() {
-        this.root = new PanelDefinitionImpl( PanelType.ROOT_TAB );
-    }
-
-    public TemplatePerspectiveDefinitionImpl( final PanelType type ) {
-        checkNotNull( "type", type );
-        if ( !isRoot( type ) ) {
-            throw new IllegalArgumentException( "Panel type must named '" + name + "' should be not null!" );
-        }
-
-        this.root = new PanelDefinitionImpl( type );
-        System.out.println( "log" );
+        this.root = new PanelDefinitionImpl( PanelType.TEMPLATE );
     }
 
     public TemplatePerspectiveDefinitionImpl( final TemplatePerspectiveActivity perspective,
-                                              String fieldName, String name ) {
+                                              String fieldName,
+                                              String name ) {
         this.perspective = perspective;
-        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.ROOT_TAB, fieldName );
+        this.root = new TemplatePanelDefinitionImpl( perspective, PanelType.TEMPLATE, fieldName );
         setName( name );
     }
 

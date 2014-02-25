@@ -92,7 +92,9 @@ public class DefaultBeanFactory
                 break;
 
             case TEMPLATE:
-                panel = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
+                //ederign <- apontar para o bean correto aqui
+               // panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
+                panel = new TemplateWorkbenchPanelPresenter(definition, false);
                 break;
 
             default:
@@ -106,7 +108,7 @@ public class DefaultBeanFactory
 
     @Override
     public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition ) {
-        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter(definition);
+        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter(definition, true);
         return panel;
     }
 

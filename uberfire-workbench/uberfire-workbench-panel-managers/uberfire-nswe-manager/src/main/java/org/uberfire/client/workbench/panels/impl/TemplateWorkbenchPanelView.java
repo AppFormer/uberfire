@@ -1,20 +1,67 @@
 package org.uberfire.client.workbench.panels.impl;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Named;
+
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.workbench.TemplatePanelDefinitionImpl;
-import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
+import org.uberfire.client.workbench.widgets.panel.SimplePanel;
+import org.uberfire.client.workbench.widgets.panel.StaticFocusedResizePanel;
+import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
-import org.uberfire.workbench.model.Position;
 
-public class TemplateWorkbenchPanelView  extends BaseWorkbenchPanelView<TemplateWorkbenchPanelPresenter>  {
+@Dependent
+@Named("TemplateWorkbenchPanelView")
+public class TemplateWorkbenchPanelView extends BaseWorkbenchPanelView<TemplateWorkbenchPanelPresenter> {
 
-    private final PanelDefinition def;
+    private PanelDefinition def;
+    private boolean root;
 
-    public TemplateWorkbenchPanelView( PanelDefinition def ) {
-        this.def=def;
+    //@Inject
+    //PlaceManager placeManager;
+
+    StaticFocusedResizePanel panel = new StaticFocusedResizePanel();
+    //SimplePanel panel = new SimplePanel();
+
+    public TemplateWorkbenchPanelView() {
+        initWidget( panel );
+    }
+
+    public TemplateWorkbenchPanelView( PanelDefinition def,
+                                       boolean root ) {
+        this.def = def;
+        this.root = root;
+
+        panel.addFocusHandler( new FocusHandler() {
+            @Override
+            public void onFocus( final FocusEvent event ) {
+                panelManager.onPanelFocus( presenter.getDefinition() );
+            }
+        } );
+
+        //When a tab is selected ensure content is resized and set focus
+        panel.addSelectionHandler( new SelectionHandler<PartDefinition>() {
+            @Override
+            public void onSelection( final SelectionEvent<PartDefinition> event ) {
+                presenter.onPartLostFocus();
+                presenter.onPartFocus( event.getSelectedItem() );
+            }
+        } );
+
+        initWidget( panel );
+    }
+
+    @Override
+    public void init( TemplateWorkbenchPanelPresenter presenter ) {
+        this.presenter = presenter;
     }
 
     @Override
@@ -24,64 +71,84 @@ public class TemplateWorkbenchPanelView  extends BaseWorkbenchPanelView<Template
 
     @Override
     public void clear() {
-        //ederign
+        panel.clear();
     }
 
     @Override
-    public void addPart( WorkbenchPartPresenter.View view ) {
-        //ederign
-        System.out.println();
+    public void addPart( final WorkbenchPartPresenter.View view ) {
+        if ( panel.getPartView() != null ) {
+            //ederign
+           /* placeManager.tryClosePlace( getPlaceOfPartView(), new Command() {
+                @Override
+                public void execute() {
+                    panel.setPart( view );
+                }
+            } );*/
+        } else {
+            panel.setPart( view );
+        }
 
     }
 
-    @Override
-    public void addPanel( PanelDefinition panel,
-                          WorkbenchPanelView view,
-                          Position position ) {
-        //ederign
-        System.out.println();
-
+    PlaceRequest getPlaceOfPartView() {
+        return panel.getPartView().getPresenter().getDefinition().getPlace();
     }
 
     @Override
-    public void changeTitle( PartDefinition part,
-                             String title,
-                             IsWidget titleDecoration ) {
-        //ederign
+    public void changeTitle( final PartDefinition part,
+                             final String title,
+                             final IsWidget titleDecoration ) {
     }
 
     @Override
-    public void selectPart( PartDefinition part ) {
-        //ederign
+    public void selectPart( final PartDefinition part ) {
+        scheduleResize();
     }
 
     @Override
-    public void removePart( PartDefinition part ) {
-        //ederign
-    }
-
-    @Override
-    public void removePanel() {
-        //ederign
+    public void removePart( final PartDefinition part ) {
+        panel.clear();
     }
 
     @Override
     public void setFocus( boolean hasFocus ) {
-        //ederign
+        panel.setFocus( hasFocus );
+    }
+
+    private void scheduleResize() {
+        Scheduler.get().scheduleDeferred( new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+                onResize();
+            }
+        } );
     }
 
     @Override
     public void onResize() {
         //ederign
+//        final Widget parent = getParent();
+//        if ( parent != null ) {
+//            final int width = parent.getOffsetWidth();
+//            final int height = parent.getOffsetHeight();
+//            setPixelSize( width, height );
+//            presenter.onResize( width, height );
+//            panel.setPixelSize( width, height );
+//            resizeSuper();
+//        }
+    }
+
+    void resizeSuper() {
+        super.onResize();
     }
 
     @Override
     public Widget asWidget() {
-        return ( (TemplatePanelDefinitionImpl) def ).perspective.getRealPresenterWidget();
+        if ( root ) {
+            return ( (TemplatePanelDefinitionImpl) def ).perspective.getRealPresenterWidget();
+        } else {
+            return this;
+        }
     }
 
-    @Override
-    public void init( TemplateWorkbenchPanelPresenter presenter ) {
-        this.presenter = presenter;
-    }
 }

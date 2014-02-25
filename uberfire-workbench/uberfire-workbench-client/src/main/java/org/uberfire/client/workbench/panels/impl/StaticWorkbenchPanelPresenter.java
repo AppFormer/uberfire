@@ -48,6 +48,11 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     private Event<MinimizePlaceEvent> minimizePanelEvent;
 
+    //ederign retirar este construtor
+    public StaticWorkbenchPanelPresenter(){
+
+    }
+
     @Inject
     public StaticWorkbenchPanelPresenter( @Named("StaticWorkbenchPanelView") final StaticWorkbenchPanelView view,
                                           final PanelManager panelManager,
@@ -62,7 +67,11 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
     @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
-        view.init( this );
+        getView().init( this );
+    }
+
+    WorkbenchPanelView getView() {
+        return view;
     }
 
     @Override
@@ -88,7 +97,7 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     @Override
     public void removePart( final PartDefinition part ) {
-        view.removePart( part );
+        getView().removePart( part );
     }
 
     @Override
@@ -104,7 +113,7 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     @Override
     public void removePanel() {
-        view.removePanel();
+        getView().removePanel();
     }
 
     @Override
@@ -116,7 +125,7 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     @Override
     public void setFocus( final boolean hasFocus ) {
-        view.setFocus( hasFocus );
+        getView().setFocus( hasFocus );
     }
 
     @Override
@@ -124,7 +133,7 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
         if ( !contains( part ) ) {
             return;
         }
-        view.selectPart( part );
+        getView().selectPart( part );
     }
 
     private boolean contains( final PartDefinition part ) {
@@ -171,7 +180,7 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     @Override
     public WorkbenchPanelView getPanelView() {
-        return view;
+        return getView();
     }
 
     @Override

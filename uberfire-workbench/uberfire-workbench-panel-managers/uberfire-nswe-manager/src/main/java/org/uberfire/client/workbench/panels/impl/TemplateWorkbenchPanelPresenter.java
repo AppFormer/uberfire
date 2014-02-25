@@ -1,10 +1,19 @@
+
+
 package org.uberfire.client.workbench.panels.impl;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.TemplatePanelDefinitionImpl;
+import org.uberfire.client.workbench.events.MaximizePlaceEvent;
+import org.uberfire.client.workbench.events.MinimizePlaceEvent;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
@@ -12,17 +21,41 @@ import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
 import org.uberfire.workbench.model.Position;
 
-    public class TemplateWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
-
+@Dependent
+public class TemplateWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     protected TemplateWorkbenchPanelView view;
 
-    private PanelDefinition def;
+   /* @Inject
+    private PanelManager panelManager;*/
 
-    public TemplateWorkbenchPanelPresenter( PanelDefinition definition ) {
-        this.def = definition;
-        this.view = new TemplateWorkbenchPanelView(def);
+    private PanelDefinition definition;
+
+    private Event<MaximizePlaceEvent> maximizePanelEvent;
+
+    private Event<MinimizePlaceEvent> minimizePanelEvent;
+
+    public TemplateWorkbenchPanelPresenter() {
     }
+
+    //old Constructor
+    public TemplateWorkbenchPanelPresenter( PanelDefinition definition,
+                                            boolean root ) {
+        this.definition = definition;
+        this.view = new TemplateWorkbenchPanelView( this.definition, root );
+    }
+
+    //ederign ?
+  /*  @Inject
+    public TemplateWorkbenchPanelPresenter( @Named("TemplateWorkbenchPanelView") final TemplateWorkbenchPanelView view,
+                                          final PanelManager panelManager,
+                                          final Event<MaximizePlaceEvent> maximizePanelEvent,
+                                          final Event<MinimizePlaceEvent> minimizePanelEvent ) {
+        this.view = view;
+        this.panelManager = panelManager;
+        this.maximizePanelEvent = maximizePanelEvent;
+        this.minimizePanelEvent = minimizePanelEvent;
+    }*/
 
     @PostConstruct
     private void init() {
@@ -31,95 +64,108 @@ import org.uberfire.workbench.model.Position;
 
     @Override
     public PanelDefinition getDefinition() {
-        return def;
+        return definition;
     }
 
     @Override
     public void setDefinition( PanelDefinition definition ) {
-        this.def = definition;
+        this.definition = definition;
     }
 
     @Override
     public void addPart( WorkbenchPartPresenter.View view ) {
-        //ederign
-        System.out.println("oi");
+        getPanelView().addPart( view );
     }
 
     @Override
     public void addPart( WorkbenchPartPresenter.View view,
                          String contextId ) {
-        //ederign
-        System.out.println("oi");
+        getPanelView().addPart( view );
     }
 
     @Override
     public void removePart( PartDefinition part ) {
-        //ederign
-        System.out.println("oi");
+        view.removePart( part );
     }
 
     @Override
     public void addPanel( PanelDefinition panel,
                           WorkbenchPanelView view,
                           Position position ) {
+        //ederign
         if ( panel instanceof TemplatePanelDefinitionImpl ) {
             TemplatePanelDefinitionImpl templateDefinition = (TemplatePanelDefinitionImpl) panel;
-            templateDefinition.perspective.setWidget( templateDefinition.getFieldName(), view.asWidget() );
+            Widget widget = view.asWidget();
+            templateDefinition.perspective.setWidget( templateDefinition.getFieldName(), widget );
         }
+
     }
 
     @Override
     public void removePanel() {
-        //ederign
-        System.out.println("oi");
-
+        view.removePanel();
     }
 
     @Override
     public void changeTitle( PartDefinition part,
                              String title,
-                             IsWidget titleDecoration ) {
-        //ederign
+                             IsWidget titleDescorator ) {
+        getPanelView().changeTitle( part, title, titleDescorator );
     }
 
     @Override
     public void setFocus( boolean hasFocus ) {
-        //ederign
+        view.setFocus( hasFocus );
     }
 
     @Override
     public void selectPart( PartDefinition part ) {
-        //ederign
+        if ( !contains( part ) ) {
+            return;
+        }
+        view.selectPart( part );
+    }
+
+    private boolean contains( final PartDefinition part ) {
+        return definition.getParts().contains( part );
     }
 
     @Override
     public void onPartFocus( PartDefinition part ) {
-        //ederign
+        //  panelManager.onPartFocus( part );
     }
 
     @Override
     public void onPartLostFocus() {
-        //ederign
+        //panelManager.onPartLostFocus();
     }
 
     @Override
     public void onPanelFocus() {
-        //ederign
+        //  panelManager.onPanelFocus( definition );
     }
 
     @Override
     public void onBeforePartClose( PartDefinition part ) {
-        //ederign
+        // panelManager.onBeforePartClose( part );
     }
 
     @Override
     public void maximize() {
-        //ederign
+        if ( !getDefinition().isRoot() ) {
+            for ( final PartDefinition part : getDefinition().getParts() ) {
+                maximizePanelEvent.fire( new MaximizePlaceEvent( part.getPlace() ) );
+            }
+        }
     }
 
     @Override
     public void minimize() {
-        //ederign
+        if ( !getDefinition().isRoot() ) {
+            for ( final PartDefinition part : getDefinition().getParts() ) {
+                minimizePanelEvent.fire( new MinimizePlaceEvent( part.getPlace() ) );
+            }
+        }
     }
 
     @Override
@@ -130,6 +176,8 @@ import org.uberfire.workbench.model.Position;
     @Override
     public void onResize( int width,
                           int height ) {
-        //ederign
+        //ederign ??
+        getDefinition().setWidth( width == 0 ? null : width );
+        getDefinition().setHeight( height == 0 ? null : height );
     }
 }
