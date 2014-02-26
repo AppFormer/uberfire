@@ -15,26 +15,24 @@
  */
 package org.uberfire.client.workbench.part;
 
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
-
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A Workbench panel part.
  */
-@Any
-@Default
-public class WorkbenchPartView
+//ederign
+public class WorkbenchPartTemplateView
         extends SimpleLayoutPanel
         implements WorkbenchPartPresenter.View {
 
     private WorkbenchPartPresenter presenter;
+    //private IsWidget sp;
 
-    private final ScrollPanel sp = new ScrollPanel();
+    //ederign
+   // private final ScrollPanel sp = new ScrollPanel();
+    private final FlowPanel sp = new FlowPanel();
 
     @Override
     public void init( WorkbenchPartPresenter presenter ) {
@@ -48,25 +46,27 @@ public class WorkbenchPartView
 
     @Override
     public void setWrappedWidget( final IsWidget widget ) {
-        sp.setWidget( widget );
+        sp.add( widget );
+        //sp = ( widget );
     }
 
     @Override
     public IsWidget getWrappedWidget() {
-        return sp.getWidget();
+       // return sp.getWidget();
+        return sp;
     }
 
-    public WorkbenchPartView() {
+    public WorkbenchPartTemplateView() {
         setWidget( sp );
     }
 
     @Override
     public void onResize() {
-        final Widget parent = getParent();
-        if ( parent != null ) {
-            sp.setPixelSize( parent.getOffsetWidth(),
-                             parent.getOffsetHeight() );
-        }
-        super.onResize();
+//        final Widget parent = getParent();
+//        if ( parent != null ) {
+//            sp.setPixelSize( parent.getOffsetWidth(),
+//                             parent.getOffsetHeight() );
+//        }
+//        super.onResize();
     }
 }

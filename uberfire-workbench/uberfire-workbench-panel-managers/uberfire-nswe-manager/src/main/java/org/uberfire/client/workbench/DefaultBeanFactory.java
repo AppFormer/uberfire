@@ -29,6 +29,8 @@ import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.TemplateWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
+import org.uberfire.client.workbench.part.WorkbenchPartTemplateView;
+import org.uberfire.client.workbench.part.WorkbenchPartView;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
@@ -54,13 +56,26 @@ public class DefaultBeanFactory
                                                     final String title,
                                                     final IsWidget titleDecoration,
                                                     final PartDefinition definition ) {
+        final WorkbenchPartPresenter part;
         //ederign
-        final WorkbenchPartPresenter part = iocManager.lookupBean( WorkbenchPartPresenter.class ).getInstance();
+        if ( parentIsATemplate( definition ) ) {
+            //part = iocManager.lookupBean( WorkbenchPartPresenter.class ).getInstance();
+            part = new WorkbenchPartPresenter( new WorkbenchPartView() );
+            part.init();
+        } else {
+            part = new WorkbenchPartPresenter( new WorkbenchPartTemplateView() );
+            part.init();
+        }
+
         part.setTitle( title );
         part.setMenus( menus );
         part.setTitleDecoration( titleDecoration );
         part.setDefinition( definition );
         return part;
+    }
+
+    private boolean parentIsATemplate( PartDefinition definition ) {
+        return false;
     }
 
     @Override
@@ -94,8 +109,8 @@ public class DefaultBeanFactory
 
             case TEMPLATE:
                 //ederign <- apontar para o bean correto aqui
-               // panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
-                panel = new TemplateWorkbenchPanelPresenter(definition, false);
+                // panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
+                panel = new TemplateWorkbenchPanelPresenter( definition, false );
                 break;
 
             default:
@@ -109,7 +124,7 @@ public class DefaultBeanFactory
 
     @Override
     public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition ) {
-        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter(definition, true);
+        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter( definition, true );
         return panel;
     }
 

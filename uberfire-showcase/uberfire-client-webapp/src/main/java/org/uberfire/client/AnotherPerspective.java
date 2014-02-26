@@ -15,6 +15,7 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.annotations.UFPanel;
 import org.uberfire.client.annotations.UFPart;
+import org.uberfire.client.annotations.UFParts;
 import org.uberfire.client.annotations.WorkbenchPerspective;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.PanelType;
@@ -30,19 +31,9 @@ public class AnotherPerspective extends Composite {
 
 
     @DataField
-    @UFPanel(panelType = " PanelType.MULTI_TAB")
-    @UFPart("HelloWorldScreen1")
+    @UFPanel(panelType = " PanelType.TEMPLATE", isDefault = true)
+    @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("MoodScreen")})
     FlowPanel panelSample1 = new FlowPanel();
-
-    @DataField
-    @UFPanel( panelType = " PanelType.MULTI_TAB", isDefault =  true)
-    @UFPart("HelloWorldScreen2")
-    FlowPanel panelSample2 = new FlowPanel();
-
-    @DataField
-    @UFPanel(panelType = " PanelType.MULTI_TAB")
-    @UFPart("HelloWorldScreen3")
-    FlowPanel panelSample3 = new FlowPanel();
 
     @PostConstruct
     public void setup() {

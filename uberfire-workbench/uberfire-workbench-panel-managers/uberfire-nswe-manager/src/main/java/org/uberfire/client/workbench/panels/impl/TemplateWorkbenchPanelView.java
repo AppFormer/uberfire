@@ -75,23 +75,23 @@ public class TemplateWorkbenchPanelView extends BaseWorkbenchTemplatePanelView<T
 
     @Override
     public void addPart( final WorkbenchPartPresenter.View view ) {
-        if ( panel.getPartView() != null ) {
+        /*if ( panel.getPartView() != null ) {
             //ederign
-           /* placeManager.tryClosePlace( getPlaceOfPartView(), new Command() {
+           *//* placeManager.tryClosePlace( getPlaceOfPartView(), new Command() {
                 @Override
                 public void execute() {
                     panel.setPart( view );
                 }
-            } );*/
-        } else {
+            } );*//*
+        } else {*/
             panel.setPart( view );
-        }
+       // }
 
     }
 
-    PlaceRequest getPlaceOfPartView() {
-        return panel.getPartView().getPresenter().getDefinition().getPlace();
-    }
+//    PlaceRequest getPlaceOfPartView() {
+//        return panel.getPartView().getPresenter().getDefinition().getPlace();
+//    }
 
     @Override
     public void changeTitle( final PartDefinition part,

@@ -349,6 +349,26 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
         assertNull( result.getActualCode() );
     }
 
+    @Test
+    public void testWorkbenchTemplateAnnotationMustHaveDefaultUFPanel() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest16";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        assertCompilationError( diagnostics,
+                                "The Template WorkbenchPerspective must provide a default @UFPanel annotated field." );
+        assertNull( result.getActualCode() );
+    }
+
 
     private void printDiagnostics( List<Diagnostic<? extends JavaFileObject>> diagnostics ) {
         for ( Diagnostic diagnostic: diagnostics ){

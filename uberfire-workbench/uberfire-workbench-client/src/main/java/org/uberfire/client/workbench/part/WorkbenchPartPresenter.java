@@ -28,7 +28,7 @@ import org.uberfire.workbench.model.menu.Menus;
 /**
  * A Workbench panel part.
  */
-@Dependent
+//@Dependent
 public class WorkbenchPartPresenter {
 
     public interface View
@@ -55,14 +55,14 @@ public class WorkbenchPartPresenter {
 
     private PartDefinition definition;
 
-    @Inject
+    //@Inject
     public WorkbenchPartPresenter( final View view ) {
         this.view = view;
     }
 
     @SuppressWarnings("unused")
-    @PostConstruct
-    private void init() {
+   // @PostConstruct
+    public void init() {
         view.init( this );
     }
 

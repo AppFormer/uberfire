@@ -1,7 +1,5 @@
 package org.uberfire.client.workbench.widgets.panel;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.HasFocusHandlers;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -9,7 +7,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.workbench.model.PartDefinition;
 
@@ -19,26 +17,26 @@ public class SimplePanel
         implements HasSelectionHandlers<PartDefinition>,
                    HasFocusHandlers {
 
-    private FocusPanel container = new FocusPanel();
+    private FlowPanel container = new FlowPanel();
 
     private PartDefinition partDefinition;
 
     public SimplePanel() {
         initWidget( container );
-        container.addClickHandler( new ClickHandler() {
-            @Override
-            public void onClick( final ClickEvent event ) {
-                if ( partDefinition != null ) {
-                    SelectionEvent.fire( SimplePanel.this, partDefinition );
-                }
-            }
-        } );
+//        container.addClickHandler( new ClickHandler() {
+//            @Override
+//            public void onClick( final ClickEvent event ) {
+//                if ( partDefinition != null ) {
+//                    SelectionEvent.fire( SimplePanel.this, partDefinition );
+//                }
+//            }
+//        } );
     }
 
 
     public void setPart( final WorkbenchPartPresenter.View part ) {
         this.partDefinition = part.getPresenter().getDefinition();
-        container.setWidget( part );
+        container.add( part );
     }
 
     public void clear() {
@@ -61,7 +59,8 @@ public class SimplePanel
 
     @Override
     public HandlerRegistration addFocusHandler( FocusHandler handler ) {
-        return container.addFocusHandler( handler );
+        //return container.addFocusHandler( handler );
+        return null;
     }
 
     public void onResize() {
@@ -78,7 +77,8 @@ public class SimplePanel
        // super.onResize();*/
     }
 
+    //ederign erro de cast
     public WorkbenchPartPresenter.View getPartView() {
-        return (WorkbenchPartPresenter.View) container.getWidget();
+        return (WorkbenchPartPresenter.View) container.asWidget();
     }
 }
