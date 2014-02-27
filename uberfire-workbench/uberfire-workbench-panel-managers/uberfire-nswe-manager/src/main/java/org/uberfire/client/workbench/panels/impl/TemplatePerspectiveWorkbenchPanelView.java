@@ -11,14 +11,6 @@ import org.uberfire.workbench.model.PanelDefinition;
 @Named("TemplatePerspectiveWorkbenchPanelView")
 public class TemplatePerspectiveWorkbenchPanelView extends AbstractTemplateWorkbenchPanelView<TemplatePerspectiveWorkbenchPanelPresenter> {
 
-    public TemplatePerspectiveWorkbenchPanelView() {
-
-    }
-
-    public TemplatePerspectiveWorkbenchPanelView( PanelDefinition def ) {
-        addFocusAndSelectionHandler();
-        initWidget( panel );
-    }
 
     @Override
     public Widget asWidget() {

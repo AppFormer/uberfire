@@ -29,10 +29,10 @@ import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.TemplatePerspectiveWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.TemplateWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
-import org.uberfire.client.workbench.part.WorkbenchPartTemplateView;
-import org.uberfire.client.workbench.part.WorkbenchPartView;
+import org.uberfire.client.workbench.part.WorkbenchPartTemplatePresenter;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
+import org.uberfire.workbench.model.PanelType;
 import org.uberfire.workbench.model.PartDefinition;
 import org.uberfire.workbench.model.menu.Menus;
 
@@ -56,14 +56,10 @@ public class DefaultBeanFactory
                                                     final IsWidget titleDecoration,
                                                     final PartDefinition definition ) {
         final WorkbenchPartPresenter part;
-        //ederign
         if ( parentIsATemplate( definition ) ) {
-            //part = iocManager.lookupBean( WorkbenchPartPresenter.class ).getInstance();
-            part = new WorkbenchPartPresenter( new WorkbenchPartView() );
-            part.init();
+            part = iocManager.lookupBean( WorkbenchPartTemplatePresenter.class ).getInstance();
         } else {
-            part = new WorkbenchPartPresenter( new WorkbenchPartTemplateView() );
-            part.init();
+            part = iocManager.lookupBean( WorkbenchPartPresenter.class ).getInstance();
         }
 
         part.setTitle( title );
@@ -74,6 +70,9 @@ public class DefaultBeanFactory
     }
 
     private boolean parentIsATemplate( PartDefinition definition ) {
+        if ( definition.getParentPanel() != null && definition.getParentPanel().getPanelType().equals( PanelType.TEMPLATE ) ) {
+            return true;
+        }
         return false;
     }
 

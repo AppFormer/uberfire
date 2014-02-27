@@ -15,8 +15,10 @@
  */
 package org.uberfire.client.workbench.part;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
+import javax.inject.Named;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -26,8 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A Workbench panel part.
  */
-@Any
-@Default
+@Dependent
+@Named("WorkbenchPartView")
 public class WorkbenchPartView
         extends SimpleLayoutPanel
         implements WorkbenchPartPresenter.View {

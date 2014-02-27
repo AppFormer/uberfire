@@ -23,6 +23,7 @@ import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.HorizontalSplitterPanel;
 import org.uberfire.client.workbench.panels.impl.VerticalSplitterPanel;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
+import org.uberfire.client.workbench.part.WorkbenchPartView;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
@@ -41,7 +42,8 @@ public class MockBeanFactory
                                                     final String title,
                                                     final IsWidget titleDecoration,
                                                     final PartDefinition definition ) {
-        final WorkbenchPartPresenter part = new WorkbenchPartPresenter( new MockWorkbenchPartView() );
+        final WorkbenchPartPresenter part = new WorkbenchPartPresenter( );
+        part.init( new MockWorkbenchPartView() );
         part.setTitle( title );
         part.setTitleDecoration( titleDecoration );
         part.setDefinition( definition );

@@ -15,7 +15,6 @@ public abstract class AbstractTemplateWorkbenchPanelView<P extends WorkbenchPane
 
     SimplePanel panel = new SimplePanel();
 
-
     @Override
     public void init( P presenter ) {
         this.presenter = presenter;

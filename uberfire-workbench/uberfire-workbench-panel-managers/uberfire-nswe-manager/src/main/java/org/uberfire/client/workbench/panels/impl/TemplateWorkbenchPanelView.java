@@ -20,16 +20,10 @@ import org.uberfire.workbench.model.PartDefinition;
 public class TemplateWorkbenchPanelView extends AbstractTemplateWorkbenchPanelView<TemplateWorkbenchPanelPresenter> {
 
 
+    @SuppressWarnings( "unused" )
     public TemplateWorkbenchPanelView() {
         initWidget( panel );
     }
-
-    public TemplateWorkbenchPanelView( PanelDefinition def ) {
-//        this.def = def;
-        addFocusAndSelectionHandler();
-        initWidget( panel );
-    }
-
 
     @Override
     public Widget asWidget() {

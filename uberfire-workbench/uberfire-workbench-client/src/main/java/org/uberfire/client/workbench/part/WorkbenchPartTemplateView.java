@@ -15,13 +15,16 @@
  */
 package org.uberfire.client.workbench.part;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Named;
+
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 
-/**
- * A Workbench panel part.
- */
+
+@Dependent
+@Named("WorkbenchPartTemplateView")
 public class WorkbenchPartTemplateView
         extends SimpleLayoutPanel
         implements WorkbenchPartPresenter.View {
