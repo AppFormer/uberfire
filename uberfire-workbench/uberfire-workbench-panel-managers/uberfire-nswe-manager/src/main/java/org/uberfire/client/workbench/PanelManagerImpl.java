@@ -131,8 +131,7 @@ public class PanelManagerImpl implements PanelManager {
         this.perspective = perspective;
         WorkbenchPanelPresenter newPresenter = getWorkbenchPanelPresenter( newRoot );
         if ( newPresenter == null ) {
-            //ederign
-            newPresenter = factory.newPerspectiveWorkbenchPanel( newRoot );
+            newPresenter = factory.newWorkbenchPanel( newRoot );
             mapPanelDefinitionToPresenter.put( newRoot, newPresenter );
         }
         if ( container != null ) {

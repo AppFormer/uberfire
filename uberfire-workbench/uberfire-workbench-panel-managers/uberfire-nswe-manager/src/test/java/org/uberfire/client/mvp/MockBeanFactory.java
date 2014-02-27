@@ -68,11 +68,6 @@ public class MockBeanFactory
     }
 
     @Override
-    public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( PanelDefinition definition ) {
-        return null;
-    }
-
-    @Override
     public HorizontalSplitterPanel newHorizontalSplitterPanel( WorkbenchPanelView eastPanel,
                                                                WorkbenchPanelView westPanel,
                                                                Position position,

@@ -31,8 +31,9 @@ public class AnotherPerspective extends Composite {
 
 
     @DataField
-    @UFPanel(panelType = " PanelType.TEMPLATE", isDefault = true)
-    @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("MoodScreen")})
+   // @UFPanel(panelType = " PanelType.TEMPLATE", isDefault = true)
+    @UFPanel(panelType = " PanelType.MULTI_TAB", isDefault = true)
+    @UFParts({@UFPart("HelloWorldScreen0"),@UFPart("HelloWorldScreen1"),@UFPart("MoodScreen")})
     FlowPanel panelSample1 = new FlowPanel();
 
     @PostConstruct

@@ -40,6 +40,4 @@ public interface BeanFactory {
 
     public void destroy( final Object o );
 
-    public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition );
-
 }

@@ -19,7 +19,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
@@ -27,6 +26,7 @@ import org.uberfire.client.workbench.panels.impl.MultiListWorkbenchPanelPresente
 import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
+import org.uberfire.client.workbench.panels.impl.TemplatePerspectiveWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.TemplateWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartTemplateView;
@@ -34,7 +34,6 @@ import org.uberfire.client.workbench.part.WorkbenchPartView;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
-import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.menu.Menus;
 
 /**
@@ -108,9 +107,11 @@ public class DefaultBeanFactory
                 break;
 
             case TEMPLATE:
-                //ederign <- apontar para o bean correto aqui
-                // panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
-                panel = new TemplateWorkbenchPanelPresenter( definition, false );
+                if ( templateRootPerspective( definition ) ) {
+                    panel = iocManager.lookupBean( TemplatePerspectiveWorkbenchPanelPresenter.class ).getInstance();
+                } else {
+                    panel = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
+                }
                 break;
 
             default:
@@ -122,10 +123,8 @@ public class DefaultBeanFactory
         return panel;
     }
 
-    @Override
-    public WorkbenchPanelPresenter newPerspectiveWorkbenchPanel( final PanelDefinition definition ) {
-        final WorkbenchPanelPresenter panel = new TemplateWorkbenchPanelPresenter( definition, true );
-        return panel;
+    private boolean templateRootPerspective( PanelDefinition definition ) {
+        return !definition.getChildren().isEmpty();
     }
 
     @Override
