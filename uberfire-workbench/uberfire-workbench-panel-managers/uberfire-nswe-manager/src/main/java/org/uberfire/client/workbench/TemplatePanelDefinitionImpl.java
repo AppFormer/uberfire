@@ -64,7 +64,6 @@ public class TemplatePanelDefinitionImpl
 
     @Override
     public PanelDefinition getChild( final Position position ) {
-        //ederign  if ( existingChild == null ) on       super.appendChild( position,panel );
         return null;
     }
 }

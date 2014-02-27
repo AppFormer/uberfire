@@ -48,11 +48,6 @@ public class StaticWorkbenchPanelPresenter implements WorkbenchPanelPresenter {
 
     private Event<MinimizePlaceEvent> minimizePanelEvent;
 
-    //ederign retirar este construtor
-    public StaticWorkbenchPanelPresenter(){
-
-    }
-
     @Inject
     public StaticWorkbenchPanelPresenter( @Named("StaticWorkbenchPanelView") final StaticWorkbenchPanelView view,
                                           final PanelManager panelManager,

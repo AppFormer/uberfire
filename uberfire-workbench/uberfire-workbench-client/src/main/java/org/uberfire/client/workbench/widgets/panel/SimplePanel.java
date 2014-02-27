@@ -77,7 +77,6 @@ public class SimplePanel
        // super.onResize();*/
     }
 
-    //ederign erro de cast
     public WorkbenchPartPresenter.View getPartView() {
         return (WorkbenchPartPresenter.View) container.asWidget();
     }

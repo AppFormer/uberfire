@@ -28,8 +28,7 @@ import org.uberfire.workbench.model.PanelType;
 @Target({ ElementType.FIELD })
 public @interface UFPanel {
 
-    //ederign
-    String panelType() default "PanelType.STATIC";
+    String panelType() default "PanelType.TEMPLATE";
 
     boolean isDefault() default false;
 

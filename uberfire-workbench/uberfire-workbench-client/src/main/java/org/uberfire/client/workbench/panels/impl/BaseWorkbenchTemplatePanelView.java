@@ -16,7 +16,6 @@ import org.uberfire.client.workbench.widgets.dnd.WorkbenchDragAndDropManager;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.Position;
 
-//ederign
 public abstract class BaseWorkbenchTemplatePanelView<P extends WorkbenchPanelPresenter>
         extends Composite
         implements WorkbenchPanelView<P> {

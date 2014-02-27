@@ -15,20 +15,8 @@ import org.uberfire.workbench.model.PanelDefinition;
 @Dependent
 public class TemplatePerspectiveWorkbenchPanelPresenter extends AbstractTemplateWorkbenchPanelPresenter< TemplatePerspectiveWorkbenchPanelView>{
 
-
-/*
-    //old Constructor
-    public TemplatePerspectiveWorkbenchPanelPresenter( PanelDefinition definition ) {
-        this.definition = definition;
-        //view.init @PostConstruct
-        this.view = new TemplatePerspectiveWorkbenchPanelView( this.definition );
-    }
-*/
-
-    //ederign ?
     @Inject
     public TemplatePerspectiveWorkbenchPanelPresenter( @Named("TemplatePerspectiveWorkbenchPanelView") final TemplatePerspectiveWorkbenchPanelView view,
-                                          final PanelManager panelManager,
                                           final Event<MaximizePlaceEvent> maximizePanelEvent,
                                           final Event<MinimizePlaceEvent> minimizePanelEvent ) {
         this.view = view;

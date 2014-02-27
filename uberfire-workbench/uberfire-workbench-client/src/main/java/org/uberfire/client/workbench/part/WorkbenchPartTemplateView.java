@@ -22,16 +22,12 @@ import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 /**
  * A Workbench panel part.
  */
-//ederign
 public class WorkbenchPartTemplateView
         extends SimpleLayoutPanel
         implements WorkbenchPartPresenter.View {
 
     private WorkbenchPartPresenter presenter;
-    //private IsWidget sp;
 
-    //ederign
-   // private final ScrollPanel sp = new ScrollPanel();
     private final FlowPanel sp = new FlowPanel();
 
     @Override
@@ -47,7 +43,6 @@ public class WorkbenchPartTemplateView
     @Override
     public void setWrappedWidget( final IsWidget widget ) {
         sp.add( widget );
-        //sp = ( widget );
     }
 
     @Override
