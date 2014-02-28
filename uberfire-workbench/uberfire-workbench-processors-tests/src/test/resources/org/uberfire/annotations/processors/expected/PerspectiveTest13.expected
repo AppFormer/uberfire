@@ -94,6 +94,7 @@ public class PerspectiveTest13Activity extends  AbstractTemplateWorkbenchPerspec
         Widget widget ) {
 
         if ( fieldName.equalsIgnoreCase( "teste" ) ) {
+            realPresenter.teste.clear();
             realPresenter.teste.add( widget.asWidget() );
         }
     }
@@ -106,7 +107,7 @@ public class PerspectiveTest13Activity extends  AbstractTemplateWorkbenchPerspec
             new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen1" ) ) );
             panelDefinition.addPart(
             new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen2" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        p.getRoot().appendChild( panelDefinition );
 
         return p;
     }

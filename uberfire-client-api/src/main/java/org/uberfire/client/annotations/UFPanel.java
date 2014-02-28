@@ -28,7 +28,7 @@ import org.uberfire.workbench.model.PanelType;
 @Target({ ElementType.FIELD })
 public @interface UFPanel {
 
-    String panelType() default "PanelType.TEMPLATE";
+    PanelType panelType() default PanelType.TEMPLATE;
 
     boolean isDefault() default false;
 

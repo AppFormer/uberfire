@@ -10,18 +10,18 @@ import org.uberfire.client.annotations.WorkbenchPerspective;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 import org.uberfire.client.annotations.UFPanel;
 import org.uberfire.client.annotations.UFPart;
-
+import org.uberfire.workbench.model.PanelType;
 @ApplicationScoped
 @WorkbenchPerspective(
         identifier = "HomePerspective",
         isDefault = true, isTemplate = true)
 public class PerspectiveTest16 {
 
-    @UFPanel(panelType = "PanelType.MULTI_TAB")
+    @UFPanel(panelType = PanelType.MULTI_TAB)
     @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("HelloWorldScreen2")})
     Object teste = new Object();
 
-    @UFPanel(panelType = "PanelType.MULTI_TAB")
+    @UFPanel(panelType = PanelType.MULTI_TAB)
     @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("HelloWorldScreen2")})
     Object teste2 = new Object();
 

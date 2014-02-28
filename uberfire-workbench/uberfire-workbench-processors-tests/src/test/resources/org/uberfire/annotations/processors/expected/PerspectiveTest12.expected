@@ -94,15 +94,19 @@ public class PerspectiveTest12Activity extends  AbstractTemplateWorkbenchPerspec
         Widget widget ) {
 
         if ( fieldName.equalsIgnoreCase( "teste" ) ) {
+            realPresenter.teste.clear();
             realPresenter.teste.add( widget.asWidget() );
         }
         if ( fieldName.equalsIgnoreCase( "teste2" ) ) {
+            realPresenter.teste2.clear();
             realPresenter.teste2.add( widget.asWidget() );
         }
         if ( fieldName.equalsIgnoreCase( "teste3" ) ) {
+            realPresenter.teste3.clear();
             realPresenter.teste3.add( widget.asWidget() );
         }
         if ( fieldName.equalsIgnoreCase( "teste4" ) ) {
+            realPresenter.teste4.clear();
             realPresenter.teste4.add( widget.asWidget() );
         }
     }
@@ -115,20 +119,20 @@ public class PerspectiveTest12Activity extends  AbstractTemplateWorkbenchPerspec
             new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen1" ) ) );
             panelDefinition.addPart(
             new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen2" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        p.getRoot().appendChild( panelDefinition );
 
-        PanelDefinition panelDefinition0 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste2"  );
+        PanelDefinition panelDefinition0 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "teste2"  );
         panelDefinition0.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen3" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition0 );
-        PanelDefinition panelDefinition1 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste3"  );
+        p.getRoot().appendChild( panelDefinition0 );
+        PanelDefinition panelDefinition1 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "teste3"  );
         panelDefinition1.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen4" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition1 );
-        PanelDefinition panelDefinition2 = new TemplatePanelDefinitionImpl( this, PanelType.STATIC , "teste4"  );
+        p.getRoot().appendChild( panelDefinition1 );
+        PanelDefinition panelDefinition2 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "teste4"  );
         panelDefinition2.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen5" ) ) );
-        p.getRoot().appendChild( Position.EAST, panelDefinition2 );
+        p.getRoot().appendChild( panelDefinition2 );
         return p;
     }
 

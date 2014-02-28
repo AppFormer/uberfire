@@ -193,7 +193,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
     @Perspective
     public PerspectiveDefinition getPerspective() {
         final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
-        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, ${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
         <#list defaultPanel.uFParts as ufPart>
             panelDefinition.addPart(
             new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
@@ -201,7 +201,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         p.getRoot().appendChild( panelDefinition );
 
         <#list ufPanels as ufPanel>
-        PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
+        PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, PanelType.${ufPanel.panelType} , "${ufPanel.fieldName}"  );
         <#list ufPanel.uFParts as ufPart>
         panelDefinition${ufPanel_index}.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
