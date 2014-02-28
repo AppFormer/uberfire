@@ -178,10 +178,12 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
     public void setWidget( String fieldName,
         Widget widget ) {
 
+        <#if defaultPanel??>
         if ( fieldName.equalsIgnoreCase( "${defaultPanel.fieldName}" ) ) {
             realPresenter.${defaultPanel.fieldName}.clear();
             realPresenter.${defaultPanel.fieldName}.add( widget.asWidget() );
         }
+        </#if>
         <#list wbPanels as wbPanel>
         if ( fieldName.equalsIgnoreCase( "${wbPanel.fieldName}" ) ) {
             realPresenter.${wbPanel.fieldName}.clear();
@@ -192,6 +194,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
 
     @Perspective
     public PerspectiveDefinition getPerspective() {
+        <#if defaultPanel??>
         final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
         PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
         <#list defaultPanel.wbParts as wbPart>
@@ -199,6 +202,10 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
             new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart}" ) ) );
         </#list>
         p.getRoot().appendChild( panelDefinition );
+        <#else>
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,null, getClass().getName() );
+
+        </#if>
 
         <#list wbPanels as wbPanel>
         PanelDefinition panelDefinition${wbPanel_index} = new TemplatePanelDefinitionImpl( this, PanelType.${wbPanel.panelType} , "${wbPanel.fieldName}"  );

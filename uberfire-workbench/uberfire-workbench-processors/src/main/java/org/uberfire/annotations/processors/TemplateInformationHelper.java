@@ -16,21 +16,34 @@ public class TemplateInformationHelper {
     public static final String VALUE = "value";
     public static final String PANEL_TYPE = "panelType";
     public static final String IS_DEFAULT = "isDefault";
+    public static final String DEFAULT_PANEL_TYPE = "TEMPLATE";
 
     public static TemplateInformation extractWbTemplatePerspectiveInformation( TypeElement classElement ) throws GenerationException {
 
         TemplateInformation template = new TemplateInformation();
 
         for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( ClientAPIModule.getWorkbenchPanel() ) != null ) {
+            if ( isAWorkbenchPanel( element ) ) {
                 extractInformationFromWorkbenchPanel( template, element );
+            } else if ( onlyWorkbenchPartWithoutPanel( element ) ) {
+                extractInformationFromGeneratedWorkbenchPanel( template, element );
             }
 
         }
-        if ( !template.thereIsTemplateFields() ) {
+        if ( template.thereIsTemplateFields() ) {
             return template;
         }
-        throw new GenerationException( "The Template WorkbenchPerspective must provide a @WorkbenchPanel annotated field." );
+        throw new GenerationException( "The Template WorkbenchPerspective must provide a @WorkbenchPanel or @WorkbenchPart annotated field." );
+    }
+
+    private static boolean onlyWorkbenchPartWithoutPanel( Element element ) {
+        boolean ufPart = element.getAnnotation( ClientAPIModule.getWorkbenchPart() ) != null;
+        boolean ufParts = element.getAnnotation( ClientAPIModule.getWorkbenchParts() ) != null;
+        return !isAWorkbenchPanel( element ) && ( ufPart || ufParts );
+    }
+
+    private static boolean isAWorkbenchPanel( Element element ) {
+        return element.getAnnotation( ClientAPIModule.getWorkbenchPanel() ) != null;
     }
 
     private static void extractInformationFromWorkbenchPanel( TemplateInformation template,
@@ -50,6 +63,16 @@ public class TemplateInformationHelper {
         } else {
             template.addTemplateField( wbPanel );
         }
+    }
+
+    private static void extractInformationFromGeneratedWorkbenchPanel( TemplateInformation template,
+                                                                       Element element ) throws GenerationException {
+        WorkbenchPanelInformation generatedWbPanel = new WorkbenchPanelInformation();
+
+        generatedWbPanel.setFieldName( element.getSimpleName().toString() );
+        generatedWbPanel.setWbParts( getWorkbenchPartsFrom( element ) );
+        generatedWbPanel.setPanelType( DEFAULT_PANEL_TYPE ) ;
+        template.addTemplateField( generatedWbPanel );
     }
 
     private static boolean shouldHaveOnlyOneDefaultPanel( TemplateInformation template ) {

@@ -27,6 +27,6 @@ public class TemplateInformation {
     }
 
     public boolean thereIsTemplateFields() {
-        return  (getTemplateFields().isEmpty()&&defaultPanel==null);
+        return  ((!getTemplateFields().isEmpty())||defaultPanel!=null);
     }
 }

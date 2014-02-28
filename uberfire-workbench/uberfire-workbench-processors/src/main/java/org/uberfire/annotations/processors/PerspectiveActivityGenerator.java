@@ -169,13 +169,11 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
 
         TemplateInformation helper = TemplateInformationHelper.extractWbTemplatePerspectiveInformation( classElement );
 
-        if ( helper.getDefaultPanel() != null ){
-        root.put( "defaultPanel", helper.getDefaultPanel() );
+        if ( helper.getDefaultPanel() != null ) {
+            root.put( "defaultPanel", helper.getDefaultPanel() );
         }
-        else{
-            throw new GenerationException("The Template WorkbenchPerspective must provide a default @WorkbenchPanel annotated field."  );
-        }
-        root.put( "wbPanels",helper.getTemplateFields() );
+        root.put( "wbPanels", helper.getTemplateFields() );
+
     }
 
 }

@@ -308,7 +308,7 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
     }
 
     @Test
-    public void testWorkbenchTemplateAnnotationMustHaveWorkbenchPanels() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationMustHaveWorkbenchPanelsOrParts() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest14";
         final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
 
@@ -322,12 +322,11 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
                 result.setActualCode( code );
             }
         } ),pathCompilationUnit );
+        printDiagnostics( diagnostics );
         assertCompilationError( diagnostics,
-                                "The Template WorkbenchPerspective must provide a @WorkbenchPanel annotated field." );
+                                "The Template WorkbenchPerspective must provide a @WorkbenchPanel or @WorkbenchPart annotated field." );
         assertNull( result.getActualCode() );
     }
-
-
 
     @Test
     public void testWorkbenchTemplateAnnotationShouldNotAllowTwoDefaultWorkbenchPanels() throws FileNotFoundException {
@@ -350,9 +349,9 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
     }
 
     @Test
-    public void testWorkbenchTemplateAnnotationMustHaveDefaultWorkbenchPanel() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationWithNoDefaultWorkbenchPanel() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest16";
-        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest16.expected";
 
         final Result result = new Result();
         result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
@@ -364,9 +363,57 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
                 result.setActualCode( code );
             }
         } ),pathCompilationUnit );
-        assertCompilationError( diagnostics,
-                                "The Template WorkbenchPerspective must provide a default @WorkbenchPanel annotated field." );
-        assertNull( result.getActualCode() );
+        assertSuccessfulCompilation( diagnostics );
+        assertNotNull( result.getActualCode() );
+        assertNotNull( result.getExpectedCode() );
+        assertEquals( result.getActualCode(),
+                      result.getExpectedCode() );
+    }
+
+    @Test
+    public void testAlonePartAnnotationShouldGenerateDefaultPanel() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest17";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest17.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        printDiagnostics(diagnostics);
+        assertSuccessfulCompilation( diagnostics );
+        assertNotNull( result.getActualCode() );
+        assertNotNull( result.getExpectedCode() );
+        assertEquals( result.getActualCode(),
+                      result.getExpectedCode() );
+    }
+
+    @Test
+    public void testAlonePartsAnnotationShouldGenerateDefaultPanel() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest18";
+        final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest18.expected";
+
+        final Result result = new Result();
+        result.setExpectedCode( getExpectedSourceCode( pathExpectedResult ) );
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile( new PerspectiveProcessor( new GenerationCompleteCallback() {
+
+            @Override
+            public void generationComplete( final String code ) {
+                result.setActualCode( code );
+            }
+        } ),pathCompilationUnit );
+        printDiagnostics(diagnostics);
+        assertSuccessfulCompilation( diagnostics );
+        assertNotNull( result.getActualCode() );
+        assertNotNull( result.getExpectedCode() );
+        assertEquals( result.getActualCode(),
+                      result.getExpectedCode() );
     }
 
 
