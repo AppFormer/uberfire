@@ -88,9 +88,5 @@ public abstract class AbstractTemplateWorkbenchPanelView<P extends WorkbenchPane
 
     @Override
     public void onResize() {
-        //ederign
-        Element element = this.getElement();
-        DOM.setStyleAttribute( element, "position", "relative" );
-        System.out.print( "" );
     }
 }

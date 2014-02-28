@@ -179,10 +179,12 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         Widget widget ) {
 
         if ( fieldName.equalsIgnoreCase( "${defaultPanel.fieldName}" ) ) {
+            realPresenter.${defaultPanel.fieldName}.clear();
             realPresenter.${defaultPanel.fieldName}.add( widget.asWidget() );
         }
         <#list ufPanels as ufPanel>
         if ( fieldName.equalsIgnoreCase( "${ufPanel.fieldName}" ) ) {
+            realPresenter.${ufPanel.fieldName}.clear();
             realPresenter.${ufPanel.fieldName}.add( widget.asWidget() );
         }
         </#list>

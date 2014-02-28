@@ -193,7 +193,6 @@ public abstract class AbstractProcessorTest {
         final List<String> messages = new ArrayList<String>();
         for ( Diagnostic<? extends JavaFileObject> diagnostic : diagnostics ) {
             if ( diagnostic.getKind().equals( kind ) ) {
-                System.out.println( diagnostic.getMessage( null ) );
                 messages.add( diagnostic.getMessage( null ) );
             }
         }

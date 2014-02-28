@@ -12,7 +12,6 @@ import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.workbench.model.PartDefinition;
 
 public class SimplePanel
-        //extends ResizeComposite
         extends Composite
         implements HasSelectionHandlers<PartDefinition>,
                    HasFocusHandlers {
@@ -23,15 +22,6 @@ public class SimplePanel
 
     public SimplePanel() {
         initWidget( container );
-//        container.addClickHandler( new ClickHandler() {
-//            @Override
-//            public void onClick( final ClickEvent event ) {
-//                if ( partDefinition != null ) {
-//                    SelectionEvent.fire( SimplePanel.this, partDefinition );
-//                }
-//            }
-//        } );
-        System.out.println();
     }
 
 
@@ -60,23 +50,10 @@ public class SimplePanel
 
     @Override
     public HandlerRegistration addFocusHandler( FocusHandler handler ) {
-        //return container.addFocusHandler( handler );
         return null;
     }
 
     public void onResize() {
-        System.out.println();
-       /* if ( isAttached() ) {
-            final int width = getParent().getOffsetWidth();
-            final int height = getParent().getOffsetHeight();
-            setPixelSize( width, height );
-
-            container.setPixelSize( width, height );
-            if ( container.getWidget() != null ) {
-                container.getWidget().setPixelSize( width, height );
-            }
-        }
-       // super.onResize();*/
     }
 
     public WorkbenchPartPresenter.View getPartView() {
