@@ -285,7 +285,7 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
     }
 
     @Test
-    public void testWorkbenchTemplateAnnotationWithOnlyUFParts() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationWithOnlyWorkbenchParts() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest13";
         final String pathExpectedResult = "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
 
@@ -308,7 +308,7 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
     }
 
     @Test
-    public void testWorkbenchTemplateAnnotationMustHaveUFPanels() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationMustHaveWorkbenchPanels() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest14";
         final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
 
@@ -323,14 +323,14 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
             }
         } ),pathCompilationUnit );
         assertCompilationError( diagnostics,
-                                "The Template WorkbenchPerspective must provide a @UFPanel annotated field." );
+                                "The Template WorkbenchPerspective must provide a @WorkbenchPanel annotated field." );
         assertNull( result.getActualCode() );
     }
 
 
 
     @Test
-    public void testWorkbenchTemplateAnnotationShouldNotAllowTwoDefaultUFPanels() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationShouldNotAllowTwoDefaultWorkbenchPanels() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest15";
         final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
 
@@ -345,12 +345,12 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
             }
         } ),pathCompilationUnit );
         assertCompilationError( diagnostics,
-                                "The Template WorkbenchPerspective must provide only one @UFPanel annotated field." );
+                                "The Template WorkbenchPerspective must provide only one @WorkbenchPanel annotated field." );
         assertNull( result.getActualCode() );
     }
 
     @Test
-    public void testWorkbenchTemplateAnnotationMustHaveDefaultUFPanel() throws FileNotFoundException {
+    public void testWorkbenchTemplateAnnotationMustHaveDefaultWorkbenchPanel() throws FileNotFoundException {
         final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest16";
         final String pathExpectedResult =  "org/uberfire/annotations/processors/expected/PerspectiveTest13.expected";
 
@@ -365,7 +365,7 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
             }
         } ),pathCompilationUnit );
         assertCompilationError( diagnostics,
-                                "The Template WorkbenchPerspective must provide a default @UFPanel annotated field." );
+                                "The Template WorkbenchPerspective must provide a default @WorkbenchPanel annotated field." );
         assertNull( result.getActualCode() );
     }
 

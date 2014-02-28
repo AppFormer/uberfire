@@ -7,11 +7,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.uberfire.client.annotations.UFPanel;
-import org.uberfire.client.annotations.UFPart;
-import org.uberfire.client.annotations.UFParts;
+import org.uberfire.client.annotations.WorkbenchPanel;
+import org.uberfire.client.annotations.WorkbenchPart;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
 
 @ApplicationScoped
@@ -22,13 +20,13 @@ import org.uberfire.workbench.model.PanelType;
 public class HomePerspective extends Composite {
 
     @DataField
-    @UFPanel(panelType = PanelType.TEMPLATE, isDefault =  true)
-    @UFPart("MoodScreen")
+    @WorkbenchPanel(panelType = PanelType.TEMPLATE, isDefault =  true)
+    @WorkbenchPart("MoodScreen")
     FlowPanel moodScreen = new FlowPanel();
 
     @DataField
-    @UFPanel
-    @UFPart("HomeScreen")
+    @WorkbenchPanel
+    @WorkbenchPart("HomeScreen")
     FlowPanel homeScreen = new FlowPanel();
 
     @PostConstruct

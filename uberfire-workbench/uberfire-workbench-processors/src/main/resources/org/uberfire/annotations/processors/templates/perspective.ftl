@@ -182,10 +182,10 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
             realPresenter.${defaultPanel.fieldName}.clear();
             realPresenter.${defaultPanel.fieldName}.add( widget.asWidget() );
         }
-        <#list ufPanels as ufPanel>
-        if ( fieldName.equalsIgnoreCase( "${ufPanel.fieldName}" ) ) {
-            realPresenter.${ufPanel.fieldName}.clear();
-            realPresenter.${ufPanel.fieldName}.add( widget.asWidget() );
+        <#list wbPanels as wbPanel>
+        if ( fieldName.equalsIgnoreCase( "${wbPanel.fieldName}" ) ) {
+            realPresenter.${wbPanel.fieldName}.clear();
+            realPresenter.${wbPanel.fieldName}.add( widget.asWidget() );
         }
         </#list>
     }
@@ -194,19 +194,19 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
     public PerspectiveDefinition getPerspective() {
         final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
         PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
-        <#list defaultPanel.uFParts as ufPart>
+        <#list defaultPanel.wbParts as wbPart>
             panelDefinition.addPart(
-            new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+            new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart}" ) ) );
         </#list>
         p.getRoot().appendChild( panelDefinition );
 
-        <#list ufPanels as ufPanel>
-        PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, PanelType.${ufPanel.panelType} , "${ufPanel.fieldName}"  );
-        <#list ufPanel.uFParts as ufPart>
-        panelDefinition${ufPanel_index}.addPart(
-                new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        <#list wbPanels as wbPanel>
+        PanelDefinition panelDefinition${wbPanel_index} = new TemplatePanelDefinitionImpl( this, PanelType.${wbPanel.panelType} , "${wbPanel.fieldName}"  );
+        <#list wbPanel.wbParts as wbPart>
+        panelDefinition${wbPanel_index}.addPart(
+                new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart}" ) ) );
         </#list>
-        p.getRoot().appendChild( panelDefinition${ufPanel_index} );
+        p.getRoot().appendChild( panelDefinition${wbPanel_index} );
         </#list>
         return p;
     }

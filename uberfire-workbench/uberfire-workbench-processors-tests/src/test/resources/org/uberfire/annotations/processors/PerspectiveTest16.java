@@ -2,14 +2,11 @@ package org.uberfire.annotations.processors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
-import org.uberfire.client.annotations.Perspective;
-import org.uberfire.client.annotations.UFParts;
+import org.uberfire.client.annotations.WorkbenchPanel;
+import org.uberfire.client.annotations.WorkbenchPart;
+import org.uberfire.client.annotations.WorkbenchParts;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.workbench.model.PerspectiveDefinition;
-import org.uberfire.client.annotations.UFPanel;
-import org.uberfire.client.annotations.UFPart;
 import org.uberfire.workbench.model.PanelType;
 @ApplicationScoped
 @WorkbenchPerspective(
@@ -17,12 +14,12 @@ import org.uberfire.workbench.model.PanelType;
         isDefault = true, isTemplate = true)
 public class PerspectiveTest16 {
 
-    @UFPanel(panelType = PanelType.MULTI_TAB)
-    @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("HelloWorldScreen2")})
+    @WorkbenchPanel(panelType = PanelType.MULTI_TAB)
+    @WorkbenchParts({@WorkbenchPart("HelloWorldScreen1"),@WorkbenchPart("HelloWorldScreen2")})
     Object teste = new Object();
 
-    @UFPanel(panelType = PanelType.MULTI_TAB)
-    @UFParts({@UFPart("HelloWorldScreen1"),@UFPart("HelloWorldScreen2")})
+    @WorkbenchPanel(panelType = PanelType.MULTI_TAB)
+    @WorkbenchParts({@WorkbenchPart("HelloWorldScreen1"),@WorkbenchPart("HelloWorldScreen2")})
     Object teste2 = new Object();
 
     @PostConstruct

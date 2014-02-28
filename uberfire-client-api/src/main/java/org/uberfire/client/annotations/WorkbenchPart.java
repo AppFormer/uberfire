@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface UFPart {
+public @interface WorkbenchPart {
 
     String value();
 }

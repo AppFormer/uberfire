@@ -41,9 +41,9 @@ public class ClientAPIModule {
     private static Class<? extends Annotation> splashFilter;
     private static Class<? extends Annotation> splashBodySize;
     private static Class<? extends Annotation> intercept;
-    private static Class<? extends Annotation> ufPart;
-    private static Class<? extends Annotation> ufParts;
-    private static Class<? extends Annotation> ufPanel;
+    private static Class<? extends Annotation> workbenchPart;
+    private static Class<? extends Annotation> workbenchParts;
+    private static Class<? extends Annotation> workbenchPanel;
 
     private ClientAPIModule() {
     }
@@ -68,9 +68,9 @@ public class ClientAPIModule {
             splashFilter = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashFilter" );
             splashBodySize = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashBodySize" );
             intercept = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.Intercept" );
-            ufPart = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.UFPart" );
-            ufParts = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.UFParts" );
-            ufPanel = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.UFPanel" );
+            workbenchPart = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPart" );
+            workbenchParts = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchParts" );
+            workbenchPanel = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPanel" );
 
         } catch ( ClassNotFoundException e ) {
             logger.error( e.getMessage() );
@@ -145,16 +145,16 @@ public class ClientAPIModule {
         return workbenchPerspective;
     }
 
-    public static Class<? extends Annotation> getUfPart() {
-        return ufPart;
+    public static Class<? extends Annotation> getWorkbenchPart() {
+        return workbenchPart;
     }
 
-    public static Class<? extends Annotation> getUfParts() {
-        return ufParts;
+    public static Class<? extends Annotation> getWorkbenchParts() {
+        return workbenchParts;
     }
 
-    public static Class<? extends Annotation> getUfPanel() {
-        return ufPanel;
+    public static Class<? extends Annotation> getWorkbenchPanel() {
+        return workbenchPanel;
     }
 
     private static String getAnnotationIdentifierValueOnClass( TypeElement o,

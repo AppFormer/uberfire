@@ -173,9 +173,9 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
         root.put( "defaultPanel", helper.getDefaultPanel() );
         }
         else{
-            throw new GenerationException("The Template WorkbenchPerspective must provide a default @UFPanel annotated field."  );
+            throw new GenerationException("The Template WorkbenchPerspective must provide a default @WorkbenchPanel annotated field."  );
         }
-        root.put( "ufPanels",helper.getTemplateFields() );
+        root.put( "wbPanels",helper.getTemplateFields() );
     }
 
 }

@@ -2,10 +2,10 @@ package org.uberfire.annotations.processors.facades;
 
 import java.util.List;
 
-public class UFPanelInformation {
+public class WorkbenchPanelInformation {
 
     private String fieldName;
-    private List<String> uFParts;
+    private List<String> wbParts;
     private boolean isDefault;
     private String panelType;
 
@@ -21,12 +21,13 @@ public class UFPanelInformation {
         this.fieldName = fieldName;
     }
 
-    public List<String> getuFParts() {
-        return uFParts;
+    @SuppressWarnings( "unused" )
+    public List<String> getWbParts() {
+        return wbParts;
     }
 
-    public void setUFParts( List<String> uFParts ) {
-        this.uFParts = uFParts;
+    public void setWbParts( List<String> uFParts ) {
+        this.wbParts = uFParts;
     }
 
     public void setPanelType( String panelType ) {
@@ -37,6 +38,7 @@ public class UFPanelInformation {
         return panelType;
     }
 
+    @SuppressWarnings( "unused" )
     public String getFieldName() {
         return fieldName;
     }

@@ -26,7 +26,7 @@ import org.uberfire.workbench.model.PanelType;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
-public @interface UFPanel {
+public @interface WorkbenchPanel {
 
     PanelType panelType() default PanelType.TEMPLATE;
 

@@ -9,7 +9,7 @@ import javax.lang.model.element.TypeElement;
 
 import org.uberfire.annotations.processors.exceptions.GenerationException;
 import org.uberfire.annotations.processors.facades.ClientAPIModule;
-import org.uberfire.annotations.processors.facades.UFPanelInformation;
+import org.uberfire.annotations.processors.facades.WorkbenchPanelInformation;
 
 public class TemplateInformationHelper {
 
@@ -22,33 +22,33 @@ public class TemplateInformationHelper {
         TemplateInformation template = new TemplateInformation();
 
         for ( Element element : classElement.getEnclosedElements() ) {
-            if ( element.getAnnotation( ClientAPIModule.getUfPanel() ) != null ) {
-                extractInformationFromUFPanel( template, element );
+            if ( element.getAnnotation( ClientAPIModule.getWorkbenchPanel() ) != null ) {
+                extractInformationFromWorkbenchPanel( template, element );
             }
 
         }
         if ( !template.thereIsTemplateFields() ) {
             return template;
         }
-        throw new GenerationException( "The Template WorkbenchPerspective must provide a @UFPanel annotated field." );
+        throw new GenerationException( "The Template WorkbenchPerspective must provide a @WorkbenchPanel annotated field." );
     }
 
-    private static void extractInformationFromUFPanel( TemplateInformation template,
-                                                       Element element ) throws GenerationException {
-        UFPanelInformation ufPanel = new UFPanelInformation();
-        if ( ufPanelIsDefault( element ) ) {
-            ufPanel.setDefault( true );
+    private static void extractInformationFromWorkbenchPanel( TemplateInformation template,
+                                                              Element element ) throws GenerationException {
+        WorkbenchPanelInformation wbPanel = new WorkbenchPanelInformation();
+        if ( workbenchPanelIsDefault( element ) ) {
+            wbPanel.setDefault( true );
         }
-        ufPanel.setFieldName( element.getSimpleName().toString() );
-        ufPanel.setUFParts( getUFPartsFrom( element ) );
-        ufPanel.setPanelType( extractPanelType( element ) );
-        if ( ufPanel.isDefault() ) {
+        wbPanel.setFieldName( element.getSimpleName().toString() );
+        wbPanel.setWbParts( getWorkbenchPartsFrom( element ) );
+        wbPanel.setPanelType( extractPanelType( element ) );
+        if ( wbPanel.isDefault() ) {
             if ( shouldHaveOnlyOneDefaultPanel( template ) ) {
-                throw new GenerationException( "The Template WorkbenchPerspective must provide only one @UFPanel annotated field." );
+                throw new GenerationException( "The Template WorkbenchPerspective must provide only one @WorkbenchPanel annotated field." );
             }
-            template.setDefaultPanel( ufPanel );
+            template.setDefaultPanel( wbPanel );
         } else {
-            template.addTemplateField( ufPanel );
+            template.addTemplateField( wbPanel );
         }
     }
 
@@ -57,27 +57,27 @@ public class TemplateInformationHelper {
     }
 
     private static String extractPanelType( Element element ) throws GenerationException {
-        Annotation annotation = element.getAnnotation( ClientAPIModule.getUfPanel() );
+        Annotation annotation = element.getAnnotation( ClientAPIModule.getWorkbenchPanel() );
         return extractAnnotationPropertyValue( annotation, PANEL_TYPE );
     }
 
-    private static boolean ufPanelIsDefault( Element element ) throws GenerationException {
-        Annotation annotation = element.getAnnotation( ClientAPIModule.getUfPanel() );
+    private static boolean workbenchPanelIsDefault( Element element ) throws GenerationException {
+        Annotation annotation = element.getAnnotation( ClientAPIModule.getWorkbenchPanel() );
         return Boolean.valueOf( extractAnnotationPropertyValue( annotation, IS_DEFAULT ) );
     }
 
-    private static List<String> getUFPartsFrom( Element ufPanel ) throws GenerationException {
+    private static List<String> getWorkbenchPartsFrom( Element wbPanel ) throws GenerationException {
         List<String> parts = new ArrayList<String>();
-        if ( thereIsUFParts( ufPanel ) ) {
-            extractUFPartFromUFParts( ufPanel, parts );
+        if ( thereIsWbParts( wbPanel ) ) {
+            extractWbPartFromWbParts( wbPanel, parts );
         } else {
-            parts.add( extractMethodValueFromAnnotation( ufPanel, ClientAPIModule.getUfPart(), VALUE ) );
+            parts.add( extractMethodValueFromAnnotation( wbPanel, ClientAPIModule.getWorkbenchPart(), VALUE ) );
         }
         return parts;
     }
 
-    private static boolean thereIsUFParts( Element element ) {
-        if ( element.getAnnotation( ClientAPIModule.getUfParts() ) != null ) {
+    private static boolean thereIsWbParts( Element element ) {
+        if ( element.getAnnotation( ClientAPIModule.getWorkbenchParts() ) != null ) {
             return true;
         }
         return false;
@@ -96,9 +96,9 @@ public class TemplateInformationHelper {
         return value;
     }
 
-    private static void extractUFPartFromUFParts( Element ufPanel,
+    private static void extractWbPartFromWbParts( Element ufPanel,
                                                   List<String> parts ) throws GenerationException {
-        Annotation[] annotations = extractAnnotationsFromAnnotation( ufPanel, ClientAPIModule.getUfParts(), VALUE );
+        Annotation[] annotations = extractAnnotationsFromAnnotation( ufPanel, ClientAPIModule.getWorkbenchParts(), VALUE );
         for ( Annotation annotation : annotations ) {
             String value = extractAnnotationStringValue( annotation );
             parts.add( value );

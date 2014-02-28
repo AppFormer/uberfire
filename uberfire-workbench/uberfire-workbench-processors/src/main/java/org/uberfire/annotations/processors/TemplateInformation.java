@@ -3,26 +3,26 @@ package org.uberfire.annotations.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.uberfire.annotations.processors.facades.UFPanelInformation;
+import org.uberfire.annotations.processors.facades.WorkbenchPanelInformation;
 
 public class TemplateInformation {
 
-    private UFPanelInformation defaultPanel;
-    private List<UFPanelInformation> templateFields = new ArrayList<UFPanelInformation>();
+    private WorkbenchPanelInformation defaultPanel;
+    private List<WorkbenchPanelInformation> templateFields = new ArrayList<WorkbenchPanelInformation>();
 
-    public void addTemplateField( UFPanelInformation field ) {
+    public void addTemplateField( WorkbenchPanelInformation field ) {
         templateFields.add( field );
     }
 
-    public List<UFPanelInformation> getTemplateFields() {
+    public List<WorkbenchPanelInformation> getTemplateFields() {
         return templateFields;
     }
 
-    public void setDefaultPanel( UFPanelInformation defaultPanel ) {
+    public void setDefaultPanel( WorkbenchPanelInformation defaultPanel ) {
         this.defaultPanel = defaultPanel;
     }
 
-    public UFPanelInformation getDefaultPanel() {
+    public WorkbenchPanelInformation getDefaultPanel() {
         return defaultPanel;
     }
 
