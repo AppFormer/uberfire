@@ -1,6 +1,7 @@
 package org.uberfire.client.workbench.panels.impl;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.gwt.core.client.Scheduler;
@@ -19,8 +20,7 @@ import org.uberfire.workbench.model.PartDefinition;
 @Named("TemplateWorkbenchPanelView")
 public class TemplateWorkbenchPanelView extends AbstractTemplateWorkbenchPanelView<TemplateWorkbenchPanelPresenter> {
 
-
-    @SuppressWarnings( "unused" )
+    @Inject
     public TemplateWorkbenchPanelView() {
         initWidget( panel );
     }

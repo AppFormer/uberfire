@@ -23,19 +23,13 @@ public class HomePerspective extends Composite {
 
     @DataField
     @UFPanel(panelType = "PanelType.TEMPLATE", isDefault =  true)
-    @UFParts({@UFPart("HelloWorldScreen0")})
-    FlowPanel hello1 = new FlowPanel();
-
-
-    @DataField
-    @UFPanel(panelType = "PanelType.TEMPLATE")
-    @UFParts({@UFPart("HelloWorldScreen1")})
-    FlowPanel hello2 = new FlowPanel();
+    @UFPart("MoodScreen")
+    FlowPanel moodScreen = new FlowPanel();
 
     @DataField
     @UFPanel(panelType = "PanelType.TEMPLATE")
-    @UFParts({@UFPart("MoodScreen")})
-    FlowPanel hello3 = new FlowPanel();
+    @UFPart("HomeScreen")
+    FlowPanel homeScreen = new FlowPanel();
 
     @PostConstruct
     public void setup() {

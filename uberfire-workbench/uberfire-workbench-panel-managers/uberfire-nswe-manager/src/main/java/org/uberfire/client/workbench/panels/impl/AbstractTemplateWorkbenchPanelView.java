@@ -27,24 +27,6 @@ public abstract class AbstractTemplateWorkbenchPanelView<P extends WorkbenchPane
         return this.presenter;
     }
 
-    void addFocusAndSelectionHandler() {
-        //ederign ?
-        panel.addFocusHandler( new FocusHandler() {
-            @Override
-            public void onFocus( final FocusEvent event ) {
-                panelManager.onPanelFocus( presenter.getDefinition() );
-            }
-        } );
-
-        //When a tab is selected ensure content is resized and set focus
-        panel.addSelectionHandler( new SelectionHandler<PartDefinition>() {
-            @Override
-            public void onSelection( final SelectionEvent<PartDefinition> event ) {
-                presenter.onPartLostFocus();
-                presenter.onPartFocus( event.getSelectedItem() );
-            }
-        } );
-    }
 
     @Override
     public void clear() {

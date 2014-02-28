@@ -198,7 +198,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
             panelDefinition.addPart(
             new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
         </#list>
-        p.getRoot().appendChild( Position.EAST, panelDefinition );
+        p.getRoot().appendChild( panelDefinition );
 
         <#list ufPanels as ufPanel>
         PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
@@ -206,7 +206,7 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         panelDefinition${ufPanel_index}.addPart(
                 new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
         </#list>
-        p.getRoot().appendChild( Position.EAST, panelDefinition${ufPanel_index} );
+        p.getRoot().appendChild( panelDefinition${ufPanel_index} );
         </#list>
         return p;
     }

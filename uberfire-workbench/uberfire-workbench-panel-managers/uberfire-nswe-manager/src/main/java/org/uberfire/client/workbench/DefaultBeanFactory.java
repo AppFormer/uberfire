@@ -109,7 +109,7 @@ public class DefaultBeanFactory
                 if ( templateRootPerspective( definition ) ) {
                     panel = iocManager.lookupBean( TemplatePerspectiveWorkbenchPanelPresenter.class ).getInstance();
                 } else {
-                    panel = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
+                    panel  = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
                 }
                 break;
 

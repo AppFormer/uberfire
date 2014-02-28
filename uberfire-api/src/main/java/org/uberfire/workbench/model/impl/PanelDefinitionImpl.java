@@ -142,6 +142,19 @@ public class PanelDefinitionImpl
     }
 
     @Override
+    public void appendChild(
+            final PanelDefinition panel ) {
+
+        if ( panel == null ) {
+            return;
+        }
+        if ( children.contains( panel ) ) {
+            return;
+        }
+        children.add( panel );
+    }
+
+    @Override
     public PanelDefinition getChild( final Position position ) {
         for ( PanelDefinition child : children ) {
             if ( child.getPosition() == position ) {

@@ -10,16 +10,10 @@ import javax.inject.Named;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.events.MaximizePlaceEvent;
 import org.uberfire.client.workbench.events.MinimizePlaceEvent;
+import org.uberfire.workbench.model.PanelDefinition;
 
 @Dependent
 public class TemplateWorkbenchPanelPresenter extends AbstractTemplateWorkbenchPanelPresenter<TemplateWorkbenchPanelView> {
-
-
-//    //old Constructor
-//    public TemplateWorkbenchPanelPresenter( PanelDefinition definition) {
-//        this.definition = definition;
-//        this.view = new TemplateWorkbenchPanelView( this.definition);
-//    }
 
     @Inject
     public TemplateWorkbenchPanelPresenter( @Named("TemplateWorkbenchPanelView") final TemplateWorkbenchPanelView view,
@@ -30,5 +24,4 @@ public class TemplateWorkbenchPanelPresenter extends AbstractTemplateWorkbenchPa
         this.maximizePanelEvent = maximizePanelEvent;
         this.minimizePanelEvent = minimizePanelEvent;
     }
-
 }
