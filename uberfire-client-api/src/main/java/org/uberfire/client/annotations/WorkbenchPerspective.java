@@ -45,4 +45,6 @@ public @interface WorkbenchPerspective {
 
     boolean isDefault() default false;
 
+    boolean isTemplate() default false;
+
 }

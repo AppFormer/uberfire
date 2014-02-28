@@ -21,6 +21,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.mvp.AbstractWorkbenchPerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.workbench.model.PerspectiveDefinition;
@@ -44,7 +45,6 @@ public class StandaloneEditorPerspective extends AbstractWorkbenchPerspectiveAct
         p.setTransient( true );
         return p;
     }
-
     @Override
     public String getIdentifier() {
         return "StandaloneEditorPerspective";

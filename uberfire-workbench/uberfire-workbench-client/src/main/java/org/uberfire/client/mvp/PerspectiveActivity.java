@@ -15,6 +15,7 @@
  */
 package org.uberfire.client.mvp;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 import org.uberfire.workbench.model.menu.Menus;
@@ -36,6 +37,8 @@ public interface PerspectiveActivity
     void onShutdown();
 
     PerspectiveDefinition getPerspective();
+
+
 
     String getIdentifier();
 

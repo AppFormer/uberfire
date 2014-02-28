@@ -25,7 +25,12 @@ import javax.inject.Inject;
 
 import javax.inject.Named;
 import org.uberfire.workbench.model.PerspectiveDefinition;
+<#if isTemplate>
+import org.uberfire.client.annotations.Perspective;
+import org.uberfire.client.mvp.AbstractTemplateWorkbenchPerspectiveActivity;
+<#else>
 import org.uberfire.client.mvp.AbstractWorkbenchPerspectiveActivity;
+</#if>
 import org.uberfire.client.mvp.PlaceManager;
 
 import org.uberfire.mvp.PlaceRequest;
@@ -38,13 +43,23 @@ import org.uberfire.workbench.model.menu.Menus;
 import org.uberfire.workbench.model.toolbar.ToolBar;
 
 </#if>
+<#if isTemplate>
+import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.workbench.TemplatePanelDefinitionImpl;
+import org.uberfire.client.workbench.TemplatePerspectiveDefinitionImpl;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.workbench.model.PanelDefinition;
+import org.uberfire.workbench.model.PanelType;
+import org.uberfire.workbench.model.Position;
+import org.uberfire.workbench.model.impl.PartDefinitionImpl;
+</#if>
 @Dependent
 @Generated("org.uberfire.annotations.processors.WorkbenchPerspectiveProcessor")
 @Named("${identifier}")
 /*
  * WARNING! This class is generated. Do not modify.
  */
-public class ${className} extends AbstractWorkbenchPerspectiveActivity {
+public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPerspectiveActivity <#else>AbstractWorkbenchPerspectiveActivity</#if> {
 
     <#if rolesList??>
     private static final Collection<String> ROLES = Arrays.asList(${rolesList});
@@ -124,7 +139,7 @@ public class ${className} extends AbstractWorkbenchPerspectiveActivity {
         return realPresenter.${getPerspectiveMethodName}();
     }
 
-    </#if>
+</#if>
     <#if getMenuBarMethodName??>
     @Override
     public Menus getMenus() {
@@ -153,4 +168,46 @@ public class ${className} extends AbstractWorkbenchPerspectiveActivity {
     public String getSignatureId() {
         return "${packageName}.${className}";
     }
+    <#if isTemplate>
+    @Override
+    public Widget getRealPresenterWidget( ) {
+      return realPresenter.asWidget();
+    }
+
+    @Override
+    public void setWidget( String fieldName,
+        Widget widget ) {
+
+        if ( fieldName.equalsIgnoreCase( "${defaultPanel.fieldName}" ) ) {
+            realPresenter.${defaultPanel.fieldName}.add( widget.asWidget() );
+        }
+        <#list ufPanels as ufPanel>
+        if ( fieldName.equalsIgnoreCase( "${ufPanel.fieldName}" ) ) {
+            realPresenter.${ufPanel.fieldName}.add( widget.asWidget() );
+        }
+        </#list>
+    }
+
+    @Perspective
+    public PerspectiveDefinition getPerspective() {
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, ${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
+        <#list defaultPanel.uFParts as ufPart>
+            panelDefinition.addPart(
+            new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        </#list>
+        p.getRoot().appendChild( Position.EAST, panelDefinition );
+
+        <#list ufPanels as ufPanel>
+        PanelDefinition panelDefinition${ufPanel_index} = new TemplatePanelDefinitionImpl( this, ${ufPanel.panelType} , "${ufPanel.fieldName}"  );
+        <#list ufPanel.uFParts as ufPart>
+        panelDefinition${ufPanel_index}.addPart(
+                new PartDefinitionImpl(new DefaultPlaceRequest( "${ufPart}" ) ) );
+        </#list>
+        p.getRoot().appendChild( Position.EAST, panelDefinition${ufPanel_index} );
+        </#list>
+        return p;
+    }
+
+    </#if>
 }

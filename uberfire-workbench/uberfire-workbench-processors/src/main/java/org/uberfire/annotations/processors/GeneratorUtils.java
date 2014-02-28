@@ -28,6 +28,7 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -307,6 +308,7 @@ public class GeneratorUtils {
         }
         final Types typeUtils = processingEnvironment.getTypeUtils();
         final Elements elementUtils = processingEnvironment.getElementUtils();
+
         final TypeMirror requiredReturnType = elementUtils.getTypeElement( "org.uberfire.client.mvp.UberView" ).asType();
 
         return typeUtils.isAssignable( typeUtils.erasure( getWidgetMethod.getReturnType() ),
@@ -667,7 +669,6 @@ public class GeneratorUtils {
         final Elements elementUtils = processingEnvironment.getElementUtils();
         final TypeMirror requiredReturnType = elementUtils.getTypeElement( "com.google.gwt.user.client.ui.IsWidget" ).asType();
         final List<ExecutableElement> methods = ElementFilter.methodsIn( classElement.getEnclosedElements() );
-
         ExecutableElement match = null;
         for ( ExecutableElement e : methods ) {
 
@@ -1015,4 +1016,5 @@ public class GeneratorUtils {
 
         return sb.toString();
     }
+
 }

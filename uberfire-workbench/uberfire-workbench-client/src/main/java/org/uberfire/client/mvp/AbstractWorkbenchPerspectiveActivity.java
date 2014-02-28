@@ -18,6 +18,7 @@ package org.uberfire.client.mvp;
 import java.util.Set;
 import javax.inject.Inject;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.WorkbenchServicesProxy;
 import org.uberfire.mvp.Command;
@@ -131,7 +132,6 @@ public abstract class AbstractWorkbenchPerspectiveActivity extends AbstractActiv
 
     //Initialise Workbench state to that of the provided perspective
     private void initialisePerspective( final PerspectiveDefinition perspective ) {
-
         panelManager.setPerspective( perspective );
 
         Set<PartDefinition> parts = panelManager.getRoot().getParts();

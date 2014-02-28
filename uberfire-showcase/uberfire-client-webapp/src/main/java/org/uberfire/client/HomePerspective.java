@@ -1,32 +1,34 @@
 package org.uberfire.client;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
-import org.uberfire.client.annotations.Perspective;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import org.jboss.errai.ui.shared.api.annotations.DataField;
+import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.uberfire.client.annotations.UFPanel;
+import org.uberfire.client.annotations.UFPart;
+import org.uberfire.client.annotations.UFParts;
 import org.uberfire.client.annotations.WorkbenchPerspective;
-import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PanelType;
-import org.uberfire.workbench.model.PerspectiveDefinition;
-import org.uberfire.workbench.model.impl.PartDefinitionImpl;
-import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
 
 @ApplicationScoped
 @WorkbenchPerspective(
         identifier = "HomePerspective",
-        isDefault = true)
-public class HomePerspective {
+        isDefault = true, isTemplate = true)
+@Templated
+public class HomePerspective extends Composite {
 
-    @Perspective
-    public PerspectiveDefinition getPerspective() {
-        final PerspectiveDefinition p = new PerspectiveDefinitionImpl( PanelType.ROOT_LIST );
-        p.setTransient( true );
-        p.setName( getClass().getName() );
+    @DataField
+    @UFPanel(panelType = "PanelType.TEMPLATE", isDefault =  true)
+    @UFParts({@UFPart("HelloWorldScreen0")})
+    FlowPanel hello1 = new FlowPanel();
 
-        p.getRoot().addPart(
-                new PartDefinitionImpl(
-                        new DefaultPlaceRequest( "HelloWorldScreen" ) ) );
 
-        return p;
+    @PostConstruct
+    public void setup() {
     }
 
 }

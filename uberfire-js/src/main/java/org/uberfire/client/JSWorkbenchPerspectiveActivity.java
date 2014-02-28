@@ -3,6 +3,7 @@ package org.uberfire.client;
 import java.util.Collection;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;

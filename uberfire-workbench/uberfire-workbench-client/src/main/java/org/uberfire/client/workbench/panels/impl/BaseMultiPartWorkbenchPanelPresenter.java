@@ -21,8 +21,11 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.mvp.ActivityManager;
 import org.uberfire.client.mvp.ContextActivity;
+import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.events.MaximizePlaceEvent;
 import org.uberfire.client.workbench.events.MinimizePlaceEvent;
@@ -97,6 +100,7 @@ public class BaseMultiPartWorkbenchPanelPresenter implements WorkbenchPanelPrese
     public void addPart( final WorkbenchPartPresenter.View view,
                          final String contextId ) {
         getPanelView().addPart( view );
+
         if ( panelManager.getPerspective().getContextDisplayMode() == SHOW
                 && definition.getContextDisplayMode() == SHOW
                 && view.getPresenter().getDefinition().getContextDisplayMode() == SHOW ) {
