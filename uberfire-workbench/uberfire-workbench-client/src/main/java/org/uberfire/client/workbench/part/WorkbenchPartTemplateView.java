@@ -16,12 +16,16 @@
 package org.uberfire.client.workbench.part;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
-
+import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.workbench.Workbench;
 
 @Dependent
 @Named("WorkbenchPartTemplateView")
@@ -32,6 +36,9 @@ public class WorkbenchPartTemplateView
     private WorkbenchPartPresenter presenter;
 
     private final FlowPanel sp = new FlowPanel();
+
+    @Inject
+    private Workbench workbench;
 
     @Override
     public void init( WorkbenchPartPresenter presenter ) {
@@ -50,7 +57,6 @@ public class WorkbenchPartTemplateView
 
     @Override
     public IsWidget getWrappedWidget() {
-       // return sp.getWidget();
         return sp;
     }
 
@@ -60,11 +66,23 @@ public class WorkbenchPartTemplateView
 
     @Override
     public void onResize() {
-//        final Widget parent = getParent();
-//        if ( parent != null ) {
-//            sp.setPixelSize( parent.getOffsetWidth(),
-//                             parent.getOffsetHeight() );
-//        }
-//        super.onResize();
+        final int width = Window.getClientWidth();
+        final int height = Window.getClientHeight();
+        sp.setHeight( height + "px" );
+        sp.setWidth( width + "px" );
+      /*  sp.setPixelSize( width, height );
+        DOM.setStyleAttribute( sp.getElement(), "position", "relative" );
+        DOM.setStyleAttribute( this.getElement(), "position", "relative" );
+        DOM.setStyleAttribute( super.getElement(), "position", "relative" );
+        WorkbenchPartTemplateView parent = (WorkbenchPartTemplateView) sp.getParent();
+        DOM.setStyleAttribute( parent.getWrappedWidget().asWidget().getElement(), "position", "relative" );*/
+
+        //codigo original
+     /*   final Widget parent2 = getParent();
+        if ( parent2 != null ) {
+            sp.setPixelSize( parent2.getOffsetWidth(),
+                             parent2.getOffsetHeight() );
+        }
+        super.onResize();*/
     }
 }

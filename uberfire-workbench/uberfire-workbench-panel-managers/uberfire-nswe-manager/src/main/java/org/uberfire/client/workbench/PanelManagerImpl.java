@@ -24,10 +24,8 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.client.mvp.PerspectiveActivity;
@@ -175,45 +173,6 @@ public class PanelManagerImpl implements PanelManager {
                                   final Menus menus,
                                   final UIPart uiPart ) {
         addWorkbenchPart( place, part, panel, menus, uiPart, null );
-    }
-
-    //@Override
-    public void addWorkbenchPartOld( final PlaceRequest place,
-                                     final PartDefinition part,
-                                     final PanelDefinition panel,
-                                     final Menus menus,
-                                     final UIPart uiPart,
-                                     final String contextId ) {
-        WorkbenchPartPresenter partPresenter = mapPartDefinitionToPresenter.get( part );
-        if ( partPresenter == null ) {
-            partPresenter = factory.newWorkbenchPart( menus, uiPart.getTitle(), uiPart.getTitleDecoration(), part );
-            partPresenter.setWrappedWidget( uiPart.getWidget() );
-            partPresenter.setContextId( contextId );
-            mapPartDefinitionToPresenter.put( part, partPresenter );
-        }
-
-        if ( part.isMinimized() ) {
-            statusBar.addMinimizedPlace( part.getPlace() );
-        } else {
-            final WorkbenchPanelPresenter panelPresenter = getWorkbenchPanelPresenter( panel );
-            WorkbenchPartPresenter.View view = partPresenter.getPartView();
-            if ( panelPresenter == null ) {
-                throw new IllegalArgumentException( "Unable to add Part to Panel. Panel has not been created." );
-            }
-
-            panelPresenter.addPart( partPresenter.getPartView(), contextId );
-
-        }
-
-        getPerspective();
-
-        //The model for a Perspective is already fully populated. Don't go adding duplicates.
-        if ( !panel.getParts().contains( part ) ) {
-            panel.addPart( part );
-        }
-
-        //Select newly inserted part
-        selectPlaceEvent.fire( new SelectPlaceEvent( place ) );
     }
 
     @Override

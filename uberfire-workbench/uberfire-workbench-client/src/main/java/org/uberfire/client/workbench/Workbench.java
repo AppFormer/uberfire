@@ -238,13 +238,8 @@ public class Workbench
 
     private void doResizeWorkbenchContainer( final int width,
                                              final int height ) {
-        final int headersHeight = headers.asWidget().getOffsetHeight();
-        final int availableHeight;
-        if ( !Window.Location.getParameterMap().containsKey( "standalone" ) ) {
-            availableHeight = height - headersHeight;
-        } else {
-            availableHeight = height;
-        }
+
+        final int availableHeight = getAvailableHeight( );
 
         workbenchContainer.setPixelSize( width, availableHeight );
         workbench.setPixelSize( width, availableHeight );
@@ -255,5 +250,22 @@ public class Workbench
                 ( (RequiresResize) w ).onResize();
             }
         }
+    }
+
+    public int getAvailableWidth(){
+        final int width = Window.getClientWidth();
+        return width;
+    }
+
+    public  int getAvailableHeight() {
+        final int height = Window.getClientHeight();
+        final int headersHeight = headers.asWidget().getOffsetHeight();
+        final int availableHeight;
+        if ( !Window.Location.getParameterMap().containsKey( "standalone" ) ) {
+            availableHeight = height - headersHeight;
+        } else {
+            availableHeight = height;
+        }
+        return availableHeight;
     }
 }

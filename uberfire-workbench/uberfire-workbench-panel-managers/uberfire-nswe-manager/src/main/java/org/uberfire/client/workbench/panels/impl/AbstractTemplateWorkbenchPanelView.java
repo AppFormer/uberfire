@@ -5,6 +5,8 @@ import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
@@ -86,5 +88,9 @@ public abstract class AbstractTemplateWorkbenchPanelView<P extends WorkbenchPane
 
     @Override
     public void onResize() {
+        //ederign
+        Element element = this.getElement();
+        DOM.setStyleAttribute( element, "position", "relative" );
+        System.out.print( "" );
     }
 }

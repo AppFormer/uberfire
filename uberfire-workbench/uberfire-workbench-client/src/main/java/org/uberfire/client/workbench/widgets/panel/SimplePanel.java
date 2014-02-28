@@ -31,6 +31,7 @@ public class SimplePanel
 //                }
 //            }
 //        } );
+        System.out.println();
     }
 
 
@@ -64,6 +65,7 @@ public class SimplePanel
     }
 
     public void onResize() {
+        System.out.println();
        /* if ( isAttached() ) {
             final int width = getParent().getOffsetWidth();
             final int height = getParent().getOffsetHeight();
