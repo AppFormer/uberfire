@@ -1,11 +1,11 @@
-package org.uberfire.annotations.processors.facades;
+package org.uberfire.annotations.processors;
 
 import java.util.List;
 
 public class WorkbenchPanelInformation {
 
     private String fieldName;
-    private List<String> wbParts;
+    private List<PartInformation> wbParts;
     private boolean isDefault;
     private String panelType;
 
@@ -22,11 +22,11 @@ public class WorkbenchPanelInformation {
     }
 
     @SuppressWarnings( "unused" )
-    public List<String> getWbParts() {
+    public List<PartInformation> getWbParts() {
         return wbParts;
     }
 
-    public void setWbParts( List<String> uFParts ) {
+    public void setWbParts( List<PartInformation> uFParts ) {
         this.wbParts = uFParts;
     }
 

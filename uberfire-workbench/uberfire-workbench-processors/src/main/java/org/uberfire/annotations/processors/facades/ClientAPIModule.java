@@ -44,6 +44,7 @@ public class ClientAPIModule {
     private static Class<? extends Annotation> workbenchPart;
     private static Class<? extends Annotation> workbenchParts;
     private static Class<? extends Annotation> workbenchPanel;
+    private static Class<? extends Annotation> parameterMapping;
 
     private ClientAPIModule() {
     }
@@ -71,6 +72,7 @@ public class ClientAPIModule {
             workbenchPart = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPart" );
             workbenchParts = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchParts" );
             workbenchPanel = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPanel" );
+            parameterMapping = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.ParameterMapping" );
 
         } catch ( ClassNotFoundException e ) {
             logger.error( e.getMessage() );
@@ -151,6 +153,10 @@ public class ClientAPIModule {
 
     public static Class<? extends Annotation> getWorkbenchParts() {
         return workbenchParts;
+    }
+
+    public static Class<? extends Annotation> getParameterMapping() {
+        return parameterMapping;
     }
 
     public static Class<? extends Annotation> getWorkbenchPanel() {

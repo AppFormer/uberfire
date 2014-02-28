@@ -16,10 +16,10 @@ import org.uberfire.workbench.model.PanelType;
 public class PerspectiveTest17 {
 
     @WorkbenchPanel(panelType = PanelType.TEMPLATE, isDefault =  true)
-    @WorkbenchPart("TesteScreen")
+    @WorkbenchPart(part = "TesteScreen")
     Object teste1 = new FlowPanel();
 
-    @WorkbenchPart("TesteScreen1")
+    @WorkbenchPart(part = "TesteScreen1")
     Object teste2 = new Object();
 
     @PostConstruct

@@ -26,5 +26,10 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 public @interface WorkbenchPart {
 
-    String value();
+
+    ParameterMapping[] parameters() default {};
+
+    String part();
+
+
 }

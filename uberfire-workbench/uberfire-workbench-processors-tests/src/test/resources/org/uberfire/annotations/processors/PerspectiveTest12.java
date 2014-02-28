@@ -16,19 +16,19 @@ import org.uberfire.workbench.model.PanelType;
 public class PerspectiveTest12 {
 
     @WorkbenchPanel(panelType = PanelType.MULTI_TAB, isDefault =  true)
-    @WorkbenchParts({@WorkbenchPart("HelloWorldScreen1"),@WorkbenchPart("HelloWorldScreen2")})
+    @WorkbenchParts({@WorkbenchPart(part = "HelloWorldScreen1"),@WorkbenchPart(part = "HelloWorldScreen2")})
     Object teste = new Object();
 
     @WorkbenchPanel
-    @WorkbenchPart("HelloWorldScreen3")
+    @WorkbenchPart(part = "HelloWorldScreen3")
     Object teste2 = new Object();
 
     @WorkbenchPanel
-    @WorkbenchPart("HelloWorldScreen4")
+    @WorkbenchPart(part = "HelloWorldScreen4")
     Object teste3 = new Object();
 
     @WorkbenchPanel
-    @WorkbenchPart("HelloWorldScreen5")
+    @WorkbenchPart(part = "HelloWorldScreen5")
     Object teste4 = new Object();
 
     @PostConstruct

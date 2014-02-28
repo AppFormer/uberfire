@@ -3,8 +3,6 @@ package org.uberfire.annotations.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.uberfire.annotations.processors.facades.WorkbenchPanelInformation;
-
 public class TemplateInformation {
 
     private WorkbenchPanelInformation defaultPanel;

@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 <#if isTemplate>
+import java.util.HashMap;
+import java.util.Map;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.mvp.AbstractTemplateWorkbenchPerspectiveActivity;
 <#else>
@@ -198,8 +200,17 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"${defaultPanel.fieldName}", getClass().getName() );
         PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.${defaultPanel.panelType} , "${defaultPanel.fieldName}"  );
         <#list defaultPanel.wbParts as wbPart>
+            <#if wbPart.parameters??>
+            Map properties = new HashMap<String,String>();
+            <#list wbPart.parameters?keys as key>
+            properties.put("${key}","${ wbPart.parameters[key]}");
+            </#list>
             panelDefinition.addPart(
-            new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart}" ) ) );
+            new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart.partName}", properties  ) ) );
+            <#else>
+            panelDefinition.addPart(
+            new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart.partName}" ) ) );
+            </#if>
         </#list>
         p.getRoot().appendChild( panelDefinition );
         <#else>
@@ -210,8 +221,17 @@ public class ${className} extends <#if isTemplate> AbstractTemplateWorkbenchPers
         <#list wbPanels as wbPanel>
         PanelDefinition panelDefinition${wbPanel_index} = new TemplatePanelDefinitionImpl( this, PanelType.${wbPanel.panelType} , "${wbPanel.fieldName}"  );
         <#list wbPanel.wbParts as wbPart>
+        <#if wbPart.parameters??>
+        Map properties${wbPanel_index} = new HashMap<String,String>();
+        <#list wbPart.parameters?keys as key>
+            properties${wbPanel_index}.put("${key}","${ wbPart.parameters[key]}");
+        </#list>
         panelDefinition${wbPanel_index}.addPart(
-                new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart}" ) ) );
+                new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart.partName}", properties${wbPanel_index} ) ) );
+        <#else>
+        panelDefinition${wbPanel_index}.addPart(
+                new PartDefinitionImpl(new DefaultPlaceRequest( "${wbPart.partName}" ) ) );
+        </#if>
         </#list>
         p.getRoot().appendChild( panelDefinition${wbPanel_index} );
         </#list>

@@ -3,13 +3,14 @@ package org.uberfire.annotations.processors;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 import org.uberfire.annotations.processors.exceptions.GenerationException;
 import org.uberfire.annotations.processors.facades.ClientAPIModule;
-import org.uberfire.annotations.processors.facades.WorkbenchPanelInformation;
 
 public class TemplateInformationHelper {
 
@@ -17,6 +18,8 @@ public class TemplateInformationHelper {
     public static final String PANEL_TYPE = "panelType";
     public static final String IS_DEFAULT = "isDefault";
     public static final String DEFAULT_PANEL_TYPE = "TEMPLATE";
+    public static final String PART = "part";
+    public static final String PARAMETERS = "parameters";
 
     public static TemplateInformation extractWbTemplatePerspectiveInformation( TypeElement classElement ) throws GenerationException {
 
@@ -71,7 +74,7 @@ public class TemplateInformationHelper {
 
         generatedWbPanel.setFieldName( element.getSimpleName().toString() );
         generatedWbPanel.setWbParts( getWorkbenchPartsFrom( element ) );
-        generatedWbPanel.setPanelType( DEFAULT_PANEL_TYPE ) ;
+        generatedWbPanel.setPanelType( DEFAULT_PANEL_TYPE );
         template.addTemplateField( generatedWbPanel );
     }
 
@@ -89,12 +92,14 @@ public class TemplateInformationHelper {
         return Boolean.valueOf( extractAnnotationPropertyValue( annotation, IS_DEFAULT ) );
     }
 
-    private static List<String> getWorkbenchPartsFrom( Element wbPanel ) throws GenerationException {
-        List<String> parts = new ArrayList<String>();
+    private static List<PartInformation> getWorkbenchPartsFrom( Element wbPanel ) throws GenerationException {
+        List<PartInformation> parts = new ArrayList<PartInformation>();
         if ( thereIsWbParts( wbPanel ) ) {
             extractWbPartFromWbParts( wbPanel, parts );
         } else {
-            parts.add( extractMethodValueFromAnnotation( wbPanel, ClientAPIModule.getWorkbenchPart(), VALUE ) );
+            String partName = extractMethodValueFromAnnotation( wbPanel, ClientAPIModule.getWorkbenchPart(), PART );
+            Map<String, String> parameters = extractParametersFromPart( wbPanel );
+            parts.add( new PartInformation( partName, parameters ) );
         }
         return parts;
     }
@@ -120,11 +125,12 @@ public class TemplateInformationHelper {
     }
 
     private static void extractWbPartFromWbParts( Element ufPanel,
-                                                  List<String> parts ) throws GenerationException {
+                                                  List<PartInformation> parts ) throws GenerationException {
         Annotation[] annotations = extractAnnotationsFromAnnotation( ufPanel, ClientAPIModule.getWorkbenchParts(), VALUE );
         for ( Annotation annotation : annotations ) {
-            String value = extractAnnotationStringValue( annotation );
-            parts.add( value );
+            String partName = extractAnnotationPropertyValue( annotation, PART );
+            //ederign FIXME
+            parts.add( new PartInformation( partName, null ) );
         }
     }
 
@@ -137,6 +143,26 @@ public class TemplateInformationHelper {
             identifierValue = getElementAnnotationStringValue( annotation, methodName, element );
         }
         return identifierValue;
+    }
+
+    private static Map<String, String> extractParametersFromPart(
+            Element element ) throws GenerationException {
+        Map<String, String> map = new HashMap<String, String>();
+        Class<? extends Annotation> wpPart = ClientAPIModule.getWorkbenchPart();
+        Class<? extends Annotation> parameterMapping = ClientAPIModule.getParameterMapping();
+        try {
+            Method parametersMethod = wpPart.getDeclaredMethod( PARAMETERS );
+            Object parameters[] = (Object[]) parametersMethod.invoke( element.getAnnotation( wpPart ) );
+            for ( Object parameter: parameters ){
+                Method name = parameterMapping.getDeclaredMethod( "name" );
+                Method val = parameterMapping.getDeclaredMethod( "val" );
+                map.put( String.valueOf( name.invoke( parameter ) ), String.valueOf( val.invoke( parameter ) ) );
+            }
+
+        } catch ( Exception e ) {
+            throw new GenerationException( e.getMessage(), e.getCause() );
+        }
+        return map;
     }
 
     private static String getElementAnnotationStringValue( Class<? extends Annotation> annotation,

@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.uberfire.client.annotations.ParameterMapping;
 import org.uberfire.client.annotations.WorkbenchPanel;
 import org.uberfire.client.annotations.WorkbenchPart;
 import org.uberfire.client.annotations.WorkbenchPerspective;
@@ -20,13 +21,12 @@ import org.uberfire.workbench.model.PanelType;
 public class HomePerspective extends Composite {
 
     @DataField
-    @WorkbenchPanel(panelType = PanelType.TEMPLATE, isDefault =  true)
-    @WorkbenchPart("MoodScreen")
+    @WorkbenchPart(part = "MoodScreen" ,parameters = {@ParameterMapping(name="uber", val="fire"),@ParameterMapping(name="uber1", val="fire1")})
     FlowPanel moodScreen = new FlowPanel();
 
     @DataField
     @WorkbenchPanel
-    @WorkbenchPart("HomeScreen")
+    @WorkbenchPart(part = "HomeScreen", parameters = @ParameterMapping(name="uber", val="fire"))
     FlowPanel homeScreen = new FlowPanel();
 
     @PostConstruct

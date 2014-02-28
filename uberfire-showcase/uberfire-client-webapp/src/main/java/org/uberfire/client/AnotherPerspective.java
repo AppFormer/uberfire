@@ -18,11 +18,11 @@ public class AnotherPerspective extends Composite {
 
 
     @DataField
-    @WorkbenchPart("MoodScreen")
+    @WorkbenchPart(part="MoodScreen")
     FlowPanel moodScreen = new FlowPanel();
 
     @DataField
-    @WorkbenchPart("HomeScreen")
+    @WorkbenchPart(part="HomeScreen")
     FlowPanel homeScreen = new FlowPanel();
 
     @PostConstruct

@@ -47,18 +47,18 @@ import org.uberfire.workbench.model.impl.PartDefinitionImpl;
 /*
  * WARNING! This class is generated. Do not modify.
  */
-public class PerspectiveTest18Activity extends  AbstractTemplateWorkbenchPerspectiveActivity  {
+public class PerspectiveTest19Activity extends  AbstractTemplateWorkbenchPerspectiveActivity  {
 
     private static final Collection<String> ROLES = Collections.emptyList();
 
     private static final Collection<String> TRAITS = Collections.emptyList();
 
     @Inject
-    private PerspectiveTest18 realPresenter;
+    private PerspectiveTest19 realPresenter;
 
     @Inject
     //Constructor injection for testing
-    public PerspectiveTest18Activity(final PlaceManager placeManager) {
+    public PerspectiveTest19Activity(final PlaceManager placeManager) {
         super( placeManager );
     }
 
@@ -84,7 +84,7 @@ public class PerspectiveTest18Activity extends  AbstractTemplateWorkbenchPerspec
 
     @Override
     public String getSignatureId() {
-        return "org.uberfire.annotations.processors.PerspectiveTest18Activity";
+        return "org.uberfire.annotations.processors.PerspectiveTest19Activity";
     }
     @Override
     public Widget getRealPresenterWidget( ) {
@@ -95,30 +95,41 @@ public class PerspectiveTest18Activity extends  AbstractTemplateWorkbenchPerspec
     public void setWidget( String fieldName,
         Widget widget ) {
 
-        if ( fieldName.equalsIgnoreCase( "teste1" ) ) {
-            realPresenter.teste1.clear();
-            realPresenter.teste1.add( widget.asWidget() );
+        if ( fieldName.equalsIgnoreCase( "oneParameter" ) ) {
+            realPresenter.oneParameter.clear();
+            realPresenter.oneParameter.add( widget.asWidget() );
         }
-        if ( fieldName.equalsIgnoreCase( "teste2" ) ) {
-            realPresenter.teste2.clear();
-            realPresenter.teste2.add( widget.asWidget() );
+        if ( fieldName.equalsIgnoreCase( "nopParameter" ) ) {
+            realPresenter.nopParameter.clear();
+            realPresenter.nopParameter.add( widget.asWidget() );
+        }
+        if ( fieldName.equalsIgnoreCase( "twoParameters" ) ) {
+            realPresenter.twoParameters.clear();
+            realPresenter.twoParameters.add( widget.asWidget() );
         }
     }
 
     @Perspective
     public PerspectiveDefinition getPerspective() {
-        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"teste1", getClass().getName() );
-        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "teste1"  );
+        final PerspectiveDefinition p = new TemplatePerspectiveDefinitionImpl( this,"oneParameter", getClass().getName() );
+        PanelDefinition panelDefinition = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "oneParameter"  );
+            Map properties = new HashMap<String,String>();
+            properties.put("uber","fire");
             panelDefinition.addPart(
-            new PartDefinitionImpl(new DefaultPlaceRequest( "TesteScreen" ) ) );
+            new PartDefinitionImpl(new DefaultPlaceRequest( "oneParameterScreen", properties  ) ) );
         p.getRoot().appendChild( panelDefinition );
 
-        PanelDefinition panelDefinition0 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "teste2"  );
+        PanelDefinition panelDefinition0 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "nopParameter"  );
         panelDefinition0.addPart(
-                new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen1" ) ) );
-        panelDefinition0.addPart(
-                new PartDefinitionImpl(new DefaultPlaceRequest( "HelloWorldScreen2" ) ) );
+                new PartDefinitionImpl(new DefaultPlaceRequest( "noParameterScreen" ) ) );
         p.getRoot().appendChild( panelDefinition0 );
+        PanelDefinition panelDefinition1 = new TemplatePanelDefinitionImpl( this, PanelType.TEMPLATE , "twoParameters"  );
+        Map properties1 = new HashMap<String,String>();
+            properties1.put("uber","fire");
+            properties1.put("uber1","fire1");
+        panelDefinition1.addPart(
+                new PartDefinitionImpl(new DefaultPlaceRequest( "twoParametersScreen", properties1 ) ) );
+        p.getRoot().appendChild( panelDefinition1 );
         return p;
     }
 

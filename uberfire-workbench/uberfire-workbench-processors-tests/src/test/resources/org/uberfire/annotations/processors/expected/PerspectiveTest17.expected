@@ -25,6 +25,8 @@ import javax.inject.Inject;
 
 import javax.inject.Named;
 import org.uberfire.workbench.model.PerspectiveDefinition;
+import java.util.HashMap;
+import java.util.Map;
 import org.uberfire.client.annotations.Perspective;
 import org.uberfire.client.mvp.AbstractTemplateWorkbenchPerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
