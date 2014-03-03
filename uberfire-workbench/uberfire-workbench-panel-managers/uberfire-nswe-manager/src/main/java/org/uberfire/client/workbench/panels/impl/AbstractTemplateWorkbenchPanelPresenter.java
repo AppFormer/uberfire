@@ -58,13 +58,11 @@ public abstract class  AbstractTemplateWorkbenchPanelPresenter<T extends Abstrac
     public void addPanel( PanelDefinition panel,
                           WorkbenchPanelView view,
                           Position position ) {
-        //ederign
         if ( panel instanceof TemplatePanelDefinitionImpl ) {
             TemplatePanelDefinitionImpl templateDefinition = (TemplatePanelDefinitionImpl) panel;
             Widget widget = view.asWidget();
             templateDefinition.perspective.setWidget( templateDefinition.getFieldName(), widget );
         }
-
     }
 
     @Override
