@@ -29,6 +29,10 @@ public class HomePerspective extends Composite {
     @WorkbenchPart(part = "HomeScreen", parameters = @ParameterMapping(name="uber", val="fire"))
     FlowPanel homeScreen = new FlowPanel();
 
+    @WorkbenchPart(part = "AnotherScreen")
+    FlowPanel anotherScreen = new FlowPanel();
+
+
     @PostConstruct
     public void setup() {
     }
