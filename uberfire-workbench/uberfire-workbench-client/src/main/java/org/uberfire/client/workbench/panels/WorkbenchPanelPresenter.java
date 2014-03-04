@@ -16,6 +16,7 @@
 package org.uberfire.client.workbench.panels;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
@@ -67,5 +68,6 @@ public interface WorkbenchPanelPresenter {
 
     public void onResize( final int width,
                           final int height );
+
 
 }

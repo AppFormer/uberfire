@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.client.resources.WorkbenchResources;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.mvp.PlaceRequest;
@@ -41,7 +42,7 @@ public class WorkbenchPickupDragController extends PickupDragController {
     private final Image dragProxy = new Image( WorkbenchResources.INSTANCE.images().workbenchPanelDragProxy() );
 
     @Inject
-    private WorkbenchDragAndDropManager dndManager;
+    SyncBeanManager iocManager;
 
     public WorkbenchPickupDragController() {
         super( new AbsolutePanel(),
@@ -76,7 +77,7 @@ public class WorkbenchPickupDragController extends PickupDragController {
                                                                        width,
                                                                        minHeight,
                                                                        minWidth );
-        dndManager.setWorkbenchContext( context );
+        setWorkbenchContextOnDndManager( context );
         super.dragStart();
         final Widget movablePanel = getMoveablePanel();
         if ( movablePanel != null ) {
@@ -84,6 +85,11 @@ public class WorkbenchPickupDragController extends PickupDragController {
                                             super.context.mouseX,
                                             super.context.mouseY );
         }
+    }
+
+    private void setWorkbenchContextOnDndManager( WorkbenchDragContext context ) {
+        final WorkbenchDragAndDropManager dndManager = iocManager.lookupBean( WorkbenchDragAndDropManager.class ).getInstance();
+        dndManager.setWorkbenchContext( context );
     }
 
     @Override

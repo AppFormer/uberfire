@@ -18,6 +18,7 @@ package org.uberfire.client.workbench.part;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.RequiresResize;
@@ -43,7 +44,7 @@ public class WorkbenchPartPresenter {
         IsWidget getWrappedWidget();
     }
 
-    private View view;
+    View view;
 
     private String title;
 
@@ -55,14 +56,20 @@ public class WorkbenchPartPresenter {
 
     private PartDefinition definition;
 
+    public WorkbenchPartPresenter(){};
+
     @Inject
-    public WorkbenchPartPresenter( final View view ) {
+    public WorkbenchPartPresenter(@Named("WorkbenchPartView") final WorkbenchPartView view ) {
         this.view = view;
     }
 
-    @SuppressWarnings("unused")
     @PostConstruct
-    private void init() {
+    public void init() {
+        view.init( this );
+    }
+
+    public void init(final View view) {
+        this.view = view;
         view.init( this );
     }
 
