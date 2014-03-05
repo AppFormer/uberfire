@@ -124,6 +124,13 @@
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-javaee-all</artifactId>
+      <version>2.4.3.Final</version>
+    </dependency>
+
   </dependencies>
 
   <build>

@@ -26,7 +26,10 @@
     }
   </ui:style>
 
-  <b:Hero addStyleNames="{style.welcome}">
+
+
+  <b:Hero  addStyleNames="{style.welcome}">
+    <b:Button ui:field="launch">Open popup</b:Button>
     <b:Heading size="2">Welcome to UberFire</b:Heading>
     <b:Paragraph>Now with a bright new Look &amp; Feel based on Boostrap.</b:Paragraph>
   </b:Hero>

@@ -24,19 +24,19 @@ $registerPerspective({
                 ]
             },
             {
-                width: 300,
-                min_width: 200,
+                width: 500,
+                min_width: 500,
                 position: "east",
                 panel_type: "multi_list",
                 parts: [
                     {
-                        place: "TodoListScreen",
+                        place: "PropertyEditorScreen",
                         parameters: {}
                     }
                 ]
             },
             {
-                height: 400,
+                height: 300,
                 position: "south",
                 panel_type: "multi_tab",
                 parts: [
