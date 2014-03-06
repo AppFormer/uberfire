@@ -1,29 +1,21 @@
 package org.uberfire.client.screens.property;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.HashMap;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import com.github.gwtbootstrap.client.ui.Label;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.shared.PropertyEditorService;
-import org.uberfire.shared.property_editor.PropertyEditorEvent;
 
 @Dependent
 @Templated
@@ -38,8 +30,8 @@ public class PropertyEditorScreen extends Composite {
     @Inject
     private Tree propertyTree;
 
-    @Inject
-    private Caller<PropertyEditorService> propertyEditor;
+//    @Inject
+//    private Caller<PropertyEditorService> propertyEditor;
 
     @Override
     @WorkbenchPartTitle
@@ -49,7 +41,6 @@ public class PropertyEditorScreen extends Composite {
 
     @EventHandler("searchItem")
     private void onKeyDown( KeyDownEvent event ) {
-
 
 //        final String text = searchItem.getText();
         final String text = "org.uberfire.propertyEditor.SamplePlanBean";
@@ -71,19 +62,20 @@ public class PropertyEditorScreen extends Composite {
 
             outerRoot.addItem(innerRoot);
             */
-            propertyEditor.call( new RemoteCallback<Map<String, String>>() {
-                @Override
-                public void callback( final Map<String, String> response ) {
-                    Label label = new Label(text + "{" +response.keySet().size() +"}");
-                    TreeItem outerRoot = new TreeItem(label);
-                    for ( String key : response.keySet() ) {
-                        Label labelInner = new Label(key+" "+response.get( key ));
-                        TreeItem tree = new TreeItem( labelInner);
-                        outerRoot.addItem(tree);
-                    }
-                    propertyTree.addItem( outerRoot );
-                }
-            } ).getInformation( text );
+//            propertyEditor.call( new RemoteCallback<Map<String, String>>() {
+//                @Override
+//                public void callback( final Map<String, String> response ) {
+//                    Label label = new Label(text + "{" +response.keySet().size() +"}");
+//                    TreeItem outerRoot = new TreeItem(label);
+//                    for ( String key : response.keySet() ) {
+//                        Label labelInner = new Label(key+" "+response.get( key ));
+//                        TreeItem tree = new TreeItem( labelInner);
+//                        outerRoot.addItem(tree);
+//                    }
+//                    propertyTree.addItem( outerRoot );
+//                }
+//            } ).getInformation( text );
+            PropertyEditorBuilder.build( propertyTree, new HashMap() );
         }
         searchItem.setText( "" );
     }

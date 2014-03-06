@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 .guvnor-PopupTitleBar-bar {
     background-color: #E3E3E3;
     width: 100%;
@@ -28,9 +28,9 @@
 }
 
 .gwt-TextArea {
-	border: 0px !important;
-	padding: 0px !important;
-	margin: 0px !important;
+    border: 0px !important;
+    padding: 0px !important;
+    margin: 0px !important;
 }
 
 /* Other styles */
@@ -486,576 +486,30 @@ td, th {
 }
 
 .guvnor-repository-body {
-	margin-top: 9px;
-	width: 100%;
-	margin-left: -10px;
-	padding: 5px 10px 5px 10px;
-	border-top: 1px solid #eee;
-	background: #fafafa;
-	background: -moz-linear-gradient(#fafafa, #efefef);
-	background: -webkit-linear-gradient(#fafafa, #efefef);
-	-ms-filter:
-		"progid:DXImageTransform.Microsoft.gradient(startColorstr='#fafafa',endColorstr='#efefef')";
-	border-bottom-right-radius: 4px;
-	border-bottom-left-radius: 4px;
+    margin-top: 9px;
+    width: 100%;
+    margin-left: -10px;
+    padding: 5px 10px 5px 10px;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+    background: -moz-linear-gradient(#fafafa, #efefef);
+    background: -webkit-linear-gradient(#fafafa, #efefef);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#fafafa',endColorstr='#efefef')";
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 .guvnor-repository-li {
-	list-style-type: none;
-	margin: 0 0 10px 0;
-	padding: 8px 10px 0 10px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	overflow: hidden;
+    list-style-type: none;
+    margin: 0 0 10px 0;
+    padding: 8px 10px 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
 }
-#DIV_1 {
-                           box-sizing: border-box;
-                           float: left;
-                           height: 255px;
-                           left: 581px;
-                           width: 517px;
-                           font: normal normal normal 15px/normal arial, sans-serif;
-                           padding: 15px 15px 15px 0px;
-                       }/*#DIV_1*/
 
-#DIV_2 {
-    box-sizing: border-box;
-    color: rgb(26, 26, 26);
-    height: 225px;
-    position: relative;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 502px;
-    border: 1px solid rgb(151, 176, 248);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-    overflow: auto;
-}/*#DIV_2*/
-
-#DIV_3 {
-    box-sizing: border-box;
-    color: rgb(26, 26, 26);
-    height: 35px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 500px;
-    background: rgb(213, 221, 246) none repeat scroll 0% 0% / auto padding-box border-box;
-    border-top: 0px none rgb(26, 26, 26);
-    border-right: 0px none rgb(26, 26, 26);
-    border-bottom: 1px solid rgb(151, 176, 248);
-    border-left: 0px none rgb(26, 26, 26);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-    overflow: hidden;
-    padding: 2px;
-}/*#DIV_3*/
-
-#BUTTON_4 {
-    background-position: 0px -120px;
-    color: rgb(77, 77, 77);
-    display: block;
-    float: left;
-    height: 26px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    width: 26px;
-    z-index: 0;
-    background: rgb(227, 234, 246) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll 0px -120px / auto padding-box border-box;
-    border: 1px solid rgb(174, 192, 248);
-    border-radius: 2px 2px 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_4*/
-
-#BUTTON_5 {
-    background-position: 0px -96px;
-    color: rgb(77, 77, 77);
-    display: block;
-    float: left;
-    height: 26px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    width: 26px;
-    z-index: 0;
-    background: rgb(227, 234, 246) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll 0px -96px / auto padding-box border-box;
-    border: 1px solid rgb(174, 192, 248);
-    border-radius: 2px 2px 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_5*/
-
-#BUTTON_6 {
-    background-position: -24px -120px;
-    color: rgb(77, 77, 77);
-    display: block;
-    float: left;
-    height: 26px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    vertical-align: top;
-    width: 26px;
-    z-index: 0;
-    background: rgb(227, 234, 246) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -24px -120px / auto padding-box border-box;
-    border: 1px solid rgb(174, 192, 248);
-    border-radius: 2px 2px 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    margin: 2px 2px 2px 10px;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_6*/
-
-#BUTTON_7 {
-    background-position: -48px -120px;
-    color: rgb(77, 77, 77);
-    display: block;
-    float: left;
-    height: 26px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    width: 26px;
-    z-index: 0;
-    background: rgb(227, 234, 246) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -48px -120px / auto padding-box border-box;
-    border: 1px solid rgb(174, 192, 248);
-    border-radius: 2px 2px 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_7*/
-
-#TABLE_8 {
-    color: rgb(26, 26, 26);
-    height: 30px;
-    position: absolute;
-    right: 2px;
-    text-decoration: none solid rgb(26, 26, 26);
-    top: 2px;
-    width: 193px;
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TABLE_8*/
-
-#TBODY_9 {
-    color: rgb(26, 26, 26);
-    height: 30px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 193px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TBODY_9*/
-
-#TR_10 {
-    color: rgb(26, 26, 26);
-    height: 26px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: middle;
-    width: 193px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TR_10*/
-
-#TD_11 {
-    color: rgb(26, 26, 26);
-    height: 26px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 5px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_11*/
-
-#DIV_12 {
-    color: rgb(77, 77, 77);
-    text-decoration: none solid rgb(77, 77, 77);
-    border: 0px none rgb(77, 77, 77);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/24px arial, sans-serif;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px 5px 0px 0px;
-}/*#DIV_12*/
-
-#TD_13 {
-    color: rgb(26, 26, 26);
-    height: 26px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 182px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_13*/
-
-#DIV_14 {
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 176px;
-    background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
-    border: 1px solid rgb(151, 176, 248);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-    padding: 0px 2px;
-}/*#DIV_14*/
-
-#TABLE_15 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 176px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TABLE_15*/
-
-#TBODY_16 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 176px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TBODY_16*/
-
-#TR_17 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: middle;
-    width: 176px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TR_17*/
-
-#TD_18, #TD_24 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 18px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_18, #TD_24*/
-
-#BUTTON_19 {
-    background-position: -99px -73px;
-    border-collapse: collapse;
-    color: rgb(77, 77, 77);
-    display: block;
-    float: left;
-    height: 24px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    vertical-align: top;
-    width: 18px;
-    z-index: 0;
-    background: rgba(0, 0, 0, 0) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -99px -73px / auto padding-box border-box;
-    border: 0px none rgb(77, 77, 77);
-    border-radius: 2px 2px 2px 2px;
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    margin: 0px;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_19*/
-
-#TD_20 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 124px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_20*/
-
-#INPUT_21 {
-    border-collapse: collapse;
-    box-sizing: content-box;
-    color: rgb(26, 26, 26);
-    height: 15px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 120px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    margin: 1px;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#INPUT_21*/
-
-#TD_22 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 24px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 16px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_22*/
-
-#BUTTON_23 {
-    background-position: -124px -73px;
-    border-collapse: collapse;
-    color: rgb(77, 77, 77);
-    cursor: pointer;
-    display: block;
-    float: left;
-    height: 24px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    vertical-align: top;
-    z-index: 0;
-    background: rgba(0, 0, 0, 0) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -124px -73px / auto padding-box border-box;
-    border: 0px none rgb(77, 77, 77);
-    border-radius: 2px 2px 2px 2px;
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    margin: 0px;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_23*/
-
-#BUTTON_25 {
-    background-position: -148px -73px;
-    border-collapse: collapse;
-    color: rgb(77, 77, 77);
-    cursor: pointer;
-    display: block;
-    float: left;
-    height: 24px;
-    min-height: 0px;
-    opacity: 0.800000011920929;
-    text-decoration: none solid rgb(77, 77, 77);
-    vertical-align: top;
-    z-index: 0;
-    background: rgba(0, 0, 0, 0) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -148px -73px / auto padding-box border-box;
-    border: 0px none rgb(77, 77, 77);
-    border-radius: 2px 2px 2px 2px;
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/normal arial, sans-serif;
-    margin: 0px 2px 0px 0px;
-    outline: rgb(77, 77, 77) none 0px;
-    padding: 0px;
-}/*#BUTTON_25*/
-
-#DIV_26 {
-    box-sizing: border-box;
-    color: rgb(26, 26, 26);
-    height: 223px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 500px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    margin: -35px 0px 0px;
-    outline: rgb(26, 26, 26) none 0px;
-    overflow: hidden;
-    padding: 35px 0px 0px;
-}/*#DIV_26*/
-
-#DIV_27 {
-    color: rgb(26, 26, 26);
-    height: 188px;
-    position: relative;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 500px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-    overflow: auto;
-}/*#DIV_27*/
-
-#TABLE_28 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 54px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 500px;
-    border-spacing: 0px 0px;
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TABLE_28*/
-
-#COLGROUP_29, #COL_30, #COL_32 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    text-decoration: none solid rgb(26, 26, 26);
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#COLGROUP_29, #COL_30, #COL_32*/
-
-#COL_31 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    text-decoration: none solid rgb(26, 26, 26);
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#COL_31*/
-
-#TBODY_33 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 54px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 500px;
-    border: 0px none rgb(128, 128, 128);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TBODY_33*/
-
-#TR_34, #TR_49 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: middle;
-    width: 500px;
-    border: 0px none rgb(128, 128, 128);
-    font: normal normal normal 15px/14.666667938232422px arial, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TR_34, #TR_49*/
-
-#TD_35, #TD_36, #TD_50 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 24px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_35, #TD_36, #TD_50*/
-
-#BUTTON_37, #BUTTON_52 {
-    background-position: -48px -72px;
-    border-collapse: collapse;
-    cursor: pointer;
-    height: 24px;
-    min-height: 0px;
-    width: 24px;
-    background: rgba(0, 0, 0, 0) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll -48px -72px / auto padding-box border-box;
-    border: 0px none rgb(0, 0, 0);
-    margin: 0px;
-    padding: 0px;
-}/*#BUTTON_37, #BUTTON_52*/
-
-#TD_38 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 452px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_38*/
-
-#TABLE_39 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 113px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TABLE_39*/
-
-#TBODY_40 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    width: 113px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TBODY_40*/
-
-#TR_41 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: middle;
-    width: 113px;
-    border: 0px none rgb(128, 128, 128);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TR_41*/
-
-#TD_42 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 24px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_42*/
-
-#BUTTON_43 {
-    background-position: 0px -72px;
-    border-collapse: collapse;
-    cursor: pointer;
-    height: 24px;
-    min-height: 0px;
-    width: 24px;
-    background: rgba(0, 0, 0, 0) url(http://jsoneditoronline.org/lib/jsoneditor/img/jsoneditor-icons.png) repeat scroll 0px -72px / auto padding-box border-box;
-    border: 0px none rgb(0, 0, 0);
-    border-spacing: 2px 2px;
-    margin: 0px;
-    padding: 0px;
-}/*#BUTTON_43*/
-
-#TD_44 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 56px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_44*/
-
-#DIV_45 {
+/*# Property Widget CSS*/
+.treeItem {
     border-collapse: collapse;
     color: rgb(128, 128, 128);
     float: left;
@@ -1068,96 +522,29 @@ td, th {
     word-wrap: break-word;
     border: 1px solid rgba(0, 0, 0, 0);
     border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
+    font: normal normal normal 13px/15px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
     margin: 1px;
     outline: rgb(128, 128, 128) none 0px;
     padding: 2px;
-}/*#DIV_45*/
+}
 
-#TD_46 {
+.textlabel {
     border-collapse: collapse;
     color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_46*/
-
-#TD_47 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 33px;
-    border: 0px none rgb(26, 26, 26);
-    border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-}/*#TD_47*/
-
-#DIV_48 {
-    border-collapse: collapse;
-    color: rgb(128, 128, 128);
     float: left;
     height: 16px;
     min-height: 16px;
-    min-width: 16px;
+    min-width: 32px;
     overflow-wrap: break-word;
-    text-decoration: none solid rgb(128, 128, 128);
-    width: 24px;
+    text-decoration: none solid rgb(26, 26, 26);
+    width: 48px;
     word-wrap: break-word;
     border: 1px solid rgba(0, 0, 0, 0);
     border-spacing: 2px 2px;
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
+    font: normal normal normal 13px/15px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
     margin: 1px;
-    outline: rgb(128, 128, 128) none 0px;
-    padding: 2px;
-}/*#DIV_48*/
-
-#TD_51 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 24px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
     outline: rgb(26, 26, 26) none 0px;
-}/*#TD_51*/
-
-#TD_53 {
-    border-collapse: collapse;
-    color: rgb(26, 26, 26);
-    height: 27px;
-    text-decoration: none solid rgb(26, 26, 26);
-    vertical-align: top;
-    width: 402px;
-    border: 0px none rgb(26, 26, 26);
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    outline: rgb(26, 26, 26) none 0px;
-    padding: 0px 0px 0px 50px;
-}/*#TD_53*/
-
-#DIV_54 {
-    border-collapse: collapse;
-    color: rgb(128, 128, 128);
-    float: left;
-    height: 16px;
-    min-height: 16px;
-    min-width: 16px;
-    overflow-wrap: break-word;
-    text-decoration: none solid rgb(128, 128, 128);
-    width: 112px;
-    word-wrap: break-word;
-    border: 1px solid rgba(0, 0, 0, 0);
-    font: normal normal normal 13px/14.666667938232422px 'droid sans mono', monospace, 'courier new', courier, sans-serif;
-    margin: 1px;
-    outline: rgb(128, 128, 128) none 0px;
     padding: 2px;
-}/*#DIV_54*/
+}
+
 
