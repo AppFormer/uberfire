@@ -50,7 +50,7 @@ public class ComboField extends AbstractField {
                                   int index,
                                   int selected,
                                   String value ) {
-        if ( value.equalsIgnoreCase( property.getActualStringValue() ) ) {
+        if ( value.equalsIgnoreCase( property.getCurrentStringValue() ) ) {
             selected = index;
         }
         return selected;

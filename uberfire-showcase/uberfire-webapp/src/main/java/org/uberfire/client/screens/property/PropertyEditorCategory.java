@@ -3,8 +3,6 @@ package org.uberfire.client.screens.property;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.uberfire.client.screens.property.fields.PropertyEditorType;
-
 public class PropertyEditorCategory {
 
 
@@ -22,34 +20,11 @@ public class PropertyEditorCategory {
         this.priority = priority;
     }
 
-    public void addField( String key,
-                          String actualStringValue,
-                          PropertyEditorType type ) {
-        fields.add( new PropertyEditorFieldInfo( key, actualStringValue, this, type ) );
+    public PropertyEditorCategory withFields( PropertyEditorFieldInfo field ) {
+        field.setPropertyEditorCategory( this );
+        fields.add( field );
+        return this;
     }
-
-    public void addField( String key,
-                          String actualStringValue,
-                          PropertyEditorType type,
-                          List<String> comboValues ) {
-        fields.add( new PropertyEditorFieldInfo( key, actualStringValue, this, type, comboValues ) );
-
-    }
-
-    public void addField( String key,
-                          String actualStringValue,
-                          PropertyEditorType type, int priority) {
-        fields.add( new PropertyEditorFieldInfo( key, actualStringValue, this, type, priority ) );
-    }
-
-    public void addField( String key,
-                          String actualStringValue,
-                          PropertyEditorType type,
-                          List<String> comboValues , int priority) {
-        fields.add( new PropertyEditorFieldInfo( key, actualStringValue, this, type, comboValues, priority ) );
-
-    }
-
 
     public String getName() {
         return name;
