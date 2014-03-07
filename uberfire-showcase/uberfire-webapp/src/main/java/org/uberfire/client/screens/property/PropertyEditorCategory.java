@@ -20,7 +20,7 @@ public class PropertyEditorCategory {
         this.priority = priority;
     }
 
-    public PropertyEditorCategory withFields( PropertyEditorFieldInfo field ) {
+    public PropertyEditorCategory withField( PropertyEditorFieldInfo field ) {
         field.setPropertyEditorCategory( this );
         fields.add( field );
         return this;

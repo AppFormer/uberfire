@@ -33,6 +33,11 @@
 
   <dependencies>
     <dependency>
+    <groupId>org.uberfire</groupId>
+    <version>0.4.0-SNAPSHOT</version>
+    <artifactId>gwt-property-editor-widget</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-all</artifactId>
     </dependency>

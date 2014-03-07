@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.property.DummyPropertyMap;
+import org.uberfire.client.screens.property.DummyProperty;
 import org.uberfire.client.screens.property.PropertyEditorChangeEvent;
 import org.uberfire.client.screens.property.PropertyEditorEvent;
 
@@ -43,7 +43,7 @@ public class WelcomeScreen
 
     @UiHandler("launch")
     public void onClickLaunchUnknownPlace( final ClickEvent e ) {
-        event.fire( new PropertyEditorEvent( "12932", DummyPropertyMap.getMap() ) );
+        event.fire( new PropertyEditorEvent( "12932", DummyProperty.getProperty() ) );
     }
 
     @WorkbenchPartTitle
