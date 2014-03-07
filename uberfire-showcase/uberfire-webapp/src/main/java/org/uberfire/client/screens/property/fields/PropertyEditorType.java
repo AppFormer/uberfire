@@ -12,12 +12,12 @@ public enum PropertyEditorType {
     BOOLEAN {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            return new BooleanField().widget( property );
+            return getWidget( property, BooleanField.class );
         }
     }, HTTP_LINK {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            return new TextField().widget( property );
+            return TEXT.widget( property );
         }
     }, OBJECT {
         @Override
@@ -27,28 +27,31 @@ public enum PropertyEditorType {
     }, NUMBER {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            return new TextField().widget( property );
+            return TEXT.widget( property );
         }
     }, COMBO {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            return new ComboField().widget( property );
+            return getWidget( property, ComboField.class );
         }
     }, SECRET_TEXT {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            return new SecretTextField().widget( property );
+            return getWidget( property, SecretTextField.class );
         }
     }, TEXT {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
-            //ederign
-            Collection<IOCBeanDef> iocBeanDefs = IOC.getBeanManager().lookupBeans( "org.uberfire.client.screens.property.fields.TextField" );
-            IOCBeanDef iocBeanDef= iocBeanDefs.iterator().next();
-            TextField textField = (TextField) iocBeanDef.getInstance();
-            return textField.widget( property );
+            return getWidget( property, TextField.class );
         }
     };
+
+    private static Widget getWidget( PropertyEditorFieldInfo property,
+                                     Class fieldtype ) {
+        IOCBeanDef iocBeanDef = IOC.getBeanManager().lookupBean( fieldtype );
+        AbstractField field = (AbstractField) iocBeanDef.getInstance();
+        return field.widget( property );
+    }
 
     public abstract Widget widget( PropertyEditorFieldInfo property );
 

@@ -10,4 +10,12 @@ public class PropertyEditorChangeEvent {
         this.property = property;
         this.newValue = newValue;
     }
+
+    public PropertyEditorFieldInfo getProperty() {
+        return property;
+    }
+
+    public String getNewValue() {
+        return newValue;
+    }
 }

@@ -6,19 +6,17 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.screens.property.DummyPropertyMap;
-import org.uberfire.client.screens.property.PropertyEditorBuilder;
 import org.uberfire.client.screens.property.PropertyEditorChangeEvent;
 import org.uberfire.client.screens.property.PropertyEditorEvent;
 
@@ -60,6 +58,8 @@ public class WelcomeScreen
 
 
     public void observer( @Observes PropertyEditorChangeEvent event ) {
-       System.out.println("Opa");
+        Window.alert("Msg from observer on WelcomeScreen: Changed: " + event.getProperty().getKey() +"- new value:" + event.getNewValue());
     }
+
+
 }

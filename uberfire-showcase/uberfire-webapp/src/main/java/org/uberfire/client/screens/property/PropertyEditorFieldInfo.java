@@ -6,24 +6,26 @@ import org.uberfire.client.screens.property.fields.PropertyEditorType;
 
 public class PropertyEditorFieldInfo {
 
+    private final String key;
     private final String actualStringValue;
     private String category;
     private final PropertyEditorType type;
-
     private List<String> comboValues;
 
-    public PropertyEditorFieldInfo( String actualStringValue,
+    public PropertyEditorFieldInfo( String key, String actualStringValue,
                                     String category,
                                     PropertyEditorType type ) {
+        this.key = key;
         this.actualStringValue = actualStringValue;
         this.category = category;
         this.type = type;
     }
 
-    public PropertyEditorFieldInfo( String actualStringValue,
+    public PropertyEditorFieldInfo( String key,  String actualStringValue,
                                     String category,
                                     PropertyEditorType type,
                                     List<String> comboValues ) {
+        this.key = key;
         this.actualStringValue = actualStringValue;
         this.category = category;
         this.type = type;
@@ -45,4 +47,9 @@ public class PropertyEditorFieldInfo {
     public String getActualStringValue() {
         return actualStringValue;
     }
+
+    public String getKey() {
+        return key;
+    }
 }
+
