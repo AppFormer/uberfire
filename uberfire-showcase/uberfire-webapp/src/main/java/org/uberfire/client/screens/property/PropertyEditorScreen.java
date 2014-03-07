@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
@@ -35,9 +36,12 @@ public class PropertyEditorScreen extends Composite {
     }
 
     public void observer( @Observes PropertyEditorEvent event ) {
-        Tree propertyTree = PropertyEditorBuilder.build( event.getPropertyMap() );
+        VerticalPanel verticalPanel = new VerticalPanel();
+        Tree propertyTree = PropertyEditorBuilder.build( event.getProperties() );
+        verticalPanel.add( propertyTree );
+
         scroolPanel.clear();
-        scroolPanel.add( propertyTree );
+        scroolPanel.add( verticalPanel );
     }
 
 }

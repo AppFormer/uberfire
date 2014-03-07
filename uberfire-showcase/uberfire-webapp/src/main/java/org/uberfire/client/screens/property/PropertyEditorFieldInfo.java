@@ -8,12 +8,14 @@ public class PropertyEditorFieldInfo {
 
     private final String key;
     private final String actualStringValue;
-    private String category;
+    private PropertyEditorCategory category;
     private final PropertyEditorType type;
     private List<String> comboValues;
+    private int priority = Integer.MAX_VALUE;
 
-    public PropertyEditorFieldInfo( String key, String actualStringValue,
-                                    String category,
+    public PropertyEditorFieldInfo( String key,
+                                    String actualStringValue,
+                                    PropertyEditorCategory category,
                                     PropertyEditorType type ) {
         this.key = key;
         this.actualStringValue = actualStringValue;
@@ -21,8 +23,9 @@ public class PropertyEditorFieldInfo {
         this.type = type;
     }
 
-    public PropertyEditorFieldInfo( String key,  String actualStringValue,
-                                    String category,
+    public PropertyEditorFieldInfo( String key,
+                                    String actualStringValue,
+                                    PropertyEditorCategory category,
                                     PropertyEditorType type,
                                     List<String> comboValues ) {
         this.key = key;
@@ -32,6 +35,31 @@ public class PropertyEditorFieldInfo {
         this.comboValues = comboValues;
     }
 
+    public PropertyEditorFieldInfo( String key,
+                                    String actualStringValue,
+                                    PropertyEditorCategory category,
+                                    PropertyEditorType type, int priority) {
+        this.key = key;
+        this.actualStringValue = actualStringValue;
+        this.category = category;
+        this.type = type;
+        this.priority = priority;
+    }
+
+    public PropertyEditorFieldInfo( String key,
+                                    String actualStringValue,
+                                    PropertyEditorCategory category,
+                                    PropertyEditorType type,
+                                    List<String> comboValues, int priority ) {
+        this.key = key;
+        this.actualStringValue = actualStringValue;
+        this.category = category;
+        this.type = type;
+        this.comboValues = comboValues;
+        this.priority = priority;
+    }
+
+
     public List<String> getComboValues() {
         return comboValues;
     }
@@ -40,7 +68,7 @@ public class PropertyEditorFieldInfo {
         return type;
     }
 
-    public String getCategory() {
+    public PropertyEditorCategory getCategory() {
         return category;
     }
 
@@ -51,5 +79,10 @@ public class PropertyEditorFieldInfo {
     public String getKey() {
         return key;
     }
+
+    public int getPriority() {
+        return priority;
+    }
+
 }
 

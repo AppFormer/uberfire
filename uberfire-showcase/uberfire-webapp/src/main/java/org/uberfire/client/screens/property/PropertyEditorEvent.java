@@ -1,20 +1,20 @@
 package org.uberfire.client.screens.property;
 
-import java.util.Map;
+import java.util.List;
 
 public class PropertyEditorEvent {
 
     private final String idEvent;
-    private Map<String, PropertyEditorFieldInfo> propertyMap;
+    private  List<PropertyEditorCategory> properties;
 
     public PropertyEditorEvent( String idEvent,
-                                Map<String, PropertyEditorFieldInfo> propertyMap ) {
+                               List<PropertyEditorCategory> properties ) {
         this.idEvent = idEvent;
-        this.propertyMap = propertyMap;
+        this.properties = properties;
     }
 
-    public Map<String, PropertyEditorFieldInfo> getPropertyMap() {
-        return propertyMap;
+    public  List<PropertyEditorCategory> getProperties() {
+        return properties;
     }
 
     public String getIdEvent() {
