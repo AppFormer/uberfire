@@ -1,4 +1,4 @@
-package org.uberfire.client.screens.property;
+package org.uberfire.shared.screens.property.api;
 
 public class PropertyEditorChangeEvent {
 

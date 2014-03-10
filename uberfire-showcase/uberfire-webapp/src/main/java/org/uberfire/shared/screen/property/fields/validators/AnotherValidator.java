@@ -1,5 +1,8 @@
-package org.uberfire.client.screens.property.fields.validators;
+package org.uberfire.shared.screen.property.fields.validators;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
+
+@Portable
 public class AnotherValidator implements PropertyFieldValidator {
 
     @Override

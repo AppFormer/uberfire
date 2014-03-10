@@ -1,4 +1,4 @@
-package org.uberfire.client.screens.property.fields;
+package org.uberfire.shared.screen.property.fields;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -8,8 +8,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.screens.property.PropertyEditorChangeEvent;
-import org.uberfire.client.screens.property.PropertyEditorFieldInfo;
+import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
+import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
 
 @Dependent
 public class ComboField extends AbstractField {

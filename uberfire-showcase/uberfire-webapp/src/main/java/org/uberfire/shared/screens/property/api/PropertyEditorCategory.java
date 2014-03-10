@@ -1,14 +1,19 @@
-package org.uberfire.client.screens.property;
+package org.uberfire.shared.screens.property.api;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
+
+@Portable
 public class PropertyEditorCategory {
 
 
-    private final String name;
+    private String name;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyEditorFieldInfo> fields = new ArrayList<PropertyEditorFieldInfo>();
+
+    public PropertyEditorCategory(){}
 
     public PropertyEditorCategory( String name ) {
         this.name = name;
@@ -19,6 +24,8 @@ public class PropertyEditorCategory {
         this.name = name;
         this.priority = priority;
     }
+
+
 
     public PropertyEditorCategory withField( PropertyEditorFieldInfo field ) {
         field.setPropertyEditorCategory( this );

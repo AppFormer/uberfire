@@ -1,9 +1,7 @@
-package org.uberfire.client.screens.property;
+package org.uberfire.shared.screens.property.api;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
@@ -15,8 +13,8 @@ import static java.util.Collections.sort;
 
 public class PropertyEditorBuilder {
 
-    public static Tree build( List<PropertyEditorCategory> properties ) {
-
+    public static Tree build( PropertyEditorEvent event  ) {
+        List<PropertyEditorCategory> properties = event.getProperties();
         sortCategoriesAndFieldsByPriority( properties );
 
         Tree propertyTree = new Tree();

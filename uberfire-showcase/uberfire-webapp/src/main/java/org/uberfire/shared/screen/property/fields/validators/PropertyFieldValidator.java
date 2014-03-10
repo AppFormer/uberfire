@@ -1,4 +1,4 @@
-package org.uberfire.client.screens.property.fields.validators;
+package org.uberfire.shared.screen.property.fields.validators;
 
 public interface PropertyFieldValidator {
 

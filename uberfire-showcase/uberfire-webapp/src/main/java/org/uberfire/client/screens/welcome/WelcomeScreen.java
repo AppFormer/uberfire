@@ -1,5 +1,7 @@
 package org.uberfire.client.screens.welcome;
 
+import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -13,12 +15,16 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.property.DummyProperty;
-import org.uberfire.client.screens.property.PropertyEditorChangeEvent;
-import org.uberfire.client.screens.property.PropertyEditorEvent;
+import org.uberfire.client.screens.property.PropertyUtils;
+import org.uberfire.client.screens.property.temp.DummyProperty;
+import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
+import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
+import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
 
 @Dependent
 @WorkbenchScreen(identifier = "welcome")
@@ -27,6 +33,9 @@ public class WelcomeScreen
 
     @Inject
     Event<PropertyEditorEvent> event;
+
+    @Inject
+    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
 
     interface ViewBinder
             extends
@@ -43,7 +52,7 @@ public class WelcomeScreen
 
     @UiHandler("launch")
     public void onClickLaunchUnknownPlace( final ClickEvent e ) {
-        event.fire( new PropertyEditorEvent( "12932", DummyProperty.getProperty() ) );
+       event.fire( new PropertyEditorEvent( "12932", DummyProperty.getProperty() ) );
     }
 
     @WorkbenchPartTitle
@@ -52,7 +61,7 @@ public class WelcomeScreen
     }
 
     @WorkbenchContextId
-    public String getMyContextRef() {
+    public String getMyCorntextRef() {
         return "welcomeContext";
     }
 

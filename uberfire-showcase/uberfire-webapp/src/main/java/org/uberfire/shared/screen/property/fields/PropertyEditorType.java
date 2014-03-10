@@ -1,15 +1,14 @@
-package org.uberfire.client.screens.property.fields;
+package org.uberfire.shared.screen.property.fields;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
-import org.uberfire.client.screens.property.PropertyEditorFieldInfo;
-import org.uberfire.client.screens.property.fields.validators.IntegerValidator;
-import org.uberfire.client.screens.property.fields.validators.PropertyFieldValidator;
+import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
+import org.uberfire.shared.screen.property.fields.validators.IntegerValidator;
+import org.uberfire.shared.screen.property.fields.validators.PropertyFieldValidator;
 
 public enum PropertyEditorType {
 

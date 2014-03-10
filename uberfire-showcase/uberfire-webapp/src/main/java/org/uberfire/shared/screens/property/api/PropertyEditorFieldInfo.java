@@ -1,22 +1,33 @@
-package org.uberfire.client.screens.property;
+package org.uberfire.shared.screens.property.api;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.uberfire.client.screens.property.fields.PropertyEditorType;
-import org.uberfire.client.screens.property.fields.validators.PropertyFieldValidator;
+import org.jboss.errai.common.client.api.annotations.Portable;
+import org.uberfire.shared.screen.property.fields.PropertyEditorType;
+import org.uberfire.shared.screen.property.fields.validators.PropertyFieldValidator;
 
+@Portable
 public class PropertyEditorFieldInfo {
 
-    private final String key;
+    private String key;
     private String currentStringValue;
-    private final String originalValue;
+    private String originalValue;
     private PropertyEditorCategory category;
-    private final PropertyEditorType type;
+    private PropertyEditorType type;
     private List<String> comboValues;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyFieldValidator> validators = new ArrayList<PropertyFieldValidator>();
+
+    public PropertyEditorFieldInfo(){};
+
+    public PropertyEditorFieldInfo( String key,
+                                    PropertyEditorType type ) {
+        this.key = key;
+        this.originalValue = currentStringValue;
+        this.type = type;
+        this.validators.addAll( type.getValidators() );
+    }
 
     public PropertyEditorFieldInfo( String key,
                                     String currentStringValue,

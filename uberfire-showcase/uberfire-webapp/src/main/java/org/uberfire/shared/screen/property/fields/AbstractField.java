@@ -1,7 +1,7 @@
-package org.uberfire.client.screens.property.fields;
+package org.uberfire.shared.screen.property.fields;
 
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.screens.property.PropertyEditorFieldInfo;
+import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
 
 public abstract class AbstractField {
 
