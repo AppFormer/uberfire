@@ -52,7 +52,7 @@ public class WelcomeScreen
 
     @UiHandler("launch")
     public void onClickLaunchUnknownPlace( final ClickEvent e ) {
-       event.fire( new PropertyEditorEvent( "12932", DummyProperty.getProperty() ) );
+       event.fire( new PropertyEditorEvent( "id", DummyProperty.getProperty() ) );
     }
 
     @WorkbenchPartTitle

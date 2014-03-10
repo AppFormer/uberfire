@@ -11,9 +11,7 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
@@ -21,8 +19,8 @@ import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.screens.PropertyEditorWidget;
 import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
-import org.uberfire.shared.screens.property.api.PropertyEditorBuilder;
 import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
 
 @Dependent
@@ -32,12 +30,11 @@ public class PropertyEditorScreen extends Composite {
 
     @DataField
     @Inject
-    private ScrollPanel scroolPanel;
+    private TextBox searchBox;
 
     @DataField
     @Inject
-    private TextBox searchBox;
-
+    private FlowPanel flowPanel;
 
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;
@@ -52,28 +49,26 @@ public class PropertyEditorScreen extends Composite {
     }
 
     @EventHandler("searchBox")
-    private void onKeyDown(KeyDownEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String,List<String>>>() {
+    private void onKeyDown( KeyDownEvent event ) {
+        if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
                 @Override
-                public void callback( final Map<String,List<String>> map ) {
-                    createPropertyWidget( new PropertyEditorEvent( "12932", PropertyUtils.mapToCategory( map ) ) );
+                public void callback( final Map<String, List<String>> map ) {
+                    propertyEditorEvent.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
                 }
             } ).extract( searchBox.getText() );
         }
+
     }
 
-    public void observer( @Observes PropertyEditorEvent event ) {
-        createPropertyWidget( event );
+    private void createPropertyWidget( PropertyEditorEvent propertyEditorEvent ) {
+        flowPanel.clear();
+        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent
+                                                  ) );
     }
 
-    private void createPropertyWidget( PropertyEditorEvent event ) {
-        VerticalPanel verticalPanel = new VerticalPanel();
-        Tree propertyTree = PropertyEditorBuilder.build( event );
-        verticalPanel.add( propertyTree );
-
-        scroolPanel.clear();
-        scroolPanel.add( verticalPanel );
+    public void propertyEditorEventObserver( @Observes PropertyEditorEvent event ) {
+            createPropertyWidget( event );
     }
 
 }

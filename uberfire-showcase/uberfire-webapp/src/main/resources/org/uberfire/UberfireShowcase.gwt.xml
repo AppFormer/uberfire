@@ -29,5 +29,6 @@
   <inherits name="org.jboss.errai.enterprise.CDI" />
   <inherits name="org.jboss.errai.enterprise.Jaxrs" />
   <inherits name="org.jboss.errai.ui.nav.Navigation"/>
+  <inherits name="com.github.gwtbootstrap.Bootstrap"/>
 
 </module>

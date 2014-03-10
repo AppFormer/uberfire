@@ -20,7 +20,7 @@ public class DummyProperty {
                 .withField( new PropertyEditorFieldInfo( "Notes (to be show in reports)", "Created on XYZ", PropertyEditorType.TEXT ) );
 
         PropertyEditorCategory dependency = new PropertyEditorCategory( "Dependency and Polling Interval" )
-                .withField( new PropertyEditorFieldInfo( "This monitor dependes on availability of", "Ping on hpmfu.local", PropertyEditorType.TEXT ) )
+                .withField( new PropertyEditorFieldInfo( "This monitor depends on availability of", "Ping on hpmfu.local", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "polling interval, seconds", "60", PropertyEditorType.INTEGER ) );
 
         PropertyEditorCategory monitorDefinition = new PropertyEditorCategory( "Monitor Definition", 1 )

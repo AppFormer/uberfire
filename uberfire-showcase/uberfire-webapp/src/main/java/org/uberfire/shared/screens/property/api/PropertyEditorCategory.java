@@ -9,6 +9,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 public class PropertyEditorCategory {
 
 
+
     private String name;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyEditorFieldInfo> fields = new ArrayList<PropertyEditorFieldInfo>();
@@ -45,5 +46,12 @@ public class PropertyEditorCategory {
         return fields;
     }
 
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + priority;
+        result = 31 * result + ( fields != null ? fields.hashCode() : 0 );
+        return result;
+    }
 
 }
