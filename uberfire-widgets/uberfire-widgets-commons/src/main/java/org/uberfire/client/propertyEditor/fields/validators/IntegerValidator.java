@@ -1,4 +1,4 @@
-package org.uberfire.shared.screen.property.fields.validators;
+package org.uberfire.client.propertyEditor.fields.validators;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 

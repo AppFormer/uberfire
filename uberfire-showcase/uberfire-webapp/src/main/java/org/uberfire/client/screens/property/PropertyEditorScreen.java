@@ -19,9 +19,8 @@ import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.PropertyEditorWidget;
-import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
-import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
+import org.uberfire.client.propertyEditor.PropertyEditorWidget;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 
 @Dependent
 @Templated
@@ -34,13 +33,13 @@ public class PropertyEditorScreen extends Composite {
 
     @DataField
     @Inject
-    private FlowPanel flowPanel;
+    private PropertyEditorWidget propertyEditorWidget;
 
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;
 
-    @Inject
-    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
+//    @Inject
+//    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
 
     @Override
     @WorkbenchPartTitle
@@ -62,12 +61,12 @@ public class PropertyEditorScreen extends Composite {
 //    }
 
     private void createPropertyWidget( PropertyEditorEvent propertyEditorEvent ) {
-        flowPanel.clear();
-        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent ) );
+//        flowPanel.clear();
+//        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent ) );
     }
 
     public void propertyEditorEventObserver( @Observes PropertyEditorEvent event ) {
-        createPropertyWidget( event );
+        propertyEditorWidget.handle(event);
     }
 
 }

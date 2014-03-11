@@ -1,4 +1,4 @@
-package org.uberfire.shared.screen.property.fields;
+package org.uberfire.client.propertyEditor.fields;
 
 import java.util.List;
 import javax.enterprise.context.Dependent;
@@ -12,9 +12,9 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
-import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
-import org.uberfire.shared.screen.property.fields.validators.PropertyFieldValidator;
+import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 
 @Dependent
 public class TextField extends AbstractField {

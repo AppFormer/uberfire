@@ -1,4 +1,4 @@
-package org.uberfire.shared.screen.property.fields;
+package org.uberfire.client.propertyEditor.fields;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -8,8 +8,8 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
-import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 
 @Dependent
 public class BooleanField extends AbstractField {

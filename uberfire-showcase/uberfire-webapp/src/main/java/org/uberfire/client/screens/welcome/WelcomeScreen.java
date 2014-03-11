@@ -25,10 +25,8 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.property.PropertyUtils;
-import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
-import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
-import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 
 @Dependent
 @WorkbenchScreen(identifier = "welcome")
@@ -42,9 +40,9 @@ public class WelcomeScreen
 
     @Inject
     Event<PropertyEditorEvent> event;
-
-    @Inject
-    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
+//
+//    @Inject
+//    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
 
 
     interface ViewBinder

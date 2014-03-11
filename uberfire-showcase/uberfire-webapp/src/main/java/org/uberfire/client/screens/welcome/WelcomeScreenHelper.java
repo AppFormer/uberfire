@@ -3,11 +3,11 @@ package org.uberfire.client.screens.welcome;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.uberfire.shared.screens.property.api.PropertyEditorCategory;
-import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
-import org.uberfire.shared.screen.property.fields.PropertyEditorType;
-import org.uberfire.shared.screen.property.fields.validators.AnotherValidator;
-import org.uberfire.shared.screen.property.fields.validators.LoginValidator;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
+import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
+import org.uberfire.client.propertyEditor.fields.validators.AnotherValidator;
+import org.uberfire.client.propertyEditor.fields.validators.LoginValidator;
 
 public class WelcomeScreenHelper {
 

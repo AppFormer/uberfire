@@ -1,9 +1,7 @@
-package org.uberfire.shared.screens.property.api;
+package org.uberfire.client.propertyEditor.api;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jboss.errai.common.client.api.annotations.Portable;
 
 public class PropertyEditorCategory {
 
