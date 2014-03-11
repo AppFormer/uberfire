@@ -25,10 +25,10 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.property.PropertyUtils;
-import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
-import org.uberfire.shared.screens.property.api.PropertyEditorChangeEvent;
-import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
+import org.uberfire.client.propertyEditor.PropertyUtils;
+import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
+import org.uberfire.shared.propertyEditor.BeanPropertyEditorBuilderService;
 
 @Dependent
 @WorkbenchScreen(identifier = "welcome")
@@ -37,15 +37,14 @@ public class WelcomeScreen
 
     public static final String WELCOME_SCREEN_ID = "welcomeScreen";
 
-//    @UiField
-//    TextBox searchBox;
+    @UiField
+    TextBox searchBox;
 
     @Inject
     Event<PropertyEditorEvent> event;
 
     @Inject
     private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
-
 
     interface ViewBinder
             extends
@@ -65,31 +64,24 @@ public class WelcomeScreen
         event.fire( new PropertyEditorEvent( WELCOME_SCREEN_ID, WelcomeScreenHelper.createProperties() ) );
     }
 
-
-//    @UiHandler("searchBox")
-//    public void onKeyDown( KeyDownEvent keyDown ) {
-//        if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-//            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
-//                @Override
-//                public void callback( final Map<String, List<String>> map ) {
-//                    event.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
-//                }
-//            } ).extract( searchBox.getText() );
-//        }
-//
-//    }
-
-    public void propertyEditorChangeEvent( @Observes PropertyEditorChangeEvent event ) {
-        if( isMyPropertyEvent( event )){
-            Window.alert("Msg from property editor: Changed: " + event.getProperty().getKey() +" - new value: " + event.getNewValue());
+    @UiHandler("searchBox")
+    public void onKeyDown( KeyDownEvent keyDown ) {
+        if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
+                @Override
+                public void callback( final Map<String, List<String>> map ) {
+                    event.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
+                }
+            } ).extract( searchBox.getText() );
         }
+
     }
 
-
-
-
-
-
+    public void propertyEditorChangeEvent( @Observes PropertyEditorChangeEvent event ) {
+        if ( isMyPropertyEvent( event ) ) {
+            Window.alert( "Msg from property editor: Changed: " + event.getProperty().getKey() + " - new value: " + event.getNewValue() );
+        }
+    }
 
     @WorkbenchPartTitle
     public String getTitle() {
@@ -100,13 +92,6 @@ public class WelcomeScreen
     public String getMyCorntextRef() {
         return "welcomeContext";
     }
-
-
-
-
-
-
-
 
     private boolean isMyPropertyEvent( PropertyEditorChangeEvent event ) {
         return true;

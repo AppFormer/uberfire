@@ -1,12 +1,10 @@
-package org.uberfire.shared.screens.property.api;
+package org.uberfire.client.propertyEditor.api;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
-
-import static java.util.Collections.sort;
+import static java.util.Collections.*;
 
 public class PropertyEditorEvent {
 

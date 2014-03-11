@@ -1,11 +1,11 @@
-package org.uberfire.client.screens.property;
+package org.uberfire.client.propertyEditor;
 
 import java.util.List;
 import java.util.Map;
 
-import org.uberfire.shared.screen.property.fields.PropertyEditorType;
-import org.uberfire.shared.screens.property.api.PropertyEditorCategory;
-import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
+import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
 
 public class PropertyUtils {
 

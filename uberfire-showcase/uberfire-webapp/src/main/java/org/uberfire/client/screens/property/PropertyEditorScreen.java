@@ -19,28 +19,20 @@ import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.screens.PropertyEditorWidget;
-import org.uberfire.shared.screens.property.api.BeanPropertyEditorBuilderService;
-import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
+import org.uberfire.client.propertyEditor.PropertyEditorWidget;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 
 @Dependent
 @Templated
 @WorkbenchScreen(identifier = "PropertyEditorScreen")
 public class PropertyEditorScreen extends Composite {
 
-    //    @DataField
-//    @Inject
-    private TextBox searchBox;
-
     @DataField
     @Inject
-    private FlowPanel flowPanel;
+    private PropertyEditorWidget propertyEditorWidget;
 
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;
-
-    @Inject
-    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
 
     @Override
     @WorkbenchPartTitle
@@ -48,26 +40,8 @@ public class PropertyEditorScreen extends Composite {
         return "Property Editor";
     }
 
-//    @EventHandler("searchBox")
-//    private void onKeyDown( KeyDownEvent event ) {
-//        if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-//            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
-//                @Override
-//                public void callback( final Map<String, List<String>> map ) {
-//                    propertyEditorEvent.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
-//                }
-//            } ).extract( searchBox.getText() );
-//        }
-//
-//    }
-
-    private void createPropertyWidget( PropertyEditorEvent propertyEditorEvent ) {
-        flowPanel.clear();
-        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent ) );
-    }
-
     public void propertyEditorEventObserver( @Observes PropertyEditorEvent event ) {
-        createPropertyWidget( event );
+        propertyEditorWidget.handle(event);
     }
 
 }

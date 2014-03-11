@@ -1,11 +1,10 @@
-package org.uberfire.shared.screens.property.api;
+package org.uberfire.client.propertyEditor.api;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
-import org.uberfire.shared.screen.property.fields.PropertyEditorType;
-import org.uberfire.shared.screen.property.fields.validators.PropertyFieldValidator;
+import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
+import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 
 public class PropertyEditorFieldInfo {
 

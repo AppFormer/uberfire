@@ -1,17 +1,28 @@
-package org.uberfire.client.screens;
+package org.uberfire.client.propertyEditor;
+
+import javax.enterprise.context.Dependent;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.shared.screen.property.fields.PropertyEditorType;
-import org.uberfire.shared.screens.property.api.PropertyEditorCategory;
-import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
-import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
 
-public class PropertyEditorWidget {
+@Dependent
+public class PropertyEditorWidget extends FlowPanel {
 
-    public static FlowPanel create( PropertyEditorEvent event ) {
+    public PropertyEditorWidget() {
+    }
+
+    public void handle( PropertyEditorEvent event ) {
+        this.clear();
+        this.add( create( event ) );
+    }
+
+    private FlowPanel create( PropertyEditorEvent event ) {
 
         FlowPanel accordion = createAccordion();
 
@@ -27,7 +38,7 @@ public class PropertyEditorWidget {
         return accordion;
     }
 
-    private static FlowPanel createItemsTable(
+    private FlowPanel createItemsTable(
             PropertyEditorCategory category ) {
         FlowPanel collapse = createCollapse( category );
 
@@ -39,14 +50,14 @@ public class PropertyEditorWidget {
         return collapse;
     }
 
-    private static FlowPanel createCollapse( PropertyEditorCategory category ) {
+    private FlowPanel createCollapse( PropertyEditorCategory category ) {
         FlowPanel collapse = new FlowPanel();
         collapse.getElement().addClassName( "accordion-body collapse" );
         collapse.getElement().setId( "collapse" + category.hashCode() );
         return collapse;
     }
 
-    private static FlowPanel createCollapseInner( PropertyEditorFieldInfo field ) {
+    private FlowPanel createCollapseInner( PropertyEditorFieldInfo field ) {
         FlowPanel collapseInner = new FlowPanel();
         collapseInner.getElement().addClassName( "row-fluid accordion-inner " );
 
@@ -55,31 +66,31 @@ public class PropertyEditorWidget {
         return collapseInner;
     }
 
-    private static FlowPanel createFieldInput( PropertyEditorFieldInfo field ) {
+    private FlowPanel createFieldInput( PropertyEditorFieldInfo field ) {
         FlowPanel col2 = new FlowPanel();
         col2.getElement().addClassName( "span6" );
         Widget fieldWidget = createFieldWidget( field );
         String style = fieldWidget.getElement().getAttribute( "style" );
-        style = style+ "margin-bottom:0px ";
+        style = style + "margin-bottom:0px ";
         fieldWidget.getElement().setAttribute( "style", style );
-        if ( field.getType().equals( PropertyEditorType.BOOLEAN ) ){
-            fieldWidget.getElement().setAttribute("style","margin-top:5px"  );
+        if ( field.getType().equals( PropertyEditorType.BOOLEAN ) ) {
+            fieldWidget.getElement().setAttribute( "style", "margin-top:5px" );
         }
         col2.add( fieldWidget );
         return col2;
     }
 
-    private static FlowPanel createFieldDescription( PropertyEditorFieldInfo field ) {
+    private FlowPanel createFieldDescription( PropertyEditorFieldInfo field ) {
         FlowPanel col1 = new FlowPanel();
         col1.getElement().addClassName( "span6 " );
         Label label = new Label( field.getKey() );
-        label.getElement().setAttribute("style","margin-top:5px"  );
+        label.getElement().setAttribute( "style", "margin-top:5px" );
 
         col1.add( label );
         return col1;
     }
 
-    private static FlowPanel createAccordionHeading( PropertyEditorCategory category ) {
+    private FlowPanel createAccordionHeading( PropertyEditorCategory category ) {
         FlowPanel accordionHeading = new FlowPanel();
         accordionHeading.getElement().addClassName( "accordion-heading" );
         HTML link = new HTML( "<a class=\"accordion-toggle\" data-toggle=\"collapse\" data-parent=\"#accordion2\" href=\"#collapse" + category.hashCode() + "\">\n" +
@@ -91,7 +102,7 @@ public class PropertyEditorWidget {
         return accordionHeading;
     }
 
-    private static FlowPanel createAccordionGroup( PropertyEditorCategory category ) {
+    private FlowPanel createAccordionGroup( PropertyEditorCategory category ) {
         FlowPanel accordionGroup = new FlowPanel();
         accordionGroup.getElement().addClassName( "accordion-group" );
         FlowPanel accordionHeading = createAccordionHeading( category );
@@ -100,7 +111,7 @@ public class PropertyEditorWidget {
         return accordionGroup;
     }
 
-    private static FlowPanel createAccordion() {
+    private FlowPanel createAccordion() {
         FlowPanel accordion = new FlowPanel();
         accordion.getElement().addClassName( "accordion" );
         accordion.getElement().setId( "accordion2" );
@@ -111,5 +122,6 @@ public class PropertyEditorWidget {
         Widget fieldWidget = property.getType().widget( property );
         return fieldWidget;
     }
+
 
 }
