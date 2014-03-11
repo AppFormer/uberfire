@@ -28,8 +28,8 @@ import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
 @WorkbenchScreen(identifier = "PropertyEditorScreen")
 public class PropertyEditorScreen extends Composite {
 
-    @DataField
-    @Inject
+//    @DataField
+//    @Inject
     private TextBox searchBox;
 
     @DataField
@@ -48,18 +48,18 @@ public class PropertyEditorScreen extends Composite {
         return "Property Editor";
     }
 
-    @EventHandler("searchBox")
-    private void onKeyDown( KeyDownEvent event ) {
-        if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
-                @Override
-                public void callback( final Map<String, List<String>> map ) {
-                    propertyEditorEvent.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
-                }
-            } ).extract( searchBox.getText() );
-        }
-
-    }
+//    @EventHandler("searchBox")
+//    private void onKeyDown( KeyDownEvent event ) {
+//        if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+//            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
+//                @Override
+//                public void callback( final Map<String, List<String>> map ) {
+//                    propertyEditorEvent.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
+//                }
+//            } ).extract( searchBox.getText() );
+//        }
+//
+//    }
 
     private void createPropertyWidget( PropertyEditorEvent propertyEditorEvent ) {
         flowPanel.clear();

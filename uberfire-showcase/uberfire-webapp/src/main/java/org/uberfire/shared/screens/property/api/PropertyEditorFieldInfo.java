@@ -7,7 +7,6 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.shared.screen.property.fields.PropertyEditorType;
 import org.uberfire.shared.screen.property.fields.validators.PropertyFieldValidator;
 
-@Portable
 public class PropertyEditorFieldInfo {
 
     private String key;

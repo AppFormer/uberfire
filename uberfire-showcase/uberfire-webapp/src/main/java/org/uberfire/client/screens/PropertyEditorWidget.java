@@ -1,12 +1,10 @@
 package org.uberfire.client.screens;
 
-import java.util.List;
-
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.shared.screen.property.fields.PropertyEditorType;
 import org.uberfire.shared.screens.property.api.PropertyEditorCategory;
 import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
 import org.uberfire.shared.screens.property.api.PropertyEditorFieldInfo;
@@ -50,7 +48,7 @@ public class PropertyEditorWidget {
 
     private static FlowPanel createCollapseInner( PropertyEditorFieldInfo field ) {
         FlowPanel collapseInner = new FlowPanel();
-        collapseInner.getElement().addClassName( "row-fluid" );
+        collapseInner.getElement().addClassName( "row-fluid accordion-inner " );
 
         collapseInner.add( createFieldDescription( field ) );
         collapseInner.add( createFieldInput( field ) );
@@ -60,14 +58,22 @@ public class PropertyEditorWidget {
     private static FlowPanel createFieldInput( PropertyEditorFieldInfo field ) {
         FlowPanel col2 = new FlowPanel();
         col2.getElement().addClassName( "span6" );
-        col2.add( createFieldWidget( field ) );
+        Widget fieldWidget = createFieldWidget( field );
+        fieldWidget.getElement().setAttribute( "style", "margin-bottom:0px" );
+        if ( field.getType().equals( PropertyEditorType.BOOLEAN ) ){
+            fieldWidget.getElement().setAttribute("style","margin-top:5px"  );
+        }
+        col2.add( fieldWidget );
         return col2;
     }
 
     private static FlowPanel createFieldDescription( PropertyEditorFieldInfo field ) {
         FlowPanel col1 = new FlowPanel();
-        col1.getElement().addClassName( "span6 accordion-inner" );
-        col1.add( new Label( field.getKey() ) );
+        col1.getElement().addClassName( "span6 " );
+        Label label = new Label( field.getKey() );
+        label.getElement().setAttribute("style","margin-top:5px"  );
+
+        col1.add( label );
         return col1;
     }
 

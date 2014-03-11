@@ -8,7 +8,6 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 
 import static java.util.Collections.sort;
 
-@Portable
 public class PropertyEditorEvent {
 
     private String idEvent;

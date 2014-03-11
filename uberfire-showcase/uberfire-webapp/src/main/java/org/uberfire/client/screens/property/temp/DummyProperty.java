@@ -29,11 +29,9 @@ public class DummyProperty {
                 .withField( new PropertyEditorFieldInfo( "Request Method", "POST", PropertyEditorType.COMBO ).withComboValues( createComboValues( "GET", "POST" ) ) )
                 .withField( new PropertyEditorFieldInfo( "Accepted Response Codes", "200", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "Response Validation", "NONE", PropertyEditorType.COMBO ).withComboValues( createComboValues( "NONE", "YES" ) ) )
-                .withField( new PropertyEditorFieldInfo( "String to Match", "", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "Login", "ederign", PropertyEditorType.TEXT ).withPriority( 0 ).withValidators( new LoginValidator(), new AnotherValidator() ) )
                 .withField( new PropertyEditorFieldInfo( "Password", "123456", PropertyEditorType.SECRET_TEXT ).withPriority( 1 ) )
-                .withField( new PropertyEditorFieldInfo( "Proxy Server", "No Proxy", PropertyEditorType.COMBO ).withComboValues( createComboValues( "No Proxy", "server 1", "server 2s" ) ) )
-                .withField( new PropertyEditorFieldInfo( "Proxy URL", "", PropertyEditorType.TEXT ) );
+                .withField( new PropertyEditorFieldInfo( "Proxy Server", "No Proxy", PropertyEditorType.COMBO ).withComboValues( createComboValues( "No Proxy", "server 1", "server 2s" ) ) );
 
         List<PropertyEditorCategory> properties = new ArrayList<PropertyEditorCategory>();
         properties.add( monitor );
