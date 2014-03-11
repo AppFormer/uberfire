@@ -59,7 +59,9 @@ public class PropertyEditorWidget {
         FlowPanel col2 = new FlowPanel();
         col2.getElement().addClassName( "span6" );
         Widget fieldWidget = createFieldWidget( field );
-        fieldWidget.getElement().setAttribute( "style", "margin-bottom:0px" );
+        String style = fieldWidget.getElement().getAttribute( "style" );
+        style = style+ "margin-bottom:0px ";
+        fieldWidget.getElement().setAttribute( "style", style );
         if ( field.getType().equals( PropertyEditorType.BOOLEAN ) ){
             fieldWidget.getElement().setAttribute("style","margin-top:5px"  );
         }

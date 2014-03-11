@@ -28,7 +28,7 @@ import org.uberfire.shared.screens.property.api.PropertyEditorEvent;
 @WorkbenchScreen(identifier = "PropertyEditorScreen")
 public class PropertyEditorScreen extends Composite {
 
-//    @DataField
+    //    @DataField
 //    @Inject
     private TextBox searchBox;
 
@@ -63,12 +63,11 @@ public class PropertyEditorScreen extends Composite {
 
     private void createPropertyWidget( PropertyEditorEvent propertyEditorEvent ) {
         flowPanel.clear();
-        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent
-                                                  ) );
+        flowPanel.add( PropertyEditorWidget.create( propertyEditorEvent ) );
     }
 
     public void propertyEditorEventObserver( @Observes PropertyEditorEvent event ) {
-            createPropertyWidget( event );
+        createPropertyWidget( event );
     }
 
 }

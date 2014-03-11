@@ -53,7 +53,7 @@
     <g:FlowPanel ui:field="contextMenuArea" styleName="{style.contextMenu}"/>
     <g:FlowPanel addStyleNames="{style.search}">
       <b:Form type="SEARCH" addStyleNames="{style.searchForm}">
-        <b:TextBox searchQuery="true" placeholder="search..."/>
+        <b:TextBox searchQuery="true" placeholder="search bean..."/>
       </b:Form>
     </g:FlowPanel>
   </g:FlowPanel>

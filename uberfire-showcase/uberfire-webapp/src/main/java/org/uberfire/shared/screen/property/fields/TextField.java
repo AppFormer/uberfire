@@ -6,6 +6,8 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -24,14 +26,25 @@ public class TextField extends AbstractField {
     public Widget widget( final PropertyEditorFieldInfo property ) {
         final TextBox textBox = new TextBox();
         textBox.setText( property.getCurrentStringValue() );
+        addSelectAllTOnFocusTo( textBox );
+        addEnterKeyHandler( property, textBox );
+        return textBox;
+    }
+
+    private void addEnterKeyHandler( final PropertyEditorFieldInfo property,
+                                     final TextBox textBox ) {
         textBox.addKeyDownHandler( new KeyDownHandler() {
             @Override
             public void onKeyDown( KeyDownEvent event ) {
                 if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
                     if ( validate( property, textBox.getText() ) ) {
+                        //ederign
+                        textBox.getElement().setAttribute( "style", "border: 2px solid rgb(204, 204, 204)" );
                         property.setCurrentStringValue( textBox.getText() );
                         propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, textBox.getText() ) );
                     } else {
+                        //ederign
+                        textBox.getElement().setAttribute( "style", "border: 2px solid rgb(255, 0, 0)" );
                         textBox.setText( property.getCurrentStringValue() );
                     }
                 }
@@ -39,7 +52,15 @@ public class TextField extends AbstractField {
             }
 
         } );
-        return textBox;
+    }
+
+    private void addSelectAllTOnFocusTo( final TextBox textBox ) {
+        textBox.addFocusHandler( new FocusHandler() {
+            @Override
+            public void onFocus( FocusEvent event ) {
+                textBox.selectAll();
+            }
+        } );
     }
 
     private boolean validate( PropertyEditorFieldInfo property,
