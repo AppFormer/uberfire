@@ -11,11 +11,6 @@ public class PropertyEditorEvent {
     private String idEvent;
     private List<PropertyEditorCategory> properties = new ArrayList<PropertyEditorCategory>();
 
-    public PropertyEditorEvent() {
-    }
-
-    ;
-
     public PropertyEditorEvent( String idEvent,
                                 List<PropertyEditorCategory> properties ) {
         this.idEvent = idEvent;
@@ -28,7 +23,7 @@ public class PropertyEditorEvent {
         this.properties.add( properties );
     }
 
-    public List<PropertyEditorCategory> getProperties() {
+    public List<PropertyEditorCategory> getSortedProperties() {
         sortCategoriesAndFieldsByPriority( properties );
         return properties;
     }

@@ -4,6 +4,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.ListBox;
@@ -17,12 +18,9 @@ public class ComboField extends AbstractField {
     @Inject
     Event<PropertyEditorChangeEvent> propertyEditorChangeEventEvent;
 
-    public ComboField() {
-    }
-
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final ListBox listBox = new ListBox();
+        final ListBox listBox = GWT.create(ListBox.class);
         int index = 0;
         int selected = -1;
         for ( String value : property.getComboValues() ) {
@@ -30,9 +28,23 @@ public class ComboField extends AbstractField {
             selected = searchSelectItem( property, index, selected, value );
             index++;
         }
+        ifSelectedSelectItem( listBox, index, selected );
+
+        addChangeHandler( property, listBox );
+
+        return listBox;
+    }
+
+    private void ifSelectedSelectItem( ListBox listBox,
+                                       int index,
+                                       int selected ) {
         if ( selectAnyItem( index ) ) {
             listBox.setSelectedIndex( selected );
         }
+    }
+
+    private void addChangeHandler( final PropertyEditorFieldInfo property,
+                                   final ListBox listBox ) {
         listBox.addChangeHandler( new ChangeHandler() {
             @Override
             public void onChange( ChangeEvent event ) {
@@ -42,8 +54,6 @@ public class ComboField extends AbstractField {
         }
 
         );
-
-        return listBox;
     }
 
     private int searchSelectItem( PropertyEditorFieldInfo property,

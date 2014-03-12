@@ -1,4 +1,4 @@
-package org.uberfire.server.impl;
+package org.uberfire.org.uberfire.server.impl;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.errai.bus.server.annotations.Service;
+import org.uberfire.client.propertyEditor.PropertyEditorException;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
@@ -50,8 +51,7 @@ public class BeanPropertyEditorBuilder implements BeanPropertyEditorBuilderServi
         try {
             targetClass = Class.forName( fqcn );
         } catch ( ClassNotFoundException e ) {
-            //ederignFIXME
-            e.printStackTrace();
+            throw new PropertyEditorException( e.getMessage() );
         }
     }
 

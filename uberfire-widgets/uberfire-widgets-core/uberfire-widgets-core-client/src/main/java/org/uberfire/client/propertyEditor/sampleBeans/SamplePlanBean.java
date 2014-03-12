@@ -1,4 +1,4 @@
-package org.uberfire.client.screens.property.temp;
+package org.uberfire.client.propertyEditor.sampleBeans;
 
 public class SamplePlanBean {
 

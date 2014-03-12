@@ -6,7 +6,7 @@ import java.util.List;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
-import org.uberfire.client.propertyEditor.fields.validators.AnotherValidator;
+import org.uberfire.client.propertyEditor.fields.validators.AnotherSampleValidator;
 import org.uberfire.client.propertyEditor.fields.validators.LoginValidator;
 
 public class WelcomeScreenHelper {
@@ -35,7 +35,7 @@ public class WelcomeScreenHelper {
                                     .withComboValues( createComboValues( "NONE", "YES" ) ) )
 
                 .withField( new PropertyEditorFieldInfo( "Login", "ederign", PropertyEditorType.TEXT )
-                                    .withPriority( 0 ).withValidators( new LoginValidator(), new AnotherValidator() ) )
+                                    .withPriority( 0 ).withValidators( new LoginValidator(), new AnotherSampleValidator() ) )
 
                 .withField( new PropertyEditorFieldInfo( "Password", "123456", PropertyEditorType.SECRET_TEXT )
                                     .withPriority( 1 ) )

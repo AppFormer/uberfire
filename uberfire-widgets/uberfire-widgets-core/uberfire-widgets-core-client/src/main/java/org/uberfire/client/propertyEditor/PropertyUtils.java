@@ -9,7 +9,7 @@ import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
 
 public class PropertyUtils {
 
-    public static PropertyEditorCategory mapToCategory( Map<String, List<String>> map ) {
+    public static PropertyEditorCategory convertMapToCategory( Map<String, List<String>> map ) {
         if ( !map.keySet().isEmpty() ) {
             String categoryName = map.keySet().iterator().next();
             PropertyEditorCategory category = new PropertyEditorCategory( categoryName );

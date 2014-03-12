@@ -24,6 +24,12 @@ public class SecretTextField extends AbstractField{
     public Widget widget( final PropertyEditorFieldInfo property ) {
         final PasswordTextBox passwordTextBox = new PasswordTextBox();
         passwordTextBox.setText( property.getCurrentStringValue() );
+        addKeyDownHandler( property, passwordTextBox );
+        return passwordTextBox;
+    }
+
+    private void addKeyDownHandler( final PropertyEditorFieldInfo property,
+                                    final PasswordTextBox passwordTextBox ) {
         passwordTextBox.addKeyDownHandler( new KeyDownHandler() {
             @Override
             public void onKeyDown( KeyDownEvent event ) {
@@ -34,6 +40,5 @@ public class SecretTextField extends AbstractField{
             }
 
         } );
-        return passwordTextBox;
     }
 }

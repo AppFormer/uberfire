@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -21,10 +20,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.propertyEditor.PropertyEditorException;
 import org.uberfire.client.propertyEditor.PropertyUtils;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
@@ -59,6 +60,16 @@ public class WelcomeScreen
         initWidget( uiBinder.createAndBindUi( this ) );
     }
 
+    @WorkbenchPartTitle
+    public String getTitle() {
+        return "Welcome";
+    }
+
+    @WorkbenchContextId
+    public String getMyCorntextRef() {
+        return "welcomeContext";
+    }
+
     @UiHandler("launch")
     public void onClickLaunchUnknownPlace( final ClickEvent e ) {
         event.fire( new PropertyEditorEvent( WELCOME_SCREEN_ID, WelcomeScreenHelper.createProperties() ) );
@@ -68,11 +79,20 @@ public class WelcomeScreen
     public void onKeyDown( KeyDownEvent keyDown ) {
         if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
             beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
-                @Override
-                public void callback( final Map<String, List<String>> map ) {
-                    event.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.mapToCategory( map ) ) );
-                }
-            } ).extract( searchBox.getText() );
+                                                      @Override
+                                                      public void callback( final Map<String, List<String>> map ) {
+                                                          event.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.convertMapToCategory( map ) ) );
+                                                      }
+                                                  }, new ErrorCallback<Object>() {
+                                                      @Override
+                                                      public boolean error( Object message,
+                                                                            Throwable throwable ) {
+                                                          //throwable.printStackTrace();
+                                                          return false;
+                                                      }
+                                                  }
+                                                ).extract( searchBox.getText() );
+
         }
 
     }
@@ -81,16 +101,6 @@ public class WelcomeScreen
         if ( isMyPropertyEvent( event ) ) {
             Window.alert( "Msg from property editor: Changed: " + event.getProperty().getKey() + " - new value: " + event.getNewValue() );
         }
-    }
-
-    @WorkbenchPartTitle
-    public String getTitle() {
-        return "Welcome";
-    }
-
-    @WorkbenchContextId
-    public String getMyCorntextRef() {
-        return "welcomeContext";
     }
 
     private boolean isMyPropertyEvent( PropertyEditorChangeEvent event ) {

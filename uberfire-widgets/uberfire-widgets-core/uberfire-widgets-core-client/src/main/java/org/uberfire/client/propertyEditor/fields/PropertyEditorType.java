@@ -17,18 +17,14 @@ public enum PropertyEditorType {
         public Widget widget( PropertyEditorFieldInfo property ) {
             return getWidget( property, BooleanField.class );
         }
-    }, OBJECT {
-        @Override
-        public Widget widget( PropertyEditorFieldInfo property ) {
-            return null;
-        }
     }, INTEGER {
         @Override
         public Widget widget( PropertyEditorFieldInfo property ) {
             return TEXT.widget( property );
         }
+
         @Override
-        public List<PropertyFieldValidator> getValidators(){
+        public List<PropertyFieldValidator> getValidators() {
             ArrayList validators = new ArrayList();
             validators.add( new IntegerValidator() );
             return validators;
@@ -59,7 +55,7 @@ public enum PropertyEditorType {
 
     public abstract Widget widget( PropertyEditorFieldInfo property );
 
-    public List<PropertyFieldValidator> getValidators(){
+    public List<PropertyFieldValidator> getValidators() {
         return new ArrayList();
     }
 

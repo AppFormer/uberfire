@@ -5,13 +5,9 @@ import java.util.List;
 
 public class PropertyEditorCategory {
 
-
-
     private String name;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyEditorFieldInfo> fields = new ArrayList<PropertyEditorFieldInfo>();
-
-    public PropertyEditorCategory(){}
 
     public PropertyEditorCategory( String name ) {
         this.name = name;
@@ -22,8 +18,6 @@ public class PropertyEditorCategory {
         this.name = name;
         this.priority = priority;
     }
-
-
 
     public PropertyEditorCategory withField( PropertyEditorFieldInfo field ) {
         field.setPropertyEditorCategory( this );
