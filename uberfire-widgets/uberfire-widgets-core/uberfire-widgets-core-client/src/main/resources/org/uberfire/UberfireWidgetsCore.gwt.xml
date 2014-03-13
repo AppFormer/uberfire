@@ -12,6 +12,7 @@
 
   <inherits name="org.uberfire.UberfireWorkbench"/>
   <inherits name="org.uberfire.UberfireWidgetsCommons"/>
+  <inherits name="com.github.gwtbootstrap.Bootstrap"/>
 
   <script src="js/ZeroClipboard.min.js"/>
   <script src="js/ZeroClipboardLoader.js"/>

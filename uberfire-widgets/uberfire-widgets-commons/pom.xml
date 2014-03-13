@@ -61,6 +61,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.gwtbootstrap</groupId>
+      <artifactId>gwt-bootstrap</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
