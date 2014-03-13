@@ -26,10 +26,15 @@ public class BeanPropertyEditorBuilder implements BeanPropertyEditorBuilderServi
         PropertyEditorCategory category = extractBeanInfo( fqcn );
         List<String> fields = new ArrayList<String>();
         for ( PropertyEditorFieldInfo field : category.getFields() ) {
-            fields.add( field.getKey() );
+            fields.add( field.getLabel() );
         }
         map.put( category.getName(), fields );
         return map;
+    }
+
+    @Override
+    public PropertyEditorCategory extractCategories( String fqcn ) {
+        return extractBeanInfo( fqcn );
     }
 
     private PropertyEditorCategory extractBeanInfo( String fqcn ) {

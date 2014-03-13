@@ -26,6 +26,7 @@ import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.propertyEditor.PropertyUtils;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 import org.uberfire.shared.propertyEditor.BeanPropertyEditorBuilderService;
@@ -77,10 +78,10 @@ public class WelcomeScreen
     @UiHandler("searchBox")
     public void onKeyDown( KeyDownEvent keyDown ) {
         if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-            beanPropertyEditorBuilderCaller.call( new RemoteCallback<Map<String, List<String>>>() {
+            beanPropertyEditorBuilderCaller.call( new RemoteCallback<PropertyEditorCategory>() {
                                                       @Override
-                                                      public void callback( final Map<String, List<String>> map ) {
-                                                          event.fire( new PropertyEditorEvent( getTitle(), PropertyUtils.convertMapToCategory( map ) ) );
+                                                      public void callback( final PropertyEditorCategory category ) {
+                                                          event.fire( new PropertyEditorEvent( getTitle(), category ) );
                                                       }
                                                   }, new ErrorCallback<Object>() {
                                                       @Override
@@ -89,7 +90,7 @@ public class WelcomeScreen
                                                           return false;
                                                       }
                                                   }
-                                                ).extract( searchBox.getText() );
+                                                ).extractCategories( searchBox.getText() );
 
         }
 
@@ -97,7 +98,7 @@ public class WelcomeScreen
 
     public void propertyEditorChangeEvent( @Observes PropertyEditorChangeEvent event ) {
         if ( isMyPropertyEvent( event ) ) {
-            Window.alert( "Msg from property editor: Changed: " + event.getProperty().getKey() + " - new value: " + event.getNewValue() );
+            Window.alert( "Msg from property editor: Changed: " + event.getProperty().getLabel() + " - new value: " + event.getNewValue() );
         }
     }
 

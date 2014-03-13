@@ -3,6 +3,9 @@ package org.uberfire.client.propertyEditor.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
+
+@Portable
 public class PropertyEditorCategory {
 
     private String name;
@@ -10,6 +13,9 @@ public class PropertyEditorCategory {
     private List<PropertyEditorFieldInfo> fields = new ArrayList<PropertyEditorFieldInfo>();
     private String idEvent;
 
+    public PropertyEditorCategory(){
+
+    }
     public PropertyEditorCategory(String name) {
         this.name = name;
     }

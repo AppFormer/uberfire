@@ -51,7 +51,7 @@ public class PropertyEditorHelper {
 
     private static PropertyEditorItemLabel createLabel( PropertyEditorFieldInfo field ) {
         PropertyEditorItemLabel item = GWT.create( PropertyEditorItemLabel.class );
-        item.setText( field.getKey() );
+        item.setText( field.getLabel() );
         return item;
     }
 

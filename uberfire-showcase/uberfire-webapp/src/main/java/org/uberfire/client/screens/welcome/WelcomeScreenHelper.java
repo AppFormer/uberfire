@@ -16,7 +16,7 @@ public class WelcomeScreenHelper {
         int monitorPriority = 0;
 
         PropertyEditorCategory monitor = new PropertyEditorCategory( "Monitor", monitorPriority )
-                .withField( new PropertyEditorFieldInfo( "Name", "HTTPS", PropertyEditorType.TEXT ) )
+                .withField( new PropertyEditorFieldInfo( "Name", "HTTPS", PropertyEditorType.TEXT ).withKey( "name" ) )
                 .withField( new PropertyEditorFieldInfo( "Show in Favorites", Boolean.FALSE.toString(), PropertyEditorType.BOOLEAN ) )
                 .withField( new PropertyEditorFieldInfo( "Link to Summary Report", "http://redhat.com", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "Notes (to be show in reports)", "Created on XYZ", PropertyEditorType.TEXT ) );

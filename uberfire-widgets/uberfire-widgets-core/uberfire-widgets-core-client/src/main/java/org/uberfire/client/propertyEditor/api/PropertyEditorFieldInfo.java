@@ -3,12 +3,14 @@ package org.uberfire.client.propertyEditor.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 
+@Portable
 public class PropertyEditorFieldInfo {
 
-    private String key;
+    private String label;
     private String currentStringValue;
     private String originalValue;
     private PropertyEditorCategory category;
@@ -16,28 +18,34 @@ public class PropertyEditorFieldInfo {
     private List<String> comboValues;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyFieldValidator> validators = new ArrayList<PropertyFieldValidator>();
+    private String key;
 
     public PropertyEditorFieldInfo() {
     }
 
     ;
 
-    public PropertyEditorFieldInfo( String key,
+    public PropertyEditorFieldInfo( String label,
                                     PropertyEditorType type ) {
-        this.key = key;
+        this.label = label;
         this.originalValue = currentStringValue;
         this.type = type;
         this.validators.addAll( type.getValidators() );
     }
 
-    public PropertyEditorFieldInfo( String key,
+    public PropertyEditorFieldInfo( String label,
                                     String currentStringValue,
                                     PropertyEditorType type ) {
-        this.key = key;
+        this.label = label;
         this.currentStringValue = currentStringValue;
         this.originalValue = currentStringValue;
         this.type = type;
         this.validators.addAll( type.getValidators() );
+    }
+
+    public PropertyEditorFieldInfo withKey( String key) {
+        this.key = key;
+        return this;
     }
 
     public PropertyEditorFieldInfo withComboValues( List<String> comboValues ) {
@@ -82,8 +90,8 @@ public class PropertyEditorFieldInfo {
         this.category = category;
     }
 
-    public String getKey() {
-        return key;
+    public String getLabel() {
+        return label;
     }
 
     public int getPriority() {
@@ -95,9 +103,11 @@ public class PropertyEditorFieldInfo {
     }
 
     public String getEventId() {
-
         return category.getIdEvent();
     }
 
+    public String getKey() {
+        return key;
+    }
 }
 
