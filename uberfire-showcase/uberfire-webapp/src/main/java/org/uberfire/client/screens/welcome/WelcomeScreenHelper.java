@@ -14,6 +14,7 @@ public class WelcomeScreenHelper {
     public static List<PropertyEditorCategory> createProperties() {
 
         int monitorPriority = 0;
+
         PropertyEditorCategory monitor = new PropertyEditorCategory( "Monitor", monitorPriority )
                 .withField( new PropertyEditorFieldInfo( "Name", "HTTPS", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "Show in Favorites", Boolean.FALSE.toString(), PropertyEditorType.BOOLEAN ) )

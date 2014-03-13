@@ -8,8 +8,9 @@ public class PropertyEditorCategory {
     private String name;
     private int priority = Integer.MAX_VALUE;
     private List<PropertyEditorFieldInfo> fields = new ArrayList<PropertyEditorFieldInfo>();
+    private String idEvent;
 
-    public PropertyEditorCategory( String name ) {
+    public PropertyEditorCategory(String name) {
         this.name = name;
     }
 
@@ -45,4 +46,11 @@ public class PropertyEditorCategory {
         return result;
     }
 
+    public String getIdEvent() {
+        return idEvent;
+    }
+
+    public void setIdEvent( String idEvent ) {
+        this.idEvent = idEvent;
+    }
 }

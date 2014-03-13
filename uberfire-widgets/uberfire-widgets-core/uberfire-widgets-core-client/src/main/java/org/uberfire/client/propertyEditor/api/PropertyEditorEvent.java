@@ -8,19 +8,19 @@ import static java.util.Collections.*;
 
 public class PropertyEditorEvent {
 
-    private String idEvent;
     private List<PropertyEditorCategory> properties = new ArrayList<PropertyEditorCategory>();
 
     public PropertyEditorEvent( String idEvent,
-                                List<PropertyEditorCategory> properties ) {
-        this.idEvent = idEvent;
+            List<PropertyEditorCategory> properties ) {
+        for (PropertyEditorCategory property: properties  ){
+            property.setIdEvent( idEvent );
+        }
         this.properties = properties;
     }
 
-    public PropertyEditorEvent( String idEvent,
-                                PropertyEditorCategory properties ) {
-        this.idEvent = idEvent;
-        this.properties.add( properties );
+    public PropertyEditorEvent( String idEvent,PropertyEditorCategory property ) {
+        property.setIdEvent( idEvent );
+        this.properties.add( property );
     }
 
     public List<PropertyEditorCategory> getSortedProperties() {
@@ -70,11 +70,6 @@ public class PropertyEditorEvent {
             } );
         }
 
-    }
-
-
-    public String getIdEvent() {
-        return idEvent;
     }
 
 }

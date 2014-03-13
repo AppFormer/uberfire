@@ -86,7 +86,6 @@ public class WelcomeScreen
                                                       @Override
                                                       public boolean error( Object message,
                                                                             Throwable throwable ) {
-                                                          //throwable.printStackTrace();
                                                           return false;
                                                       }
                                                   }

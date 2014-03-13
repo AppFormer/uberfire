@@ -17,7 +17,10 @@ public class PropertyEditorFieldInfo {
     private int priority = Integer.MAX_VALUE;
     private List<PropertyFieldValidator> validators = new ArrayList<PropertyFieldValidator>();
 
-    public PropertyEditorFieldInfo(){};
+    public PropertyEditorFieldInfo() {
+    }
+
+    ;
 
     public PropertyEditorFieldInfo( String key,
                                     PropertyEditorType type ) {
@@ -89,6 +92,11 @@ public class PropertyEditorFieldInfo {
 
     public List<PropertyFieldValidator> getValidators() {
         return validators;
+    }
+
+    public String getEventId() {
+
+        return category.getIdEvent();
     }
 
 }

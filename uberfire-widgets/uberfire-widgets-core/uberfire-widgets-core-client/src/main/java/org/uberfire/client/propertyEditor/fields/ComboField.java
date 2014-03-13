@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 
@@ -20,7 +21,7 @@ public class ComboField extends AbstractField {
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final ListBox listBox = GWT.create(ListBox.class);
+        final ListBox listBox = GWT.create( ListBox.class );
         int index = 0;
         int selected = -1;
         for ( String value : property.getComboValues() ) {
@@ -53,7 +54,7 @@ public class ComboField extends AbstractField {
             }
         }
 
-        );
+                                );
     }
 
     private int searchSelectItem( PropertyEditorFieldInfo property,

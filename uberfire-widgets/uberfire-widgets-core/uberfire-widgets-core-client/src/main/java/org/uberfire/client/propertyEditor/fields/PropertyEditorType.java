@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.IntegerValidator;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;

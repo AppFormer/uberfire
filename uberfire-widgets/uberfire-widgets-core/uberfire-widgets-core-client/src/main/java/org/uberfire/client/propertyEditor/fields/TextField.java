@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
@@ -27,7 +28,7 @@ public class TextField extends AbstractField {
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final PropertyEditorTextBox textBox = GWT.create(PropertyEditorTextBox.class);
+        final PropertyEditorTextBox textBox = GWT.create( PropertyEditorTextBox.class );
         textBox.setText( property.getCurrentStringValue() );
         addEnterKeyHandler( property, textBox );
         return textBox;
