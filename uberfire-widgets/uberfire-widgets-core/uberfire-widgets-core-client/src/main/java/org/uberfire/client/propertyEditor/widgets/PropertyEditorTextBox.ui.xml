@@ -1,0 +1,14 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" >
+
+  <ui:style type='org.uberfire.client.propertyEditor.widgets.PropertyEditorTextBox.Style'>
+    .regular {
+      border: 2px solid rgb(204, 204, 204) !important;;
+    }
+    .error {
+      border: 2px solid rgb(255, 0, 0) !important;;
+    }
+  </ui:style>
+
+  <b:TextBox ui:field="textBox" styleName="{style.regular}"/>
+</ui:UiBinder>

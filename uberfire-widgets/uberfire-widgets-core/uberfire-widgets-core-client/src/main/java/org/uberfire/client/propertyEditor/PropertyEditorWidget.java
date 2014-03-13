@@ -30,8 +30,6 @@ public class PropertyEditorWidget extends Composite {
 
     }
 
-
-
     public PropertyEditorWidget() {
         initWidget( uiBinder.createAndBindUi( this ) );
 

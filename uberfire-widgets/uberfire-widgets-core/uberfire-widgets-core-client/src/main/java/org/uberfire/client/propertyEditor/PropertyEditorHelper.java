@@ -2,7 +2,6 @@ package org.uberfire.client.propertyEditor;
 
 import com.github.gwtbootstrap.client.ui.Accordion;
 import com.github.gwtbootstrap.client.ui.AccordionGroup;
-import com.github.gwtbootstrap.client.ui.Label;
 import com.google.gwt.core.client.GWT;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;

@@ -6,6 +6,8 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.aria.client.Property;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -15,6 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
+import org.uberfire.client.propertyEditor.widgets.PropertyEditorTextBox;
 
 @Dependent
 public class TextField extends AbstractField {
@@ -24,27 +27,24 @@ public class TextField extends AbstractField {
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final TextBox textBox = new TextBox();
+        final PropertyEditorTextBox textBox = GWT.create(PropertyEditorTextBox.class);
         textBox.setText( property.getCurrentStringValue() );
-        addSelectAllTOnFocusTo( textBox );
         addEnterKeyHandler( property, textBox );
         return textBox;
     }
 
     private void addEnterKeyHandler( final PropertyEditorFieldInfo property,
-                                     final TextBox textBox ) {
+                                     final PropertyEditorTextBox textBox ) {
         textBox.addKeyDownHandler( new KeyDownHandler() {
             @Override
             public void onKeyDown( KeyDownEvent event ) {
                 if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
                     if ( validate( property, textBox.getText() ) ) {
-                        //ederign
-                        textBox.getElement().setAttribute( "style", "border: 2px solid rgb(204, 204, 204)" );
+                        textBox.setCSSRegular();
                         property.setCurrentStringValue( textBox.getText() );
                         propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, textBox.getText() ) );
                     } else {
-                        //ederign
-                        textBox.getElement().setAttribute( "style", "border: 2px solid rgb(255, 0, 0)" );
+                        textBox.setCSSError();
                         textBox.setText( property.getCurrentStringValue() );
                     }
                 }
@@ -54,22 +54,12 @@ public class TextField extends AbstractField {
         } );
     }
 
-    private void addSelectAllTOnFocusTo( final TextBox textBox ) {
-        textBox.addFocusHandler( new FocusHandler() {
-            @Override
-            public void onFocus( FocusEvent event ) {
-                textBox.selectAll();
-            }
-        } );
-    }
-
     private boolean validate( PropertyEditorFieldInfo property,
                               String value ) {
         List<PropertyFieldValidator> validators = property.getValidators();
 
         for ( PropertyFieldValidator validator : validators ) {
             if ( !validator.validate( value ) ) {
-                //ederign fire msg?
                 return false;
             }
         }

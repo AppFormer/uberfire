@@ -4,6 +4,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -22,7 +23,7 @@ public class SecretTextField extends AbstractField{
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final PasswordTextBox passwordTextBox = new PasswordTextBox();
+        final PasswordTextBox passwordTextBox = GWT.create(PasswordTextBox.class);
         passwordTextBox.setText( property.getCurrentStringValue() );
         addKeyDownHandler( property, passwordTextBox );
         return passwordTextBox;
