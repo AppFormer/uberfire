@@ -56,6 +56,17 @@ public class PropertyEditorHelper {
     }
 
     public static boolean validade( PropertyEditorEvent event ) {
+        if (event == null) throw new NullEventException();
+        if (event.getSortedProperties().isEmpty()) throw new NoPropertiesException();
+
         return event != null && !event.getSortedProperties().isEmpty();
+    }
+
+    private static class NullEventException extends RuntimeException {
+
+    }
+
+    private static class NoPropertiesException extends RuntimeException {
+
     }
 }

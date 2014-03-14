@@ -1,7 +1,5 @@
 package org.uberfire.client.screens.welcome;
 
-import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -25,7 +23,6 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.propertyEditor.PropertyUtils;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
@@ -77,20 +74,15 @@ public class WelcomeScreen
 
     @UiHandler("searchBox")
     public void onKeyDown( KeyDownEvent keyDown ) {
+        ComplexPlanBean instance = new ComplexPlanBean("texto" , true, true,1,1,1l,SampleEnum.VALUE2 );
         if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
             beanPropertyEditorBuilderCaller.call( new RemoteCallback<PropertyEditorCategory>() {
                                                       @Override
                                                       public void callback( final PropertyEditorCategory category ) {
                                                           event.fire( new PropertyEditorEvent( getTitle(), category ) );
                                                       }
-                                                  }, new ErrorCallback<Object>() {
-                                                      @Override
-                                                      public boolean error( Object message,
-                                                                            Throwable throwable ) {
-                                                          return false;
-                                                      }
                                                   }
-                                                ).extractCategories( searchBox.getText() );
+                                                ).extract( "org.uberfire.client.screens.welcome.ComplexPlanBean",instance );
 
         }
 

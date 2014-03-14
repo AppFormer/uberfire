@@ -10,7 +10,6 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.propertyEditor.PropertyEditorException;
 import org.uberfire.client.propertyEditor.PropertyEditorWidget;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 
@@ -25,6 +24,7 @@ public class PropertyEditorScreen extends Composite {
 
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;
+
     @Override
     @WorkbenchPartTitle
 
@@ -33,12 +33,7 @@ public class PropertyEditorScreen extends Composite {
     }
 
     public void propertyEditorEventObserver( @Observes PropertyEditorEvent event ) {
-        try {
-            propertyEditor.handle(event);
-        } catch ( PropertyEditorException e ) {
-            e.printStackTrace();
-        }
+        propertyEditor.handle( event );
     }
-
 
 }

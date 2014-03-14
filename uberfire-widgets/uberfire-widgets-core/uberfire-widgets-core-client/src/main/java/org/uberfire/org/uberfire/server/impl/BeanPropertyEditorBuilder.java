@@ -2,13 +2,10 @@ package org.uberfire.org.uberfire.server.impl;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.enterprise.context.Dependent;
 
 import org.jboss.errai.bus.server.annotations.Service;
-import org.uberfire.client.propertyEditor.PropertyEditorException;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
@@ -18,46 +15,107 @@ import org.uberfire.shared.propertyEditor.BeanPropertyEditorBuilderService;
 @Dependent
 public class BeanPropertyEditorBuilder implements BeanPropertyEditorBuilderService {
 
-    private Class<?> targetClass;
+    @Override
+    public PropertyEditorCategory extract( String fqcn ) {
+        return extractOnlyBeanInfo( fqcn );
+    }
 
     @Override
-    public Map<String, List<String>> extract( String fqcn ) {
-        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
-        PropertyEditorCategory category = extractBeanInfo( fqcn );
-        List<String> fields = new ArrayList<String>();
-        for ( PropertyEditorFieldInfo field : category.getFields() ) {
-            fields.add( field.getLabel() );
+    public PropertyEditorCategory extract( String fqcn,
+                                           Object instance ) {
+        return extractBeanInfoAndValues( fqcn, instance );
+    }
+
+    private PropertyEditorCategory extractOnlyBeanInfo( String fqcn ) {
+        return extractBeanInfoAndValues( fqcn, null );
+    }
+
+    private PropertyEditorCategory extractBeanInfoAndValues( String fqcn,
+                                                             Object instance ) {
+        Class targetClass;
+        try {
+            targetClass = Class.forName( fqcn );
+        } catch ( Exception e ) {
+            throw new NullBeanException();
         }
-        map.put( category.getName(), fields );
-        return map;
-    }
 
-    @Override
-    public PropertyEditorCategory extractCategories( String fqcn ) {
-        return extractBeanInfo( fqcn );
-    }
-
-    private PropertyEditorCategory extractBeanInfo( String fqcn ) {
-        PropertyEditorCategory beanCategory = new PropertyEditorCategory( fqcn );
-        extractTargetClass( fqcn );
-        extractFieldInformation( beanCategory );
+        PropertyEditorCategory beanCategory = new PropertyEditorCategory( targetClass.getSimpleName() );
+        extractFieldInformationAndValues( targetClass, beanCategory, instance );
         return beanCategory;
     }
 
-    private void extractFieldInformation( PropertyEditorCategory beanCategory ) {
-        final Field[] declaredFields = targetClass.getDeclaredFields();
-        for ( Field field : declaredFields ) {
-            beanCategory.withField(
-                    new PropertyEditorFieldInfo( field.getName(), PropertyEditorType.TEXT ) );
+    private void extractFieldInformationAndValues( Class targetClass,
+                                                   PropertyEditorCategory beanCategory,
+                                                   Object instance ) throws ErrorReadingFieldInformationAndValues {
+        for ( Field declaredField : targetClass.getDeclaredFields() ) {
+            PropertyEditorType type = PropertyEditorType.getFromType( declaredField.getType() );
+            if ( isAHandledType( type ) ) {
+                PropertyEditorFieldInfo field = createPropertyEditorInfo( instance, declaredField, type );
+                if ( isACombo( field ) ) {
+                    generateComboValues( declaredField, field );
+                }
+                beanCategory.withField( field );
+            }
         }
     }
 
-    private void extractTargetClass( String fqcn ) {
+    private PropertyEditorFieldInfo createPropertyEditorInfo( Object instance,
+                                                              Field declaredField,
+                                                              PropertyEditorType type ) {
+        if ( needToExtractValues( instance ) ) {
+            return new PropertyEditorFieldInfo( declaredField.getName(), extractFieldValue( instance, declaredField ), type );
+        } else {
+            return new PropertyEditorFieldInfo( declaredField.getName(), type );
+        }
+    }
+
+    private boolean needToExtractValues( Object instance ) {
+        return instance != null;
+    }
+
+    private boolean isACombo( PropertyEditorFieldInfo field ) {
+        return field.getType().equals( PropertyEditorType.COMBO );
+    }
+
+    private String extractFieldValue( Object instance,
+                                      Field field ) {
         try {
-            targetClass = Class.forName( fqcn );
-        } catch ( ClassNotFoundException e ) {
-            throw new PropertyEditorException( e.getMessage() );
+            return extractStringValue( instance, field );
+        } catch ( IllegalAccessException e ) {
+            throw new ErrorReadingFieldInformationAndValues();
         }
     }
 
+    private String extractStringValue( Object instance,
+                                       Field field ) throws IllegalAccessException {
+        field.setAccessible( true );
+        Object value = field.get( instance );
+        if ( value != null ) {
+            return value.toString();
+        } else {
+            return "";
+        }
+    }
+
+    private void generateComboValues( Field declaredField,
+                                      PropertyEditorFieldInfo field ) {
+        List<String> values = new ArrayList<String>();
+        for ( Object constant : declaredField.getType().getEnumConstants() ) {
+            values.add( constant.toString() );
+        }
+        field.withComboValues( values );
+
+    }
+
+    public boolean isAHandledType( PropertyEditorType type ) {
+        return type != null;
+    }
+
+    public class NullBeanException extends RuntimeException {
+
+    }
+
+    private class ErrorReadingFieldInformationAndValues extends RuntimeException {
+
+    }
 }
