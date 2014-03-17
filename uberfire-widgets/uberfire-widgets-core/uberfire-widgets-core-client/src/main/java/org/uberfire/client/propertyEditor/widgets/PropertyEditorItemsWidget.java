@@ -21,6 +21,14 @@ public class PropertyEditorItemsWidget extends Composite {
         items.add( item );
     }
 
+    public void setError(){
+        items.addStyleName( "error" );
+    }
+
+    public void clearError() {
+        items.removeStyleName( "error" );
+    }
+
     interface MyUiBinder extends UiBinder<Widget, PropertyEditorItemsWidget> {
 
     }

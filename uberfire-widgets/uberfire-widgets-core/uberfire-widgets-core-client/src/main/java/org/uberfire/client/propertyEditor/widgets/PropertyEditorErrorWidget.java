@@ -7,13 +7,13 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-public class PropertyEditorItemLabel extends Composite {
+public class PropertyEditorErrorWidget extends Composite {
 
     @UiField
     Paragraph label;
 
 
-    public PropertyEditorItemLabel() {
+    public PropertyEditorErrorWidget() {
         initWidget( uiBinder.createAndBindUi( this ) );
     }
 
@@ -21,7 +21,7 @@ public class PropertyEditorItemLabel extends Composite {
         label.setText( text );
     }
 
-    interface MyUiBinder extends UiBinder<Widget, PropertyEditorItemLabel> {
+    interface MyUiBinder extends UiBinder<Widget, PropertyEditorErrorWidget> {
 
     }
 

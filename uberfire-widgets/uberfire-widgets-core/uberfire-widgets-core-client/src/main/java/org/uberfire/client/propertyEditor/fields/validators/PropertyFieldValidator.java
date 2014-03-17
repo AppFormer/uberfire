@@ -4,4 +4,6 @@ public interface PropertyFieldValidator {
 
     public boolean validate( Object value );
 
+    public String getValidatorErrorMessage();
+
 }

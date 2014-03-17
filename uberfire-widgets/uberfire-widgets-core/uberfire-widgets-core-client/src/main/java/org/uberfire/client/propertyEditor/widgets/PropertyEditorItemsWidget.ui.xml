@@ -1,4 +1,4 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-  <g:FlowPanel ui:field='items' addStyleNames="row-fluid"/>
+  <g:FlowPanel ui:field='items' addStyleNames="row-fluid control-group"/>
 </ui:UiBinder>

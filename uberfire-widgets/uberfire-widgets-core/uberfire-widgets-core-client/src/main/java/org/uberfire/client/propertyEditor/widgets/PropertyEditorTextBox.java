@@ -2,6 +2,7 @@ package org.uberfire.client.propertyEditor.widgets;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -16,20 +17,12 @@ public class PropertyEditorTextBox extends Composite {
     @UiField
     TextBox textBox;
 
+    PropertyEditorItemsWidget parent;
 
-    @UiField
-    Style style;
-
-
-    interface Style extends CssResource {
-        String regular();
-
-        String error();
-    }
+    PropertyEditorErrorWidget errorWidget;
 
     public PropertyEditorTextBox() {
         initWidget( uiBinder.createAndBindUi( this ) );
-        textBox.setStyleName( style.regular() );
         textBox.addFocusHandler( new FocusHandler() {
             @Override
             public void onFocus( FocusEvent event ) {
@@ -50,18 +43,26 @@ public class PropertyEditorTextBox extends Composite {
         textBox.addKeyDownHandler( keyDownHandler );
     }
 
-    public void setCSSError() {
-        textBox.getElement().addClassName(style.error());
-        textBox.getElement().removeClassName(style.regular());
+    public void setValidationError(String error) {
+        parent.setError();
+        errorWidget.setText( error );
     }
-    public void setCSSRegular() {
-        textBox.getElement().addClassName(style.regular());
-        textBox.getElement().removeClassName(style.error());
+    public void clearOldValidationErrors() {
+        parent.clearError();
+        errorWidget.setText( "" );
     }
     interface MyUiBinder extends UiBinder<Widget, PropertyEditorTextBox> {
 
     }
 
     private static MyUiBinder uiBinder = GWT.create( MyUiBinder.class );
+
+    public void setParent( PropertyEditorItemsWidget parent ) {
+        this.parent = parent;
+    }
+
+    public void setErrorWidget( PropertyEditorErrorWidget errorWidget ) {
+        this.errorWidget = errorWidget;
+    }
 
 }

@@ -19,6 +19,7 @@ public class PropertyEditorItemWidget extends Composite {
 
     public void add(Widget widget){
         item.add( widget );
+
     }
 
     interface MyUiBinder extends UiBinder<Widget, PropertyEditorItemWidget> {

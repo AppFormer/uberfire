@@ -11,6 +11,7 @@ import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.IntegerValidator;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
+import org.uberfire.client.propertyEditor.fields.validators.TextValidator;
 
 public enum PropertyEditorType {
 
@@ -19,9 +20,17 @@ public enum PropertyEditorType {
         public Widget widget( PropertyEditorFieldInfo property ) {
             return getWidget( property, TextField.class );
         }
+
         @Override
         public boolean isType( Class<?> type ) {
             return ( type.equals( String.class ) );
+        }
+
+        @Override
+        public List<PropertyFieldValidator> getValidators() {
+            ArrayList validators = new ArrayList();
+            validators.add( new TextValidator() );
+            return validators;
         }
 
     }, BOOLEAN {

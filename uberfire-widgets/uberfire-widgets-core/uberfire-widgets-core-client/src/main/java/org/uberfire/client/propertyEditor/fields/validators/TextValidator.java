@@ -3,20 +3,18 @@ package org.uberfire.client.propertyEditor.fields.validators;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class IntegerValidator implements PropertyFieldValidator {
+public class TextValidator implements PropertyFieldValidator {
 
     @Override
     public boolean validate( Object value ) {
-        try {
-            Integer.parseInt( value.toString() );
+        if ( value.toString().length() > 8 ) {
             return true;
-        } catch ( Exception e ) {
-            return false;
         }
+        return false;
     }
 
     @Override
     public String getValidatorErrorMessage() {
-        return "Value must be a integer.";
+        return "Invalid Text data.";
     }
 }

@@ -5,16 +5,11 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.aria.client.Property;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
@@ -41,11 +36,11 @@ public class TextField extends AbstractField {
             public void onKeyDown( KeyDownEvent event ) {
                 if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
                     if ( validate( property, textBox.getText() ) ) {
-                        textBox.setCSSRegular();
+                        textBox.clearOldValidationErrors();
                         property.setCurrentStringValue( textBox.getText() );
                         propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, textBox.getText() ) );
                     } else {
-                        textBox.setCSSError();
+                        textBox.setValidationError( getValidatorErrorMessage( property, textBox.getText() ) );
                         textBox.setText( property.getCurrentStringValue() );
                     }
                 }
@@ -53,19 +48,6 @@ public class TextField extends AbstractField {
             }
 
         } );
-    }
-
-    private boolean validate( PropertyEditorFieldInfo property,
-                              String value ) {
-        List<PropertyFieldValidator> validators = property.getValidators();
-
-        for ( PropertyFieldValidator validator : validators ) {
-            if ( !validator.validate( value ) ) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }
