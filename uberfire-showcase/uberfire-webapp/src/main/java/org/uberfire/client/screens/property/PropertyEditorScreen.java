@@ -5,6 +5,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Composite;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
@@ -21,6 +22,7 @@ public class PropertyEditorScreen extends Composite {
     @DataField
     @Inject
     private PropertyEditorWidget propertyEditor;
+
 
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;

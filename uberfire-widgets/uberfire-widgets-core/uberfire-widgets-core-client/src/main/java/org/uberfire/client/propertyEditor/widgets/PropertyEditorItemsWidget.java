@@ -1,5 +1,7 @@
 package org.uberfire.client.propertyEditor.widgets;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -11,6 +13,7 @@ public class PropertyEditorItemsWidget extends Composite {
 
     @UiField
     FlowPanel items;
+
 
 
     public PropertyEditorItemsWidget() {

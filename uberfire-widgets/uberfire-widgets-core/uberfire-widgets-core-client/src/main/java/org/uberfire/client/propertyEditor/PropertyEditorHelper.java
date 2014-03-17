@@ -17,30 +17,48 @@ import org.uberfire.client.propertyEditor.widgets.PropertyEditorTextBox;
 public class PropertyEditorHelper {
 
     public static void extractEditorFrom( Accordion propertyMenu,
-                                          PropertyEditorEvent event ) {
+                                          PropertyEditorEvent event,
+                                          String propertyNameFilter ) {
         propertyMenu.clear();
-
         for ( PropertyEditorCategory category : event.getSortedProperties() ) {
-            createCategory( propertyMenu, category );
+            createCategory( propertyMenu, category, propertyNameFilter );
         }
     }
 
+    public static void extractEditorFrom( Accordion propertyMenu,
+                                          PropertyEditorEvent event ) {
+        extractEditorFrom( propertyMenu, event, "" );
+    }
+
     private static void createCategory( Accordion propertyMenu,
-                                        PropertyEditorCategory category ) {
+                                        PropertyEditorCategory category,
+                                        String propertyNameFilter ) {
 
         AccordionGroup categoryAccordion = GWT.create( AccordionGroup.class );
         categoryAccordion.setHeading( category.getName() );
 
         for ( PropertyEditorFieldInfo field : category.getFields() ) {
-            categoryAccordion.add( createItemsWidget( field ) );
+            if ( isAMatchOfFilter( propertyNameFilter, field ) ) {
+                categoryAccordion.add( createItemsWidget( field ) );
+            }
 
         }
         propertyMenu.add( categoryAccordion );
     }
 
+    private static boolean isAMatchOfFilter( String propertyNameFilter,
+                                             PropertyEditorFieldInfo field ) {
+        if ( propertyNameFilter.isEmpty() ) {
+            return true;
+        }
+        if ( field.getLabel().toUpperCase().contains( propertyNameFilter.toUpperCase() ) ){
+            return true;
+        }
+        return false;
+    }
+
     private static PropertyEditorItemsWidget createItemsWidget( PropertyEditorFieldInfo field ) {
         PropertyEditorItemsWidget items = GWT.create( PropertyEditorItemsWidget.class );
-
         items.add( createLabel( field ) );
         items.add( createField( field, items ) );
         return items;
@@ -52,11 +70,10 @@ public class PropertyEditorHelper {
         PropertyEditorErrorWidget errorWidget = GWT.create( PropertyEditorErrorWidget.class );
         Widget widget = field.getType().widget( field );
 
-        if(field.getType().equals( PropertyEditorType.TEXT )){
+        if ( field.getType().equals( PropertyEditorType.TEXT ) ) {
             createErrorHandlingInfraStructure( parent, itemWidget, errorWidget, widget );
             itemWidget.add( errorWidget );
-        }
-        else {
+        } else {
             itemWidget.add( widget );
         }
         return itemWidget;
