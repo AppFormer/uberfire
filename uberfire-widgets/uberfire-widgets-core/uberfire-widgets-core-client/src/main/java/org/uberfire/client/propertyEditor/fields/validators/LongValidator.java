@@ -3,12 +3,12 @@ package org.uberfire.client.propertyEditor.fields.validators;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class IntegerValidator implements PropertyFieldValidator {
+public class LongValidator implements PropertyFieldValidator {
 
     @Override
     public boolean validate( Object value ) {
         try {
-            Integer.parseInt( value.toString() );
+            Long.parseLong( value.toString() );
             return true;
         } catch ( Exception e ) {
             return false;
@@ -17,6 +17,6 @@ public class IntegerValidator implements PropertyFieldValidator {
 
     @Override
     public String getValidatorErrorMessage() {
-        return "Value must be a integer.";
+        return "Value must be a number.";
     }
 }

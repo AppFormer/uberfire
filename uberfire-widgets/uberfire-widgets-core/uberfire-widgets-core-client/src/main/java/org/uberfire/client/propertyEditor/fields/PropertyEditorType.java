@@ -3,13 +3,11 @@ package org.uberfire.client.propertyEditor.fields;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.aria.client.Property;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
-import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
-import org.uberfire.client.propertyEditor.fields.validators.IntegerValidator;
+import org.uberfire.client.propertyEditor.fields.validators.LongValidator;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 import org.uberfire.client.propertyEditor.fields.validators.TextValidator;
 
@@ -23,7 +21,17 @@ public enum PropertyEditorType {
 
         @Override
         public boolean isType( Class<?> type ) {
-            return ( type.equals( String.class ) );
+            return isString( type )||isFloat( type )||isDouble( type );
+        }
+
+        private boolean isFloat( Class<?> type ) {
+            return ( type.equals( Float.class ) || ( type.toString().equalsIgnoreCase( "float" ) ) );
+        }
+        private boolean isDouble( Class<?> type ) {
+            return ( type.equals( Double.class ) || ( type.toString().equalsIgnoreCase( "double" ) ) );
+        }
+        private boolean isString( Class<?> type ) {
+            return type.equals( String.class );
         }
 
         @Override
@@ -52,13 +60,17 @@ public enum PropertyEditorType {
         @Override
         public List<PropertyFieldValidator> getValidators() {
             ArrayList validators = new ArrayList();
-            validators.add( new IntegerValidator() );
+            validators.add( new LongValidator() );
             return validators;
         }
 
         @Override
         public boolean isType( Class<?> type ) {
-            return isInteger( type ) || isLong( type );
+            return isInteger( type ) || isLong( type ) || isShort( type );
+        }
+
+        private boolean isShort( Class<?> type ) {
+            return ( type.equals( Short.class ) || ( type.toString().equalsIgnoreCase( "short" ) ) );
         }
 
         private boolean isLong( Class<?> type ) {
@@ -110,4 +122,6 @@ public enum PropertyEditorType {
         }
         return null;
     }
+
+
 }

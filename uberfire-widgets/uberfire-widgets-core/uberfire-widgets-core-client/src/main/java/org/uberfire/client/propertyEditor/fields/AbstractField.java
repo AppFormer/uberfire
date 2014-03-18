@@ -3,7 +3,6 @@ package org.uberfire.client.propertyEditor.fields;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 
@@ -25,7 +24,7 @@ public abstract class AbstractField {
     }
 
     protected String getValidatorErrorMessage( PropertyEditorFieldInfo property,
-                                               String value ) {
+                                               String value) {
         List<PropertyFieldValidator> validators = property.getValidators();
 
         for ( PropertyFieldValidator validator : validators ) {

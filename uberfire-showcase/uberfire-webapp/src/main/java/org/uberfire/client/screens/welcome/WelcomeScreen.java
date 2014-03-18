@@ -74,15 +74,15 @@ public class WelcomeScreen
 
     @UiHandler("searchBox")
     public void onKeyDown( KeyDownEvent keyDown ) {
-        ComplexPlanBean instance = new ComplexPlanBean("texto" , true, true,1,1,1l,SampleEnum.VALUE2 );
+        ComplexPlanBean instance = new ComplexPlanBean( "texto", true, true, 1, 1, new Long( 1 ), new Double( "1.1" ), 1.2d, new Float( "2.2" ), 2.3f, new Short( "1" ), new Short( "2" ).shortValue(), SampleEnum.VALUE2 );
         if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
             beanPropertyEditorBuilderCaller.call( new RemoteCallback<PropertyEditorCategory>() {
-                                                      @Override
-                                                      public void callback( final PropertyEditorCategory category ) {
-                                                          event.fire( new PropertyEditorEvent( getTitle(), category ) );
-                                                      }
-                                                  }
-                                                ).extract( "org.uberfire.client.screens.welcome.ComplexPlanBean",instance );
+                @Override
+                public void callback( final PropertyEditorCategory category ) {
+                    event.fire( new PropertyEditorEvent( getTitle(), category ) );
+                }
+            }
+                                                ).extract( "org.uberfire.client.screens.welcome.ComplexPlanBean", instance );
 
         }
 

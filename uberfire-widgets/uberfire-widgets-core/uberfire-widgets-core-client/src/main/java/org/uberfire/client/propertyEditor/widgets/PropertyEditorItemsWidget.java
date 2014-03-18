@@ -14,8 +14,6 @@ public class PropertyEditorItemsWidget extends Composite {
     @UiField
     FlowPanel items;
 
-
-
     public PropertyEditorItemsWidget() {
         initWidget( uiBinder.createAndBindUi( this ) );
     }

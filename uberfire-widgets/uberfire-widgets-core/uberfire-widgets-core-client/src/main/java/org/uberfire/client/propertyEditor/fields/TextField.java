@@ -1,6 +1,5 @@
 package org.uberfire.client.propertyEditor.fields;
 
-import java.util.List;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -12,7 +11,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
-import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 import org.uberfire.client.propertyEditor.widgets.PropertyEditorTextBox;
 
 @Dependent
