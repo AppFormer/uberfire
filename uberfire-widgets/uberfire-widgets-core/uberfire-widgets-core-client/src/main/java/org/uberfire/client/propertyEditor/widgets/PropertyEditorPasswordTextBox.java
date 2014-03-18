@@ -1,45 +1,42 @@
 package org.uberfire.client.propertyEditor.widgets;
 
-import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-public class PropertyEditorTextBox extends AbstractPropertyEditorWidget {
+public class PropertyEditorPasswordTextBox extends AbstractPropertyEditorWidget {
 
     @UiField
-    TextBox textBox;
+    PasswordTextBox passwordTextBox;
 
-    public PropertyEditorTextBox() {
+    public PropertyEditorPasswordTextBox() {
         initWidget( uiBinder.createAndBindUi( this ) );
-        textBox.addFocusHandler( new FocusHandler() {
+        passwordTextBox.addFocusHandler( new FocusHandler() {
             @Override
             public void onFocus( FocusEvent event ) {
-                textBox.selectAll();
+                passwordTextBox.selectAll();
             }
         } );
     }
 
     public void setText(String text){
-        textBox.setText( text );
+        passwordTextBox.setText( text );
     }
 
     public String getText() {
-        return textBox.getText();
+        return passwordTextBox.getText();
     }
 
     public void addKeyDownHandler( KeyDownHandler keyDownHandler ) {
-        textBox.addKeyDownHandler( keyDownHandler );
+        passwordTextBox.addKeyDownHandler( keyDownHandler );
     }
 
-    interface MyUiBinder extends UiBinder<Widget, PropertyEditorTextBox> {
+    interface MyUiBinder extends UiBinder<Widget, PropertyEditorPasswordTextBox> {
 
     }
 

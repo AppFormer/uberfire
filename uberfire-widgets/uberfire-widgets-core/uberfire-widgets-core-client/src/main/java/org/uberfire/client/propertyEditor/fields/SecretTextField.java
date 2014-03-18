@@ -8,10 +8,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.widgets.PropertyEditorPasswordTextBox;
 
 @Dependent
 public class SecretTextField extends AbstractField{
@@ -23,19 +23,26 @@ public class SecretTextField extends AbstractField{
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final PasswordTextBox passwordTextBox = GWT.create(PasswordTextBox.class);
+        final PropertyEditorPasswordTextBox passwordTextBox = GWT.create(PropertyEditorPasswordTextBox.class);
         passwordTextBox.setText( property.getCurrentStringValue() );
         addKeyDownHandler( property, passwordTextBox );
         return passwordTextBox;
     }
 
     private void addKeyDownHandler( final PropertyEditorFieldInfo property,
-                                    final PasswordTextBox passwordTextBox ) {
+                                    final PropertyEditorPasswordTextBox passwordTextBox ) {
         passwordTextBox.addKeyDownHandler( new KeyDownHandler() {
             @Override
             public void onKeyDown( KeyDownEvent event ) {
                 if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-                    propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, passwordTextBox.getText() ) );
+                    if ( validate( property, passwordTextBox.getText() ) ) {
+                        passwordTextBox.clearOldValidationErrors();
+                        property.setCurrentStringValue( passwordTextBox.getText() );
+                        propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, passwordTextBox.getText() ) );
+                    } else {
+                        passwordTextBox.setValidationError( getValidatorErrorMessage( property, passwordTextBox.getText() ) );
+                        passwordTextBox.setText( property.getCurrentStringValue() );
+                    }
                 }
 
             }

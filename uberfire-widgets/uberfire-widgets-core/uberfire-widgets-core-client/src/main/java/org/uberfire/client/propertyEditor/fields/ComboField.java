@@ -7,11 +7,10 @@ import javax.inject.Inject;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.widgets.PropertyEditorComboBox;
 
 @Dependent
 public class ComboField extends AbstractField {
@@ -21,7 +20,7 @@ public class ComboField extends AbstractField {
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final ListBox listBox = GWT.create( ListBox.class );
+        final PropertyEditorComboBox listBox = GWT.create( PropertyEditorComboBox.class );
         int index = 0;
         int selected = -1;
         for ( String value : property.getComboValues() ) {
@@ -36,7 +35,7 @@ public class ComboField extends AbstractField {
         return listBox;
     }
 
-    private void ifSelectedSelectItem( ListBox listBox,
+    private void ifSelectedSelectItem( PropertyEditorComboBox listBox,
                                        int index,
                                        int selected ) {
         if ( selectAnyItem( index ) ) {
@@ -45,12 +44,19 @@ public class ComboField extends AbstractField {
     }
 
     private void addChangeHandler( final PropertyEditorFieldInfo property,
-                                   final ListBox listBox ) {
+                                   final PropertyEditorComboBox listBox ) {
         listBox.addChangeHandler( new ChangeHandler() {
             @Override
             public void onChange( ChangeEvent event ) {
                 int selectedIndex = listBox.getSelectedIndex();
-                propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, listBox.getItemText( selectedIndex ) ) );
+                if ( validate( property, listBox.getItemText( selectedIndex ) ) ) {
+                    listBox.clearOldValidationErrors();
+                    property.setCurrentStringValue( listBox.getItemText( selectedIndex ) );
+                    propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, listBox.getItemText( selectedIndex ) ) );
+                } else {
+                    listBox.setValidationError( getValidatorErrorMessage( property, listBox.getItemText( selectedIndex ) ) );
+                    listBox.setSelectItemByText( property.getCurrentStringValue() );
+                }
             }
         }
 

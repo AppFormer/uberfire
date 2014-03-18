@@ -6,6 +6,7 @@ import java.util.List;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
+import org.uberfire.client.propertyEditor.fields.validators.PropertyFieldValidator;
 
 public class WelcomeScreenHelper {
 
@@ -15,7 +16,28 @@ public class WelcomeScreenHelper {
 
         PropertyEditorCategory monitor = new PropertyEditorCategory( "Monitor", monitorPriority )
                 .withField( new PropertyEditorFieldInfo( "Name", "HTTPS", PropertyEditorType.TEXT ).withKey( "name" ) )
-                .withField( new PropertyEditorFieldInfo( "Show in Favorites", Boolean.FALSE.toString(), PropertyEditorType.BOOLEAN ) )
+                .withField( new PropertyEditorFieldInfo( "Show in Favorites", Boolean.FALSE.toString(), PropertyEditorType.BOOLEAN ).withValidators( new PropertyFieldValidator() {
+                    @Override
+                    public boolean validate( Object value ) {
+                        return false;
+                    }
+
+                    @Override
+                    public String getValidatorErrorMessage() {
+                        return "error error error!!!!";
+                    }
+                } ) )
+                .withField( new PropertyEditorFieldInfo( "Show in Favorites True", Boolean.FALSE.toString(), PropertyEditorType.BOOLEAN ).withValidators( new PropertyFieldValidator() {
+                    @Override
+                    public boolean validate( Object value ) {
+                        return true;
+                    }
+
+                    @Override
+                    public String getValidatorErrorMessage() {
+                        return "error error error!!!!";
+                    }
+                } ) )
                 .withField( new PropertyEditorFieldInfo( "Link to Summary Report", "http://redhat.com", PropertyEditorType.TEXT ) )
                 .withField( new PropertyEditorFieldInfo( "Notes (to be show in reports)", "Created on XYZ", PropertyEditorType.TEXT ) );
 
@@ -30,14 +52,34 @@ public class WelcomeScreenHelper {
                 .withField( new PropertyEditorFieldInfo( "Request Method", "POST", PropertyEditorType.COMBO )
                                     .withComboValues( createComboValues( "GET", "POST" ) ) )
                 .withField( new PropertyEditorFieldInfo( "Accepted Response Codes", "200", PropertyEditorType.TEXT ) )
-                .withField( new PropertyEditorFieldInfo( "Response Validation", "NONE", PropertyEditorType.COMBO )
-                                    .withComboValues( createComboValues( "NONE", "YES" ) ) )
+                .withField( new PropertyEditorFieldInfo( "Response Validation", "YES", PropertyEditorType.COMBO )
+                                    .withComboValues( createComboValues( "NONE", "YES" ) ).withValidators( new PropertyFieldValidator() {
+                            @Override
+                            public boolean validate( Object value ) {
+                                return false;
+                            }
+
+                            @Override
+                            public String getValidatorErrorMessage() {
+                                return "Teste teste teste";
+                            }
+                        } ) )
 
 //                .withField( new PropertyEditorFieldInfo( "Login", "ederign", PropertyEditorType.TEXT )
 //                                    .withPriority( 0 ).withValidators( new LoginValidator(), new AnotherSampleValidator() ) )
 
                 .withField( new PropertyEditorFieldInfo( "Password", "123456", PropertyEditorType.SECRET_TEXT )
-                                    .withPriority( 1 ) )
+                                    .withPriority( 1 ).withValidators( new PropertyFieldValidator() {
+                            @Override
+                            public boolean validate( Object value ) {
+                                return false;
+                            }
+
+                            @Override
+                            public String getValidatorErrorMessage() {
+                                return "123";
+                            }
+                        } ) )
                 .withField( new PropertyEditorFieldInfo( "Proxy Server", "No Proxy", PropertyEditorType.COMBO )
                                     .withComboValues( createComboValues( "No Proxy", "server 1", "server 2s" ) ) );
 

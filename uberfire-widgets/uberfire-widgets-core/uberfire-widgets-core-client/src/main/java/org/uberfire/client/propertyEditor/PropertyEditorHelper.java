@@ -10,6 +10,7 @@ import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
 import org.uberfire.client.propertyEditor.fields.PropertyEditorType;
+import org.uberfire.client.propertyEditor.widgets.AbstractPropertyEditorWidget;
 import org.uberfire.client.propertyEditor.widgets.PropertyEditorErrorWidget;
 import org.uberfire.client.propertyEditor.widgets.PropertyEditorItemLabel;
 import org.uberfire.client.propertyEditor.widgets.PropertyEditorItemWidget;
@@ -93,12 +94,10 @@ public class PropertyEditorHelper {
         PropertyEditorErrorWidget errorWidget = GWT.create( PropertyEditorErrorWidget.class );
         Widget widget = field.getType().widget( field );
 
-        if ( field.getType().equals( PropertyEditorType.TEXT ) ||field.getType().equals( PropertyEditorType.NATURAL_NUMBER )  ) {
-            createErrorHandlingInfraStructure( parent, itemWidget, errorWidget, widget );
-            itemWidget.add( errorWidget );
-        } else {
-            itemWidget.add( widget );
-        }
+        createErrorHandlingInfraStructure( parent, itemWidget, errorWidget, widget );
+        itemWidget.add( widget );
+        itemWidget.add( errorWidget );
+
         return itemWidget;
     }
 
@@ -106,9 +105,9 @@ public class PropertyEditorHelper {
                                                            PropertyEditorItemWidget itemWidget,
                                                            PropertyEditorErrorWidget errorWidget,
                                                            Widget widget ) {
-        PropertyEditorTextBox textbox = (PropertyEditorTextBox) widget;
-        textbox.setErrorWidget( errorWidget );
-        textbox.setParent( parent );
+        AbstractPropertyEditorWidget abstractPropertyEditorWidget = (AbstractPropertyEditorWidget) widget;
+        abstractPropertyEditorWidget.setErrorWidget( errorWidget );
+        abstractPropertyEditorWidget.setParent( parent );
         itemWidget.add( widget );
     }
 

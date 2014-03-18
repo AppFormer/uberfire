@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
 import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
 import org.uberfire.client.propertyEditor.api.PropertyEditorFieldInfo;
+import org.uberfire.client.propertyEditor.widgets.PropertyEditorCheckBox;
 
 @Dependent
 public class BooleanField extends AbstractField {
@@ -21,13 +22,20 @@ public class BooleanField extends AbstractField {
 
     @Override
     public Widget widget( final PropertyEditorFieldInfo property ) {
-        final CheckBox checkBox = GWT.create(CheckBox.class);
-        checkBox.setValue( Boolean.valueOf( property.getCurrentStringValue() ) );
+        final PropertyEditorCheckBox checkBox = GWT.create( PropertyEditorCheckBox.class );
+
         checkBox.addValueChangeHandler( new ValueChangeHandler<Boolean>() {
             @Override
             public void onValueChange( ValueChangeEvent<Boolean> event ) {
-                propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, checkBox.getValue().toString() ) );
 
+                if ( validate( property, checkBox.getValue().toString() ) ) {
+                    checkBox.clearOldValidationErrors();
+                    property.setCurrentStringValue( checkBox.getValue().toString() );
+                    propertyEditorChangeEventEvent.fire( new PropertyEditorChangeEvent( property, checkBox.getValue().toString() ) );
+                } else {
+                    checkBox.setValidationError( getValidatorErrorMessage( property, checkBox.getValue().toString() ) );
+                    checkBox.setValue( new Boolean( property.getCurrentStringValue() ) );
+                }
             }
         } );
 

@@ -5,6 +5,11 @@
     .margin {margin-top:8px;
       margin-bottom:8px;
       margin-left:15px;
+
+    }
+    .container{
+      overflow-y: auto;
+      height: 500px;
     }
   </ui:style>
 
@@ -18,7 +23,7 @@
         </b:ButtonGroup>
     </g:HTMLPanel>
 
-    <b:Accordion ui:field='propertyMenu'/>
+    <b:Accordion ui:field='propertyMenu'  addStyleNames="{style.container}"/>
 
   </g:HTMLPanel>
 </ui:UiBinder>

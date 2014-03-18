@@ -33,6 +33,7 @@
     <b:Button ui:field="launch">Launch property editor</b:Button>
     <b:Heading size="2">Welcome to UberFire</b:Heading>
     <b:Paragraph>Now with a bright new Look &amp; Feel based on Boostrap.</b:Paragraph>
+
   </b:Hero>
 
 </ui:UiBinder>
