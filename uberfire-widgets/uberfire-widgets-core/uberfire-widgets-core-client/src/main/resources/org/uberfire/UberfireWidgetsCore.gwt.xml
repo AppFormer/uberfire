@@ -8,11 +8,20 @@
   <inherits name="com.google.gwt.http.HTTP"/>
   <inherits name="com.google.gwt.user.User"/>
 
-  <inherits name='org.jboss.errai.bus.ErraiBus'/>
+  <inherits name="org.jboss.errai.common.ErraiCommon" />
+  <inherits name="org.jboss.errai.bus.ErraiBus" />
+  <inherits name="org.jboss.errai.ioc.Container" />
+  <inherits name="org.jboss.errai.enterprise.CDI" />
 
   <inherits name="org.uberfire.UberfireWorkbench"/>
   <inherits name="org.uberfire.UberfireWidgetsCommons"/>
+  <inherits name="com.github.gwtbootstrap.Bootstrap"/>
 
+  <inherits name="org.jboss.errai.common.ErraiCommon" />
+  <inherits name="org.jboss.errai.bus.ErraiBus" />
+  <inherits name="org.jboss.errai.enterprise.CDI" />
+  <inherits name="org.jboss.errai.ioc.Container" />
+  <inherits name="org.jboss.errai.marshalling.ErraiMarshalling" />
   <script src="js/ZeroClipboard.min.js"/>
   <script src="js/ZeroClipboardLoader.js"/>
 

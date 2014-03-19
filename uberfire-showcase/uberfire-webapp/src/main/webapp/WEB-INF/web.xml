@@ -57,6 +57,7 @@ profile in pom.xml to use that. -->
       <param-name>service-locator</param-name>
       <param-value>org.jboss.errai.cdi.server.CDIServiceLocator</param-value>
     </init-param>
+
     <load-on-startup>1</load-on-startup>
   </servlet>
 

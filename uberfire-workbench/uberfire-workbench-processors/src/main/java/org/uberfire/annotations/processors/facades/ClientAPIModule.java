@@ -18,11 +18,12 @@ import org.uberfire.annotations.processors.exceptions.GenerationException;
  */
 public class ClientAPIModule {
 
-
     private static final Logger logger = LoggerFactory.getLogger( ClientAPIModule.class );
 
     public static final String IDENTIFIER = "identifier";
     public static final String IS_DEFAULT = "isDefault";
+    public static final String IS_TEMPLATE = "isTemplate";
+    public static final String VALUE = "value";
     private static Class<? extends Annotation> workbenchSplashScreen;
     private static Class<? extends Annotation> workbenchPerspective;
     private static Class<? extends Annotation> workbenchPopup;
@@ -40,10 +41,14 @@ public class ClientAPIModule {
     private static Class<? extends Annotation> splashFilter;
     private static Class<? extends Annotation> splashBodySize;
     private static Class<? extends Annotation> intercept;
+    private static Class<? extends Annotation> workbenchPart;
+    private static Class<? extends Annotation> workbenchParts;
+    private static Class<? extends Annotation> workbenchPanel;
+    private static Class<? extends Annotation> parameterMapping;
 
-    private ClientAPIModule() {}
-    
-    
+    private ClientAPIModule() {
+    }
+
     static {
 
         try {
@@ -64,13 +69,15 @@ public class ClientAPIModule {
             splashFilter = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashFilter" );
             splashBodySize = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.SplashBodySize" );
             intercept = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.Intercept" );
+            workbenchPart = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPart" );
+            workbenchParts = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchParts" );
+            workbenchPanel = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.WorkbenchPanel" );
+            parameterMapping = (Class<? extends Annotation>) Class.forName( "org.uberfire.client.annotations.ParameterMapping" );
 
         } catch ( ClassNotFoundException e ) {
-            logger.error(e.getMessage());
+            logger.error( e.getMessage() );
         }
     }
-
-
 
     public static Class<? extends Annotation> getWorkbenchScreenClass() {
         return workbenchScreen;
@@ -140,9 +147,25 @@ public class ClientAPIModule {
         return workbenchPerspective;
     }
 
+    public static Class<? extends Annotation> getWorkbenchPart() {
+        return workbenchPart;
+    }
+
+    public static Class<? extends Annotation> getWorkbenchParts() {
+        return workbenchParts;
+    }
+
+    public static Class<? extends Annotation> getParameterMapping() {
+        return parameterMapping;
+    }
+
+    public static Class<? extends Annotation> getWorkbenchPanel() {
+        return workbenchPanel;
+    }
+
     private static String getAnnotationIdentifierValueOnClass( TypeElement o,
-                                                        String className,
-                                                        String annotationName ) throws GenerationException {
+                                                               String className,
+                                                               String annotationName ) throws GenerationException {
         try {
             String identifierValue = "";
             for ( final AnnotationMirror am : o.getAnnotationMirrors() ) {
@@ -186,4 +209,10 @@ public class ClientAPIModule {
     public static String getWbContextIdentifierValueOnClass( TypeElement classElement ) throws GenerationException {
         return getAnnotationIdentifierValueOnClass( classElement, workbenchContext.getName(), IDENTIFIER );
     }
+
+    public static boolean getWbPerspectiveScreenIsTemplateValueOnClass( TypeElement classElement ) throws GenerationException {
+        String bool = ( getAnnotationIdentifierValueOnClass( classElement, workbenchPerspective.getName(), IS_TEMPLATE ) );
+        return Boolean.valueOf( bool );
+    }
+
 }

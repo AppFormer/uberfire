@@ -39,6 +39,10 @@ public interface BeanFactory {
 
     public WorkbenchPanelPresenter newWorkbenchPanel( final PanelDefinition definition );
 
+    public CompassDropController newDropController( final WorkbenchPanelView view );
+
+    public void destroy( final Object o );
+
     public HorizontalSplitterPanel newHorizontalSplitterPanel( final WorkbenchPanelView eastPanel,
                                                                final WorkbenchPanelView westPanel,
                                                                final Position position,
@@ -50,9 +54,5 @@ public interface BeanFactory {
                                                            final Position position,
                                                            final Integer preferredSize,
                                                            final Integer preferredMinSize );
-
-    public CompassDropController newDropController( final WorkbenchPanelView view );
-
-    public void destroy( final Object o );
 
 }

@@ -16,10 +16,13 @@
 package org.uberfire.client.workbench;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
+import org.uberfire.client.workbench.BeanFactory;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelView;
 import org.uberfire.client.workbench.panels.impl.HorizontalSplitterPanel;
@@ -27,6 +30,8 @@ import org.uberfire.client.workbench.panels.impl.MultiListWorkbenchPanelPresente
 import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.SimpleWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.StaticWorkbenchPanelPresenter;
+import org.uberfire.client.workbench.panels.impl.TemplatePerspectiveWorkbenchPanelPresenter;
+import org.uberfire.client.workbench.panels.impl.TemplateWorkbenchPanelPresenter;
 import org.uberfire.client.workbench.panels.impl.VerticalSplitterPanel;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.dnd.CompassDropController;
@@ -39,12 +44,13 @@ import org.uberfire.workbench.model.menu.Menus;
  * BeanFactory using Errai IOCBeanManager to instantiate (CDI) beans
  */
 @ApplicationScoped
+@Default
 public class DefaultBeanFactory
         implements
         BeanFactory {
 
     @Inject
-    private SyncBeanManager iocManager;
+    SyncBeanManager iocManager;
 
     @Override
     public WorkbenchPartPresenter newWorkbenchPart( final Menus menus,
@@ -88,6 +94,14 @@ public class DefaultBeanFactory
                 panel = iocManager.lookupBean( StaticWorkbenchPanelPresenter.class ).getInstance();
                 break;
 
+            case TEMPLATE:
+                if ( templateRootPerspective( definition ) ) {
+                    panel = iocManager.lookupBean( TemplatePerspectiveWorkbenchPanelPresenter.class ).getInstance();
+                } else {
+                    panel  = iocManager.lookupBean( TemplateWorkbenchPanelPresenter.class ).getInstance();
+                }
+                break;
+
             default:
                 throw new IllegalArgumentException( "Unhandled PanelType. Expect subsequent errors." );
         }
@@ -95,6 +109,22 @@ public class DefaultBeanFactory
         panel.setDefinition( definition );
 
         return panel;
+    }
+
+    private boolean templateRootPerspective( PanelDefinition definition ) {
+        return !definition.getChildren().isEmpty();
+    }
+
+    @Override
+    public CompassDropController newDropController( final WorkbenchPanelView view ) {
+        final CompassDropController dropController = iocManager.lookupBean( CompassDropController.class ).getInstance();
+        dropController.setup( view );
+        return dropController;
+    }
+
+    @Override
+    public void destroy( final Object o ) {
+        iocManager.destroyBean( o );
     }
 
     @Override
@@ -125,18 +155,6 @@ public class DefaultBeanFactory
                    preferredSize,
                    preferredMinSize );
         return vsp;
-    }
-
-    @Override
-    public CompassDropController newDropController( final WorkbenchPanelView view ) {
-        final CompassDropController dropController = iocManager.lookupBean( CompassDropController.class ).getInstance();
-        dropController.setup( view );
-        return dropController;
-    }
-
-    @Override
-    public void destroy( final Object o ) {
-        iocManager.destroyBean( o );
     }
 
 }

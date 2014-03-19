@@ -402,8 +402,8 @@ public class UberTabPanel
             final int height;
             if ( parent.getParent() != null ) {
                 if ( parent.getParent().getParent() != null ) {
-                    width = parent.getParent().getParent().getOffsetWidth();
-                    height = parent.getParent().getParent().getOffsetHeight();
+                    width = parent.getParent().getParent().getParent().getOffsetWidth();
+                    height = parent.getParent().getParent().getParent().getOffsetHeight();
                 } else {
                     width = parent.getParent().getOffsetWidth();
                     height = parent.getParent().getOffsetHeight();

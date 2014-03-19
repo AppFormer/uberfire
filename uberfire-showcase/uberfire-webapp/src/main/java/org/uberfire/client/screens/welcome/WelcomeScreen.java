@@ -2,20 +2,47 @@ package org.uberfire.client.screens.welcome;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.api.ErrorCallback;
+import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.client.propertyEditor.api.PropertyEditorCategory;
+import org.uberfire.client.propertyEditor.api.PropertyEditorChangeEvent;
+import org.uberfire.client.propertyEditor.api.PropertyEditorEvent;
+import org.uberfire.shared.propertyEditor.BeanPropertyEditorBuilderService;
 
 @Dependent
 @WorkbenchScreen(identifier = "welcome")
 public class WelcomeScreen
         extends Composite {
+
+    public static final String WELCOME_SCREEN_ID = "welcomeScreen";
+
+    @UiField
+    TextBox searchBox;
+
+    @Inject
+    Event<PropertyEditorEvent> event;
+
+    @Inject
+    private Caller<BeanPropertyEditorBuilderService> beanPropertyEditorBuilderCaller;
 
     interface ViewBinder
             extends
@@ -36,8 +63,39 @@ public class WelcomeScreen
     }
 
     @WorkbenchContextId
-    public String getMyContextRef() {
+    public String getMyCorntextRef() {
         return "welcomeContext";
+    }
+
+    @UiHandler("launch")
+    public void onClickLaunchUnknownPlace( final ClickEvent e ) {
+        event.fire( new PropertyEditorEvent( WELCOME_SCREEN_ID, WelcomeScreenHelper.createProperties() ) );
+    }
+
+    @UiHandler("searchBox")
+    public void onKeyDown( KeyDownEvent keyDown ) {
+        ComplexPlanBean instance = new ComplexPlanBean( "texto", true, true, 1, 1, new Long( 1 ), new Double( "1.1" ), 1.2d, new Float( "2.2" ), 2.3f, new Short( "1" ), new Short( "2" ).shortValue(), SampleEnum.VALUE2 );
+        if ( keyDown.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+            beanPropertyEditorBuilderCaller.call( new RemoteCallback<PropertyEditorCategory>() {
+                @Override
+                public void callback( final PropertyEditorCategory category ) {
+                    event.fire( new PropertyEditorEvent( getTitle(), category ) );
+                }
+            }
+                                                ).extract( "org.uberfire.client.screens.welcome.ComplexPlanBean", instance );
+
+        }
+
+    }
+
+    public void propertyEditorChangeEvent( @Observes PropertyEditorChangeEvent event ) {
+        if ( isMyPropertyEvent( event ) ) {
+            Window.alert( "Msg from property editor: Changed: " + event.getProperty().getLabel() + " - new value: " + event.getNewValue() );
+        }
+    }
+
+    private boolean isMyPropertyEvent( PropertyEditorChangeEvent event ) {
+        return true;
     }
 
 }
