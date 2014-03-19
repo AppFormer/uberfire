@@ -250,6 +250,13 @@
         <version>${version.org.jboss.errai}</version>
       </dependency>
 
+       <dependency>
+        <groupId>org.jboss.errai</groupId>
+        <artifactId>errai-javaee-all</artifactId>
+        <version>${version.org.jboss.errai}</version>
+       </dependency>
+
+
       <!-- Errai Core -->
       <dependency>
         <groupId>org.jboss.errai</groupId>

@@ -25,11 +25,11 @@
     <version>0.4.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>uberfire-nswe-manager</artifactId>
+  <artifactId>uberfire-panel-manager-template</artifactId>
   <packaging>jar</packaging>
 
-  <name>UberFire NSWE Panel Manager</name>
-  <description>UberFire NSWE Panel Manager</description>
+  <name>UberFire Template Panel Manager</name>
+  <description>UberFire Template Panel Manager</description>
 
   <dependencies>
     <dependency>

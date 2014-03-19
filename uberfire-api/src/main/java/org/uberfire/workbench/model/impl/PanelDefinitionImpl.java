@@ -60,7 +60,7 @@ public class PanelDefinitionImpl
     private ContextDisplayMode contextDisplayMode = SHOW;
 
     public PanelDefinitionImpl() {
-        this( PanelType.ROOT_STATIC );
+        this( PanelType.ROOT_TAB );
     }
 
     public PanelDefinitionImpl( final PanelType type ) {

@@ -29,7 +29,7 @@
   <name>UberFire Panel Manager</name>
 
   <modules>
-    <module>uberfire-nswe-manager</module>
-    <module>uberfire-template-manager</module>
+    <module>uberfire-panel-manager-nswe</module>
+    <module>uberfire-panel-manager-template</module>
   </modules>
 </project>

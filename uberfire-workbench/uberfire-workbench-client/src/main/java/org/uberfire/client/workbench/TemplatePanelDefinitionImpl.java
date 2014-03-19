@@ -49,14 +49,6 @@ public class TemplatePanelDefinitionImpl
         return fieldName;
     }
 
-    @Override
-    public void appendChild( final Position position,
-                             final PanelDefinition panel ) {
-
-        super.appendChild( position,panel );
-    }
-
-
 
     @Override
     public PanelDefinition getChild( final Position position ) {
