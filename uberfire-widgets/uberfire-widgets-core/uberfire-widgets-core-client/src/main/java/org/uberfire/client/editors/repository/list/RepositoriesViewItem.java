@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,12 +17,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.backend.repositories.PublicURI;
-import org.uberfire.client.common.BusyPopup;
-import org.uberfire.client.navigator.CommitNavigator;
-import org.uberfire.commons.validation.PortablePreconditions;
 import org.uberfire.client.resources.i18n.CoreConstants;
-import org.uberfire.java.nio.base.version.VersionRecord;
-import org.uberfire.mvp.ParameterizedCommand;
 
 public class RepositoriesViewItem extends Composite {
 
