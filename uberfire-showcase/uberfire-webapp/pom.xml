@@ -44,12 +44,12 @@
 
     <dependency>
       <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-widgets-property-editor-client</artifactId>
+      <artifactId>uberfire-widgets-properties-editor-client</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-widgets-property-editor-backend</artifactId>
+      <artifactId>uberfire-widgets-properties-editor-backend</artifactId>
     </dependency>
 
     <dependency>
