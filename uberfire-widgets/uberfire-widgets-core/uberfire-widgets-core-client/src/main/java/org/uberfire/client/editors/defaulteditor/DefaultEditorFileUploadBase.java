@@ -3,8 +3,6 @@ package org.uberfire.client.editors.defaulteditor;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.github.gwtbootstrap.client.ui.Form;
-import com.github.gwtbootstrap.client.ui.WellForm;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

@@ -18,8 +18,6 @@ package org.uberfire.client.editors.texteditor;
 
 import javax.annotation.PostConstruct;
 
-import org.uberfire.client.common.ResizableTextArea;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -28,6 +26,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
+import org.uberfire.client.common.ResizableTextArea;
 
 /**
  * A Text editor
