@@ -1,6 +1,5 @@
 package org.uberfire.properties.editor;
 
-import java.beans.PropertyEditor;
 import java.util.ArrayList;
 
 import com.github.gwtbootstrap.client.ui.Accordion;
@@ -9,12 +8,8 @@ import com.github.gwtbootstrap.client.ui.event.ShowHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
-import org.jboss.errai.ioc.client.container.IOC;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.uberfire.properties.editor.fields.PropertyEditorFieldType;
 import org.uberfire.properties.editor.model.PropertyEditorCategory;
 import org.uberfire.properties.editor.model.PropertyEditorEvent;
 import org.uberfire.properties.editor.model.PropertyEditorFieldInfo;
