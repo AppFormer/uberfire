@@ -44,7 +44,12 @@
 
     <dependency>
       <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-widgets-core-client</artifactId>
+      <artifactId>uberfire-widgets-property-editor-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-widgets-property-editor-client</artifactId>
     </dependency>
 
     <dependency>

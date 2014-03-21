@@ -33,9 +33,9 @@ import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.Caller;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.property.editor.api.PropertyEditorChangeEvent;
-import org.uberfire.client.property.editor.api.PropertyEditorEvent;
-import org.uberfire.shared.propertyEditor.BeanPropertyEditorBuilderService;
+import org.uberfire.properties.editor.temp.model.PropertyEditorChangeEvent;
+import org.uberfire.properties.editor.temp.model.PropertyEditorEvent;
+import org.uberfire.properties.editor.temp.service.BeanPropertyEditorBuilderService;
 
 @Dependent
 @WorkbenchScreen(identifier = "PropertyEditorClientScreen")

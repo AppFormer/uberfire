@@ -15,8 +15,8 @@ import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
-import org.uberfire.client.property.editor.PropertyEditorWidget;
-import org.uberfire.client.property.editor.api.PropertyEditorEvent;
+import org.uberfire.properties.editor.PropertyEditorWidget;
+import org.uberfire.properties.editor.temp.model.PropertyEditorEvent;
 
 @Dependent
 @WorkbenchScreen(identifier = "PropertyEditorScreen")
@@ -30,7 +30,7 @@ public class PropertyEditorScreen
     @Inject
     Event<PropertyEditorEvent> propertyEditorEvent;
 
-    private  PropertyEditorWidget propertyEditorWidget;
+    private PropertyEditorWidget propertyEditorWidget;
 
     @PostConstruct
     public void init() {
