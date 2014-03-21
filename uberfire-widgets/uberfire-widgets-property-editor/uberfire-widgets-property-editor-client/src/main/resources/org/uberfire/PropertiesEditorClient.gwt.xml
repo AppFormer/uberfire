@@ -4,6 +4,8 @@
 <module>
   <inherits name="org.jboss.errai.bus.ErraiBus"/>
   <inherits name="org.uberfire.PropertiesEditorAPI"/>
+  <inherits name="com.github.gwtbootstrap.Bootstrap"/>
+  <inherits name="org.jboss.errai.ioc.Container"/>
 
   <source path='properties'/>
 

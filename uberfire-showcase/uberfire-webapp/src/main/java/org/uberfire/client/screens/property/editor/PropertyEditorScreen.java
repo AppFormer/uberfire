@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.properties.editor.PropertyEditorWidget;
-import org.uberfire.properties.editor.temp.model.PropertyEditorEvent;
+import org.uberfire.properties.editor.model.PropertyEditorEvent;
 
 @Dependent
 @WorkbenchScreen(identifier = "PropertyEditorScreen")

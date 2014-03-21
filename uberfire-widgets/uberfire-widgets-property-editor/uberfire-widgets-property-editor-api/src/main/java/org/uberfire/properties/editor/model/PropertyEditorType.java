@@ -80,4 +80,13 @@ public enum PropertyEditorType {
         return new ArrayList();
     }
 
+    public static PropertyEditorType getFromType( Class<?> type ) {
+        for ( PropertyEditorType candidate : PropertyEditorType.values() ) {
+            if ( candidate.isType( type ) ) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
 }

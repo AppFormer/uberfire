@@ -6,9 +6,10 @@ import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.github.gwtbootstrap.client.ui.event.ShowHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.properties.editor.temp.model.PropertyEditorCategory;
-import org.uberfire.properties.editor.temp.model.PropertyEditorEvent;
-import org.uberfire.properties.editor.temp.model.PropertyEditorFieldInfo;
+import org.uberfire.properties.editor.fields.PropertyEditorFieldType;
+import org.uberfire.properties.editor.model.PropertyEditorCategory;
+import org.uberfire.properties.editor.model.PropertyEditorEvent;
+import org.uberfire.properties.editor.model.PropertyEditorFieldInfo;
 import org.uberfire.properties.editor.widgets.AbstractPropertyEditorWidget;
 import org.uberfire.properties.editor.widgets.PropertyEditorErrorWidget;
 import org.uberfire.properties.editor.widgets.PropertyEditorItemLabel;
@@ -78,7 +79,8 @@ public class PropertyEditorHelper {
                                                          PropertyEditorItemsWidget parent ) {
         PropertyEditorItemWidget itemWidget = GWT.create( PropertyEditorItemWidget.class );
         PropertyEditorErrorWidget errorWidget = GWT.create( PropertyEditorErrorWidget.class );
-        Widget widget = field.getWidget();
+        PropertyEditorFieldType editorFieldType = PropertyEditorFieldType.getFieldTypeFrom( field );
+        Widget widget = editorFieldType.widget( field );
 
         createErrorHandlingInfraStructure( parent, itemWidget, errorWidget, widget );
         itemWidget.add( widget );

@@ -11,7 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.uberfire.properties.editor.temp.model.PropertyEditorEvent;
+import org.uberfire.properties.editor.model.PropertyEditorEvent;
 
 public class PropertyEditorWidget extends Composite {
 
