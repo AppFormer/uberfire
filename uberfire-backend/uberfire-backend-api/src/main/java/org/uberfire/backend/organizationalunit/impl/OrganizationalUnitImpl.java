@@ -16,6 +16,7 @@ public class OrganizationalUnitImpl implements OrganizationalUnit {
 
     private Collection<Repository> repositories = new ArrayList<Repository>();
     private Collection<String> roles = new ArrayList<String>();
+    private boolean requiresRefresh = true;
 
     public OrganizationalUnitImpl() {
     }
@@ -82,5 +83,21 @@ public class OrganizationalUnitImpl implements OrganizationalUnit {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + ( owner != null ? owner.hashCode() : 0 );
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "OrganizationalUnitImpl [name=" + name + ", owner=" + owner + ", repositories=" + repositories
+                + ", roles=" + roles + "]";
+    }
+
+    @Override
+    public void markAsCached() {
+        this.requiresRefresh = false;
+    }
+
+    @Override
+    public boolean requiresRefresh() {
+        return requiresRefresh;
     }
 }

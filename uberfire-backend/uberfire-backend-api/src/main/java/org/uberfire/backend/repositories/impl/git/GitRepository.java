@@ -25,6 +25,8 @@ public class GitRepository implements Repository {
 
     private Collection<String> roles = new ArrayList<String>();
 
+    private boolean requiresRefresh = true;
+
     public GitRepository() {
     }
 
@@ -149,5 +151,22 @@ public class GitRepository implements Repository {
         result = 31 * result + ( root != null ? root.hashCode() : 0 );
         result = 31 * result + ( roles != null ? roles.hashCode() : 0 );
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "GitRepository [alias=" + alias + ", environment=" + environment + ", root=" + root + ", roles=" + roles
+                + ", publicURI=" + publicURIs + "]";
+    }
+
+
+    @Override
+    public void markAsCached() {
+        this.requiresRefresh = false;
+    }
+
+    @Override
+    public boolean requiresRefresh() {
+        return requiresRefresh;
     }
 }

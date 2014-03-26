@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.commons.data.Cacheable;
 import org.uberfire.security.authz.RuntimeResource;
 
-public interface Repository extends RuntimeResource {
+public interface Repository extends RuntimeResource,
+                                    Cacheable {
 
     String getAlias();
 
