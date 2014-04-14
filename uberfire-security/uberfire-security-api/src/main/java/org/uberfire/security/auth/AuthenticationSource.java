@@ -16,16 +16,33 @@
 
 package org.uberfire.security.auth;
 
+import java.util.List;
 import java.util.Map;
 
+import org.uberfire.security.Role;
 import org.uberfire.security.SecurityContext;
 
 public interface AuthenticationSource {
 
-    void initialize(final Map<String, ?> options);
+    void initialize( final Map<String, ?> options );
 
-    boolean supportsCredential(final Credential credential);
+    boolean supportsCredential( final Credential credential );
 
-    boolean authenticate(final Credential credential, final SecurityContext securityContext);
+    List<Principal> loadPrincipals();
+
+    boolean authenticate( final Credential credential,
+                          final SecurityContext securityContext );
+
+    boolean supportsAddUser();
+
+    void addUser( final Credential credential );
+
+    boolean supportsUpdatePassword();
+
+    void updatePassword( final Credential credential );
+
+    boolean supportsDeleteUser();
+
+    void deleteUser( final Credential credential );
 
 }

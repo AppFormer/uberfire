@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.uberfire.security.auth.Credential;
 import org.uberfire.security.auth.Principal;
 import org.uberfire.security.auth.RoleProvider;
 import org.uberfire.security.impl.RoleImpl;
+import org.uberfire.security.impl.auth.PrincipalImpl;
 import org.uberfire.security.impl.auth.UsernamePasswordCredential;
 
 import static org.uberfire.commons.validation.Preconditions.*;
@@ -35,10 +37,13 @@ public class JAASAuthenticationSource implements AuthenticationSource,
     private String rolePrincipleName = DEFAULT_ROLE_PRINCIPLE_NAME;
     private final ThreadLocal<Subject> subjects = new ThreadLocal<Subject>();
 
+    private Map<String, ?> options = new HashMap<String, Object>();
+
     private String domain = "ApplicationRealm";
 
     @Override
     public void initialize( Map<String, ?> options ) {
+        this.options = options;
         if ( options.containsKey( AUTH_DOMAIN_KEY ) ) {
             domain = (String) options.get( AUTH_DOMAIN_KEY );
         }
@@ -58,10 +63,12 @@ public class JAASAuthenticationSource implements AuthenticationSource,
     @Override
     public boolean authenticate( final Credential credential,
                                  final SecurityContext securityContext ) {
-        final UsernamePasswordCredential usernamePasswd = checkInstanceOf( "credential", credential, UsernamePasswordCredential.class );
+        final UsernamePasswordCredential usernamePassword = checkInstanceOf( "credential",
+                                                                             credential,
+                                                                             UsernamePasswordCredential.class );
 
         try {
-            final LoginContext loginContext = new LoginContext( domain, new UsernamePasswordCallbackHandler( usernamePasswd ) );
+            final LoginContext loginContext = new LoginContext( domain, new UsernamePasswordCallbackHandler( usernamePassword ) );
             loginContext.login();
             subjects.set( loginContext.getSubject() );
 
@@ -70,6 +77,57 @@ public class JAASAuthenticationSource implements AuthenticationSource,
         }
 
         return false;
+    }
+
+    @Override
+    public List<Principal> loadPrincipals() {
+        final List<Principal> principals = new ArrayList<Principal>();
+        try {
+            final Subject subject = subjects.get();
+
+            if ( subject != null ) {
+                final Set<java.security.Principal> jaasPrincipals = subject.getPrincipals();
+                if ( jaasPrincipals != null ) {
+                    for ( java.security.Principal jaccPrincipal : jaasPrincipals ) {
+                        principals.add( new PrincipalImpl( jaccPrincipal.getName() ) );
+                    }
+                }
+            }
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        }
+
+        return principals;
+    }
+
+    @Override
+    public boolean supportsAddUser() {
+        return false;
+    }
+
+    @Override
+    public void addUser( final Credential credential ) {
+        throw new UnsupportedOperationException( "addUser() is not supported." );
+    }
+
+    @Override
+    public boolean supportsUpdatePassword() {
+        return false;
+    }
+
+    @Override
+    public void updatePassword( final Credential credential ) {
+        throw new UnsupportedOperationException( "updatePassword() is not supported." );
+    }
+
+    @Override
+    public boolean supportsDeleteUser() {
+        return false;
+    }
+
+    @Override
+    public void deleteUser( final Credential credential ) {
+        throw new UnsupportedOperationException( "deleteUser() is not supported." );
     }
 
     @Override
@@ -102,6 +160,17 @@ public class JAASAuthenticationSource implements AuthenticationSource,
             throw new RuntimeException( e );
         }
         return roles;
+    }
+
+    @Override
+    public boolean supportsRoleUpdates() {
+        return false;
+    }
+
+    @Override
+    public void updateRoles( final Principal principal,
+                             final List<Role> roles ) {
+        throw new UnsupportedOperationException( "updateRoles() is not supported." );
     }
 
     class UsernamePasswordCallbackHandler implements CallbackHandler {
