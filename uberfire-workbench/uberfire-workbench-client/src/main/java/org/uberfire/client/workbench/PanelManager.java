@@ -17,6 +17,10 @@ import org.uberfire.workbench.model.menu.Menus;
  */
 public interface PanelManager {
 
+    PerspectiveActivity getPerspectiveActivity();
+
+    void setPerspectiveActivity(final PerspectiveActivity perspectiveActivity);
+
     PerspectiveDefinition getPerspective();
 
     void setPerspective( final PerspectiveDefinition perspective );

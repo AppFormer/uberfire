@@ -63,6 +63,8 @@ public abstract class AbstractPanelManagerImpl implements PanelManager  {
 
     PerspectiveDefinition perspective;
 
+    PerspectiveActivity perspectiveActivity;
+
     Map<PartDefinition, WorkbenchPartPresenter> mapPartDefinitionToPresenter = new HashMap<PartDefinition, WorkbenchPartPresenter>();
 
     Map<PanelDefinition, WorkbenchPanelPresenter> mapPanelDefinitionToPresenter = new HashMap<PanelDefinition, WorkbenchPanelPresenter>();
@@ -101,6 +103,16 @@ public abstract class AbstractPanelManagerImpl implements PanelManager  {
             }
             container.setWidget( newPresenter.getPanelView() );
         }
+    }
+
+    @Override
+    public void setPerspectiveActivity(PerspectiveActivity perspectiveActivity) {
+        this.perspectiveActivity = perspectiveActivity;
+    }
+
+    @Override
+    public PerspectiveActivity getPerspectiveActivity() {
+        return perspectiveActivity;
     }
 
     protected abstract BeanFactory getBeanFactory();
