@@ -155,6 +155,7 @@ public class JSWorkbenchPerspectiveActivity implements PerspectiveActivity {
         onStartup( place );
 
         nativePerspective.getPanelManager().setPerspective( perspective );
+        nativePerspective.getPanelManager().setPerspectiveActivity( this );
 
         Set<PartDefinition> parts = nativePerspective.getPanelManager().getRoot().getParts();
         for ( PartDefinition part : parts ) {

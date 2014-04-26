@@ -133,6 +133,7 @@ public abstract class AbstractWorkbenchPerspectiveActivity extends AbstractActiv
     private void initialisePerspective( final PerspectiveDefinition perspective ) {
 
         panelManager.setPerspective( perspective );
+        panelManager.setPerspectiveActivity( this );
 
         Set<PartDefinition> parts = panelManager.getRoot().getParts();
         for ( PartDefinition part : parts ) {
