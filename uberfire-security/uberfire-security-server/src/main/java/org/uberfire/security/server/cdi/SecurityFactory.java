@@ -23,9 +23,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 
+import org.uberfire.commons.validation.PortablePreconditions;
 import org.uberfire.security.Identity;
 import org.uberfire.security.Role;
 import org.uberfire.security.Subject;
+import org.uberfire.security.auth.AuthenticationSource;
+import org.uberfire.security.auth.RoleProvider;
 import org.uberfire.security.authz.AuthorizationManager;
 import org.uberfire.security.impl.IdentityImpl;
 import org.uberfire.security.impl.RoleImpl;
@@ -37,14 +40,32 @@ public class SecurityFactory {
     }};
     private static final ThreadLocal<Subject> subjects = new ThreadLocal<Subject>();
 
-    static private AuthorizationManager authzManager = null;
+    private static AuthorizationManager authzManager = null;
+
+    private static List<AuthenticationSource> authenticationSources = new ArrayList<AuthenticationSource>();
+
+    private static List<RoleProvider> roleProviders = new ArrayList<RoleProvider>();
 
     public static void setSubject( final Subject subject ) {
         subjects.set( subject );
     }
 
     public static void setAuthzManager( final AuthorizationManager authzManager ) {
+        PortablePreconditions.checkNotNull( "authzManager",
+                                            authzManager );
         SecurityFactory.authzManager = authzManager;
+    }
+
+    public static void addAuthenticationSource( final AuthenticationSource authenticationSource ) {
+        PortablePreconditions.checkNotNull( "authenticationSource",
+                                            authenticationSource );
+        SecurityFactory.authenticationSources.add( authenticationSource );
+    }
+
+    public static void addRoleProvider( final RoleProvider roleProvider ) {
+        PortablePreconditions.checkNotNull( "roleProvider",
+                                            roleProvider );
+        SecurityFactory.roleProviders.add( roleProvider );
     }
 
     @Produces
@@ -61,6 +82,20 @@ public class SecurityFactory {
     @AppResourcesAuthz
     public static AuthorizationManager getAuthzManager() {
         return authzManager;
+    }
+
+    @Produces
+    @ApplicationScoped
+    @AppAuthenticationStores
+    public static List<AuthenticationSource> getAuthenticationSources() {
+        return authenticationSources;
+    }
+
+    @Produces
+    @ApplicationScoped
+    @AppRoleProviders
+    public static List<RoleProvider> getRoleProviders() {
+        return roleProviders;
     }
 
 }

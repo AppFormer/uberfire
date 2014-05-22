@@ -27,47 +27,47 @@ import org.uberfire.security.auth.AuthenticationSource;
 
 public class JDBCAuthenticationSource extends AbstractDatabaseAuthSource implements AuthenticationSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JDBCAuthenticationSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger( JDBCAuthenticationSource.class );
 
     private String dbDriver;
     private String dbUrl;
     private String dbUserName;
     private String dbPassword;
 
-    public void initialize(final Map<String, ?> options) {
+    public void initialize( final Map<String, ?> options ) {
         try {
-            dbDriver = (String) options.get("dbDriver");
-            dbUrl = (String) options.get("dbUrl");
-            dbUserName = (String) options.get("dbUserName");
-            dbPassword = (String) options.get("dbPassword");
+            dbDriver = (String) options.get( "dbDriver" );
+            dbUrl = (String) options.get( "dbUrl" );
+            dbUserName = (String) options.get( "dbUserName" );
+            dbPassword = (String) options.get( "dbPassword" );
 
-            if (dbUserName == null) {
+            if ( dbUserName == null ) {
                 dbUserName = "";
             }
 
-            if (dbPassword == null) {
+            if ( dbPassword == null ) {
                 dbPassword = "";
             }
 
-            if (dbDriver != null) {
-                Class.forName(dbDriver);
+            if ( dbDriver != null ) {
+                Class.forName( dbDriver );
             }
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e.toString(), e);
+        } catch ( ClassNotFoundException e ) {
+            throw new IllegalStateException( e.toString(), e );
         }
     }
 
     public Connection getConnection() {
-        if (!((dbDriver != null) && (dbUrl != null))) {
-            throw new IllegalStateException("Database connection information not configured");
+        if ( !( ( dbDriver != null ) && ( dbUrl != null ) ) ) {
+            throw new IllegalStateException( "Database connection information not configured" );
         }
 
-        LOG.debug("Connecting using dbDriver=" + dbDriver + "+ dbUserName=" + dbUserName + ", dbPassword=" + dbUrl);
+        LOG.debug( "Connecting using dbDriver=" + dbDriver + "+ dbUserName=" + dbUserName + ", dbPassword=" + dbUrl );
 
         try {
-            return DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-        } catch (final SQLException e) {
-            throw new IllegalStateException(e.toString(), e);
+            return DriverManager.getConnection( dbUrl, dbUserName, dbPassword );
+        } catch ( final SQLException e ) {
+            throw new IllegalStateException( e.toString(), e );
         }
     }
 

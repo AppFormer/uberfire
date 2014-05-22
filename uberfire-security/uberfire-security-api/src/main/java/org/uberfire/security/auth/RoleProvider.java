@@ -23,8 +23,13 @@ import org.uberfire.security.Role;
 
 public interface RoleProvider {
 
-    void initialize(final Map<String, ?> options);
+    void initialize( final Map<String, ?> options );
 
-    List<Role> loadRoles(final Principal principal);
+    List<Role> loadRoles( final Principal principal );
+
+    boolean supportsRoleUpdates();
+
+    void updateRoles( final Principal principal,
+                      final List<Role> roles );
 
 }
