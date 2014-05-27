@@ -61,7 +61,6 @@ import org.eclipse.jgit.transport.PreReceiveHook;
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
 import org.eclipse.jgit.transport.ServiceMayNotContinueException;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.transport.resolver.ReceivePackFactory;
 import org.eclipse.jgit.transport.resolver.RepositoryResolver;
 import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException;
@@ -116,6 +115,7 @@ import org.uberfire.java.nio.fs.jgit.daemon.git.Daemon;
 import org.uberfire.java.nio.fs.jgit.daemon.git.DaemonClient;
 import org.uberfire.java.nio.fs.jgit.daemon.ssh.BaseGitCommand;
 import org.uberfire.java.nio.fs.jgit.daemon.ssh.GitSSHService;
+import org.uberfire.java.nio.fs.jgit.util.AutoAnsweredUsernamePasswordCredentialsProvider;
 import org.uberfire.java.nio.fs.jgit.util.CommitContent;
 import org.uberfire.java.nio.fs.jgit.util.CopyCommitContent;
 import org.uberfire.java.nio.fs.jgit.util.DefaultCommitContent;
@@ -351,7 +351,7 @@ public class JGitFileSystemProvider implements FileSystemProvider,
 
     public JGitFileSystemProvider() {
         loadConfig();
-        CredentialsProvider.setDefault( new UsernamePasswordCredentialsProvider( "guest", "" ) );
+        CredentialsProvider.setDefault( new AutoAnsweredUsernamePasswordCredentialsProvider( "guest", "" ) );
 
         if ( DAEMON_ENABLED ) {
             fullHostNames.put( "git", DAEMON_HOST_NAME + ":" + DAEMON_PORT );
@@ -1755,9 +1755,9 @@ public class JGitFileSystemProvider implements FileSystemProvider,
         if ( env != null ) {
             if ( env.containsKey( USER_NAME ) ) {
                 if ( env.containsKey( PASSWORD ) ) {
-                    return new UsernamePasswordCredentialsProvider( env.get( USER_NAME ).toString(), env.get( PASSWORD ).toString() );
+                    return new AutoAnsweredUsernamePasswordCredentialsProvider( env.get( USER_NAME ).toString(), env.get( PASSWORD ).toString() );
                 }
-                return new UsernamePasswordCredentialsProvider( env.get( USER_NAME ).toString(), "" );
+                return new AutoAnsweredUsernamePasswordCredentialsProvider( env.get( USER_NAME ).toString(), "" );
             }
         }
         return CredentialsProvider.getDefault();
