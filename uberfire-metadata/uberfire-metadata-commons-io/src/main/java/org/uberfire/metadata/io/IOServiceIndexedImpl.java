@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uberfire.commons.async.DescriptiveRunnable;
+import org.uberfire.commons.async.SimpleAsyncExecutorService;
 import org.uberfire.commons.lock.LockService;
 import org.uberfire.io.FileSystemType;
 import org.uberfire.io.IOWatchService;
@@ -168,7 +170,13 @@ public class IOServiceIndexedImpl extends IOServiceDotFileImpl {
         }
         watchedList.add( fs );
         final WatchService ws = fs.newWatchService();
-        new Thread( threadGroup, "IOServiceIndexedImpl(" + ws.toString() + ")" ) {
+
+        SimpleAsyncExecutorService.getDefaultInstance().execute( new DescriptiveRunnable() {
+            @Override
+            public String getDescription() {
+                return "IOServiceIndexedImpl(" + ws.toString() + ")";
+            }
+
             @Override
             public void run() {
                 while ( !isDisposed && !ws.isClose() ) {
@@ -209,7 +217,7 @@ public class IOServiceIndexedImpl extends IOServiceDotFileImpl {
                 }
                 ws.close();
             }
-        }.start();
+        } );
     }
 
     private void indexIfFresh( final FileSystem fs ) {
