@@ -3,22 +3,18 @@ package org.uberfire.commons.async;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Resource;
-import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.naming.InitialContext;
 
 import static javax.ejb.TransactionAttributeType.*;
 
-@Stateless
+@Singleton
+@Startup
 @TransactionAttribute(NOT_SUPPORTED)
 public class SimpleAsyncExecutorService {
-
-    @Resource
-    SessionContext sessionContext;
 
     private final ExecutorService executorService;
 
