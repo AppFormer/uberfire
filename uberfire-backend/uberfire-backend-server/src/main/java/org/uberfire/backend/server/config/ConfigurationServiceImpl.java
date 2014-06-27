@@ -6,9 +6,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PostConstruct;
@@ -83,6 +86,8 @@ public class ConfigurationServiceImpl implements ConfigurationService,
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+    private final Set<Future<?>> jobs = new CopyOnWriteArraySet<Future<?>>();
+
     private ConfigServiceWatchServiceExecutor executor = null;
 
     private CheckConfigurationUpdates configUpdates = null;
@@ -116,7 +121,7 @@ public class ConfigurationServiceImpl implements ConfigurationService,
             watchService = fs.newWatchService();
             configUpdates = new CheckConfigurationUpdates( watchService );
             final ConfigServiceWatchServiceExecutor configServiceWatchServiceExecutor = getWatchServiceExecutor();
-            executorService.execute( new DescriptiveRunnable() {
+            jobs.add(executorService.submit(new DescriptiveRunnable() {
                 @Override
                 public String getDescription() {
                     return configUpdates.getDescription();
@@ -124,9 +129,9 @@ public class ConfigurationServiceImpl implements ConfigurationService,
 
                 @Override
                 public void run() {
-                    configUpdates.execute( configServiceWatchServiceExecutor );
+                    configUpdates.execute(configServiceWatchServiceExecutor);
                 }
-            } );
+            }));
         }
     }
 
@@ -137,6 +142,11 @@ public class ConfigurationServiceImpl implements ConfigurationService,
         }
         if ( watchService != null ) {
             watchService.close();
+        }
+        for (Future<?> job : jobs) {
+            if (!job.isCancelled() && !job.isDone()) {
+                job.cancel(true);
+            }
         }
         executorService.shutdown(); // Disable new tasks from being submitted
         try {
