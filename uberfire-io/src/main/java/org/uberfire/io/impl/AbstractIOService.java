@@ -16,9 +16,6 @@
 
 package org.uberfire.io.impl;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.java.nio.file.StandardOpenOption.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStream;
@@ -70,6 +67,9 @@ import org.uberfire.java.nio.file.attribute.FileTime;
 import org.uberfire.java.nio.file.spi.FileSystemProvider;
 import org.uberfire.java.nio.security.SecurityAware;
 import org.uberfire.security.authz.AuthorizationManager;
+
+import static org.uberfire.commons.validation.PortablePreconditions.*;
+import static org.uberfire.java.nio.file.StandardOpenOption.*;
 
 public abstract class AbstractIOService implements IOServiceIdentifiable {
 
@@ -141,29 +141,35 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     }
 
     @Override
-    public void startBatch( final Option... options ) {
+    public void startBatch( FileSystem fs,
+                            final Option... options ) {
         lockService.lock();
+        setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.BATCH );
         if ( !fileSystems.isEmpty() ) {
             cleanupClosedFileSystems();
-            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
-            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
-            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
-            setAttribute( firstRootOfARandomFs, FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.BATCH );
-            if ( options != null && options.length == 1 ) {
-                setAttribute( firstRootOfARandomFs, FileSystemState.FILE_SYSTEM_STATE_ATTR, options[ 0 ] );
-            }
+//            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
+//            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
+//            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
+
+          //
+            //???
+//            if ( options != null && options.length == 1 ) {
+//                setAttribute( fs, FileSystemState.FILE_SYSTEM_STATE_ATTR, options[ 0 ] );
+//            }
         }
     }
 
     @Override
-    public void endBatch( final Option... options ) {
+    public void endBatch( FileSystem fs,
+                          final Option... options ) {
         lockService.unlock();
+        setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
         if ( !fileSystems.isEmpty() ) {
             cleanupClosedFileSystems();
-            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
-            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
-            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
-            setAttribute( firstRootOfARandomFs, FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
+//            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
+//            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
+//            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
+//            setAttribute( firstRootOfARandomFs, FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
         }
     }
 
@@ -259,8 +265,8 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public FileSystem newFileSystem( final URI uri,
                                      final Map<String, ?> env,
                                      final FileSystemType type )
-                                             throws IllegalArgumentException, FileSystemAlreadyExistsException, ProviderNotFoundException,
-                                             IOException, SecurityException {
+            throws IllegalArgumentException, FileSystemAlreadyExistsException, ProviderNotFoundException,
+            IOException, SecurityException {
         try {
             final FileSystem fs = FileSystems.newFileSystem( uri, env );
             return registerFS( fs, type );
@@ -300,8 +306,8 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     @Override
     public InputStream newInputStream( final Path path,
                                        final OpenOption... options )
-                                               throws IllegalArgumentException, NoSuchFileException, UnsupportedOperationException,
-                                               IOException, SecurityException {
+            throws IllegalArgumentException, NoSuchFileException, UnsupportedOperationException,
+            IOException, SecurityException {
         return Files.newInputStream( path, options );
     }
 
@@ -313,24 +319,24 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
 
     @Override
     public DirectoryStream<Path> newDirectoryStream( final Path dir,
-            final DirectoryStream.Filter<Path> filter )
-                    throws IllegalArgumentException, NotDirectoryException, IOException, SecurityException {
+                                                     final DirectoryStream.Filter<Path> filter )
+            throws IllegalArgumentException, NotDirectoryException, IOException, SecurityException {
         return Files.newDirectoryStream( dir, filter );
     }
 
     @Override
     public OutputStream newOutputStream( final Path path,
                                          final OpenOption... options )
-                                                 throws IllegalArgumentException, UnsupportedOperationException,
-                                                 IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException,
+            IOException, SecurityException {
         return Files.newOutputStream( path, options );
     }
 
     @Override
     public SeekableByteChannel newByteChannel( final Path path,
                                                final OpenOption... options )
-                                                       throws IllegalArgumentException, UnsupportedOperationException,
-                                                       FileAlreadyExistsException, IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException,
+            FileAlreadyExistsException, IOException, SecurityException {
         return Files.newByteChannel( path, options );
     }
 
@@ -350,7 +356,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public Path createTempFile( final String prefix,
                                 final String suffix,
                                 final FileAttribute<?>... attrs )
-                                        throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
         return Files.createTempFile( prefix, suffix, attrs );
     }
 
@@ -359,14 +365,14 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                                 final String prefix,
                                 final String suffix,
                                 final FileAttribute<?>... attrs )
-                                        throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
         return Files.createTempFile( dir, prefix, suffix, attrs );
     }
 
     @Override
     public Path createTempDirectory( final String prefix,
                                      final FileAttribute<?>... attrs )
-                                             throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
         return Files.createTempDirectory( prefix, attrs );
     }
 
@@ -374,7 +380,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public Path createTempDirectory( final Path dir,
                                      final String prefix,
                                      final FileAttribute<?>... attrs )
-                                             throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, IOException, SecurityException {
         return Files.createTempDirectory( dir, prefix, attrs );
     }
 
@@ -395,7 +401,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public Path setAttribute( final Path path,
                               final String attribute,
                               final Object value )
-                                      throws UnsupportedOperationException, IllegalArgumentException, ClassCastException, IOException, SecurityException {
+            throws UnsupportedOperationException, IllegalArgumentException, ClassCastException, IOException, SecurityException {
         Files.setAttribute( path, attribute, value );
         return path;
     }
@@ -403,8 +409,8 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     @Override
     public Path setAttributes( final Path path,
                                final Map<String, Object> attrs )
-                                       throws UnsupportedOperationException, IllegalArgumentException,
-                                       ClassCastException, IOException, SecurityException {
+            throws UnsupportedOperationException, IllegalArgumentException,
+            ClassCastException, IOException, SecurityException {
         return setAttributes( path, convert( attrs ) );
     }
 
@@ -429,15 +435,15 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     @Override
     public boolean isSameFile( final Path path,
                                final Path path2 )
-                                       throws IllegalArgumentException, IOException, SecurityException {
+            throws IllegalArgumentException, IOException, SecurityException {
         return Files.isSameFile( path, path2 );
     }
 
     @Override
     public synchronized Path createFile( final Path path,
                                          final FileAttribute<?>... attrs )
-                                                 throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
-                                                 IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
+            IOException, SecurityException {
 
         try {
             newByteChannel( path, CREATE_NEW_FILE_OPTIONS, attrs ).close();
@@ -451,14 +457,14 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     @Override
     public BufferedReader newBufferedReader( final Path path,
                                              final Charset cs )
-                                                     throws IllegalArgumentException, NoSuchFileException, IOException, SecurityException {
+            throws IllegalArgumentException, NoSuchFileException, IOException, SecurityException {
         return Files.newBufferedReader( path, cs );
     }
 
     @Override
     public long copy( final Path source,
                       final OutputStream out )
-                              throws IOException, SecurityException {
+            throws IOException, SecurityException {
         return Files.copy( source, out );
     }
 
@@ -476,8 +482,8 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
 
     @Override
     public List<String> readAllLines( final Path path,
-            final Charset cs )
-                    throws IllegalArgumentException, NoSuchFileException, IOException, SecurityException {
+                                      final Charset cs )
+            throws IllegalArgumentException, NoSuchFileException, IOException, SecurityException {
         return Files.readAllLines( path, cs );
     }
 
@@ -501,7 +507,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public BufferedWriter newBufferedWriter( final Path path,
                                              final Charset cs,
                                              final OpenOption... options )
-                                                     throws IllegalArgumentException, IOException, UnsupportedOperationException, SecurityException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException, SecurityException {
         return Files.newBufferedWriter( path, cs, options );
     }
 
@@ -509,7 +515,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public long copy( final InputStream in,
                       final Path target,
                       final CopyOption... options )
-                              throws IOException, FileAlreadyExistsException, DirectoryNotEmptyException, UnsupportedOperationException, SecurityException {
+            throws IOException, FileAlreadyExistsException, DirectoryNotEmptyException, UnsupportedOperationException, SecurityException {
         return Files.copy( in, target, options );
     }
 
@@ -517,7 +523,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public Path write( final Path path,
                        final byte[] bytes,
                        final OpenOption... options )
-                               throws IOException, UnsupportedOperationException, SecurityException {
+            throws IOException, UnsupportedOperationException, SecurityException {
         return write( path, bytes, new HashSet<OpenOption>( Arrays.asList( options ) ) );
     }
 
@@ -543,7 +549,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                        final String content,
                        final Charset cs,
                        final OpenOption... options )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
         return write( path, content.getBytes( cs ), new HashSet<OpenOption>( Arrays.asList( options ) ) );
     }
 
@@ -551,7 +557,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     public Path write( final Path path,
                        final String content,
                        final OpenOption... options )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
         return write( path, content, UTF_8, options );
     }
 
@@ -560,7 +566,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                        final String content,
                        final Map<String, ?> attrs,
                        final OpenOption... options )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
         return write( path, content, UTF_8, attrs, options );
     }
 
@@ -570,7 +576,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                        final Charset cs,
                        final Map<String, ?> attrs,
                        final OpenOption... options )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
         return write( path, content, cs, new HashSet<OpenOption>( Arrays.asList( options ) ), convert( attrs ) );
     }
 
@@ -628,7 +634,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                        final String content,
                        final Set<? extends OpenOption> options,
                        final FileAttribute<?>... attrs )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
         return write( path, content, UTF_8, options, attrs );
     }
 
@@ -638,7 +644,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
                        final Charset cs,
                        final Set<? extends OpenOption> options,
                        final FileAttribute<?>... attrs )
-                               throws IllegalArgumentException, IOException, UnsupportedOperationException {
+            throws IllegalArgumentException, IOException, UnsupportedOperationException {
 
         return write( path, content.getBytes( cs ), options, attrs );
     }
@@ -667,7 +673,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     }
 
     protected abstract Set<? extends OpenOption> buildOptions( final Set<? extends OpenOption> options,
-            final OpenOption... other );
+                                                               final OpenOption... other );
 
     @Override
     public String getId() {

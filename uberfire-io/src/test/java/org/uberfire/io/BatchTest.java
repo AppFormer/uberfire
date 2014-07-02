@@ -1,13 +1,12 @@
 package org.uberfire.io;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Random;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -15,18 +14,21 @@ import org.junit.Test;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.base.version.VersionAttributeView;
+import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 
-import com.google.common.collect.ImmutableMap;
+import static org.junit.Assert.*;
 
 public class BatchTest {
 
     IOService ioService;
     private File path;
+    FileSystem fs1;
+    FileSystem fs2;
 
     @Before
     public void setup() throws IOException {
@@ -40,11 +42,11 @@ public class BatchTest {
 
         final URI newRepo = URI.create( "git://amend-repo-test" );
 
-        ioService.newFileSystem( newRepo, ImmutableMap.<String, Object>of() );
+        fs1 = ioService.newFileSystem( newRepo, ImmutableMap.<String, Object>of() );
 
         final URI newRepo2 = URI.create( "git://check-amend-repo-test" );
 
-        ioService.newFileSystem( newRepo2, ImmutableMap.of( "init", "true" ) );
+        fs2 = ioService.newFileSystem( newRepo2, ImmutableMap.of( "init", "true" ) );
     }
 
     @After
@@ -89,7 +91,7 @@ public class BatchTest {
         assertNotNull( vinit2 );
         assertEquals( 2, vinit2.readAttributes().history().records().size() );
 
-        ioService.startBatch();
+        ioService.startBatch( init.getFileSystem() );
         final Path path = ioService.get( URI.create( "git://amend-repo-test/mybatch" + new Random( 10L ).nextInt() + ".txt" ) );
         final Path path2 = ioService.get( URI.create( "git://amend-repo-test/mybatch2" + new Random( 10L ).nextInt() + ".txt" ) );
         ioService.write( path, "ooooo!" );
@@ -100,7 +102,7 @@ public class BatchTest {
         assertNull( ws.poll() );
         ioService.write( path2, " sdfsdg sdg ooooo222!" );
         assertNull( ws.poll() );
-        ioService.endBatch();
+        ioService.endBatch( init.getFileSystem() );
         {
             List<WatchEvent<?>> events = ws.poll().pollEvents();
             assertEquals( 2, events.size() ); //adds files
@@ -132,14 +134,14 @@ public class BatchTest {
 
         final WatchService ws = f1.getFileSystem().newWatchService();
 
-        ioService.startBatch();
+        ioService.startBatch( f1.getFileSystem() );
         ioService.write( f1, "f1-u1!" );
         assertNull( ws.poll() );
         ioService.write( f2, "f2-u1!" );
         assertNull( ws.poll() );
         ioService.write( f3, "f3-u1!" );
         assertNull( ws.poll() );
-        ioService.endBatch();
+        ioService.endBatch( f1.getFileSystem() );
 
         {
             List<WatchEvent<?>> events = ws.poll().pollEvents();
@@ -158,14 +160,14 @@ public class BatchTest {
             assertEquals( 1, v3.readAttributes().history().records().size() );
         }
 
-        ioService.startBatch();
+        ioService.startBatch( f1.getFileSystem() );
         ioService.write( f1, "f1-u1!" );
         assertNull( ws.poll() );
         ioService.write( f2, "f2-u2!" );
         assertNull( ws.poll() );
         ioService.write( f3, "f3-u2!" );
         assertNull( ws.poll() );
-        ioService.endBatch();
+        ioService.endBatch( f1.getFileSystem() );
 
         {
             List<WatchEvent<?>> events = ws.poll().pollEvents();
@@ -184,4 +186,35 @@ public class BatchTest {
             assertEquals( 2, v3.readAttributes().history().records().size() );
         }
     }
+
+    @Test
+    public void batchTest() throws IOException, InterruptedException {
+        final Path init = ioService.get( URI.create( "git://amend-repo-test/readme.txt" ) );
+        ioService.write( init, "init!", new CommentedOption( "User Tester", "message1" ) );
+
+        assertFalse( fs1.isOnBatch() );
+        ioService.startBatch( fs1 );
+        assertTrue( fs1.isOnBatch() );
+        ioService.endBatch( fs1 );
+        assertFalse( fs1.isOnBatch() );
+    }
+
+    @Test
+    public void justOneFSOnBatchTest() throws IOException, InterruptedException {
+        Path init = ioService.get( URI.create( "git://amend-repo-test/readme.txt" ) );
+        ioService.write( init, "init!", new CommentedOption( "User Tester", "message1" ) );
+
+        init = ioService.get( URI.create( "git://check-amend-repo-test/readme.txt" ) );
+        ioService.write( init, "init!", new CommentedOption( "User Tester", "message1" ) );
+
+        assertFalse( fs1.isOnBatch() );
+        assertFalse( fs2.isOnBatch() );
+        ioService.startBatch( fs1 );
+        assertTrue( fs1.isOnBatch() );
+        assertFalse( fs2.isOnBatch() );
+        ioService.endBatch( fs1 );
+        assertFalse( fs1.isOnBatch() );
+        assertFalse( fs2.isOnBatch() );
+    }
+
 }

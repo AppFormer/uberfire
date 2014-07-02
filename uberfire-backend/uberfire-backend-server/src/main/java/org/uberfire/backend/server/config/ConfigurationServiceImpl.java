@@ -161,12 +161,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final CommentedOption commentedOption = new CommentedOption( getIdentityName(),
                 "Created config " + filePath.getFileName() );
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
         //Invalidate cache if a new item has been created; otherwise cached value is stale
         configuration.remove( configGroup.getType() );
@@ -183,12 +183,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final CommentedOption commentedOption = new CommentedOption( getIdentityName(),
                 "Updated config " + filePath.getFileName() );
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
         //Invalidate cache if a new item has been created; otherwise cached value is stale
         configuration.remove( configGroup.getType() );
@@ -210,13 +210,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
         boolean result;
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             result = ioService.deleteIfExists( filePath );
             if ( result ) {
                 updateLastModified();
             }
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
 
         return result;
