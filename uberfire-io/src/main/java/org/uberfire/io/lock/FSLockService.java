@@ -4,11 +4,11 @@ import org.uberfire.java.nio.file.FileSystem;
 
 public interface FSLockService {
 
-    void lock( FileSystem fs ) throws InterruptedException;
+    void lock( FileSystem fs );
 
     void unlock( FileSystem fs );
 
-    void waitForUnlock( FileSystem fs ) throws InterruptedException;
+    void waitForUnlock( FileSystem fs );
 
-    void removeFromService(FileSystem fs);
+    void removeFromService( FileSystem fs );
 }

@@ -14,7 +14,7 @@ public class FSLockServiceImpl implements FSLockService {
     private final ConcurrentHashMap<FileSystem, FSLock> lockControl = new ConcurrentHashMap<FileSystem, FSLock>();
 
     @Override
-    public void lock( FileSystem fs ) throws InterruptedException {
+    public void lock( FileSystem fs ) {
         lock.lock();
         try {
             FSLock fSLock = getFSLock( fs );
@@ -41,7 +41,7 @@ public class FSLockServiceImpl implements FSLockService {
     }
 
     @Override
-    public void waitForUnlock( FileSystem fs ) throws InterruptedException {
+    public void waitForUnlock( FileSystem fs ) {
         FSLock fsLock = lockControl.get( fs );
         if ( fsLock != null ) {
             fsLock.waitForUnlock();
@@ -68,6 +68,7 @@ public class FSLockServiceImpl implements FSLockService {
 
         private Condition conditional;
         private Boolean locked;
+        private Thread currentThread;
 
         FSLock() {
             this.locked = Boolean.FALSE;
@@ -78,21 +79,41 @@ public class FSLockServiceImpl implements FSLockService {
             return locked;
         }
 
-        void lock() throws InterruptedException {
-            if ( locked ) {
-                conditional.await();
+        void lock() {
+            if ( locked && !lockedByMe() ) {
+                try {
+                    conditional.await();
+                } catch ( InterruptedException e ) {
+                    throw new FSLockServiceException( e );
+                }
             }
             this.locked = Boolean.TRUE;
+            this.currentThread = Thread.currentThread();
+        }
+
+        private boolean lockedByMe() {
+            return this.currentThread == null || currentThread == Thread.currentThread();
         }
 
         void unlock() {
             this.locked = Boolean.FALSE;
+            this.currentThread = null;
             conditional.signal();
         }
 
-        public void waitForUnlock() throws InterruptedException {
-            while ( this.locked ) {
-                conditional.await();
+        public void waitForUnlock() {
+            while ( this.locked && !lockedByMe() ) {
+                try {
+                    conditional.await();
+                } catch ( InterruptedException e ) {
+                    throw new FSLockServiceException( e );
+                }
+            }
+        }
+
+        private class FSLockServiceException extends RuntimeException {
+
+            public FSLockServiceException( InterruptedException e ) {
             }
         }
     }

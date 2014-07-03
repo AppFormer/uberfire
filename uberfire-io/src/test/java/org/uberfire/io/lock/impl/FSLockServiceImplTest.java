@@ -97,6 +97,13 @@ public class FSLockServiceImplTest {
         assertMinDeltas( fsThread1, fsThread2, fsThread3 );
     }
 
+    @Test
+    public void sameThreadShouldNotWaitForLock(){
+        lockService.lock( fs1 );
+        lockService.waitForUnlock( fs1 );
+
+    }
+
     private void assertMinDeltas( FSThread fsThread1,
                                   FSThread fsThread2,
                                   FSThread fsThread3 ) {
