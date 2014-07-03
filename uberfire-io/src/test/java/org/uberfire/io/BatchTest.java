@@ -216,5 +216,20 @@ public class BatchTest {
         assertFalse( fs1.isOnBatch() );
         assertFalse( fs2.isOnBatch() );
     }
+    @Test
+    public void testTwo() throws IOException, InterruptedException {
+        Path init = ioService.get( URI.create( "git://amend-repo-test/readme.txt" ) );
+        ioService.write( init, "init!", new CommentedOption( "User Tester", "message1" ) );
+
+        init = ioService.get( URI.create( "git://check-amend-repo-test/readme.txt" ) );
+        ioService.write( init, "init!", new CommentedOption( "User Tester", "message1" ) );
+
+        ioService.startBatch( fs1 );
+        ioService.startBatch( fs2 );
+        assertTrue( fs1.isOnBatch() );
+        assertTrue( fs2.isOnBatch() );
+        ioService.endBatch( fs1 );
+        ioService.endBatch( fs2 );
+    }
 
 }

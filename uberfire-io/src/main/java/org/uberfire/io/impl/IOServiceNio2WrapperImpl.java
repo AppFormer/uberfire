@@ -23,6 +23,7 @@ import java.util.Set;
 import org.uberfire.commons.lock.LockService;
 import org.uberfire.io.IOService;
 import org.uberfire.io.IOWatchService;
+import org.uberfire.io.lock.FSLockService;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.channels.SeekableByteChannel;
 import org.uberfire.java.nio.file.AtomicMoveNotSupportedException;
@@ -58,13 +59,13 @@ public class IOServiceNio2WrapperImpl
         super( id, watchService );
     }
 
-    public IOServiceNio2WrapperImpl( final LockService lockService,
+    public IOServiceNio2WrapperImpl( final FSLockService lockService,
                                      final IOWatchService watchService ) {
         super( lockService, watchService );
     }
 
     public IOServiceNio2WrapperImpl( final String id,
-                                     final LockService lockService,
+                                     final FSLockService lockService,
                                      final IOWatchService watchService ) {
         super( id, lockService, watchService );
     }

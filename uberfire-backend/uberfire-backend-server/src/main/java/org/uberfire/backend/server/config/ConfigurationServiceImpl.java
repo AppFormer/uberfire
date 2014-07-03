@@ -165,6 +165,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
             ioService.endBatch(filePath.getFileSystem());
         }
@@ -187,6 +189,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
             ioService.endBatch(filePath.getFileSystem());
         }
@@ -208,13 +212,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         if ( !ioService.exists( filePath ) ) {
             return true;
         }
-        boolean result;
+        boolean result = false;
         try {
             ioService.startBatch(filePath.getFileSystem());
             result = ioService.deleteIfExists( filePath );
             if ( result ) {
                 updateLastModified();
             }
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
             ioService.endBatch(filePath.getFileSystem());
         }

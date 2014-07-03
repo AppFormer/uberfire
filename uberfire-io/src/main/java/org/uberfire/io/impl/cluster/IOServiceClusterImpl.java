@@ -209,7 +209,7 @@ public class IOServiceClusterImpl implements IOClusteredService {
     }
 
     @Override
-    public void startBatch( FileSystem fs, final Option... options ) {
+    public void startBatch( FileSystem fs, final Option... options ) throws InterruptedException {
         clusterService.lock();
         service.startBatch( fs, options );
     }

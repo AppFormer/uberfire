@@ -59,7 +59,7 @@ public interface IOService extends SecurityAware {
     void dispose();
 
     void startBatch( FileSystem fs,
-                     final Option... options );
+                     final Option... options ) throws InterruptedException;
 
     void endBatch( FileSystem fs,
                    final Option... options );

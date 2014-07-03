@@ -29,6 +29,7 @@ import java.util.Set;
 import org.uberfire.commons.lock.LockService;
 import org.uberfire.io.IOService;
 import org.uberfire.io.IOWatchService;
+import org.uberfire.io.lock.FSLockService;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.AbstractBasicFileAttributeView;
 import org.uberfire.java.nio.base.AttrHolder;
@@ -69,13 +70,13 @@ implements IOService {
         super( serviceId, watchService );
     }
 
-    public IOServiceDotFileImpl( final LockService lockService,
+    public IOServiceDotFileImpl( final FSLockService lockService,
                                  final IOWatchService watchService ) {
         super( lockService, watchService );
     }
 
     public IOServiceDotFileImpl( final String serviceId,
-                                 final LockService lockService,
+                                 final FSLockService lockService,
                                  final IOWatchService watchService ) {
         super( serviceId, lockService, watchService );
     }

@@ -36,10 +36,10 @@ import java.util.Set;
 import org.jboss.errai.security.shared.service.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.commons.lock.LockService;
-import org.uberfire.commons.lock.impl.ThreadLockServiceImpl;
 import org.uberfire.io.FileSystemType;
 import org.uberfire.io.IOWatchService;
+import org.uberfire.io.lock.FSLockService;
+import org.uberfire.io.lock.impl.FSLockServiceImpl;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.base.FileSystemState;
@@ -92,7 +92,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
         }
     };
 
-    protected final LockService lockService;
+    protected final FSLockService lockService;
     protected final IOWatchService ioWatchService;
     protected final Map<FileSystemType, List<FileSystem>> fileSystems = new HashMap<FileSystemType, List<FileSystem>>();
 
@@ -102,30 +102,30 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
 
     public AbstractIOService() {
         this.id = DEFAULT_SERVICE_NAME;
-        lockService = new ThreadLockServiceImpl();
+        lockService = new FSLockServiceImpl();
         ioWatchService = null;
     }
 
     public AbstractIOService( final String id ) {
         this.id = id;
-        lockService = new ThreadLockServiceImpl();
+        lockService = new FSLockServiceImpl();
         ioWatchService = null;
     }
 
     public AbstractIOService( final IOWatchService watchService ) {
         this.id = DEFAULT_SERVICE_NAME;
-        lockService = new ThreadLockServiceImpl();
+        lockService = new FSLockServiceImpl();
         ioWatchService = watchService;
     }
 
     public AbstractIOService( final String id,
                               final IOWatchService watchService ) {
         this.id = id;
-        lockService = new ThreadLockServiceImpl();
+        lockService = new FSLockServiceImpl();
         ioWatchService = watchService;
     }
 
-    public AbstractIOService( final LockService lockService,
+    public AbstractIOService( final FSLockService lockService,
                               final IOWatchService watchService ) {
         this.id = DEFAULT_SERVICE_NAME;
         this.lockService = lockService;
@@ -133,7 +133,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
     }
 
     public AbstractIOService( final String id,
-                              final LockService lockService,
+                              final FSLockService lockService,
                               final IOWatchService watchService ) {
         this.id = id;
         this.lockService = lockService;
@@ -142,34 +142,25 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
 
     @Override
     public void startBatch( FileSystem fs,
-                            final Option... options ) {
-        lockService.lock();
+                            final Option... options ) throws InterruptedException {
+        lockService.lock( fs );
         setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.BATCH );
         if ( !fileSystems.isEmpty() ) {
             cleanupClosedFileSystems();
-//            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
-//            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
-//            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
-
-          //
-            //???
-//            if ( options != null && options.length == 1 ) {
-//                setAttribute( fs, FileSystemState.FILE_SYSTEM_STATE_ATTR, options[ 0 ] );
-//            }
+            if ( options != null && options.length == 1 ) {
+                setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, options[ 0 ] );
+            }
         }
     }
 
     @Override
     public void endBatch( FileSystem fs,
                           final Option... options ) {
-        lockService.unlock();
+        lockService.unlock( fs );
         setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
         if ( !fileSystems.isEmpty() ) {
             cleanupClosedFileSystems();
-//            List<FileSystem> fileSystemsOfARandomProvider = fileSystems.values().iterator().next();
-//            FileSystem firstFsOfARandomProvider = fileSystemsOfARandomProvider.get( 0 );
-//            final Path firstRootOfARandomFs = firstFsOfARandomProvider.getRootDirectories().iterator().next();
-//            setAttribute( firstRootOfARandomFs, FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
+            setAttribute( fs.getRootDirectories().iterator().next(), FileSystemState.FILE_SYSTEM_STATE_ATTR, FileSystemState.NORMAL );
         }
     }
 
@@ -179,6 +170,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable {
             for ( final FileSystem fileSystem : fileSystemTypeListEntry.getValue() ) {
                 if ( !fileSystem.isOpen() ) {
                     removeList.add( fileSystem );
+                    lockService.removeFromService( fileSystem );
                 }
             }
             fileSystemTypeListEntry.getValue().removeAll( removeList );
