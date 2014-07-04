@@ -189,7 +189,6 @@ public class BatchIndexTest {
         }
 
         new BatchIndex( config.getIndexEngine(),
-                        config.getIndexers(),
                         ioService(),
                         DublinCoreView.class ).run( ioService().get( "git://temp-repo-test/" ), new Runnable() {
             @Override

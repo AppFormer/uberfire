@@ -63,7 +63,6 @@ public class IOServiceIndexedGitImplTest {
         if ( ioService == null ) {
             config = new LuceneConfigBuilder().withInMemoryMetaModelStore().useDirectoryBasedIndex().useInMemoryDirectory().build();
             ioService = new IOServiceIndexedImpl( config.getIndexEngine(),
-                                                  config.getIndexers(),
                                                   DublinCoreView.class,
                                                   VersionAttributeView.class );
         }
