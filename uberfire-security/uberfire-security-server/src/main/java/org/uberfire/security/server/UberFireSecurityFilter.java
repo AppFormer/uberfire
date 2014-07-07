@@ -16,29 +16,10 @@
 
 package org.uberfire.security.server;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static org.uberfire.security.server.SecurityConstants.AUTHZ_MANAGER_KEY;
-import static org.uberfire.security.server.SecurityConstants.AUTH_FORCE_URL;
-import static org.uberfire.security.server.SecurityConstants.AUTH_MANAGER_KEY;
-import static org.uberfire.security.server.SecurityConstants.AUTH_PROVIDER_KEY;
-import static org.uberfire.security.server.SecurityConstants.AUTH_REMEMBER_ME_SCHEME_KEY;
-import static org.uberfire.security.server.SecurityConstants.AUTH_SCHEME_KEY;
-import static org.uberfire.security.server.SecurityConstants.COOKIE_NAME_KEY;
-import static org.uberfire.security.server.SecurityConstants.FORM;
-import static org.uberfire.security.server.SecurityConstants.LOGOUT_URI;
-import static org.uberfire.security.server.SecurityConstants.RESOURCE_MANAGER_CONFIG_KEY;
-import static org.uberfire.security.server.SecurityConstants.RESOURCE_MANAGER_KEY;
-import static org.uberfire.security.server.SecurityConstants.ROLE_DECISION_MANAGER_KEY;
-import static org.uberfire.security.server.SecurityConstants.ROLE_PROVIDER_KEY;
-import static org.uberfire.security.server.SecurityConstants.SUBJECT_PROPERTIES_PROVIDER_KEY;
-import static org.uberfire.security.server.SecurityConstants.URL_ACCESS_DECISION_MANAGER_KEY;
-import static org.uberfire.security.server.SecurityConstants.URL_VOTING_MANAGER_KEY;
-
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -71,6 +52,9 @@ import org.uberfire.security.server.auth.HttpBasicAuthenticationScheme;
 import org.uberfire.security.server.auth.HttpSessionStorage;
 import org.uberfire.security.server.auth.RememberMeCookieAuthScheme;
 import org.uberfire.security.server.cdi.SecurityFactory;
+
+import static javax.servlet.http.HttpServletResponse.*;
+import static org.uberfire.security.server.SecurityConstants.*;
 
 public class UberFireSecurityFilter implements Filter {
 
@@ -117,7 +101,7 @@ public class UberFireSecurityFilter implements Filter {
                 .loadAvailableAuthenticationSources()
                 .build( options );
 
-        LOG.debug("Starting security manager with the following configuration:\n" + securityManager);
+        LOG.debug( "Starting security manager with the following configuration:\n" + securityManager );
         securityManager.start();
     }
 
@@ -268,8 +252,9 @@ public class UberFireSecurityFilter implements Filter {
             throws IOException, ServletException {
 
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
-        final HttpServletResponse httpResponse = new HttpServletResponseWrapper((HttpServletResponse) rawResponse);
+        final HttpServletResponse httpResponse = new HttpServletResponseWrapper( (HttpServletResponse) rawResponse );
 
+        setupSecurityContext( httpRequest );
         final SecurityContext context = securityManager.newSecurityContext( httpRequest, httpResponse );
 
         try {
@@ -284,13 +269,16 @@ public class UberFireSecurityFilter implements Filter {
             }
         } catch ( AuthenticationException e ) {
             if ( !httpResponse.isCommitted() ) {
-                LOG.debug("Authentication failure. Sending HTTP 401 response.", e);
+                LOG.debug( "Authentication failure. Sending HTTP 401 response.", e );
                 httpResponse.sendError( 401, e.getMessage() );
-            }
-            else {
-              LOG.debug("Authentication failure on already-committed response. NOT sending HTTP 401.", e);
+            } else {
+                LOG.debug( "Authentication failure on already-committed response. NOT sending HTTP 401.", e );
             }
         }
+    }
+
+    private void setupSecurityContext( HttpServletRequest httpRequest ) {
+        UberFireThreadLocalSecurityContext.put( UberFireThreadLocalSecurityContext.Key.HTTP_SESSION, httpRequest.getSession() );
     }
 
     private void logout( final SecurityContext context,
