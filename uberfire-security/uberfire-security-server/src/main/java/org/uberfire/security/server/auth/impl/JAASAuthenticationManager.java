@@ -1,7 +1,6 @@
 package org.uberfire.security.server.auth.impl;
 
 import java.util.HashMap;
-
 import javax.enterprise.inject.Alternative;
 
 import org.uberfire.security.auth.SubjectPropertiesProvider;

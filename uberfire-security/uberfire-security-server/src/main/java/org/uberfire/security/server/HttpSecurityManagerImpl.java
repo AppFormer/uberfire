@@ -176,7 +176,6 @@ public class HttpSecurityManagerImpl implements SecurityManager {
     public SecurityContext newSecurityContext( Object... params ) {
         checkNotEmpty( "params", params );
         checkCondition( "at least two params should be provided", params.length >= 2 );
-
         HttpServletRequest httpRequest = null;
         HttpServletResponse httpResponse = null;
 

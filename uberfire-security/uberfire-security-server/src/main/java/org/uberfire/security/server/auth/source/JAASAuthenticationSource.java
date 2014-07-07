@@ -33,8 +33,7 @@ public class JAASAuthenticationSource implements AuthenticationSource,
 
     public static final String DEFAULT_ROLE_PRINCIPLE_NAME = "Roles";
     private String rolePrincipleName = DEFAULT_ROLE_PRINCIPLE_NAME;
-    private final ThreadLocal<Subject> subjects = new ThreadLocal<Subject>();
-
+    private SubjectsStorage subjectsStorage = SubjectsStorageFactory.build();
     private String domain = "ApplicationRealm";
 
     @Override
@@ -59,11 +58,10 @@ public class JAASAuthenticationSource implements AuthenticationSource,
     public boolean authenticate( final Credential credential,
                                  final SecurityContext securityContext ) {
         final UsernamePasswordCredential usernamePasswd = checkInstanceOf( "credential", credential, UsernamePasswordCredential.class );
-
         try {
             final LoginContext loginContext = new LoginContext( domain, new UsernamePasswordCallbackHandler( usernamePasswd ) );
             loginContext.login();
-            subjects.set( loginContext.getSubject() );
+            subjectsStorage.set( loginContext.getSubject() );
 
             return true;
         } catch ( final Exception ex ) {
@@ -76,7 +74,7 @@ public class JAASAuthenticationSource implements AuthenticationSource,
     public List<Role> loadRoles( final Principal principal ) {
         List<Role> roles = null;
         try {
-            Subject subject = subjects.get();
+            Subject subject = subjectsStorage.get();
 
             if ( subject != null ) {
                 Set<java.security.Principal> principals = subject.getPrincipals();
