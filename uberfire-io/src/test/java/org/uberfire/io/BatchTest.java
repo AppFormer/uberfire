@@ -19,6 +19,7 @@ import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 
 import static org.junit.Assert.*;
@@ -27,8 +28,8 @@ public class BatchTest {
 
     IOService ioService;
     private File path;
-    FileSystem fs1;
-    FileSystem fs2;
+    JGitFileSystem fs1;
+    JGitFileSystem fs2;
 
     @Before
     public void setup() throws IOException {
@@ -42,11 +43,11 @@ public class BatchTest {
 
         final URI newRepo = URI.create( "git://amend-repo-test" );
 
-        fs1 = ioService.newFileSystem( newRepo, ImmutableMap.<String, Object>of() );
+        fs1 =  (JGitFileSystem)ioService.newFileSystem( newRepo, ImmutableMap.<String, Object>of() );
 
         final URI newRepo2 = URI.create( "git://check-amend-repo-test" );
 
-        fs2 = ioService.newFileSystem( newRepo2, ImmutableMap.of( "init", "true" ) );
+        fs2 = (JGitFileSystem) ioService.newFileSystem( newRepo2, ImmutableMap.of( "init", "true" ) );
     }
 
     @After
