@@ -151,7 +151,7 @@ public class HttpAuthenticationManager implements AuthenticationManager {
         }
 
         for ( final RoleProvider roleProvider : roleProviders ) {
-            roles.addAll( roleProvider.loadRoles( principal ) );
+            roles.addAll( roleProvider.loadRoles( principal, context ) );
         }
 
         final Map<String, String> properties = new HashMap<String, String>();
@@ -196,7 +196,7 @@ public class HttpAuthenticationManager implements AuthenticationManager {
         httpContext.getRequest().getSession().invalidate();
         try {
             httpContext.getRequest().logout();
-        } catch (ServletException e) {
+        } catch ( ServletException e ) {
             e.printStackTrace();
         }
     }
