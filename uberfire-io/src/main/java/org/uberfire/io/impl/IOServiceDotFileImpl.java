@@ -16,19 +16,15 @@
 
 package org.uberfire.io.impl;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.*;
-import static org.uberfire.java.nio.file.StandardCopyOption.*;
-
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.uberfire.commons.lock.LockService;
 import org.uberfire.io.IOService;
 import org.uberfire.io.IOWatchService;
+import org.uberfire.io.lock.FSLockService;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.AbstractBasicFileAttributeView;
 import org.uberfire.java.nio.base.AttrHolder;
@@ -48,9 +44,13 @@ import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.attribute.FileAttribute;
 import org.uberfire.java.nio.file.attribute.FileAttributeView;
 
+import static org.uberfire.commons.validation.PortablePreconditions.*;
+import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.*;
+import static org.uberfire.java.nio.file.StandardCopyOption.*;
+
 public class IOServiceDotFileImpl
-extends AbstractIOService
-implements IOService {
+        extends AbstractIOService
+        implements IOService {
 
     public IOServiceDotFileImpl() {
         super();
@@ -69,13 +69,13 @@ implements IOService {
         super( serviceId, watchService );
     }
 
-    public IOServiceDotFileImpl( final LockService lockService,
+    public IOServiceDotFileImpl( final FSLockService lockService,
                                  final IOWatchService watchService ) {
         super( lockService, watchService );
     }
 
     public IOServiceDotFileImpl( final String serviceId,
-                                 final LockService lockService,
+                                 final FSLockService lockService,
                                  final IOWatchService watchService ) {
         super( serviceId, lockService, watchService );
     }
@@ -83,8 +83,9 @@ implements IOService {
     @Override
     public synchronized void delete( final Path path,
                                      final DeleteOption... options )
-                                             throws IllegalArgumentException, NoSuchFileException, DirectoryNotEmptyException,
-                                             IOException, SecurityException {
+            throws IllegalArgumentException, NoSuchFileException, DirectoryNotEmptyException,
+            IOException, SecurityException {
+        waitFSUnlock( path );
         Files.delete( path, options );
         try {
             Files.deleteIfExists( dot( path ), options );
@@ -98,7 +99,8 @@ implements IOService {
     @Override
     public synchronized boolean deleteIfExists( final Path path,
                                                 final DeleteOption... options )
-                                                        throws IllegalArgumentException, DirectoryNotEmptyException, IOException, SecurityException {
+            throws IllegalArgumentException, DirectoryNotEmptyException, IOException, SecurityException {
+        waitFSUnlock( path );
         final boolean result = Files.deleteIfExists( path, options );
         try {
             Files.deleteIfExists( dot( path ), options );
@@ -114,10 +116,9 @@ implements IOService {
     public synchronized SeekableByteChannel newByteChannel( final Path path,
                                                             final Set<? extends OpenOption> options,
                                                             final FileAttribute<?>... attrs )
-                                                                    throws IllegalArgumentException, UnsupportedOperationException,
-                                                                    FileAlreadyExistsException, IOException, SecurityException {
-        checkNotNull( "path", path );
-
+            throws IllegalArgumentException, UnsupportedOperationException,
+            FileAlreadyExistsException, IOException, SecurityException {
+        waitFSUnlock( path );
         final Properties properties = new Properties();
         if ( exists( dot( path ) ) ) {
             properties.load( newInputStream( dot( path ) ) );
@@ -136,16 +137,18 @@ implements IOService {
     @Override
     public synchronized Path createDirectory( final Path dir,
                                               final FileAttribute<?>... attrs )
-                                                      throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
-                                                      IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
+            IOException, SecurityException {
+        waitFSUnlock( dir );
         return internalCreateDirectory( dir, false, attrs );
     }
 
     @Override
     public synchronized Path createDirectories( final Path dir,
                                                 final FileAttribute<?>... attrs )
-                                                        throws UnsupportedOperationException, FileAlreadyExistsException,
-                                                        IOException, SecurityException {
+            throws UnsupportedOperationException, FileAlreadyExistsException,
+            IOException, SecurityException {
+        waitFSUnlock( dir );
         final Path result = Files.createDirectories( dir, attrs );
 
         buildDotFile( dir, newOutputStream( dot( dir ) ), attrs );
@@ -157,9 +160,10 @@ implements IOService {
     public synchronized Path copy( final Path source,
                                    final Path target,
                                    final CopyOption... options )
-                                           throws UnsupportedOperationException, FileAlreadyExistsException,
-                                           DirectoryNotEmptyException, IOException, SecurityException {
-
+            throws UnsupportedOperationException, FileAlreadyExistsException,
+            DirectoryNotEmptyException, IOException, SecurityException {
+        waitFSUnlock( source );
+        waitFSUnlock( target );
         if ( Files.exists( dot( source ) ) ) {
             Files.copy( dot( source ), dot( target ), forceBuildOptions( options ) );
         } else if ( Files.exists( dot( target ) ) ) {
@@ -175,8 +179,10 @@ implements IOService {
     public synchronized Path move( final Path source,
                                    final Path target,
                                    final CopyOption... options )
-                                           throws UnsupportedOperationException, FileAlreadyExistsException,
-                                           DirectoryNotEmptyException, AtomicMoveNotSupportedException, IOException, SecurityException {
+            throws UnsupportedOperationException, FileAlreadyExistsException,
+            DirectoryNotEmptyException, AtomicMoveNotSupportedException, IOException, SecurityException {
+        waitFSUnlock( source );
+        waitFSUnlock( target );
         if ( Files.exists( dot( source ) ) ) {
             Files.move( dot( source ), dot( target ), forceBuildOptions( options ) );
         } else if ( Files.exists( dot( target ) ) ) {
@@ -191,7 +197,7 @@ implements IOService {
     @Override
     public <V extends FileAttributeView> V getFileAttributeView( final Path path,
                                                                  final Class<V> type )
-                                                                         throws IllegalArgumentException {
+            throws IllegalArgumentException {
 
         final V value = Files.getFileAttributeView( path, type );
 
@@ -209,9 +215,9 @@ implements IOService {
 
     @Override
     public Map<String, Object> readAttributes( final Path path,
-            final String attributes )
-                    throws UnsupportedOperationException, NoSuchFileException, IllegalArgumentException,
-                    IOException, SecurityException {
+                                               final String attributes )
+            throws UnsupportedOperationException, NoSuchFileException, IllegalArgumentException,
+            IOException, SecurityException {
         checkNotNull( "path", path );
         checkNotEmpty( "attributes", attributes );
 
@@ -237,8 +243,9 @@ implements IOService {
     @Override
     public synchronized Path setAttributes( final Path path,
                                             final FileAttribute<?>... attrs )
-                                                    throws UnsupportedOperationException, IllegalArgumentException, ClassCastException, IOException, SecurityException {
+            throws UnsupportedOperationException, IllegalArgumentException, ClassCastException, IOException, SecurityException {
         checkNotNull( "path", path );
+        waitFSUnlock( path );
         if ( Files.isDirectory( path ) ) {
             return internalCreateDirectory( path, true, attrs );
         }
@@ -248,7 +255,7 @@ implements IOService {
     @Override
     public Object getAttribute( final Path path,
                                 final String attribute )
-                                        throws UnsupportedOperationException, IllegalArgumentException, IOException, SecurityException {
+            throws UnsupportedOperationException, IllegalArgumentException, IOException, SecurityException {
         checkNotNull( "path", path );
 
         Object value;
@@ -272,7 +279,7 @@ implements IOService {
 
     @Override
     protected Set<? extends OpenOption> buildOptions( final Set<? extends OpenOption> options,
-            final OpenOption... others ) {
+                                                      final OpenOption... others ) {
         return new HashSet<OpenOption>( options ) {{
             add( new DotFileOption() );
             if ( others != null ) {
@@ -333,10 +340,10 @@ implements IOService {
     protected synchronized Path internalCreateDirectory( final Path dir,
                                                          final boolean skipAlreadyExistsException,
                                                          final FileAttribute<?>... attrs )
-                                                                 throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
-                                                                 IOException, SecurityException {
+            throws IllegalArgumentException, UnsupportedOperationException, FileAlreadyExistsException,
+            IOException, SecurityException {
         checkNotNull( "dir", dir );
-
+        waitFSUnlock( dir );
         FileAttribute<?>[] allAttrs = attrs;
         try {
             Files.createDirectory( dir, attrs );

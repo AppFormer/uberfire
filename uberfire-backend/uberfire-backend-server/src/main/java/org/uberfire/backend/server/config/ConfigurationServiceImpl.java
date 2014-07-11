@@ -161,12 +161,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final CommentedOption commentedOption = new CommentedOption( getIdentityName(),
                 "Created config " + filePath.getFileName() );
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
         //Invalidate cache if a new item has been created; otherwise cached value is stale
         configuration.remove( configGroup.getType() );
@@ -183,12 +185,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final CommentedOption commentedOption = new CommentedOption( getIdentityName(),
                 "Updated config " + filePath.getFileName() );
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             ioService.write( filePath, marshaller.marshall( configGroup ), commentedOption );
 
             updateLastModified();
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
         //Invalidate cache if a new item has been created; otherwise cached value is stale
         configuration.remove( configGroup.getType() );
@@ -208,15 +212,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         if ( !ioService.exists( filePath ) ) {
             return true;
         }
-        boolean result;
+        boolean result = false;
         try {
-            ioService.startBatch();
+            ioService.startBatch(filePath.getFileSystem());
             result = ioService.deleteIfExists( filePath );
             if ( result ) {
                 updateLastModified();
             }
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
         } finally {
-            ioService.endBatch();
+            ioService.endBatch(filePath.getFileSystem());
         }
 
         return result;
