@@ -22,11 +22,11 @@ import java.io.IOException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.uberfire.java.nio.file.FileStore;
 import org.uberfire.java.nio.file.Path;
+import org.uberfire.java.nio.fs.jgit.util.AutoAnsweredUsernamePasswordCredentialsProvider;
 
 import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 public class JGitFileSystemTest extends AbstractTestInfra {
 
     static {
-        CredentialsProvider.setDefault( new UsernamePasswordCredentialsProvider( "guest", "" ) );
+        CredentialsProvider.setDefault( new AutoAnsweredUsernamePasswordCredentialsProvider( "guest", "" ) );
     }
 
     @Test
