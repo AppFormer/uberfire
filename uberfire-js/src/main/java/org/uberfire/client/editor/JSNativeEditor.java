@@ -1,24 +1,47 @@
 package org.uberfire.client.editor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import javax.enterprise.context.Dependent;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import org.uberfire.client.plugin.JSNativePlugin;
+
+import static java.util.Collections.*;
 
 @Dependent
 public class JSNativeEditor extends JSNativePlugin {
 
-    private String resourceType;
+    private List<String> resourcesType = new ArrayList<String>(  );
+    private String priority;
 
     public void build( final JavaScriptObject obj ) {
         super.build( obj );
-        if ( hasStringProperty( obj, "resourceType" ) ) {
-            resourceType = getResourceType( obj );
-        }
+        extractResourcesType( obj );
+        this.priority = extractPriority( obj );
     }
 
-    private static native String getResourceType( final JavaScriptObject o ) /*-{
-        return o.resourceType;
+    public int getPriority() {
+        return Integer.valueOf( this.priority );
+    }
+
+    public static native String extractPriority( JavaScriptObject obj ) /*-{
+        return obj.priority;
+    }-*/;
+
+    private void extractResourcesType( JavaScriptObject obj ) {
+        JsArrayString jsResources = getResourceType( obj );
+        resourcesType.addAll( toCollection( jsResources ) );
+    }
+
+    public List<String> getResourceType() {
+        return resourcesType;
+    }
+
+    private static native JsArrayString getResourceType( final JavaScriptObject o ) /*-{
+        return o.resources_type;
     }-*/;
 
     public void onConcurrentUpdate() {
@@ -76,6 +99,7 @@ public class JSNativeEditor extends JSNativePlugin {
             executeOnDelete( obj );
         }
     }
+
     private static native void executeOnDelete( final JavaScriptObject o ) /*-{
         o.on_copy();
     }-*/;
@@ -100,8 +124,18 @@ public class JSNativeEditor extends JSNativePlugin {
         o.on_update();
     }-*/;
 
-    public String getResourceType() {
-        return resourceType;
+
+    private Collection<String> toCollection( final JsArrayString list ) {
+        if ( list == null || list.length() == 0 ) {
+            return emptyList();
+        }
+
+        final Collection<String> result = new ArrayList<String>();
+        for ( int i = 0; i < list.length(); i++ ) {
+            result.add( list.get( i ) );
+        }
+
+        return result;
     }
 
 }
