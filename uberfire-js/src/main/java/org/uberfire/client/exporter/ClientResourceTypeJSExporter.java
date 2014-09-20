@@ -25,19 +25,7 @@ public class ClientResourceTypeJSExporter implements UberfireJSExporter {
 
     private native void publish() /*-{
         $wnd.$registerClientResourceType = @org.uberfire.client.exporter.ClientResourceTypeJSExporter::registerClientResourceType(Ljava/lang/Object;);
-        $wnd.$getClientResourceType =  @org.uberfire.client.exporter.ClientResourceTypeJSExporter::getClientResourceType(Ljava/lang/String;);
     }-*/;
-
-    public static void getClientResourceType( final String shortName ) {
-        final SyncBeanManager beanManager = IOC.getBeanManager();
-        Collection<IOCBeanDef<ClientResourceType>> availableResourceTypes = beanManager.lookupBeans( ClientResourceType.class );
-        for ( final IOCBeanDef<ClientResourceType> resourceTypeBean : availableResourceTypes ) {
-            final ClientResourceType resourceType = resourceTypeBean.getInstance();
-            if(resourceType.getShortName().equals( shortName )){
-                Window.alert( "It Works" );
-            }
-        }
-    }
 
     public static void registerClientResourceType( final Object _obj ) {
         final JavaScriptObject obj = (JavaScriptObject) _obj;
