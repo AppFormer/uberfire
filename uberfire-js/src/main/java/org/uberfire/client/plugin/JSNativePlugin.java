@@ -196,10 +196,9 @@ public class JSNativePlugin {
     }-*/;
 
     public static native boolean hasArrayProperty( final JavaScriptObject obj,
-                                            final String propertyName )  /*-{
+                                                   final String propertyName )  /*-{
         return ((obj.propertyName) instanceof Array);
     }-*/;
-
 
     private static native String getTemplateUrlFunctionResult( final JavaScriptObject o ) /*-{
         var result = o.templateUrl();

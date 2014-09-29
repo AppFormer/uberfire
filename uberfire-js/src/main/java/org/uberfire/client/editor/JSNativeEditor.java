@@ -14,13 +14,17 @@ import static java.util.Collections.*;
 @Dependent
 public class JSNativeEditor extends JSNativePlugin {
 
-    private List<String> resourcesType = new ArrayList<String>(  );
+    private List<String> resourcesType = new ArrayList<String>();
     private String priority;
 
     public void build( final JavaScriptObject obj ) {
         super.build( obj );
-        extractResourcesType( obj );
-        this.priority = extractPriority( obj );
+        if ( hasResourceType( obj ) ) {
+            extractResourcesType( obj );
+        }
+        if ( hasStringProperty( obj, "priority" ) ) {
+            this.priority = extractPriority( obj );
+        }
     }
 
     public int getPriority() {
@@ -39,6 +43,10 @@ public class JSNativeEditor extends JSNativePlugin {
     public List<String> getResourceType() {
         return resourcesType;
     }
+
+    public static native boolean hasResourceType( final JavaScriptObject obj )  /*-{
+        return ((obj.resources_type.constructor.name) == 'Array');
+    }-*/;
 
     private static native JsArrayString getResourceType( final JavaScriptObject o ) /*-{
         return o.resources_type;
@@ -123,7 +131,6 @@ public class JSNativeEditor extends JSNativePlugin {
     private static native void executeOnUpdate( final JavaScriptObject o ) /*-{
         o.on_update();
     }-*/;
-
 
     private Collection<String> toCollection( final JsArrayString list ) {
         if ( list == null || list.length() == 0 ) {

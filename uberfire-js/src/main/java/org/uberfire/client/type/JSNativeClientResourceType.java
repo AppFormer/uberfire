@@ -23,11 +23,25 @@ public class JSNativeClientResourceType {
     }
 
     private void extract( JavaScriptObject obj ) {
-        this.shortName = extractShortName( obj );
-        this.description = extractDescription( obj );
-        this.priority = extractPriority( obj );
-        this.iconClass = extractIconClass( obj );
-        this.acceptRegex = extractAcceptRegex( obj );
+        if(hasShortName(obj)) {
+            this.shortName = extractShortName( obj );
+        }
+        if(hasDescription( obj )) {
+            this.description = extractDescription( obj );
+        }
+        if(hasPriority( obj )) {
+            this.priority = extractPriority( obj );
+        }
+        if(hasIconClass( obj )) {
+            this.iconClass = extractIconClass( obj );
+        }
+        if(hasAcceptRegex( obj )) {
+            this.acceptRegex = extractAcceptRegex( obj );
+        }
+    }
+
+    private boolean hasAcceptRegex( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "accept_regex" );
     }
 
     public String getAcceptRegex() {
@@ -38,6 +52,11 @@ public class JSNativeClientResourceType {
         return obj.accept_regex;
     }-*/;
 
+
+    private boolean hasShortName( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "short_name" );
+    }
+
     public String getShortName() {
         return this.shortName;
     }
@@ -45,6 +64,10 @@ public class JSNativeClientResourceType {
     public static native String extractShortName( JavaScriptObject obj ) /*-{
         return obj.short_name;
     }-*/;
+
+    private boolean hasDescription( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "description" );
+    }
 
     public String getDescription() {
         return this.description;
@@ -54,6 +77,10 @@ public class JSNativeClientResourceType {
         return obj.description;
     }-*/;
 
+    private boolean hasPriority( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "priority" );
+    }
+
     public int getPriority() {
         return Integer.valueOf( this.priority );
     }
@@ -62,12 +89,21 @@ public class JSNativeClientResourceType {
         return obj.priority;
     }-*/;
 
+    private boolean hasIconClass( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "icon_class" );
+    }
+
     public String getIconClass() {
         return iconClass;
     }
 
     public static native String extractIconClass( JavaScriptObject obj ) /*-{
         return obj.icon_class;
+    }-*/;
+
+    public static native boolean hasStringProperty( final JavaScriptObject obj,
+                                                    final String propertyName )  /*-{
+        return ((typeof obj[propertyName]) === "string");
     }-*/;
 
 }
