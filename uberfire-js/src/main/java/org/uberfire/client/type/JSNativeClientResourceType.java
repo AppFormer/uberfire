@@ -23,22 +23,23 @@ public class JSNativeClientResourceType {
     }
 
     private void extract( JavaScriptObject obj ) {
-        if(hasShortName(obj)) {
+        if(hasShortName( obj )) {
             this.shortName = extractShortName( obj );
         }
         if(hasDescription( obj )) {
             this.description = extractDescription( obj );
         }
-        if(hasPriority( obj )) {
-            this.priority = extractPriority( obj );
-        }
+
         if(hasIconClass( obj )) {
             this.iconClass = extractIconClass( obj );
         }
         if(hasAcceptRegex( obj )) {
             this.acceptRegex = extractAcceptRegex( obj );
         }
+
+        this.priority = extractPriority( obj );
     }
+
 
     private boolean hasAcceptRegex( JavaScriptObject obj ) {
         return hasStringProperty( obj, "accept_regex" );
@@ -77,17 +78,44 @@ public class JSNativeClientResourceType {
         return obj.description;
     }-*/;
 
-    private boolean hasPriority( JavaScriptObject obj ) {
-        return hasStringProperty( obj, "priority" );
+    private String extractPriority( JavaScriptObject obj ) {
+        String priority = null;
+        if ( hasPriorityMethod( obj ) ) {
+            priority = getPriorityFunctionResult( obj );
+        } else if ( hasPriority( obj ) ) {
+            priority = getPriority( obj );
+        }
+
+        if ( priority == null ) {
+            priority = new Integer(Integer.MAX_VALUE).toString();
+        }
+        return priority;
     }
 
     public int getPriority() {
         return Integer.valueOf( this.priority );
     }
 
-    public static native String extractPriority( JavaScriptObject obj ) /*-{
+    private boolean hasPriority( JavaScriptObject obj ) {
+        return hasStringProperty( obj, "priority" );
+    }
+
+    private static native String getPriority( JavaScriptObject obj ) /*-{
         return obj.priority;
     }-*/;
+
+    private static native boolean hasPriorityMethod( final JavaScriptObject obj )  /*-{
+        return ((typeof obj.priority) === "function");
+    }-*/;
+
+    private static native String getPriorityFunctionResult( final JavaScriptObject o ) /*-{
+        var result = o.priority();
+        if (typeof result === "string") {
+            return result;
+        }
+        return null;
+    }-*/;
+
 
     private boolean hasIconClass( JavaScriptObject obj ) {
         return hasStringProperty( obj, "icon_class" );
