@@ -32,6 +32,7 @@ public class PlaceRequestHistoryMapperImplTest {
     public static void registerBean() {
         final ObservablePath opath = new ObservablePathImpl();
 
+        IOC.getBeanManager().destroyAllBeans();
         IOC.getBeanManager().registerBean( new IOCBeanDef<ObservablePath>() {
             @Override
             public Class<ObservablePath> getType() {

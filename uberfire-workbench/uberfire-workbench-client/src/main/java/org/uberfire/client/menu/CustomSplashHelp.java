@@ -2,15 +2,17 @@ package org.uberfire.client.menu;
 
 import java.util.Collection;
 import java.util.Collections;
+
 import javax.enterprise.context.ApplicationScoped;
 
-import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.uberfire.workbench.model.menu.EnabledStateChangeListener;
 import org.uberfire.workbench.model.menu.MenuCustom;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.MenuPosition;
+
+import com.google.gwt.user.client.ui.IsWidget;
 
 @ApplicationScoped
 public class CustomSplashHelp implements MenuFactory.CustomMenuBuilder {
@@ -22,11 +24,11 @@ public class CustomSplashHelp implements MenuFactory.CustomMenuBuilder {
 
     @Override
     public MenuItem build() {
-        return new MenuCustom<Widget>() {
+        return new MenuCustom<IsWidget>() {
 
             @Override
-            public Widget build() {
-                return IOC.getBeanManager().lookupBean( MenuSplashList.class ).getInstance();
+            public IsWidget build() {
+                return IOC.getBeanManager().lookupBean( SplashScreenMenuPresenter.class ).getInstance();
             }
 
             @Override

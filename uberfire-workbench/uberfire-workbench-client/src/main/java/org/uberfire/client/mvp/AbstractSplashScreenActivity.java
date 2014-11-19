@@ -15,6 +15,8 @@
  */
 package org.uberfire.client.mvp;
 
+import static org.uberfire.commons.validation.PortablePreconditions.*;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -36,14 +38,16 @@ public abstract class AbstractSplashScreenActivity extends AbstractActivity impl
     @Inject
     private WorkbenchServicesProxy wbServices;
 
-    private final SplashView splash = new SplashView();
+    private final SplashView view;
 
     private Boolean showAgain;
     private SplashScreenFilter splashFilter;
 
     @Inject
-    public AbstractSplashScreenActivity( final PlaceManager placeManager ) {
+    public AbstractSplashScreenActivity( final PlaceManager placeManager,
+                                         final SplashView view ) {
         super( placeManager );
+        this.view = checkNotNull( "view", view );
     }
 
     @PostConstruct
@@ -90,9 +94,9 @@ public abstract class AbstractSplashScreenActivity extends AbstractActivity impl
     public void forceShow() {
         final IsWidget widget = getWidget();
 
-        splash.setContent( widget, getBodyHeight() );
-        splash.setTitle( getTitle() );
-        splash.show();
+        view.setContent( widget, getBodyHeight() );
+        view.setTitle( getTitle() );
+        view.show();
     }
 
     @Override
@@ -116,7 +120,7 @@ public abstract class AbstractSplashScreenActivity extends AbstractActivity impl
     }
 
     private void saveState() {
-        showAgain = splash.showAgain();
+        showAgain = view.showAgain();
         if ( showAgain != null ) {
             splashFilter.setDisplayNextTime( showAgain );
             wbServices.save( splashFilter );

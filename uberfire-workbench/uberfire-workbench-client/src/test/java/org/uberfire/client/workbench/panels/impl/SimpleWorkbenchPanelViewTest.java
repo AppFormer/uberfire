@@ -16,6 +16,7 @@ import org.uberfire.mvp.Command;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
 @RunWith(GwtMockitoTestRunner.class)
@@ -37,8 +38,9 @@ public class SimpleWorkbenchPanelViewTest extends AbstractDockingWorkbenchPanelV
 
     @Before
     public void setup() {
-        when( listBar.asWidget() ).thenReturn( listBar );
-        when( listBar.getElement() ).thenReturn( listBarElement );
+        Widget listBarWidget = mock( Widget.class );
+        when( listBar.asWidget() ).thenReturn( listBarWidget );
+        when( listBarWidget.getElement() ).thenReturn( listBarElement );
         when( listBarElement.getStyle() ).thenReturn( listBarElementStyle );
 
         presenter = mock( SimpleWorkbenchPanelPresenter.class );

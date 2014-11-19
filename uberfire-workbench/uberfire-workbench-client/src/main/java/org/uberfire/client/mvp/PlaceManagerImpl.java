@@ -34,7 +34,7 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.client.menu.MenuSplashList;
+import org.uberfire.client.menu.SplashScreenMenuPresenter;
 import org.uberfire.client.mvp.ActivityLifecycleError.LifecyclePhase;
 import org.uberfire.client.workbench.PanelManager;
 import org.uberfire.client.workbench.WorkbenchLayout;
@@ -473,7 +473,7 @@ implements PlaceManager {
      * wants to see it.
      * <p>
      * Whether or not it chooses to display itself, the splash screen will be recorded in
-     * {@link #availableSplashScreens} for lookup (for example, see {@link MenuSplashList}) and later disposal.
+     * {@link #availableSplashScreens} for lookup (for example, see {@link SplashScreenMenuPresenter}) and later disposal.
      * Internally, this method should be called every time any part or perspective is added to the workbench, and called
      * again when that part or perspective is removed.
      *
