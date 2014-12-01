@@ -18,12 +18,9 @@ package org.uberfire.client.workbench.panels.impl;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
-/**
- * A Workbench panel that can contain WorkbenchParts.
- */
 @Dependent
 @Named("CustomSimpleWorkbenchPanelView")
-public class CustomSimpleWorkbenchPanelView
-        extends AbstractSimpleWorkbenchPanelView<CustomSimpleWorkbenchPanelPresenter> {
+public class AdaptiveWorkbenchPanelView
+        extends AbstractSimpleWorkbenchPanelView<AdaptiveWorkbenchPanelPresenter> {
 
 }
