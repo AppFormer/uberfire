@@ -96,7 +96,7 @@ public final class MenuFactory {
         T endMenu();
     }
 
-    public interface TerminalCustomMenu<T> {
+    public interface TerminalCustomMenu<T> extends SecurityInfos<MenuBuilder<T>> {
 
         T endMenu();
     }
