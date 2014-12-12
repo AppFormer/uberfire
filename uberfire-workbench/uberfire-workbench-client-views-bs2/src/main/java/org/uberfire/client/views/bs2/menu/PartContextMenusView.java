@@ -67,27 +67,6 @@ public class PartContextMenusView
         return null;
     }
 
-    Widget makeMenuGroup( MenuGroup item ) {
-        final MenuGroup groups = item;
-        final List<Widget> widgetList = new ArrayList<Widget>();
-        for ( final MenuItem _item : groups.getItems() ) {
-            final Widget result = makeItem( _item );
-            if ( result != null ) {
-                widgetList.add( result );
-            }
-        }
-
-        if ( widgetList.isEmpty() ) {
-            return null;
-        }
-
-        return new Dropdown( groups.getCaption() ) {{
-            for ( final Widget widget : widgetList ) {
-                add( widget );
-            }
-        }};
-    }
-
     Widget makeMenuItemCommand( final MenuItem item ) {
         final MenuItemCommand cmdItem = (MenuItemCommand) item;
         final Widget gwtItem;
@@ -109,6 +88,27 @@ public class PartContextMenusView
         } );
 
         return gwtItem;
+    }
+
+    Widget makeMenuGroup( MenuGroup item ) {
+        final MenuGroup groups = item;
+        final List<Widget> widgetList = new ArrayList<Widget>();
+        for ( final MenuItem _item : groups.getItems() ) {
+            final Widget result = makeItem( _item );
+            if ( result != null ) {
+                widgetList.add( result );
+            }
+        }
+
+        if ( widgetList.isEmpty() ) {
+            return null;
+        }
+
+        return new Dropdown( groups.getCaption() ) {{
+            for ( final Widget widget : widgetList ) {
+                add( widget );
+            }
+        }};
     }
 
     boolean notHavePermissionToMakeThis( MenuItem item ) {

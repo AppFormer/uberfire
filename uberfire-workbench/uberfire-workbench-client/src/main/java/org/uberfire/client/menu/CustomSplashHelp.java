@@ -11,6 +11,7 @@ import org.uberfire.workbench.model.menu.MenuCustom;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.MenuPosition;
+import org.uberfire.workbench.model.menu.MenuVisitor;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -79,6 +80,11 @@ public class CustomSplashHelp implements MenuFactory.CustomMenuBuilder {
             @Override
             public Collection<String> getTraits() {
                 return Collections.emptyList();
+            }
+
+            @Override
+            public void accept( MenuVisitor visitor ) {
+                visitor.visit( this );
             }
         };
     }

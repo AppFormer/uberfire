@@ -16,6 +16,7 @@ import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.MenuItemCommand;
 import org.uberfire.workbench.model.menu.MenuPosition;
+import org.uberfire.workbench.model.menu.MenuVisitor;
 import org.uberfire.workbench.model.menu.Menus;
 
 import com.github.gwtbootstrap.client.ui.Divider;
@@ -142,6 +143,11 @@ public class MenusFixture {
                             public Collection<String> getTraits() {
                                 return null;
                             }
+
+                            @Override
+                            public void accept( MenuVisitor visitor ) {
+                                visitor.visit( this );
+                            }
                         };
                     }
                 } ).endMenu().build();
@@ -183,7 +189,7 @@ public class MenusFixture {
 
             @Override
             public Command getCommand() {
-                return mock(Command.class);  //To change body of implemented methods use File | Settings | File Templates.
+                return mock(Command.class);
             }
 
             @Override
@@ -235,6 +241,11 @@ public class MenusFixture {
             @Override
             public Collection<String> getTraits() {
                 return emptyList();
+            }
+
+            @Override
+            public void accept( MenuVisitor visitor ) {
+                visitor.visit( this );
             }
 
             private void notifyListeners( final boolean enabled ) {
