@@ -27,10 +27,7 @@ import org.uberfire.client.workbench.widgets.menu.WorkbenchMenuBarPresenter;
 import org.uberfire.security.authz.AuthorizationManager;
 import org.uberfire.workbench.model.menu.Menus;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -39,14 +36,6 @@ import com.google.gwt.user.client.ui.Widget;
 public class WorkbenchMenuBarView extends Composite
         implements
         WorkbenchMenuBarPresenter.View {
-
-    interface WorkbenchMenuBarViewBinder
-            extends
-            UiBinder<Panel, WorkbenchMenuBarView> {
-
-    }
-
-    private static WorkbenchMenuBarViewBinder uiBinder = GWT.create( WorkbenchMenuBarViewBinder.class );
 
     @Inject
     private AuthorizationManager authzManager;

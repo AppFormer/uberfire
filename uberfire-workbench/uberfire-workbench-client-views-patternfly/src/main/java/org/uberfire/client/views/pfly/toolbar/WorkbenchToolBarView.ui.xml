@@ -17,7 +17,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
+             xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
   <ui:with field='res' type='org.uberfire.client.resources.WorkbenchResources'/>
 
@@ -49,7 +49,7 @@
 
   <g:FlowPanel ui:field="masterContainer">
     <g:FlowPanel ui:field="container" addStyleNames="{style.container} {res.CSS.toolbar}">
-      <b:ButtonToolbar ui:field="toolBar" addStyleNames="{style.reset_toolbar_margin}"/>
+      <b:ButtonToolBar ui:field="toolBar" addStyleNames="{style.reset_toolbar_margin}"/>
       <b:Tooltip ui:field="tip">
         <g:Button ui:field="viewControl" addStyleNames="{style.expand}">&#8942;</g:Button>
       </b:Tooltip>

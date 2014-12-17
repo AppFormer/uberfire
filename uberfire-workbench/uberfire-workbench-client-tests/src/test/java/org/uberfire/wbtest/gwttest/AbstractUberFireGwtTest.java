@@ -7,7 +7,6 @@ import java.util.ListIterator;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.uberfire.wbtest.client.api.UncaughtExceptionAlerter;
 
-import com.github.gwtbootstrap.client.Bootstrap;
 import com.google.common.base.Predicate;
 import com.google.gwt.user.client.Timer;
 
@@ -32,7 +31,8 @@ public abstract class AbstractUberFireGwtTest extends AbstractErraiCDITest {
         disableBus = true;
 
         // let GwtBootstrap inject its scripts (otherwise, its widgets will blow up during the test)
-        new Bootstrap().onModuleLoad();
+        //new Bootstrap().onModuleLoad();
+        new GwtBootstrap3EntryPoint().onModuleLoad();
 
         super.gwtSetUp();
     }

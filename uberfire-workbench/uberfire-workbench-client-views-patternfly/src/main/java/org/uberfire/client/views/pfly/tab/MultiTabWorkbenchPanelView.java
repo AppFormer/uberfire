@@ -16,8 +16,10 @@
 package org.uberfire.client.views.pfly.tab;
 
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.util.Layouts;
 import org.uberfire.client.workbench.panels.MultiPartWidget;
 import org.uberfire.client.workbench.panels.impl.AbstractMultiPartWorkbenchPanelView;
@@ -27,6 +29,9 @@ import org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter
 @Named("MultiTabWorkbenchPanelView")
 public class MultiTabWorkbenchPanelView
 extends AbstractMultiPartWorkbenchPanelView<MultiTabWorkbenchPanelPresenter> {
+
+    @Inject
+    private PlaceManager placeManager;
 
     @Override
     protected MultiPartWidget setupWidget() {
@@ -40,6 +45,6 @@ extends AbstractMultiPartWorkbenchPanelView<MultiTabWorkbenchPanelPresenter> {
     }
 
     UberTabPanel getUberTabPanel() {
-        return new UberTabPanel( panelManager );
+        return new UberTabPanel( placeManager );
     }
 }

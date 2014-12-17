@@ -8,13 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.shared.event.ShowEvent;
-import org.gwtbootstrap3.client.shared.event.ShownEvent;
-import org.gwtbootstrap3.client.ui.TabPane;
-import org.gwtbootstrap3.client.ui.TabPanel;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.resources.WorkbenchResources;
 import org.uberfire.client.util.Layouts;
-import org.uberfire.client.workbench.PanelManager;
+import org.uberfire.client.views.pfly.tab.TabPanelWithDropdowns.DropDownTab;
 import org.uberfire.client.workbench.panels.MultiPartWidget;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
@@ -31,37 +29,58 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ComplexPanel;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ProvidesResize;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeComposite;
-import com.google.gwt.user.client.ui.TabBar.Tab;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * A wrapper around {@link TabPanelWithDropdowns} that adds the following capabilities:
+ * <ul>
+ *  <li>Tabs that don't fit in the tab bar are automatically collapsed into a dropdown
+ *  <li>Each tab gets a close button
+ *  <li>Obeys the RequiresResize/ProvidesResize contract (onResize() calls are propagated
+ *      to the visible tab content widgets)
+ *  <li>Participates in UberFire's panel focus system
+ * </ul>
+ */
 public class UberTabPanel extends ResizeComposite implements MultiPartWidget, ClickHandler {
 
-    static class ResizeTabPanel extends TabPanel implements RequiresResize, ProvidesResize {
-
-        public ResizeTabPanel( Tabs tabPosition ) {
-            super( tabPosition );
-        }
+    static class ResizeTabPanel extends TabPanelWithDropdowns implements RequiresResize, ProvidesResize {
 
         @Override
         public void onResize() {
-            // there are two layers of children in a TabPanel: the TabContent and the TabPane.
+            Layouts.setToFillParent( tabContent );
+
             // TabContent is just a container for all the TabPane divs, one of which is made visible at a time.
             // For compatibility with GWT LayoutPanel, we have to set both layers of children to fill their parents.
             // We do it in onResize() to get to the TabPanes no matter how they were added.
-            for ( Widget child : getChildren() ) {
+            for ( Widget child : tabContent ) {
                 Layouts.setToFillParent( child );
                 if ( child instanceof RequiresResize ) {
                     ((RequiresResize) child).onResize();
                 }
-                for( Widget grandChild : (HasWidgets) child ) {
-                    Layouts.setToFillParent( grandChild );
-                }
+            }
+        }
+
+        /**
+         * Returns the height (in pixels) taken up by the tab bar.
+         */
+        public int getTabBarHeight() {
+            return tabBar.getOffsetHeight();
+        }
+
+        /**
+         * Makes the tab panel look more or less prominent.
+         *
+         * @param hasFocus if true, the tab panel will look more prominent. If false, the tab panel will look normal.
+         */
+        public void setFocus( boolean hasFocus ) {
+            if ( hasFocus ) {
+                tabBar.addStyleName( WorkbenchResources.INSTANCE.CSS().activeNavTabs() );
+            } else {
+                tabBar.removeStyleName( WorkbenchResources.INSTANCE.CSS().activeNavTabs() );
             }
         }
 
@@ -70,7 +89,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     private static final int MARGIN = 20;
 
     ResizeTabPanel tabPanel;
-    private final DropdownTab dropdownTab;
+    private final DropDownTab dropdownTab;
 
     /**
      * Flag protecting {@link #updateDisplayedTabs()} from recursively invoking itself through events that it causes.
@@ -79,13 +98,13 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
 
     final List<WorkbenchPartPresenter> parts = new ArrayList<WorkbenchPartPresenter>();
 
-    final Map<WorkbenchPartPresenter.View, TabLink> tabIndex = new HashMap<WorkbenchPartPresenter.View, TabLink>();
-    final Map<TabLink, WorkbenchPartPresenter.View> tabInvertedIndex = new HashMap<TabLink, WorkbenchPartPresenter.View>();
-    final Map<PartDefinition, TabLink> partTabIndex = new HashMap<PartDefinition, TabLink>();
+    final Map<WorkbenchPartPresenter.View, TabPanelEntry> tabIndex = new HashMap<WorkbenchPartPresenter.View, TabPanelEntry>();
+    final Map<TabPanelEntry, WorkbenchPartPresenter.View> tabInvertedIndex = new HashMap<TabPanelEntry, WorkbenchPartPresenter.View>();
+    final Map<PartDefinition, TabPanelEntry> partTabIndex = new HashMap<PartDefinition, TabPanelEntry>();
     private boolean hasFocus = false;
     private final List<Command> focusGainedHandlers = new ArrayList<Command>();
 
-    private final PanelManager panelManager;
+    private final PlaceManager panelManager;
     WorkbenchDragAndDropManager dndManager;
 
     /**
@@ -95,34 +114,31 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
      *            the PanelManager that will be called upon to close a place when the user clicks on its tab's close
      *            button. (TODO: change to PlaceManager).
      */
-    public UberTabPanel( PanelManager panelManager ) {
-        this( panelManager,
-              new DropdownTab( "More..." ) );
-    }
-
-    protected UberTabPanel( PanelManager panelManager, DropdownTab dropdownTab ) {
+    public UberTabPanel( PlaceManager panelManager ) {
         this.panelManager = checkNotNull( "panelManager", panelManager );
-        this.dropdownTab = checkNotNull( "dropdownTab", dropdownTab );
-        tabPanel = new ResizeTabPanel( ABOVE );
-        tabPanel.addShownHandler( new ShownEvent.Handler() {
-            @Override
-            public void onShow( final ShownEvent e ) {
-                onResize();
-                if ( e.getRelatedTarget() != null ) {
-                    BeforeSelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getRelatedTarget() ).getPresenter().getDefinition() );
-                }
-            }
-        } );
-
-        tabPanel.addShowHandler( new ShowEvent.Handler() {
-            @Override
-            public void onShow( final ShowEvent e ) {
-                if ( e.getTarget() == null ) {
-                    return;
-                }
-                SelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getTarget() ).getPresenter().getDefinition() );
-            }
-        } );
+        tabPanel = new ResizeTabPanel();
+        this.dropdownTab = tabPanel.addDropdownTab( "More..." );
+//        tabPanel.addShownHandler( new TabShownHandler() {
+//
+//            @Override
+//            public void onShown( TabShownEvent e ) {
+//                onResize();
+//                if ( e.getTab() != null ) {
+//                    BeforeSelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getTab() ).getPresenter().getDefinition() );
+//                }
+//            }
+//        });
+//
+//        tabPanel.addShowHandler( new TabShowHandler() {
+//
+//            @Override
+//            public void onShow( TabShowEvent e ) {
+//                if ( e.getTab() == null ) {
+//                    return;
+//                }
+//                SelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getTab() ).getPresenter().getDefinition() );
+//            }
+//        } );
 
         tabPanel.addDomHandler( UberTabPanel.this, ClickEvent.getType() );
 
@@ -140,7 +156,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     }
 
     /**
-     * Updates the display ({@link #tabPanel}) to reflect the current desired state of this tab panel.
+     * Updates the {@link #tabPanel} to contain a tab for each part in {@link #parts} in the order the parts
      */
     private void updateDisplayedTabs() {
         if ( updating ) {
@@ -156,49 +172,52 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
             }
 
             int availableSpace = tabPanel.getOffsetWidth();
-            TabLink selectedTab = null;
+            TabPanelEntry selectedTab = null;
+
+            // the number of regular (not dropdown) tabs in the tab bar
+            int regularTabCount = 0;
 
             // add and measure all tabs
             for ( int i = 0; i < parts.size(); i++ ) {
                 WorkbenchPartPresenter part = parts.get( i );
-                TabLink tabWidget = partTabIndex.get( part.getDefinition() );
-                if ( tabWidget.isActive() ) {
-                    selectedTab = tabWidget;
+                TabPanelEntry tabPanelEntry = partTabIndex.get( part.getDefinition() );
+                if ( tabPanelEntry.isActive() ) {
+                    selectedTab = tabPanelEntry;
                 }
-                tabWidget.setActive( false );
-                tabPanel.add( tabWidget );
-                availableSpace -= tabWidget.getOffsetWidth();
+                tabPanelEntry.setActive( false );
+                tabPanel.addItem( tabPanelEntry );
+                regularTabCount++;
+                availableSpace -= tabPanelEntry.getTabWidget().getOffsetWidth();
             }
 
             // if we didn't find any selected tab, let's select the first one
             if ( selectedTab == null ) {
-                TabLink firstTab = (TabLink) getTabs().getWidget( 0 );
+                TabPanelEntry firstTab = partTabIndex.get( parts.get( 0 ) );
                 selectedTab = firstTab;
             }
 
             // now work from right to left to find out how many tabs we have to collapse into the dropdown
             if ( availableSpace < 0 ) {
-                LinkedList<TabLink> newDropdownContents = new LinkedList<TabLink>();
+                LinkedList<TabPanelEntry> newDropdownContents = new LinkedList<TabPanelEntry>();
                 dropdownTab.setText( "More..." );
-                tabPanel.add( dropdownTab );
-                while ( availableSpace - dropdownTab.getOffsetWidth() < 0 && getTabs().getWidgetCount() > 1 ) {
+                tabPanel.addDropdownTab( dropdownTab );
+                while ( availableSpace - dropdownTab.getOffsetWidth() < 0 && regularTabCount > 1 ) {
                     // get the last tab that isn't the dropdown tab
-                    TabLink tabWidget = (TabLink) getTabs().getWidget( getTabs().getWidgetCount() - 2 );
-                    availableSpace += tabWidget.getOffsetWidth();
-                    tabPanel.remove( tabWidget );
-                    newDropdownContents.addFirst( tabWidget );
-                    if ( tabWidget == selectedTab ) {
-                        dropdownTab.setText( tabInvertedIndex.get( selectedTab ).getPresenter().getTitle() );
+                    TabPanelEntry tab = partTabIndex.get( parts.get( regularTabCount - 1 ) );
+                    availableSpace += tab.getTabWidget().getOffsetWidth();
+                    tabPanel.remove( tab );
+                    newDropdownContents.addFirst( tab );
+                    if ( tab == selectedTab ) {
+                        dropdownTab.setText( selectedTab.getTitle() );
                     }
                 }
 
-                for ( TabLink l : newDropdownContents ) {
-                    dropdownTab.add( l );
-                    getTabContent().add( l.getTabPane() );
+                for ( TabPanelEntry l : newDropdownContents ) {
+                    dropdownTab.addItem( l );
                 }
             }
 
-            selectedTab.show();
+            selectedTab.showTab();
 
         } finally {
             updating = false;
@@ -207,31 +226,31 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
 
     @Override
     public boolean selectPart( final PartDefinition id ) {
-        final TabLink tab = partTabIndex.get( id );
+        final TabPanelEntry tab = partTabIndex.get( id );
         if ( tab != null ) {
-            tab.show();
+            tab.showTab();
         }
         return false;
     }
 
     @Override
     public boolean remove( final PartDefinition id ) {
-        final TabLink tab = partTabIndex.get( id );
+        final TabPanelEntry tab = partTabIndex.get( id );
         if ( tab == null ) {
             return false;
         }
-        int removedTabIndex = getTabs().getWidgetIndex( tab );
         final boolean wasActive = tab.isActive();
 
         View partView = tabInvertedIndex.remove( tab );
-        parts.remove( partView.getPresenter() );
+        int removedTabIndex = parts.indexOf( partView.getPresenter() );
+        parts.remove( removedTabIndex );
         tabIndex.remove( partView );
         partTabIndex.remove( id );
 
         updateDisplayedTabs();
 
-        if ( removedTabIndex >= 0 && wasActive && getTabs().getWidgetCount() > 0 ) {
-            tabPanel.selectTab( removedTabIndex <= 0 ? 0 : removedTabIndex - 1 );
+        if ( removedTabIndex >= 0 && wasActive && parts.size() > 0 ) {
+            selectPart( parts.get( removedTabIndex <= 0 ? 0 : removedTabIndex - 1 ).getDefinition() );
         }
 
         return true;
@@ -241,9 +260,9 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     public void changeTitle( final PartDefinition id,
                              final String title,
                              final IsWidget titleDecoration ) {
-        final TabLink tabLink = partTabIndex.get( id );
-        if ( tabLink != null ) {
-            tabLink.setText( title );
+        final TabPanelEntry tab = partTabIndex.get( id );
+        if ( tab != null ) {
+            tab.setTitle( title );
         }
     }
 
@@ -265,19 +284,25 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     @Override
     public void addPart( final WorkbenchPartPresenter.View view ) {
         if ( !tabIndex.containsKey( view ) ) {
-            final Tab newTab = createTab( view, false, 0, 0 );
+            final TabPanelEntry tab = tabPanel.addItem( view.getPresenter().getTitle(), view.asWidget() );
+
+            resizeIfNeeded( view.asWidget() );
+
+            tabIndex.put( view, tab );
+            tabInvertedIndex.put( tab, view );
+            partTabIndex.put( view.getPresenter().getDefinition(), tab );
+
+            dndManager.makeDraggable( view, tab.getTabWidget() );
+            addCloseToTab( tab.getTabWidget() );
+
             parts.add( view.getPresenter() );
-            tabIndex.put( view, newTab.asTabLink() );
+            tabIndex.put( view, tab );
             updateDisplayedTabs();
         }
     }
 
-    boolean isFirstWidget() {
-        return getTabs().getWidgetCount() == 1;
-    }
-
     /**
-     * The GwtBootstrap TabPanel doesn't support the RequiresResize/ProvidesResize contract, and UberTabPanel fills in
+     * The GwtBootstrap3 TabPanel doesn't support the RequiresResize/ProvidesResize contract, and UberTabPanel fills in
      * the gap. This helper method allows us to call onResize() on the widgets that need it.
      *
      * @param widget the widget that has just been resized
@@ -288,53 +313,6 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
         }
     }
 
-    /**
-     * Creates a tab widget for the given part view, adding it to the tab/partDef/tabLink maps.
-     */
-    Tab createTab( final WorkbenchPartPresenter.View view,
-                   final boolean isActive,
-                   final int width,
-                   final int height ) {
-
-        final Tab tab = createTab( view, isActive );
-
-        tab.addClickHandler( createTabClickHandler( view, tab ) );
-
-        tab.add( view.asWidget() );
-
-        resizeIfNeeded( view.asWidget() );
-
-        tabIndex.put( view, tab.asTabLink() );
-        tabInvertedIndex.put( tab.asTabLink(), view );
-        partTabIndex.put( view.getPresenter().getDefinition(), tab.asTabLink() );
-
-        dndManager.makeDraggable( view, tab.asTabLink().getWidget( 0 ) );
-
-        return addCloseToTab( tab );
-    }
-
-    /**
-     * Subroutine of {@link #createTab(View, boolean, int, int)}. Exposed for testing. Never call this except from
-     * within the other createTab method.
-     */
-    Tab createTab( final WorkbenchPartPresenter.View view,
-                   final boolean isActive ) {
-        Tab tab = new Tab();
-        tab.setHeading( view.getPresenter().getTitle() );
-        tab.setActive( isActive );
-        return tab;
-    }
-
-    private ClickHandler createTabClickHandler( final WorkbenchPartPresenter.View view,
-                                                final Tab tab ) {
-        return new ClickHandler() {
-            @Override
-            public void onClick( final ClickEvent event ) {
-                UberTabPanel.this.onClick( event );
-            }
-        };
-    }
-
     @Override
     public void onResize() {
         final int width = getOffsetWidth();
@@ -342,51 +320,31 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
 
         updateDisplayedTabs();
 
-        TabLink selectedTab = getSelectedTab();
+        TabPanelEntry selectedTab = getSelectedTab();
         if ( selectedTab != null ) {
-            final TabPane tabPane = selectedTab.getTabPane();
-            Widget tabPaneContent = tabPane.getWidget( 0 );
+            Widget tabPaneContent = selectedTab.getContents();
             tabPaneContent.setPixelSize( width, height - getTabHeight() );
             resizeIfNeeded(tabPaneContent);
         }
     }
 
     private int getTabHeight() {
-        return tabPanel.getWidget( 0 ).getOffsetHeight() + MARGIN;
+        return tabPanel.getTabBarHeight() + MARGIN;
     }
 
-    /**
-     * Returns the panel (from inside {@link #tabPanel}) that contains the panel content for each tab. Each child of the
-     * returned panel is the GUI that will be shown then its corresponding tab is selected.
-     */
-    private ComplexPanel getTabContent() {
-        return (ComplexPanel) tabPanel.getWidget( 1 );
-    }
+    private void addCloseToTab( final TabListItem tab ) {
+        final Button close = new Button( "&times;" );
+        close.setStyleName( "close" );
+        close.addStyleName( WorkbenchResources.INSTANCE.CSS().tabCloseButton() );
+        close.addClickHandler( new ClickHandler() {
+            @Override
+            public void onClick( final ClickEvent event ) {
+                final WorkbenchPartPresenter.View partToDeselect = tabInvertedIndex.get( tab );
+                panelManager.closePlace( partToDeselect.getPresenter().getDefinition().getPlace() );
+            }
+        } );
 
-    /**
-     * Returns the panel (from inside {@link #tabPanel}) that contains the tab widgets. Each child of the returned panel
-     * is a tab in the GUI.
-     */
-    private ComplexPanel getTabs() {
-        return (ComplexPanel) tabPanel.getWidget( 0 );
-    }
-
-    private Tab addCloseToTab( final Tab tab ) {
-        final Button close = new Button( "&times;" ) {{
-            setStyleName( "close" );
-            addStyleName( WorkbenchResources.INSTANCE.CSS().tabCloseButton() );
-            addClickHandler( new ClickHandler() {
-                @Override
-                public void onClick( final ClickEvent event ) {
-                    final WorkbenchPartPresenter.View partToDeselect = tabInvertedIndex.get( tab.asTabLink() );
-                    panelManager.closePart( partToDeselect.getPresenter().getDefinition() );
-                }
-            } );
-        }};
-
-        tab.addDecorate( close );
-
-        return tab;
+        tab.add( close );
     }
 
     @Override
@@ -397,11 +355,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     @Override
     public void setFocus( final boolean hasFocus ) {
         this.hasFocus = hasFocus;
-        if ( hasFocus ) {
-            getTabs().setStyleName( WorkbenchResources.INSTANCE.CSS().activeNavTabs(), true );
-        } else {
-            getTabs().removeStyleName( WorkbenchResources.INSTANCE.CSS().activeNavTabs() );
-        }
+        tabPanel.setFocus( hasFocus );
     }
 
     @Override
@@ -418,8 +372,8 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     /**
      * Gets the selected tab, even if it's nested in the DropdownTab. Returns null if no tab is selected.
      */
-    private TabLink getSelectedTab() {
-        for ( TabLink tab : tabInvertedIndex.keySet() ) {
+    private TabPanelEntry getSelectedTab() {
+        for ( TabPanelEntry tab : tabInvertedIndex.keySet() ) {
             if ( tab.isActive() ) {
                 return tab;
             }

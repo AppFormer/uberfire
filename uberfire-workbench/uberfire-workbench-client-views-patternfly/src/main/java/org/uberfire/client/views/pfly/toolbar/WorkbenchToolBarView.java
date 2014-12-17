@@ -18,18 +18,19 @@ package org.uberfire.client.views.pfly.toolbar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.uberfire.client.resources.i18n.WorkbenchConstants;
+import org.uberfire.client.views.pfly.sys.PatternFlyBootstrapper;
 import org.uberfire.client.workbench.widgets.toolbar.WorkbenchToolBarPresenter;
 import org.uberfire.workbench.model.toolbar.ToolBar;
 import org.uberfire.workbench.model.toolbar.ToolBarItem;
 import org.uberfire.workbench.model.toolbar.ToolBarTypeIcon;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ButtonGroup;
-import com.github.gwtbootstrap.client.ui.ButtonToolbar;
-import com.github.gwtbootstrap.client.ui.Tooltip;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.github.gwtbootstrap.client.ui.constants.Placement;
 import com.google.gwt.animation.client.Animation;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -66,7 +67,7 @@ public class WorkbenchToolBarView extends Composite
     public FlowPanel container;
 
     @UiField
-    public ButtonToolbar toolBar;
+    public ButtonToolBar toolBar;
 
     @UiField
     public SimplePanel simpleMargin;
@@ -87,6 +88,7 @@ public class WorkbenchToolBarView extends Composite
     private final Map<String, ButtonGroup> toolBarItemsMap = new HashMap<String, ButtonGroup>();
 
     public WorkbenchToolBarView() {
+        PatternFlyBootstrapper.ensurejQueryIsAvailable();
         initWidget( uiBinder.createAndBindUi( this ) );
         tip.setText( WorkbenchConstants.INSTANCE.collapseToolbar() );
         tip.setPlacement( Placement.LEFT );
@@ -94,10 +96,6 @@ public class WorkbenchToolBarView extends Composite
         simpleMargin.setVisible( false );
     }
 
-    /**
-     * Add a Tool Bar item to the view. Filtering of menu items for permissions
-     * is conducted by the Presenter.
-     */
     @Override
     public void addToolBar( final ToolBar _toolBar ) {
 
@@ -108,19 +106,19 @@ public class WorkbenchToolBarView extends Composite
         }
 
         for ( final ToolBarItem item : _toolBar.getItems() ) {
-            bgroup.add( new Tooltip( item.getTooltip() ) {{
-                setPlacement( Placement.BOTTOM );
-                add( new Button() {{
-                    setIcon( IconType.valueOf( ( (ToolBarTypeIcon) item.getIcon() ).getType().toString() ) );
-                    setEnabled( item.isEnabled() );
-                    addClickHandler( new ClickHandler() {
-                        @Override
-                        public void onClick( final ClickEvent event ) {
-                            item.getCommand().execute();
-                        }
-                    } );
-                }} );
-            }} );
+            Button button = new Button();
+            button.setIcon( IconType.valueOf( ( (ToolBarTypeIcon) item.getIcon() ).getType().toString() ) );
+            button.setEnabled( item.isEnabled() );
+            button.addClickHandler( new ClickHandler() {
+                @Override
+                public void onClick( final ClickEvent event ) {
+                    item.getCommand().execute();
+                }
+            } );
+
+            Tooltip tooltip = new Tooltip( button );
+            tooltip.setPlacement( Placement.BOTTOM );
+            bgroup.add( tooltip );
         }
 
         toolBarItemsMap.put( _toolBar.getId(), bgroup );

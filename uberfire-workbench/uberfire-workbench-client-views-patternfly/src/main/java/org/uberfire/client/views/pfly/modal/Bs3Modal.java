@@ -48,9 +48,7 @@ public class Bs3Modal extends Composite {
     /**
      * This is a CDI bean. It should be instantiated through the Errai bean manager.
      */
-    @Inject
-    Bs3Modal() {
-
+    public Bs3Modal() {
     }
 
     @PostConstruct
