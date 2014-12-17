@@ -37,7 +37,7 @@ public class TabPanelEntry implements HasActive {
         tab.setDataTargetWidget( contentPane );
     }
 
-    public TabListItem getTabWidget() {
+    public DropDownTabListItem getTabWidget() {
         return tab;
     }
 
@@ -68,7 +68,7 @@ public class TabPanelEntry implements HasActive {
     /**
      * Represents the tab widget that lives in the tab bar or under a dropdown tab.
      */
-    static class DropDownTabListItem extends TabListItem {
+    public static class DropDownTabListItem extends TabListItem {
 
         public DropDownTabListItem( String label ) {
             super( label );
@@ -78,8 +78,15 @@ public class TabPanelEntry implements HasActive {
         /**
          * Sets this tab for use in the top-level tab bar (isDropdown false) or inside a dropdown tab (isDropdown true).
          */
-        void setInDropdown( boolean inDropdown ) {
+        public void setInDropdown( boolean inDropdown ) {
             anchor.setTabIndex( inDropdown ? -1 : 0 );
+        }
+
+        /**
+         * Adds the given widget as a child of the anchor within the tab.
+         */
+        public void addToAnchor( Widget w ) {
+            anchor.add( w );
         }
     }
 
@@ -104,6 +111,11 @@ public class TabPanelEntry implements HasActive {
      */
     public void showTab() {
         tab.showTab(false);
+    }
+
+    @Override
+    public String toString() {
+        return "TabPanelEntry \"" + title + "\"";
     }
 
 }

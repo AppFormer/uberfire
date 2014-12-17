@@ -2,9 +2,7 @@ package org.uberfire.client.views.pfly.tab;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.shared.event.TabShowEvent;
@@ -63,7 +61,13 @@ public class TabPanelWithDropdowns extends Composite {
         }
     };
 
-    private final Map<TabPanelEntry, HandlerRegistration> tabHandlerRegistrations = new IdentityHashMap<TabPanelEntry, HandlerRegistration>();
+    private final Multimap<TabPanelEntry, HandlerRegistration> tabHandlerRegistrations = HashMultimap.create();
+
+    /**
+     * All tabs (both top-level and nested) that have content associated with them. In other words, everything except
+     * the dropdown tabs themselves.
+     */
+    private final Set<TabPanelEntry> allContentTabs = new HashSet<TabPanelEntry>();
 
     /**
      * Creates an empty tab panel.
@@ -100,6 +104,7 @@ public class TabPanelWithDropdowns extends Composite {
      * @param tab the label and contents associated with the new tab.
      */
     public void addItem( TabPanelEntry tab ) {
+        allContentTabs.add( tab );
         tabHandlerRegistrations.put( tab, tab.getTabWidget().addShowHandler( clearActiveStyles ) );
         activatableWidgets.add( tab.getTabWidget() );
         tabBar.add( tab.getTabWidget() );
@@ -113,12 +118,13 @@ public class TabPanelWithDropdowns extends Composite {
      *            the item to remove.
      */
     public boolean remove( TabPanelEntry tab ) {
-        if ( tabHandlerRegistrations.get( tab ) != null ) {
-            tabHandlerRegistrations.remove( tab ).removeHandler();
+        for ( HandlerRegistration registration : tabHandlerRegistrations.removeAll( tab ) ) {
+            registration.removeHandler();
         }
         boolean removed = tabBar.remove( tab.getTabWidget() );
+        tabContent.remove( tab.getContentPane() );
         activatableWidgets.remove( tab.getTabWidget() );
-        tab.getContents().asWidget().removeFromParent();
+        allContentTabs.remove( tab );
         return removed;
     }
 
@@ -137,7 +143,7 @@ public class TabPanelWithDropdowns extends Composite {
         AnchorListItem tab = new AnchorListItem( label );
 
         // FIXME should actually subclass AnchorListItem and add a <b class=caret/> to the anchor elem
-        tab.setIcon( IconType.CARET_DOWN );
+        tab.setIcon( IconType.ANGLE_DOWN );
         tab.setIconPosition( IconPosition.RIGHT );
 
         tab.addStyleName( Styles.DROPDOWN_TOGGLE );
@@ -158,6 +164,8 @@ public class TabPanelWithDropdowns extends Composite {
      */
     public void addDropdownTab( DropDownTab contents ) {
         AnchorListItem tab = contents.owningTab;
+
+        // TODO for each contained tab, reattach handlers and add to allContentTabs list
 
         // gets set to active when one of the menu items is selected
         activatableWidgets.add( tab );
@@ -189,6 +197,7 @@ public class TabPanelWithDropdowns extends Composite {
         public void addItem( TabPanelEntry tab ) {
             tab.setInDropdown( true );
             contents.add( tab );
+            allContentTabs.add( tab );
 
             TabListItem tabWidget = tab.getTabWidget();
             activatableWidgets.add( tabWidget );
@@ -225,8 +234,16 @@ public class TabPanelWithDropdowns extends Composite {
                 }
 
                 activatableWidgets.remove( tab.getTabWidget() );
+                allContentTabs.remove( tab );
             }
             contents.clear();
+        }
+
+        /**
+         * Returns the offset width of the dropdown tab widget itself ({@link #getOffsetWidth()} returns the width of the popup window).
+         */
+        public int getTabWidth() {
+            return owningTab.getOffsetWidth();
         }
     }
 
@@ -234,9 +251,28 @@ public class TabPanelWithDropdowns extends Composite {
      * Removes all tabs and content from this tab panel.
      */
     public void clear() {
+        for ( HandlerRegistration registration : tabHandlerRegistrations.values() ) {
+            registration.removeHandler();
+        }
+        tabHandlerRegistrations.clear();
         tabBar.clear();
-        tabContent.clear();
         activatableWidgets.clear();
-        // TODO clear all handler registrations
+        tabContent.clear();
+        allContentTabs.clear();
+    }
+
+    /**
+     * Returns the tab whose contents are currently being displayed. The tab widget itself may be a top-level tab, or
+     * nested under a dropdown tab.
+     *
+     * @return the currently selected (active) tab. If no tab has been displayed yet, returns null.
+     */
+    public TabPanelEntry getActiveTab() {
+        for ( TabPanelEntry entry : allContentTabs ) {
+            if ( entry.isActive() ) {
+                return entry;
+            }
+        }
+        return null;
     }
 }

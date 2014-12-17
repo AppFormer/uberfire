@@ -55,15 +55,15 @@
         <g:FlowPanel styleName="{style.pull-right} {style.better_margin}" ui:field="menuArea">
           <g:FlowPanel styleName="{style.inline} {style.better_margin}" ui:field="contextMenu"/>
           <tb:ButtonGroup ui:field="closeButtonContainer">
-            <tb:Button ui:field="closeButton" size="MINI" icon="REMOVE"/>
+            <tb:Button ui:field="closeButton" size="EXTRA_SMALL" icon="TIMES"/> <!-- "remove" and "close" are aliases for "times" -->
           </tb:ButtonGroup>
           <tb:ButtonGroup ui:field="dropdownCaretContainer">
-            <tb:Button ui:field="dropdownCaret" size="MINI" dataToggle="DROPDOWN"/>
+            <tb:Button ui:field="dropdownCaret" size="EXTRA_SMALL" dataToggle="DROPDOWN"/>
           </tb:ButtonGroup>
         </g:FlowPanel>
 
         <g:FlowPanel styleName="{style.inline}">
-          <tb:Button ui:field="contextDisplay" size="MINI" icon="REORDER"/>
+          <tb:Button ui:field="contextDisplay" size="EXTRA_SMALL" icon="REORDER"/>
           <g:SimplePanel styleName="{style.inline} {style.title}" ui:field="title"/>
         </g:FlowPanel>
 

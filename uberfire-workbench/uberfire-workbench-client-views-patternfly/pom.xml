@@ -70,6 +70,9 @@
         break the Intellij GWT plug-in -->
       <resource>
         <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>**/*.less</exclude>
+        </excludes>
       </resource>
     </resources>
     

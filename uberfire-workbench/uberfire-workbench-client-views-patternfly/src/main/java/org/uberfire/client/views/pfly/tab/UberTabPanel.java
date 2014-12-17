@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.base.HasActive;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.resources.WorkbenchResources;
 import org.uberfire.client.util.Layouts;
@@ -58,8 +58,11 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
             // We do it in onResize() to get to the TabPanes no matter how they were added.
             for ( Widget child : tabContent ) {
                 Layouts.setToFillParent( child );
-                if ( child instanceof RequiresResize ) {
-                    ((RequiresResize) child).onResize();
+                if ( ((HasActive) child).isActive() ) {
+                    child.setPixelSize( getOffsetWidth(), getOffsetHeight() - getTabBarHeight() );
+                    if ( child instanceof RequiresResize ) {
+                        ((RequiresResize) child).onResize();
+                    }
                 }
             }
         }
@@ -112,7 +115,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
      *
      * @param panelManager
      *            the PanelManager that will be called upon to close a place when the user clicks on its tab's close
-     *            button. (TODO: change to PlaceManager).
+     *            button.
      */
     public UberTabPanel( PlaceManager panelManager ) {
         this.panelManager = checkNotNull( "panelManager", panelManager );
@@ -192,7 +195,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
 
             // if we didn't find any selected tab, let's select the first one
             if ( selectedTab == null ) {
-                TabPanelEntry firstTab = partTabIndex.get( parts.get( 0 ) );
+                TabPanelEntry firstTab = getTab( 0 );
                 selectedTab = firstTab;
             }
 
@@ -201,9 +204,9 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
                 LinkedList<TabPanelEntry> newDropdownContents = new LinkedList<TabPanelEntry>();
                 dropdownTab.setText( "More..." );
                 tabPanel.addDropdownTab( dropdownTab );
-                while ( availableSpace - dropdownTab.getOffsetWidth() < 0 && regularTabCount > 1 ) {
+                while ( availableSpace - dropdownTab.getTabWidth() < 0 && regularTabCount > 1 ) {
                     // get the last tab that isn't the dropdown tab
-                    TabPanelEntry tab = partTabIndex.get( parts.get( regularTabCount - 1 ) );
+                    TabPanelEntry tab = getTab( --regularTabCount );
                     availableSpace += tab.getTabWidget().getOffsetWidth();
                     tabPanel.remove( tab );
                     newDropdownContents.addFirst( tab );
@@ -222,6 +225,10 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
         } finally {
             updating = false;
         }
+    }
+
+    private TabPanelEntry getTab( int i ) {
+        return checkNotNull( "part entry in map", partTabIndex.get( parts.get( i ).getDefinition() ) );
     }
 
     @Override
@@ -293,7 +300,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
             partTabIndex.put( view.getPresenter().getDefinition(), tab );
 
             dndManager.makeDraggable( view, tab.getTabWidget() );
-            addCloseToTab( tab.getTabWidget() );
+            addCloseToTab( tab );
 
             parts.add( view.getPresenter() );
             tabIndex.put( view, tab );
@@ -315,24 +322,11 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
 
     @Override
     public void onResize() {
-        final int width = getOffsetWidth();
-        final int height = getOffsetHeight();
-
         updateDisplayedTabs();
-
-        TabPanelEntry selectedTab = getSelectedTab();
-        if ( selectedTab != null ) {
-            Widget tabPaneContent = selectedTab.getContents();
-            tabPaneContent.setPixelSize( width, height - getTabHeight() );
-            resizeIfNeeded(tabPaneContent);
-        }
+        tabPanel.onResize();
     }
 
-    private int getTabHeight() {
-        return tabPanel.getTabBarHeight() + MARGIN;
-    }
-
-    private void addCloseToTab( final TabListItem tab ) {
+    private void addCloseToTab( final TabPanelEntry tab ) {
         final Button close = new Button( "&times;" );
         close.setStyleName( "close" );
         close.addStyleName( WorkbenchResources.INSTANCE.CSS().tabCloseButton() );
@@ -344,7 +338,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
             }
         } );
 
-        tab.add( close );
+        tab.getTabWidget().addToAnchor( close );
     }
 
     @Override

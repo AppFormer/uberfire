@@ -1,7 +1,6 @@
 package org.uberfire.client.views.pfly.menu;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Stack;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -35,7 +34,7 @@ public class Bs3Menus {
      * @param menus the description of the menus to build. Not null.
      * @param authzManager the current authorization manager for the application. Not null.
      * @param identity the identity of the user who will see the menus. Not null.
-     * @param topLevelWidget the container to all all the menu items to. Not null.
+     * @param topLevelWidget the container to add all the menu items to. Not null.
      */
     public static void constructMenuView( final Menus menus,
                                           final AuthorizationManager authzManager,
@@ -44,7 +43,7 @@ public class Bs3Menus {
 
         MenuVisitor viewBuilder = new MenuVisitor() {
 
-            Deque<HasMenuItems> parentMenus = new ArrayDeque<HasMenuItems>();
+            Stack<HasMenuItems> parentMenus = new Stack<HasMenuItems>();
 
             @Override
             public boolean visitEnter( Menus menus ) {
@@ -66,7 +65,12 @@ public class Bs3Menus {
             @Override
             public void visitLeave( MenuGroup menuGroup ) {
                 HasMenuItems finishedMenu = parentMenus.pop();
-                parentMenus.peek().addMenuItem( (AbstractListItem) finishedMenu );
+
+                // XXX probably Bs3DropDownMenu should extend AbstractListItem so we don't need to wrap it in an <li> here
+                ListItem dropDownMenuWrapper = new ListItem();
+                dropDownMenuWrapper.add( finishedMenu );
+
+                parentMenus.peek().addMenuItem( dropDownMenuWrapper );
             }
 
             @Override
