@@ -49,19 +49,54 @@ public class TabPanelWithDropdowns extends Composite {
     private final Set<Widget> activatableWidgets = new HashSet<Widget>();
 
     /**
-     * Removes the "active" style class from all widgets in {@link #activatableWidgets}.
+     * Removes the "active" style class from all widgets in {@link #activatableWidgets}, then propagates the event to
+     * the panel-level listeners.
      */
-    private final TabShowHandler clearActiveStyles = new TabShowHandler() {
+    private final TabShowHandler individualTabShowHandler = new TabShowHandler() {
 
         @Override
         public void onShow( TabShowEvent showEvent ) {
             for ( Widget w : activatableWidgets ) {
                 w.removeStyleName( Styles.ACTIVE );
             }
+            TabPanelWithDropdowns.this.fireEvent( showEvent );
         }
     };
 
+    /**
+     * Propagates the event to the panel-level listeners.
+     */
+    private final TabShownHandler individualTabShownHandler = new TabShownHandler() {
+        @Override
+        public void onShown( TabShownEvent shownEvent ) {
+            TabPanelWithDropdowns.this.fireEvent( shownEvent );
+        }
+    };
+
+    /**
+     * These are our own registrations on the events from the individual tabs, which must be removed when the associated
+     * tab is removed. This is <i>not</i> a record of registrations we've handed out at the panel level: those are
+     * managed by this widget's HandlerManager.
+     */
     private final Multimap<TabPanelEntry, HandlerRegistration> tabHandlerRegistrations = HashMultimap.create();
+
+    /**
+     * Registers a handler that is notified just before any tab in this panel (nested under a dropdown or not) is shown.
+     *
+     * @param tabShowHandler the handler that will receive the notifications.
+     */
+    public HandlerRegistration addShowHandler( TabShowHandler tabShowHandler ) {
+        return addHandler( tabShowHandler, TabShowEvent.getType() );
+    }
+
+    /**
+     * Registers a handler that is notified just after any tab in this panel (nested under a dropdown or not) is shown.
+     *
+     * @param tabShowHandler the handler that will receive the notifications.
+     */
+    public HandlerRegistration addShownHandler( TabShownHandler tabShownHandler ) {
+        return addHandler( tabShownHandler, TabShownEvent.getType() );
+    }
 
     /**
      * All tabs (both top-level and nested) that have content associated with them. In other words, everything except
@@ -105,7 +140,8 @@ public class TabPanelWithDropdowns extends Composite {
      */
     public void addItem( TabPanelEntry tab ) {
         allContentTabs.add( tab );
-        tabHandlerRegistrations.put( tab, tab.getTabWidget().addShowHandler( clearActiveStyles ) );
+        tabHandlerRegistrations.put( tab, tab.getTabWidget().addShowHandler( individualTabShowHandler ) );
+        tabHandlerRegistrations.put( tab, tab.getTabWidget().addShownHandler( individualTabShownHandler ) );
         activatableWidgets.add( tab.getTabWidget() );
         tabBar.add( tab.getTabWidget() );
         tabContent.add( tab.getContentPane() );
@@ -201,7 +237,8 @@ public class TabPanelWithDropdowns extends Composite {
 
             TabListItem tabWidget = tab.getTabWidget();
             activatableWidgets.add( tabWidget );
-            tabHandlerRegistrations.put( tab, tabWidget.addShowHandler( clearActiveStyles ) );
+            tabHandlerRegistrations.put( tab, tabWidget.addShowHandler( individualTabShowHandler ) );
+            tabHandlerRegistrations.put( tab, tabWidget.addShownHandler( individualTabShownHandler ) );
             tabHandlerRegistrations.put( tab, tabWidget.addShownHandler( new TabShownHandler() {
 
                 @Override

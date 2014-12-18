@@ -8,6 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.shared.event.TabShowEvent;
+import org.gwtbootstrap3.client.shared.event.TabShowHandler;
+import org.gwtbootstrap3.client.shared.event.TabShownEvent;
+import org.gwtbootstrap3.client.shared.event.TabShownHandler;
+import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.base.HasActive;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.resources.WorkbenchResources;
@@ -86,7 +91,6 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
                 tabBar.removeStyleName( WorkbenchResources.INSTANCE.CSS().activeNavTabs() );
             }
         }
-
     }
 
     private static final int MARGIN = 20;
@@ -121,27 +125,28 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
         this.panelManager = checkNotNull( "panelManager", panelManager );
         tabPanel = new ResizeTabPanel();
         this.dropdownTab = tabPanel.addDropdownTab( "More..." );
-//        tabPanel.addShownHandler( new TabShownHandler() {
-//
-//            @Override
-//            public void onShown( TabShownEvent e ) {
-//                onResize();
-//                if ( e.getTab() != null ) {
-//                    BeforeSelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getTab() ).getPresenter().getDefinition() );
-//                }
-//            }
-//        });
-//
-//        tabPanel.addShowHandler( new TabShowHandler() {
-//
-//            @Override
-//            public void onShow( TabShowEvent e ) {
-//                if ( e.getTab() == null ) {
-//                    return;
-//                }
-//                SelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( e.getTab() ).getPresenter().getDefinition() );
-//            }
-//        } );
+
+        tabPanel.addShowHandler( new TabShowHandler() {
+
+            @Override
+            public void onShow( TabShowEvent e ) {
+                if ( e.getTab() != null ) {
+                    TabPanelEntry selected = findEntryForTabWidget( e.getTab() );
+                    BeforeSelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( selected ).getPresenter().getDefinition() );
+                }
+            }
+        } );
+        tabPanel.addShownHandler( new TabShownHandler() {
+
+            @Override
+            public void onShown( TabShownEvent e ) {
+                onResize();
+                if ( e.getTab() != null ) {
+                    TabPanelEntry selected = findEntryForTabWidget( e.getTab() );
+                    SelectionEvent.fire( UberTabPanel.this, tabInvertedIndex.get( selected ).getPresenter().getDefinition() );
+                }
+            }
+        });
 
         tabPanel.addDomHandler( UberTabPanel.this, ClickEvent.getType() );
 
@@ -369,6 +374,18 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
     private TabPanelEntry getSelectedTab() {
         for ( TabPanelEntry tab : tabInvertedIndex.keySet() ) {
             if ( tab.isActive() ) {
+                return tab;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds the TabPanelEntry associated with the given tab widget, even if it's nested in a DropdownTab.
+     */
+    private TabPanelEntry findEntryForTabWidget( TabListItem tabWidget ) {
+        for ( TabPanelEntry tab : tabInvertedIndex.keySet() ) {
+            if ( tab.getTabWidget() == tabWidget ) {
                 return tab;
             }
         }

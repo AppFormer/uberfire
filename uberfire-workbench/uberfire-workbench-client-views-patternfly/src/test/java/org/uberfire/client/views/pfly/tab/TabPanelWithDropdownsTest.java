@@ -1,6 +1,8 @@
 package org.uberfire.client.views.pfly.tab;
 
 import org.gwtbootstrap3.client.GwtBootstrap3EntryPoint;
+import org.uberfire.client.views.pfly.mock.CountingTabShowHandler;
+import org.uberfire.client.views.pfly.mock.CountingTabShownHandler;
 
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.user.client.ui.Label;
@@ -68,12 +70,28 @@ public class TabPanelWithDropdownsTest extends GWTTestCase {
 
         // checking that the content _pane_ was removed, and the content itself is still parented to the content pane.
         // this rule could be changed if the tab panel would always reconnect the tab item's content to its content pane
-        // when adding an entry back to the panel
+        // when adding an entry back to the panel. Feel free to change this if necessary/convenient.
         assertEquals( item1.getContentPane(), item1.getContents().getParent() );
         assertNull( item1.getContentPane().getParent() );
 
         assertFalse( item2.getContentPane().isActive() );
         assertFalse( item2.getTabWidget().isActive() );
+    }
+
+    public void testRebroadcastShowEvents() throws Exception {
+        RootPanel.get().add( tabPanel );
+
+        CountingTabShowHandler showHandler = new CountingTabShowHandler();
+        CountingTabShownHandler shownHandler = new CountingTabShownHandler();
+        tabPanel.addShowHandler( showHandler );
+        tabPanel.addShownHandler( shownHandler );
+
+        // this test leaves it intentionally ambiguous if the show[n] events come from adding the tab or from showing it later
+        TabPanelEntry item1 = tabPanel.addItem( "First Tab", new Label( "First tab's content" ) );
+        item1.showTab();
+
+        assertEquals( 1, showHandler.getEventCount() );
+        assertEquals( 1, shownHandler.getEventCount() );
     }
 
 }
