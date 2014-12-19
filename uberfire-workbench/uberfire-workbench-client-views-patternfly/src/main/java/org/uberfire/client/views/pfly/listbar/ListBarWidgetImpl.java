@@ -26,12 +26,13 @@ import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.NavbarLink;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
@@ -45,7 +46,6 @@ import org.uberfire.client.workbench.widgets.dnd.DragArea;
 import org.uberfire.client.workbench.widgets.dnd.WorkbenchDragAndDropManager;
 import org.uberfire.client.workbench.widgets.listbar.ListBarWidget;
 import org.uberfire.client.workbench.widgets.listbar.ListbarPreferences;
-import org.uberfire.client.workbench.widgets.listbar.ResizeFlowPanel;
 import org.uberfire.client.workbench.widgets.listbar.ResizeFocusPanel;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.mvp.Command;
@@ -133,13 +133,16 @@ extends ResizeComposite implements ListBarWidget {
     FlowPanel contextMenu;
 
     @UiField
-    Button closeButton;
+    Anchor closeButton;
 
     @UiField
-    Button dropdownCaret;
+    Anchor dropdownCaret;
 
     @UiField
     ButtonGroup dropdownCaretContainer;
+
+    @UiField
+    DropDownMenu dropdownMenuItems;
 
     @UiField
     ButtonGroup closeButtonContainer;
@@ -149,8 +152,6 @@ extends ResizeComposite implements ListBarWidget {
 
     @UiField
     FlowPanel menuArea;
-
-    PartChooserList partChooserList = null;
 
     WorkbenchPanelPresenter presenter;
 
@@ -167,6 +168,15 @@ extends ResizeComposite implements ListBarWidget {
     public ListBarWidgetImpl() {
         initWidget( uiBinder.createAndBindUi( this ) );
         setup( true, true );
+
+        // default patternfly dropdown is left-aligned with the trigger button. We need right alignment.
+        dropdownMenuItems.getElement().getStyle().setProperty( "left", "auto" );
+        dropdownMenuItems.getElement().getStyle().setProperty( "right", "0px" );
+
+        // the text shows up too low in the titlebar by default
+        title.getElement().getStyle().setPosition( Position.RELATIVE );
+        title.getElement().getStyle().setTop( -5, Unit.PX );
+
         Layouts.setToFillParent( this );
         scheduleResize();
     }
@@ -259,9 +269,7 @@ extends ResizeComposite implements ListBarWidget {
         partContentView.clear();
         partTitle.clear();
         currentPart = null;
-        if ( partChooserList != null ) {
-            partChooserList.clear();
-        }
+        dropdownMenuItems.clear();
     }
 
     @Override
@@ -361,10 +369,9 @@ extends ResizeComposite implements ListBarWidget {
 
     private void setupDropdown() {
         if ( isMultiPart ) {
-            dropdownCaret.setPull( Pull.RIGHT );
-            dropdownCaret.clear();
-            partChooserList = new PartChooserList();
-            dropdownCaret.add( partChooserList );
+//            dropdownCaret.setPull( Pull.RIGHT );
+            dropdownCaretContainer.setVisible( true );
+            refillPartChooserList();
         } else {
             dropdownCaretContainer.setVisible( false );
         }
@@ -462,11 +469,9 @@ extends ResizeComposite implements ListBarWidget {
                 ( (RequiresResize) containedWidget ).onResize();
             }
         }
-        if ( partChooserList != null ) {
-            partChooserList.onResize();
-        }
     }
 
+    // TODO refactor this to use a MenuVisitor
     private Widget makeItem( final MenuItem item,
                              boolean isRoot ) {
         if ( !authzManager.authorize( item, identity ) ) {
@@ -582,44 +587,24 @@ extends ResizeComposite implements ListBarWidget {
      * the available parts. Clicking on a list item selects its associated part, making it visible, and hiding all other
      * parts.
      */
-    class PartChooserList extends ResizeComposite {
+    private void refillPartChooserList() {
+        dropdownMenuItems.clear();
+        if ( currentPart != null ) {
+            final String ctitle = ( (WorkbenchPartPresenter.View) partContentView.get( currentPart.getK1() ).getWidget( 0 ) ).getPresenter().getTitle();
+            final AnchorListItem currentPartEntry = new AnchorListItem( ctitle );
+            dropdownMenuItems.add( currentPartEntry );
 
-        final ResizeFlowPanel panel = new ResizeFlowPanel();
-
-        PartChooserList() {
-            initWidget( panel );
-            if ( currentPart != null ) {
-                final String ctitle = ( (WorkbenchPartPresenter.View) partContentView.get( currentPart.getK1() ).getWidget( 0 ) ).getPresenter().getTitle();
-                final NavbarLink navbarLink = new NavbarLink();
-                navbarLink.setText( ctitle );
-                panel.add( navbarLink );
-
-                for ( final PartDefinition part : parts ) {
-                    final String title = ( (WorkbenchPartPresenter.View) partContentView.get( part ).getWidget( 0 ) ).getPresenter().getTitle();
-                    NavbarLink partLink = new NavbarLink();
-                    partLink.setTitle( title );
-                    partLink.addClickHandler( new ClickHandler() {
-                        @Override
-                        public void onClick( final ClickEvent event ) {
-                            selectPart( part );
-                        }
-                    } );
-                    panel.add( partLink );
-                }
+            for ( final PartDefinition part : parts ) {
+                final String title = ( (WorkbenchPartPresenter.View) partContentView.get( part ).getWidget( 0 ) ).getPresenter().getTitle();
+                AnchorListItem selectPartEntry = new AnchorListItem( title );
+                selectPartEntry.addClickHandler( new ClickHandler() {
+                    @Override
+                    public void onClick( final ClickEvent event ) {
+                        selectPart( part );
+                    }
+                } );
+                dropdownMenuItems.add( selectPartEntry );
             }
-            onResize();
-        }
-
-        @Override
-        public void onResize() {
-            int width = content.getOffsetWidth() - 10;
-            if ( width > 0 ) {
-                setWidth( width + "px" );
-            }
-        }
-
-        public void clear() {
-            panel.clear();
         }
     }
 

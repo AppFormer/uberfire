@@ -49,7 +49,16 @@ public class NotificationPopupView extends DecoratedPopupPanel {
     }
 
     public void setType( final NotificationEvent.NotificationType type ) {
-        notification.setType( AlertType.valueOf( type.toString() ) );
+        AlertType bs3Type;
+        switch ( type ) {
+            case ERROR:
+                bs3Type = AlertType.DANGER;
+                break;
+            default:
+                bs3Type = AlertType.valueOf( type.toString() );
+                break;
+        }
+        notification.setType( bs3Type );
     }
 
     /**
