@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.gwtbootstrap3.client.GwtBootstrap3EntryPoint;
 import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.uberfire.wbtest.client.api.UncaughtExceptionAlerter;
 
