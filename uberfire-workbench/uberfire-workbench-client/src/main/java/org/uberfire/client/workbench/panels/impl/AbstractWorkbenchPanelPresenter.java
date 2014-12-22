@@ -17,7 +17,7 @@ package org.uberfire.client.workbench.panels.impl;
 
 import static org.uberfire.debug.Debug.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -48,7 +48,7 @@ public abstract class AbstractWorkbenchPanelPresenter<P extends AbstractWorkbenc
     protected final PerspectiveManager perspectiveManager;
     private PanelDefinition definition;
     private final Event<MaximizePlaceEvent> maximizePanelEvent;
-    protected final Map<Position, WorkbenchPanelPresenter> childPanels = new HashMap<Position, WorkbenchPanelPresenter>();
+    protected final Map<Position, WorkbenchPanelPresenter> childPanels = new LinkedHashMap<Position, WorkbenchPanelPresenter>();
 
     public AbstractWorkbenchPanelPresenter( final WorkbenchPanelView<P> view,
                                             final PerspectiveManager perspectiveManager,
