@@ -1,28 +1,33 @@
 package org.uberfire.client.views.pfly.menu;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.DropDown;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.base.AbstractListItem;
+import org.gwtbootstrap3.client.ui.constants.Styles;
 import org.gwtbootstrap3.client.ui.constants.Toggle;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.uberfire.workbench.model.menu.MenuPosition;
 
 /**
  * A container for menu items. The contents are initially hidden. They appear when the title text is clicked.
  */
-public class Bs3DropDownMenu extends DropDown implements HasMenuItems {
+public class Bs3DropDownMenu extends AnchorListItem implements HasMenuItems {
 
     DropDownMenu items = new DropDownMenu();
 
     public Bs3DropDownMenu(String text) {
-        Anchor anchor = new Anchor();
         anchor.setText( text );
         anchor.setDataToggle( Toggle.DROPDOWN );
-        add( anchor );
+
+        Span caret = new Span();
+        caret.addStyleName( Styles.CARET );
+        anchor.add( caret );
+
         add( items );
     }
 
     @Override
-    public void addMenuItem( AbstractListItem listItem ) {
+    public void addMenuItem( MenuPosition ignored, AbstractListItem listItem ) {
         items.add( listItem );
     }
 

@@ -15,16 +15,22 @@
  */
 package org.uberfire.client.views.pfly.menu;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.gwtbootstrap3.client.ui.Navbar;
+import org.gwtbootstrap3.client.ui.NavbarBrand;
 import org.gwtbootstrap3.client.ui.NavbarCollapse;
+import org.gwtbootstrap3.client.ui.NavbarHeader;
 import org.gwtbootstrap3.client.ui.NavbarNav;
 import org.gwtbootstrap3.client.ui.base.AbstractListItem;
-import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.jboss.errai.ioc.client.container.IOCResolutionException;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.uberfire.client.workbench.widgets.menu.WorkbenchMenuBarPresenter;
 import org.uberfire.security.authz.AuthorizationManager;
+import org.uberfire.workbench.model.menu.MenuPosition;
 import org.uberfire.workbench.model.menu.Menus;
 
 import com.google.gwt.user.client.ui.Composite;
@@ -33,9 +39,8 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * The Menu Bar widget
  */
-public class WorkbenchMenuBarView extends Composite
-        implements
-        WorkbenchMenuBarPresenter.View {
+@Dependent
+public class WorkbenchMenuBarView extends Composite implements WorkbenchMenuBarPresenter.View {
 
     @Inject
     private AuthorizationManager authzManager;
@@ -43,24 +48,38 @@ public class WorkbenchMenuBarView extends Composite
     @Inject
     private User identity;
 
-    public NavbarNav menuBarLeft = new NavbarNav();
-    public NavbarNav menuBarCenter = new NavbarNav();
-    public NavbarNav menuBarRight = new NavbarNav();
+    @Inject @MainBrand
+    private Instance<NavbarBrand> menuBarBrand;
 
-    public WorkbenchMenuBarView() {
-        Navbar container = new Navbar();
+    @Inject
+    private UserMenu userMenu;
+    private final NavbarNav primaryNavBar = new NavbarNav();
+    private final UtilityNavbar utilityNavbar = new UtilityNavbar();
+
+    @PostConstruct
+    private void setup() {
+        Navbar root = new Navbar();
+        root.addStyleName( "navbar-pf" );
+
+        try {
+            NavbarHeader headerContainer = new NavbarHeader();
+            headerContainer.add(menuBarBrand.get());
+            root.add( headerContainer );
+        } catch ( IOCResolutionException e ) {
+            // app didn't provide a branded header bean
+        }
+
         NavbarCollapse collapsibleContainer = new NavbarCollapse();
 
-        menuBarLeft.setPull( Pull.LEFT );
-        menuBarRight.setPull( Pull.RIGHT );
+        utilityNavbar.add( userMenu );
+        primaryNavBar.addStyleName( "navbar-primary" );
 
-        collapsibleContainer.add( menuBarLeft );
-        collapsibleContainer.add( menuBarRight );
-        collapsibleContainer.add( menuBarCenter );
+        collapsibleContainer.add( utilityNavbar );
+        collapsibleContainer.add( primaryNavBar );
 
-        container.add( collapsibleContainer );
+        root.add( collapsibleContainer );
 
-        initWidget( container );
+        initWidget( root );
     }
 
     @Override
@@ -74,20 +93,25 @@ public class WorkbenchMenuBarView extends Composite
 
             @Override
             public int getMenuItemCount() {
-                return menuBarLeft.getWidgetCount() + menuBarCenter.getWidgetCount() + menuBarRight.getWidgetCount();
+                return primaryNavBar.getWidgetCount() + utilityNavbar.getWidgetCount() + userMenu.getWidgetCount();
             }
 
             @Override
-            public void addMenuItem( AbstractListItem menuContent ) {
-                switch ( menuContent.getPull() ) {
+            public void addMenuItem( MenuPosition position,
+                                     AbstractListItem menuContent ) {
+                if ( position == null ) {
+                    position = MenuPosition.CENTER;
+                }
+                switch ( position ) {
                     case LEFT:
-                    menuBarLeft.add( menuContent );
-                    break;
-                    case NONE:
-                    menuBarCenter.add( menuContent );
-                    break;
+                        primaryNavBar.add( menuContent );
+                        break;
+                    case CENTER:
+                        utilityNavbar.insert( menuContent, utilityNavbar.getWidgetCount() - 1 );
+                        break;
                     case RIGHT:
-                    menuBarRight.add( menuContent );
+                        userMenu.getMenu().add( menuContent );
+                        break;
                 }
             }
         };
@@ -96,9 +120,10 @@ public class WorkbenchMenuBarView extends Composite
 
     @Override
     public void clear() {
-        menuBarLeft.clear();
-        menuBarCenter.clear();
-        menuBarRight.clear();
+        userMenu.clear();
+        primaryNavBar.clear();
+        utilityNavbar.clear();
+        utilityNavbar.add( userMenu );
     }
 
 }

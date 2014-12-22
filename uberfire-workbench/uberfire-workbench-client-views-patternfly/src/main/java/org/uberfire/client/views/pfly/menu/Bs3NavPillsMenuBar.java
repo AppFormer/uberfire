@@ -2,16 +2,15 @@ package org.uberfire.client.views.pfly.menu;
 
 import org.gwtbootstrap3.client.ui.NavPills;
 import org.gwtbootstrap3.client.ui.base.AbstractListItem;
-
-import com.google.gwt.user.client.ui.Widget;
+import org.uberfire.workbench.model.menu.MenuPosition;
 
 
 public class Bs3NavPillsMenuBar extends NavPills implements HasMenuItems {
 
 
     @Override
-    public void addMenuItem( AbstractListItem item ) {
-        add( (Widget) item );
+    public void addMenuItem( MenuPosition ignored, AbstractListItem item ) {
+        add( item );
     }
 
     @Override

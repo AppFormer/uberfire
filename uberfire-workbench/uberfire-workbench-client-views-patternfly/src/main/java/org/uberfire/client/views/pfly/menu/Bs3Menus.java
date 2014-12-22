@@ -64,13 +64,9 @@ public class Bs3Menus {
 
             @Override
             public void visitLeave( MenuGroup menuGroup ) {
-                HasMenuItems finishedMenu = parentMenus.pop();
+                Bs3DropDownMenu finishedMenu = (Bs3DropDownMenu) parentMenus.pop();
 
-                // XXX probably Bs3DropDownMenu should extend AbstractListItem so we don't need to wrap it in an <li> here
-                ListItem dropDownMenuWrapper = new ListItem();
-                dropDownMenuWrapper.add( finishedMenu );
-
-                parentMenus.peek().addMenuItem( dropDownMenuWrapper );
+                parentMenus.peek().addMenuItem( menuGroup.getPosition(), finishedMenu );
             }
 
             @Override
@@ -90,7 +86,7 @@ public class Bs3Menus {
                 }
                 setupEnableDisable( menuCustom,
                                     view );
-                parentMenus.peek().addMenuItem( view );
+                parentMenus.peek().addMenuItem( menuCustom.getPosition(), view );
             }
 
             @Override
@@ -104,7 +100,7 @@ public class Bs3Menus {
                         menuItemCommand.getCommand().execute();
                     }
                 } );
-                parentMenus.peek().addMenuItem( listItem );
+                parentMenus.peek().addMenuItem( menuItemCommand.getPosition(), listItem );
             }
 
             @Override
@@ -112,7 +108,7 @@ public class Bs3Menus {
                 AnchorListItem view = new AnchorListItem( menuItemPlain.getCaption() );
                 setupEnableDisable( menuItemPlain,
                                     view );
-                parentMenus.peek().addMenuItem( view );
+                parentMenus.peek().addMenuItem( menuItemPlain.getPosition(), view );
             }
 
             /**
@@ -135,7 +131,6 @@ public class Bs3Menus {
                     }
                 } );
             }
-
         };
 
         menus.accept( new AuthFilterMenuVisitor( authzManager, identity, viewBuilder ) );
