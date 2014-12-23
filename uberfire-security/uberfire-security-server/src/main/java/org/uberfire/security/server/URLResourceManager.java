@@ -31,7 +31,7 @@ import org.uberfire.security.Resource;
 import org.uberfire.security.ResourceManager;
 import org.uberfire.security.Role;
 import org.uberfire.security.impl.RoleImpl;
-import org.uberfire.security.server.util.AntPathMatcher;
+import org.uberfire.commons.regex.util.AntPathMatcher;
 import org.yaml.snakeyaml.Yaml;
 
 import static java.util.Collections.*;
