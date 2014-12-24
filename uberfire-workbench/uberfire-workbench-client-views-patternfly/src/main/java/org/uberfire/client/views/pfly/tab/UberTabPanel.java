@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
 import org.gwtbootstrap3.client.shared.event.TabShowEvent;
 import org.gwtbootstrap3.client.shared.event.TabShowHandler;
 import org.gwtbootstrap3.client.shared.event.TabShownEvent;
@@ -50,6 +53,7 @@ import com.google.gwt.user.client.ui.Widget;
  *  <li>Participates in UberFire's panel focus system
  * </ul>
  */
+@Dependent
 public class UberTabPanel extends ResizeComposite implements MultiPartWidget, ClickHandler {
 
     static class ResizeTabPanel extends TabPanelWithDropdowns implements RequiresResize, ProvidesResize {
@@ -121,6 +125,7 @@ public class UberTabPanel extends ResizeComposite implements MultiPartWidget, Cl
      *            the PanelManager that will be called upon to close a place when the user clicks on its tab's close
      *            button.
      */
+    @Inject
     public UberTabPanel( PlaceManager panelManager ) {
         this.panelManager = checkNotNull( "panelManager", panelManager );
         tabPanel = new ResizeTabPanel();

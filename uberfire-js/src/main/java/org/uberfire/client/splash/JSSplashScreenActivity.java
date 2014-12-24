@@ -33,6 +33,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public class JSSplashScreenActivity implements SplashScreenActivity {
 
     private Boolean showAgain;
+    private final Boolean isEnabled;
     private SplashScreenFilter splashFilter;
 
     private final JSNativeSplashScreen nativeSplashScreen;
@@ -42,6 +43,7 @@ public class JSSplashScreenActivity implements SplashScreenActivity {
     public JSSplashScreenActivity( final JSNativeSplashScreen nativeSplashScreen, SplashView splashView ) {
         this.nativeSplashScreen = checkNotNull( "nativeSplashScreen", nativeSplashScreen );
         this.splash = checkNotNull( "splashView", splashView );
+        this.isEnabled = nativeSplashScreen.isEnabled();
         this.splashFilter = nativeSplashScreen.buildFilter();
     }
 
@@ -142,6 +144,11 @@ public class JSSplashScreenActivity implements SplashScreenActivity {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
     private void saveState() {

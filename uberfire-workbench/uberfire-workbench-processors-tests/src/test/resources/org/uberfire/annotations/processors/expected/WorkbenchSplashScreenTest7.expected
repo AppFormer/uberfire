@@ -75,6 +75,11 @@ public class WorkbenchSplashScreenTest7Activity extends AbstractSplashScreenActi
     }
 
     @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
     public Collection<String> getRoles() {
         return ROLES;
     }

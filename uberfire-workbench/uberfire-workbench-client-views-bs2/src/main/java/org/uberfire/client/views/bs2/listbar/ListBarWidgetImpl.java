@@ -24,15 +24,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.jboss.errai.ioc.client.container.IOC;
-import org.jboss.errai.ioc.client.container.IOCBeanDef;
 import org.jboss.errai.ioc.client.container.IOCResolutionException;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.uberfire.client.util.Layouts;
+import org.uberfire.client.views.bs2.maximize.MaximizeToggleButton;
 import org.uberfire.client.workbench.PanelManager;
+import org.uberfire.client.workbench.panels.MaximizeToggleButtonPresenter;
 import org.uberfire.client.workbench.panels.WorkbenchPanelPresenter;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 import org.uberfire.client.workbench.widgets.dnd.DragArea;
@@ -107,6 +109,12 @@ extends ResizeComposite implements ListBarWidget {
 
     private static ListBarWidgetBinder uiBinder = GWT.create( ListBarWidgetBinder.class );
 
+    /**
+     * Preferences bean that applications can optionally provide. If this injection is unsatisfied, default settings are used.
+     */
+    @Inject
+    Instance<ListbarPreferences> optionalListBarPrefs;
+
     @Inject
     PanelManager panelManager;
 
@@ -144,6 +152,12 @@ extends ResizeComposite implements ListBarWidget {
     ButtonGroup closeButtonContainer;
 
     @UiField
+    MaximizeToggleButton maximizeButton;
+
+    /** Wraps maximizeButton, which is the view. */
+    MaximizeToggleButtonPresenter maximizeButtonPresenter;
+
+    @UiField
     FlowPanel content;
 
     @UiField
@@ -163,8 +177,11 @@ extends ResizeComposite implements ListBarWidget {
     boolean isDndEnabled = true;
     Pair<PartDefinition, FlowPanel> currentPart;
 
-    public ListBarWidgetImpl() {
+    @PostConstruct
+    void postConstruct() {
         initWidget( uiBinder.createAndBindUi( this ) );
+        maximizeButton.setVisible( false );
+        maximizeButtonPresenter = new MaximizeToggleButtonPresenter( maximizeButton );
         setup( true, true );
         Layouts.setToFillParent( this );
         scheduleResize();
@@ -212,17 +229,26 @@ extends ResizeComposite implements ListBarWidget {
     }
 
     boolean isPropertyListbarContextDisable() {
-        try {
-            final IOCBeanDef<ListbarPreferences> beanDef = IOC.getBeanManager().lookupBean( ListbarPreferences.class );
-            return beanDef == null || beanDef.getInstance().isContextEnabled();
-        } catch ( IOCResolutionException exception ) {
+        if ( optionalListBarPrefs.isUnsatisfied() ) {
+            return true;
         }
-        return true;
+
+        // as of Errai 3.0.4.Final, Instance.isUnsatisfied() always returns false. The try-catch is a necessary safety net.
+        try {
+            return optionalListBarPrefs.get().isContextEnabled();
+        } catch ( IOCResolutionException e ) {
+            return true;
+        }
     }
 
     @Override
     public void enableDnd() {
         this.isDndEnabled = true;
+    }
+
+    @Override
+    public boolean isDndEnabled() {
+        return isDndEnabled;
     }
 
     @Override
@@ -597,7 +623,9 @@ extends ResizeComposite implements ListBarWidget {
 
         @Override
         public void onResize() {
-            int width = content.getOffsetWidth() - 10;
+            int contentAbsoluteRight = content.getAbsoluteLeft() + content.getOffsetWidth();
+            int caretAbsoluteRight = dropdownCaretContainer.getAbsoluteLeft() + dropdownCaretContainer.getOffsetWidth();
+            int width = content.getOffsetWidth() - ( contentAbsoluteRight - caretAbsoluteRight );
             if ( width > 0 ) {
                 setWidth( width + "px" );
             }
@@ -617,4 +645,19 @@ extends ResizeComposite implements ListBarWidget {
         } );
     }
 
+    /**
+     * Returns the toggle button, which is initially hidden, that can be used to trigger maximizing and unmaximizing
+     * of the panel containing this list bar. Make the button visible by calling {@link Widget#setVisible(boolean)}
+     * and set its maximize and unmaximize actions with {@link MaximizeToggleButton#setMaximizeCommand(Command)} and
+     * {@link MaximizeToggleButton#setUnmaximizeCommand(Command)}.
+     */
+    @Override
+    public MaximizeToggleButtonPresenter getMaximizeButton() {
+        return maximizeButtonPresenter;
+    }
+
+    @Override
+    public boolean isMultiPart() {
+        return isMultiPart;
+    }
 }

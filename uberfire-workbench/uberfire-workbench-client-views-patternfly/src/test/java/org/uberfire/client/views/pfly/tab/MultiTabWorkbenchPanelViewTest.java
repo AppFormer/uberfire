@@ -6,33 +6,34 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.uberfire.client.views.pfly.tab.MultiTabWorkbenchPanelView;
-import org.uberfire.client.views.pfly.tab.UberTabPanel;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.uberfire.client.views.pfly.maximize.MaximizeToggleButton;
+import org.uberfire.client.workbench.widgets.listbar.ResizeFlowPanel;
 import org.uberfire.mvp.Command;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Element;
-import com.google.gwtmockito.GwtMock;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
 @RunWith(GwtMockitoTestRunner.class)
 public class MultiTabWorkbenchPanelViewTest {
 
+    @InjectMocks
     private MultiTabWorkbenchPanelView view;
 
-    @GwtMock
+    @Mock
     private UberTabPanel uberTabPanel;
+
+    @Mock
+    private MaximizeToggleButton maximizeButton;
+
+    @Mock
+    private ResizeFlowPanel partViewContainer;
 
     @Before
     public void setup() {
-        view = new MultiTabWorkbenchPanelView(){
-            @Override
-            UberTabPanel getUberTabPanel() {
-                return uberTabPanel;
-            }
-        };
-
         Element uberTabPanelElement = mock( Element.class );
         Style uberTabPanelElementStyle = mock( Style.class );
         when( uberTabPanel.getElement() ).thenReturn( uberTabPanelElement );

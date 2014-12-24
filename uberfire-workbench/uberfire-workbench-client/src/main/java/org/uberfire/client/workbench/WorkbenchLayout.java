@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Used by the workbench to construct the outer most DOM structure (header, footer and perspective container).
@@ -67,4 +68,27 @@ public interface WorkbenchLayout {
      */
     void resizeTo(int width, int height);
 
+    /**
+     * Makes the given widget fill the entire space normally dedicated to the perspective container. Has no effect if
+     * the given widget is already maximized.
+     * <p>
+     * <b>Important:</b> this feature is used by panels to maximize themselves. You should not pass a WorkbenchPanelView
+     * to this method yourself; instead, you should use the panel's own API to maximize it. You are free to use this method
+     * to maximize your own widgets that are not workbench panels.
+     *
+     * @param w the Widget to maximize.
+     */
+    void maximize( Widget w );
+
+    /**
+     * Restores a previously maximized widget to its original size and position. Has no effect if the given widget is
+     * not currently in a maximized state set up by {@link #maximize(Widget)}.
+     * <p>
+     * <b>Important:</b> this feature is used by panels to unmaximize themselves. You should not pass a WorkbenchPanelView
+     * to this method yourself; instead, you should use the panel's own API to unmaximize it. You are free to use this method
+     * to unmaximize your own widgets that have previously been passed to {@link #maximize(Widget)}.
+     *
+     * @param w the Widget to restore to its original size and location.
+     */
+    void unmaximize( Widget w );
 }

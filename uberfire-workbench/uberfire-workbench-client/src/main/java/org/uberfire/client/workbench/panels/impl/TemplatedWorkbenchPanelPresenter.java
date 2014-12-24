@@ -1,14 +1,12 @@
 package org.uberfire.client.workbench.panels.impl;
 
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.uberfire.client.annotations.WorkbenchPanel;
 import org.uberfire.client.mvp.PerspectiveManager;
 import org.uberfire.client.mvp.TemplatedActivity;
-import org.uberfire.client.workbench.events.MaximizePlaceEvent;
 import org.uberfire.client.workbench.part.WorkbenchPartPresenter;
 
 @Dependent
@@ -16,11 +14,9 @@ public class TemplatedWorkbenchPanelPresenter extends AbstractWorkbenchPanelPres
 
     @Inject
     public TemplatedWorkbenchPanelPresenter( @Named("TemplatedWorkbenchPanelView") TemplatedWorkbenchPanelView view,
-                                             PerspectiveManager panelManager,
-                                             Event<MaximizePlaceEvent> maximizePanelEvent ) {
+                                             PerspectiveManager panelManager ) {
         super( view,
-               panelManager,
-               maximizePanelEvent );
+               panelManager );
     }
 
     @Override

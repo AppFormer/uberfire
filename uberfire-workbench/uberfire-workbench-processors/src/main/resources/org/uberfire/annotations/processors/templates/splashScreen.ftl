@@ -171,6 +171,15 @@ public class ${className} extends AbstractSplashScreenActivity {
 
     </#if>
     @Override
+    public boolean isEnabled() {
+        <#if isEnabled>
+        return true;
+        <#else>
+        return false;
+        </#if>
+    }
+
+    @Override
     public Collection<String> getRoles() {
         return ROLES;
     }

@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Label;
 @IsSplashScreen
 public class SplashyScreenSplashScreen extends AbstractTestSplashScreenActivity {
 
-    Label view = new Label("Not started");
+    Label view = new Label( "Not started" );
 
     @Inject
     public SplashyScreenSplashScreen( final PlaceManager placeManager,
@@ -65,4 +65,10 @@ public class SplashyScreenSplashScreen extends AbstractTestSplashScreenActivity 
     public SplashScreenFilter getFilter() {
         return new SplashScreenFilterImpl( getClass().getName(), true, asList( SplashyScreen.class.getName() ) );
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }

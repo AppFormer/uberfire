@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Label;
 @IsSplashScreen
 public class SplashyPerspectiveSplashScreen extends AbstractTestSplashScreenActivity {
 
-    Label view = new Label("I am splash screen. Who are you?");
+    Label view = new Label( "I am splash screen. Who are you?" );
 
     @Inject
     public SplashyPerspectiveSplashScreen( final PlaceManager placeManager,
@@ -64,4 +64,10 @@ public class SplashyPerspectiveSplashScreen extends AbstractTestSplashScreenActi
     public SplashScreenFilter getFilter() {
         return new SplashScreenFilterImpl( getClass().getName(), true, asList( SplashyPerspective.class.getName() ) );
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
