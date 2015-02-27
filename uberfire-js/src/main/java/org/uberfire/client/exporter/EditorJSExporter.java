@@ -1,6 +1,8 @@
 package org.uberfire.client.exporter;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -46,23 +48,40 @@ public class EditorJSExporter implements UberfireJSExporter {
             ( (SyncBeanManagerImpl) beanManager ).addBean( (Class) WorkbenchEditorActivity.class, JSEditorActivity.class, null, activity, DEFAULT_QUALIFIERS, newNativeEditor.getId(), true );
             ( (SyncBeanManagerImpl) beanManager ).addBean( (Class) JSEditorActivity.class, JSEditorActivity.class, null, activity, DEFAULT_QUALIFIERS, newNativeEditor.getId(), true );
 
-            Class<? extends ClientResourceType> resourceTypeClass = getResourceTypeClass( beanManager, newNativeEditor );
-            activityBeansCache.addNewEditorActivity( beanManager.lookupBeans( newNativeEditor.getId() ).iterator().next(), resourceTypeClass );
+            List<Class<? extends ClientResourceType>> resourceTypeClass = getResourceTypeClass( beanManager, newNativeEditor );
+            IOCBeanDef nativeEditorBean = beanManager.lookupBeans( newNativeEditor.getId() ).iterator().next();
+            activityBeansCache.addNewEditorActivity( nativeEditorBean, resourceTypeClass, newNativeEditor.getPriority() );
 
         }
     }
 
-    private static Class<? extends ClientResourceType> getResourceTypeClass( SyncBeanManager beanManager,
-                                                                             JSNativeEditor newNativeEditor ) {
+    private static List<Class<? extends ClientResourceType>> getResourceTypeClass( SyncBeanManager beanManager,
+                                                                                   JSNativeEditor newNativeEditor ) {
+
+        List<Class<? extends ClientResourceType>> resources = new ArrayList<Class<? extends ClientResourceType>>();
 
         Collection<IOCBeanDef<ClientResourceType>> iocBeanDefs = beanManager.lookupBeans( ClientResourceType.class );
+
+        for ( String resourcesType : newNativeEditor.getResourceType() ) {
+            findResourceTypeDefinition( resources, iocBeanDefs, resourcesType );
+        }
+        if ( resources.isEmpty() ) {
+            throw new EditorResourceTypeNotFound();
+        }
+
+        return resources;
+
+    }
+
+    private static void findResourceTypeDefinition( List<Class<? extends ClientResourceType>> resources,
+                                                    Collection<IOCBeanDef<ClientResourceType>> iocBeanDefs,
+                                                    String resourcesType ) {
         for ( IOCBeanDef<ClientResourceType> iocBeanDef : iocBeanDefs ) {
-            String beanClassName = iocBeanDef.getBeanClass().getName();
-            if ( beanClassName.equalsIgnoreCase( newNativeEditor.getResourceType() ) ) {
-                return (Class<? extends ClientResourceType>) iocBeanDef.getBeanClass();
+            String beanClassName = iocBeanDef.getInstance().getShortName();
+            if ( beanClassName.equalsIgnoreCase( resourcesType ) ) {
+                resources.add( (Class<? extends ClientResourceType>) iocBeanDef.getBeanClass() );
             }
         }
-        throw new EditorResourceTypeNotFound();
     }
 
     public static class EditorResourceTypeNotFound extends RuntimeException {

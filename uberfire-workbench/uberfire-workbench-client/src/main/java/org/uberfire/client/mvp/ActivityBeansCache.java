@@ -13,6 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.regexp.shared.RegExp;
 import org.jboss.errai.ioc.client.container.IOCBeanDef;
 import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.uberfire.backend.vfs.Path;
@@ -134,7 +135,8 @@ public class ActivityBeansCache {
     }
 
     public void addNewEditorActivity( final IOCBeanDef<Activity> activityBean,
-                                      Class<? extends ClientResourceType> resourceTypeClass ) {
+                                      List<Class<? extends ClientResourceType>> resourceTypeClass,
+                                      int priority ) {
         final String id = activityBean.getName();
 
         if ( activitiesById.keySet().contains( id ) ) {
@@ -142,8 +144,8 @@ public class ActivityBeansCache {
         }
 
         final List<Class<? extends ClientResourceType>> resourceTypes = new ArrayList<Class<? extends ClientResourceType>>();
-        resourceTypes.add( resourceTypeClass );
-        activities.add( new ActivityAndMetaInfo( activityBean, 0, resourceTypes ) );
+        resourceTypes.addAll( resourceTypeClass );
+        activities.add( new ActivityAndMetaInfo( activityBean, priority, resourceTypes ) );
     }
 
     public void addNewSplashScreenActivity( final IOCBeanDef<Activity> activityBean ) {
@@ -183,7 +185,7 @@ public class ActivityBeansCache {
     }
 
     public List<String> getActivitiesById() {
-      return new ArrayList<String>(activitiesById.keySet());
+        return new ArrayList<String>( activitiesById.keySet() );
     }
 
     class ActivityAndMetaInfo {
@@ -219,5 +221,11 @@ public class ActivityBeansCache {
 
     private class EditorResourceTypeNotFound extends RuntimeException {
 
+    }
+
+    public static void main( String[] args ) {
+        String pattern = "[^s]+(.(?i)(md|doc|csv|pdf))$";
+        RegExp r = RegExp.compile( pattern );
+        System.out.println( r.test( "default://master@uf-playground/todo.md" ) );
     }
 }
