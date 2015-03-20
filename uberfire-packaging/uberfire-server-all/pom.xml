@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.uberfire</groupId>
     <artifactId>uberfire-packaging</artifactId>
-    <version>0.5.2-SNAPSHOT</version>
+    <version>0.5.2.Final</version>
   </parent>
 
   <artifactId>uberfire-server-all</artifactId>
