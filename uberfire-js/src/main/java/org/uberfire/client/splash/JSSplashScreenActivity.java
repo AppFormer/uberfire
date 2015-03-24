@@ -1,12 +1,12 @@
 /*
  * Copyright 2012 JBoss Inc
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -27,27 +27,24 @@ import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.SplashScreenFilter;
 
+import static org.uberfire.commons.validation.PortablePreconditions.*;
+
 public class JSSplashScreenActivity implements SplashScreenActivity {
 
-    private Boolean showAgain;
-    private Boolean isEnabled;
+    private Boolean showAgain = Boolean.TRUE;
+    private Boolean isEnabled = Boolean.TRUE;
     private SplashScreenFilter splashFilter;
 
     private final JSNativeSplashScreen nativeSplashScreen;
     private PlaceRequest place;
-    private final SplashView splash = new SplashView();
+    private final SplashView splash;
 
-    public JSSplashScreenActivity( final JSNativeSplashScreen nativeSplashScreen ) {
-        this.nativeSplashScreen = nativeSplashScreen;
+    public JSSplashScreenActivity( final JSNativeSplashScreen nativeSplashScreen,
+                                   final SplashView splashView ) {
+        this.nativeSplashScreen = checkNotNull( "nativeSplashScreen", nativeSplashScreen );
+        this.splash = checkNotNull( "splashView", splashView );
         this.isEnabled = nativeSplashScreen.isEnabled();
         this.splashFilter = nativeSplashScreen.buildFilter();
-
-        splash.addCloseHandler( new CloseHandler<SplashView>() {
-            @Override
-            public void onClose( final CloseEvent<SplashView> event ) {
-                JSSplashScreenActivity.this.onClose();
-            }
-        } );
     }
 
     @Override
@@ -124,6 +121,12 @@ public class JSSplashScreenActivity implements SplashScreenActivity {
         splash.setContent( widget, getBodyHeight() );
         splash.setTitle( getTitle() );
         splash.show();
+        splash.addCloseHandler( new CloseHandler<SplashView>() {
+            @Override
+            public void onClose( final CloseEvent<SplashView> event ) {
+                JSSplashScreenActivity.this.onClose();
+            }
+        } );
     }
 
     @Override
