@@ -41,6 +41,9 @@ import org.uberfire.client.mvp.PerspectiveManager;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.WorkbenchScreenActivity;
 import org.uberfire.client.screen.JSWorkbenchScreenActivity;
+import org.uberfire.client.workbench.docks.UberfireDock;
+import org.uberfire.client.workbench.docks.UberfireDockPosition;
+import org.uberfire.client.workbench.docks.UberfireDocks;
 import org.uberfire.client.workbench.events.ApplicationReadyEvent;
 import org.uberfire.client.workbench.widgets.menu.WorkbenchMenuBar;
 import org.uberfire.mvp.Command;
@@ -81,6 +84,8 @@ public class ShowcaseEntryPoint {
     private ClientMessageBus bus;
 
     @Inject private Event<DumpLayout> dumpLayoutEvent;
+
+
     public static class DumpLayout {};
 
     @PostConstruct

@@ -635,6 +635,7 @@
     <module>uberfire-workbench</module>
     <module>uberfire-testing-utils</module>
     <module>uberfire-packaging</module>
+    <module>uberfire-docks</module>
     <module>uberfire-showcase</module>
   </modules>
 
