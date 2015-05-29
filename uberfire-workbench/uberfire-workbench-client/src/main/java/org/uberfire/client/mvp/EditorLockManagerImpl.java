@@ -11,10 +11,11 @@ import javax.inject.Inject;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.uberfire.backend.vfs.impl.LockInfo;
 import org.uberfire.backend.vfs.impl.LockResult;
+import org.uberfire.client.resources.i18n.WorkbenchConstants;
 import org.uberfire.client.workbench.VFSLockServiceProxy;
 import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
-import org.uberfire.client.workbench.widgets.popup.EditorLockPopup;
 import org.uberfire.mvp.ParameterizedCommand;
+import org.uberfire.workbench.events.NotificationEvent;
 import org.uberfire.workbench.events.ResourceAddedEvent;
 import org.uberfire.workbench.events.ResourceUpdatedEvent;
 
@@ -50,7 +51,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
     private javax.enterprise.event.Event<ChangeTitleWidgetEvent> changeTitleEvent;
 
     @Inject
-    private EditorLockPopup lockPopup;
+    private javax.enterprise.event.Event<NotificationEvent> lockNotification;
 
     @Inject
     private User user;
@@ -71,7 +72,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
     @Override
     public void init( final AbstractWorkbenchEditorActivity activity ) {
         this.activity = activity;
-        
+
         final ParameterizedCommand<LockInfo> command = new ParameterizedCommand<LockInfo>() {
 
             @Override
@@ -84,7 +85,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
         lockService.retrieveLockInfo( activity.getPath(),
                                       command );
     }
-    
+
     @Override
     public void initJs() {
         this.publishJsApi();
@@ -113,8 +114,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
     private void acquireLock() {
         if ( lockInfo.isLocked() ) {
             handleLockFailure();
-        }
-        else if ( !lockRequestPending ) {
+        } else if ( !lockRequestPending ) {
             lockRequestPending = true;
             final ParameterizedCommand<LockResult> command = new ParameterizedCommand<LockResult>() {
 
@@ -124,8 +124,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
 
                     if ( result.isSuccess() ) {
                         releaseLockOnClose();
-                    }
-                    else {
+                    } else {
                         handleLockFailure();
                     }
                     lockRequestPending = false;
@@ -135,7 +134,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
                                      command );
         }
     }
-    
+
     @Override
     public void releaseLock() {
         final Runnable releaseLock = new Runnable() {
@@ -147,12 +146,11 @@ public class EditorLockManagerImpl implements EditorLockManager {
         };
         if ( lockSyncComplete ) {
             releaseLock.run();
-        }
-        else {
+        } else {
             syncCompleteRunnables.add( releaseLock );
         }
     }
-    
+
     private void releaseLockInternal() {
         if ( isLockedByCurrentUser() && !unlockRequestPending ) {
             unlockRequestPending = true;
@@ -176,7 +174,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
                                      command );
         }
     }
-    
+
     private void releaseLockOnClose() {
         closeHandler = Window.addCloseHandler( new CloseHandler<Window>() {
 
@@ -188,8 +186,9 @@ public class EditorLockManagerImpl implements EditorLockManager {
     }
 
     private void handleLockFailure() {
-        lockPopup.show( activity.getWidget().asWidget().getElement(),
-                        lockInfo.lockedBy() );
+        lockNotification.fire( new NotificationEvent( WorkbenchConstants.INSTANCE.lockedMessage( lockInfo.lockedBy() ),
+                                                      NotificationEvent.NotificationType.INFO,
+                                                      true ) );
 
         // Delay reloading slightly in case we're dealing with a flood of events
         if ( reloadTimer == null ) {
@@ -222,15 +221,16 @@ public class EditorLockManagerImpl implements EditorLockManager {
             return Boolean.parseBoolean( lockAttribute );
         }
 
-        boolean eventExcluded = (event.getTypeInt() == Event.ONCLICK &&
-                TAG_CLICK_LOCK_EXCLUSIONS.contains( target.getTagName().toLowerCase() ));
+        boolean eventExcluded = ( event.getTypeInt() == Event.ONCLICK &&
+                TAG_CLICK_LOCK_EXCLUSIONS.contains( target.getTagName().toLowerCase() ) );
 
         return !eventExcluded;
     }
 
     private String findLockAttribute( final Element element ) {
-        if ( element == null )
+        if ( element == null ) {
             return null;
+        }
 
         final String lockAttribute = element.getAttribute( "data-uf-lock" );
         if ( lockAttribute != null && !lockAttribute.isEmpty() ) {
@@ -244,7 +244,7 @@ public class EditorLockManagerImpl implements EditorLockManager {
         if ( lockInfo.getFile().equals( activity.getPath() ) ) {
             this.lockInfo = lockInfo;
             this.lockSyncComplete = true;
-            
+
             if ( activity.isOpen() ) {
                 changeTitleEvent.fire( LockTitleWidgetEvent.create( activity,
                                                                     lockInfo ) );
@@ -269,23 +269,23 @@ public class EditorLockManagerImpl implements EditorLockManager {
             releaseLock();
         }
     }
-    
-    private native void publishJsApi( )/*-{
-      var lockManager = this;
-      $wnd.isLocked = function () {
-          return lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::isLocked()();
-      }
-      $wnd.isLockedByCurrentUser = function () {
-          return lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::isLockedByCurrentUser()();
-      }
-      $wnd.acquireLock = function () {        
-          lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::acquireLock()();
-      }
-      $wnd.releaseLock = function () {        
-          lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::releaseLock()();
-      }
+
+    private native void publishJsApi()/*-{
+        var lockManager = this;
+        $wnd.isLocked = function () {
+            return lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::isLocked()();
+        }
+        $wnd.isLockedByCurrentUser = function () {
+            return lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::isLockedByCurrentUser()();
+        }
+        $wnd.acquireLock = function () {
+            lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::acquireLock()();
+        }
+        $wnd.releaseLock = function () {
+            lockManager.@org.uberfire.client.mvp.EditorLockManagerImpl::releaseLock()();
+        }
     }-*/;
-    
+
     private boolean isLocked() {
         return lockInfo.isLocked();
     }
