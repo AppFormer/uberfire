@@ -3,11 +3,18 @@ package org.uberfire.client.mvp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.uberfire.backend.vfs.impl.LockInfo;
 import org.uberfire.backend.vfs.impl.LockResult;
@@ -18,15 +25,6 @@ import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.workbench.events.NotificationEvent;
 import org.uberfire.workbench.events.ResourceAddedEvent;
 import org.uberfire.workbench.events.ResourceUpdatedEvent;
-
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.EventListener;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 
 /**
  * Default implementation of {@link EditorLockManager} using the
@@ -188,7 +186,8 @@ public class EditorLockManagerImpl implements EditorLockManager {
     private void handleLockFailure() {
         lockNotification.fire( new NotificationEvent( WorkbenchConstants.INSTANCE.lockedMessage( lockInfo.lockedBy() ),
                                                       NotificationEvent.NotificationType.INFO,
-                                                      true ) );
+                                                      true,
+                                                      activity.getPlace() ) );
 
         // Delay reloading slightly in case we're dealing with a flood of events
         if ( reloadTimer == null ) {
