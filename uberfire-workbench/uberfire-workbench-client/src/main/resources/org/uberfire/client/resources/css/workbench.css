@@ -2,6 +2,7 @@
     border: 0;
     margin: 0;
     padding: 0;
+    z-index: 100000;
 }
 
 .toolbar {
@@ -74,23 +75,6 @@
     padding-top: 5px;
     text-shadow: rgba(255, 255, 255, 0.74902) 0px 1px 1px;
     height: 32px;
-}
-
-.uf-lock-hint {
-	width: 180px;
-	height: 90px;
-	background-color: #FFFFFF;
-	color: #848484;
-	border: 1px solid;
-	border-color: #848484;	
-	text-align: center;
-	font-size: 13px;
-	-webkit-transition: top 0.5s ease-in;
-    -moz-transition: top 0.5s ease-in;
-    -ms-transition: top 0.5s ease-in;
-    -o-transition: top 0.5s ease-in;
-    transition: top 0.5s ease-in;
-    z-index: 1;
 }
 
 .show-context {
