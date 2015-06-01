@@ -4,12 +4,8 @@
 // Bootstrap overrides and PatternFly-specific variables
 
 /* PatternFly specific */
-@btn-danger-bg-img-start:                                           #d60915;
-@btn-danger-bg-img-stop:                                            #ac0710;
 @btn-default-bg-img-start:                                          #fafafa;
 @btn-default-bg-img-stop:                                           #ededed;
-@btn-primary-bg-img-start:                                          #1CACE8;
-@btn-primary-bg-img-stop:                                           #1998CC;
 @btn-xs-font-weight:                                                400;
 @dropdown-divider-margin:                                           4px 1px;
 @dropdown-link-active-border-color:                                 #0076b7;
@@ -35,6 +31,7 @@
 @img-spinner-sm:                                                    "spinner-sm.gif";
 @img-spinner-xs:                                                    "spinner-xs.gif";
 @input-border-disabled:                                             #d4d4d4;
+@input-border-hover:                                                #7BB2DD;
 @list-group-top-border:                                             #e9e8e8;
 @login-bg-color:                                                    #080808;
 @login-container-bg-color:                                          #181818;
@@ -103,19 +100,19 @@
 @alert-padding:                                                     7px;
 @body-bg:                                                           #ffffff;
 @border-radius-base:                                                1px;
-@brand-danger:                                                      #c90813;
-@brand-info:                                                        #27799c;
-@brand-primary:                                                     #1cace9;
-@brand-success:                                                     #5cb75c;
-@brand-warning:                                                     #eb7720;
+@brand-danger:                                                      #cc0000;
+@brand-info:                                                        #006e9c;
+@brand-primary:                                                     #00a8e1;
+@brand-success:                                                     #3f9c35;
+@brand-warning:                                                     #ec7a08;
 @breadcrumb-bg:                                                     transparent;
 @breadcrumb-separator:                                              "\f105";
-@btn-danger-bg:                                                     #ab070f;
+@btn-danger-bg:                                                     #a30000;
 @btn-danger-border:                                                 #781919;
 @btn-default-border:                                                #b7b7b7;
 @btn-font-weight:                                                   600;
-@btn-primary-bg:                                                    #189AD1;
-@btn-primary-border:                                                #267DA1;
+@btn-primary-bg:                                                    #0085cf;
+@btn-primary-border:                                                #006e9c;
 @caret-width-base:                                                  0;
 @dropdown-border:                                                   #b6b6b6;
 @dropdown-divider-bg:                                               #e5e5e5;
@@ -154,6 +151,7 @@
 @popover-border-color:                                              #bbb;
 @popover-max-width:                                                 220px;
 @popover-title-bg:                                                  #f5f5f5;
+@pre-bg:                                                            #fcfcfc;
 @progress-bg:                                                       #ededed;
 @table-bg-accent:                                                   #f5f5f5;
 @table-bg-hover:                                                    #d5ecf9;
@@ -162,9 +160,7 @@
 @tooltip-arrow-width:                                               8px;
 @tooltip-bg:                                                        #434343;
 @tooltip-max-width:                                                 220px;
-// References variable declared in blocks above
-@panel-primary-text:                                                @body-bg;
-// Reference variables declared in blocks above
+// Reference variables declared in block above
 @alert-danger-bg:                                                   @body-bg;
 @alert-danger-border:                                               @brand-danger;
 @alert-danger-text:                                                 @gray-dark;
@@ -200,20 +196,31 @@
 @padding-small-vertical:                                            @padding-base-vertical;
 @panel-danger-border:                                               @brand-danger;
 @panel-danger-heading-bg:                                           @brand-danger;
-@panel-danger-text:                                                 @panel-primary-text;
 @panel-info-border:                                                 @brand-info;
 @panel-info-heading-bg:                                             @brand-info;
-@panel-info-text:                                                   @panel-primary-text;
+@panel-primary-text:                                                @body-bg;
 @panel-success-border:                                              @brand-success;
 @panel-success-heading-bg:                                          @brand-success;
-@panel-success-text:                                                @panel-primary-text;
 @panel-warning-border:                                              @brand-warning;
 @panel-warning-heading-bg:                                          @brand-warning;
+@state-warning-text:                                                @brand-warning;
+// Reference variable declared in block above
+@panel-danger-text:                                                 @panel-primary-text;
+@panel-info-text:                                                   @panel-primary-text;
+@panel-success-text:                                                @panel-primary-text;
 @panel-warning-text:                                                @panel-primary-text;
 
 /* PatternFly-specific variables based on Bootstrap overides */
+@btn-danger-bg-img-start:                                           @brand-danger;
+@btn-danger-bg-img-stop:                                            @btn-danger-bg;
+@btn-primary-bg-img-start:                                          @brand-primary;
+@btn-primary-bg-img-stop:                                           @btn-primary-bg;
 @dropdown-link-focus-bg:                                            @link-color;
 @line-height-computed:                                              floor((@font-size-base * @line-height-base));
 @progress-sm:                                                       @line-height-computed - 6;
 @progress-xs:                                                       @line-height-computed - 14;
+@syntax-1:                                                          @btn-danger-bg;
+@syntax-2:                                                          @gray-dark;
+@syntax-3:                                                          @brand-success;
+@syntax-4:                                                          @brand-info;
 @tooltip-font-size:                                                 @font-size-base;
