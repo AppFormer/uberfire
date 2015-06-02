@@ -1,0 +1,6 @@
+{
+  "name": "Uberfire PatternFly",
+  "dependencies": {
+    "patternfly": "~1.2.1"
+  }
+}
