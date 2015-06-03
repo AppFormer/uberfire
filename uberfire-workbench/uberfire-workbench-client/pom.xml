@@ -31,6 +31,7 @@
   <description>UberFire Workbench Client</description>
 
   <dependencies>
+
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-client-api</artifactId>

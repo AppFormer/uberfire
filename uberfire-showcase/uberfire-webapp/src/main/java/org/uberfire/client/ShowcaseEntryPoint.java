@@ -15,8 +15,6 @@
  */
 package org.uberfire.client;
 
-import static org.uberfire.workbench.model.menu.MenuFactory.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,10 +22,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.animation.client.Animation;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.RootPanel;
 import org.jboss.errai.bus.client.api.BusErrorCallback;
 import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
@@ -44,6 +47,7 @@ import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.WorkbenchScreenActivity;
 import org.uberfire.client.screen.JSWorkbenchScreenActivity;
+import org.uberfire.client.workbench.docks.UberfireDocks;
 import org.uberfire.client.workbench.events.ApplicationReadyEvent;
 import org.uberfire.client.workbench.widgets.menu.WorkbenchMenuBar;
 import org.uberfire.mvp.Command;
@@ -53,12 +57,7 @@ import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.MenuPosition;
 import org.uberfire.workbench.model.menu.Menus;
 
-import com.google.gwt.animation.client.Animation;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
+import static org.uberfire.workbench.model.menu.MenuFactory.*;
 
 /**
  * GWT's Entry-point for Uberfire-showcase
@@ -80,6 +79,9 @@ public class ShowcaseEntryPoint {
 
     @Inject
     private Caller<AuthenticationService> authService;
+
+    @Inject
+    private UberfireDocks uberfireDocks;
 
     private final List<String> menuItemsToRemove = new ArrayList<String>() {{
         add( "IFrameScreen" );
@@ -103,37 +105,38 @@ public class ShowcaseEntryPoint {
 
         final Menus menus =
                 newTopLevelMenu( "Home" )
-                .respondsWith( new Command() {
-                    @Override
-                    public void execute() {
-                        if ( defaultPerspective != null ) {
-                            placeManager.goTo( new DefaultPlaceRequest( defaultPerspective.getIdentifier() ) );
-                        } else {
-                            Window.alert( "Default perspective not found." );
-                        }
-                    }
-                } )
-                .endMenu()
-                .newTopLevelMenu( "Perspectives" )
-                .withItems( getPerspectives() )
-                .endMenu()
-                .newTopLevelMenu( "Screens" )
-                .withItems( getScreens() )
-                .endMenu()
-                .newTopLevelCustomMenu( manager.lookupBean( CustomSplashHelp.class ).getInstance() )
-                .endMenu()
-                .newTopLevelMenu( "Logout" )
-                .position( MenuPosition.RIGHT )
-                .respondsWith( new Command() {
-                    @Override
-                    public void execute() {
-                        logout();
-                    }
-                } )
-                .endMenu()
-                .build();
+                        .respondsWith( new Command() {
+                            @Override
+                            public void execute() {
+                                if ( defaultPerspective != null ) {
+                                    placeManager.goTo( new DefaultPlaceRequest( defaultPerspective.getIdentifier() ) );
+                                } else {
+                                    Window.alert( "Default perspective not found." );
+                                }
+                            }
+                        } )
+                        .endMenu()
+                        .newTopLevelMenu( "Perspectives" )
+                        .withItems( getPerspectives() )
+                        .endMenu()
+                        .newTopLevelMenu( "Screens" )
+                        .withItems( getScreens() )
+                        .endMenu()
+                        .newTopLevelCustomMenu( manager.lookupBean( CustomSplashHelp.class ).getInstance() )
+                        .endMenu()
+                        .newTopLevelMenu( "Logout" )
+                        .position( MenuPosition.RIGHT )
+                        .respondsWith( new Command() {
+                            @Override
+                            public void execute() {
+                                logout();
+                            }
+                        } )
+                        .endMenu()
+                        .build();
 
         menubar.addMenus( menus );
+
     }
 
     private List<MenuItem> getScreens() {
@@ -214,15 +217,15 @@ public class ShowcaseEntryPoint {
         //Sort Perspective Providers so they're always in the same sequence!
         List<PerspectiveActivity> sortedActivities = new ArrayList<PerspectiveActivity>( activities );
         Collections.sort( sortedActivities,
-                new Comparator<PerspectiveActivity>() {
+                          new Comparator<PerspectiveActivity>() {
 
-            @Override
-            public int compare( PerspectiveActivity o1,
-                                PerspectiveActivity o2 ) {
-                return o1.getDefaultPerspectiveLayout().getName().compareTo( o2.getDefaultPerspectiveLayout().getName() );
-            }
+                              @Override
+                              public int compare( PerspectiveActivity o1,
+                                                  PerspectiveActivity o2 ) {
+                                  return o1.getDefaultPerspectiveLayout().getName().compareTo( o2.getDefaultPerspectiveLayout().getName() );
+                              }
 
-        } );
+                          } );
 
         return sortedActivities;
     }
@@ -259,7 +262,8 @@ public class ShowcaseEntryPoint {
             }
         }, new BusErrorCallback() {
             @Override
-            public boolean error( Message message, Throwable throwable ) {
+            public boolean error( Message message,
+                                  Throwable throwable ) {
                 Window.alert( "Logout failed: " + throwable );
                 return true;
             }

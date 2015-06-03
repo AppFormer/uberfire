@@ -340,8 +340,7 @@
         <artifactId>uberfire-all</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!-- Testing Utils -->
+       <!-- Testing Utils -->
       <dependency>
         <groupId>org.uberfire</groupId>
         <artifactId>uberfire-testing-utils</artifactId>
@@ -353,6 +352,19 @@
         <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
+      <!-- UberFire Docks -->
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-docks-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+       <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-docks-client</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+
     </dependencies>
 
   </dependencyManagement>

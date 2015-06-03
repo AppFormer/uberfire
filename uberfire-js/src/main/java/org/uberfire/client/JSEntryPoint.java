@@ -7,6 +7,7 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import com.google.gwt.user.client.Window;
 import org.jboss.errai.ioc.client.api.AfterInitialization;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.uberfire.client.plugin.RuntimePluginsServiceProxy;
@@ -47,7 +48,6 @@ public class JSEntryPoint {
                         } finally {
                             workbench.removeStartupBlocker( JSEntryPoint.class );
                         }
-
                     }
                 } );
             }
