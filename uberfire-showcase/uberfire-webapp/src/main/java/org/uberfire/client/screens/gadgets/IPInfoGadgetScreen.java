@@ -16,33 +16,19 @@
 
 package org.uberfire.client.screens.gadgets;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.safehtml.shared.UriUtils;
-import com.google.gwt.user.client.ui.Frame;
-import com.google.gwt.user.client.ui.IsWidget;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 
 @Dependent
-@WorkbenchScreen(identifier = "IPInfoGadget")
-public class IPInfoGadgetScreen {
+@WorkbenchScreen( identifier = "IPInfoGadget" )
+public class IPInfoGadgetScreen extends AbstractGadgetScreen {
 
-    private static final String URL = "http://www.gmodules.com/ig/ifr?url=http://aruljohn.com/gadget/ip.xml&amp;synd=open&amp;w=320&amp;h=150&amp;title=IP+Info&amp;border=http%3A%2F%2Fwww.gmodules.com%2Fig%2Fimages%2F&amp;output=js";
+    private static final String URL = "http://aruljohn.com/widget/ip/ip.php";
 
-    private Frame frame;
-
-    @PostConstruct
-    public void init() {
-        frame = new Frame();
-        frame.setWidth("100%");
-        frame.setHeight("300px");
-        frame.getElement().getStyle().setBorderWidth(0, Style.Unit.PX);
-        frame.setUrl(UriUtils.fromString(GWT.getModuleBaseURL() + "google.gadget?src=" + URL).asString());
+    public IPInfoGadgetScreen() {
+        super( URL );
     }
 
     @WorkbenchPartTitle
@@ -50,8 +36,4 @@ public class IPInfoGadgetScreen {
         return "IP Info";
     }
 
-    @WorkbenchPartView
-    public IsWidget getView() {
-        return frame;
-    }
 }
