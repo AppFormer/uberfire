@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.uberfire</groupId>
     <artifactId>uberfire-parent-metadata</artifactId>
-    <version>0.5.7-SNAPSHOT</version>
+    <version>0.5.7.Final</version>
     <relativePath>..</relativePath>
   </parent>
   
