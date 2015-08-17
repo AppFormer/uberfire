@@ -48,6 +48,6 @@ public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferen
     }
 
     private String buildStoragePath(String key) {
-        return "/config/"+ scope.key() + "/" + key + ".preferences";
+        return "/config/" + scope.key() + "/" + key + ".preferences";
     }
 }
