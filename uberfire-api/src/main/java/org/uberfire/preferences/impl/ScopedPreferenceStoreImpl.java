@@ -4,8 +4,8 @@ import com.thoughtworks.xstream.XStream;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
-import org.uberfire.preferences.Scope;
 import org.uberfire.preferences.PreferenceStore;
+import org.uberfire.preferences.Scope;
 
 public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferenceStore {
 
@@ -22,17 +22,29 @@ public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferen
 
     @Override
     public void put(String key, Object value) {
-        ioService.startBatch(fileSystem);
-        Path path = fileSystem.getPath(buildStoragePath(key));
-        ioService.write(path, xs.toXML(value));
-        ioService.endBatch();
+        try {
+            ioService.startBatch(fileSystem);
+            Path path = fileSystem.getPath(buildStoragePath(key));
+            ioService.write(path, xs.toXML(value));
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            ioService.endBatch();
+        }
     }
 
     @Override
     public Object get(String key) {
         Path path = fileSystem.getPath(buildStoragePath(key));
-        String content = ioService.readAllString(path);
-        return xs.fromXML(content);
+        try {
+            if (ioService.exists(path)) {
+                String content = ioService.readAllString(path);
+                return xs.fromXML(content);
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     private String buildStoragePath(String key) {
