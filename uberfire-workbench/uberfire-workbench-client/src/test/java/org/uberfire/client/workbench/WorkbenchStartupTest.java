@@ -24,6 +24,8 @@ import org.uberfire.client.workbench.widgets.dnd.WorkbenchPickupDragController;
 
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwtmockito.GwtMockitoTestRunner;
+import org.uberfire.preferences.PreferenceStorage;
+import org.uberfire.preferences.ResolutionStrategy;
 
 @RunWith( GwtMockitoTestRunner.class )
 public class WorkbenchStartupTest {
@@ -40,6 +42,8 @@ public class WorkbenchStartupTest {
     @Mock(extraInterfaces=ClientMessageBus.class) ClientMessageBusImpl bus;
     @Mock WorkbenchLayout layout;
     @Mock LayoutSelection layoutSelection;
+    @Mock PreferenceStorage preferenceStorage;
+    @Mock ResolutionStrategy resolutionStrategy;
 
     @Before
     public void setup() {
