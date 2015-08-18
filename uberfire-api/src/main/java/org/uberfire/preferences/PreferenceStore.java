@@ -1,8 +1,6 @@
 package org.uberfire.preferences;
 
-public interface PreferenceStore {
-
-    ScopedPreferenceStore forScope(Scope scope);
+public interface PreferenceStore extends ScopedPreferenceStoreFactory {
 
     Object get(String key);
 
