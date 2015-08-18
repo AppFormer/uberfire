@@ -18,6 +18,8 @@ import static org.hamcrest.CoreMatchers.is;
 public class PreferencesStoreTest {
 
     private File temp;
+    private IOServiceDotFileImpl ioServiceConfig;
+    private FileSystem fs;
 
     public static class SimplePojo {
         private String simpleProperty;
@@ -43,17 +45,15 @@ public class PreferencesStoreTest {
         }
 
         System.setProperty("org.uberfire.nio.git.dir", temp.getAbsolutePath());
+        ioServiceConfig = new IOServiceDotFileImpl();
+        fs = ioServiceConfig.newFileSystem(URI.create("git://config-store-repo"), new HashMap<String, Object>() {{
+            put("init", true);
+        }});
     }
 
 
     @Test
     public void obeysHierarchycalKeyResolution() {
-        final IOService ioServiceConfig = new IOServiceDotFileImpl();
-
-        final FileSystem fs = ioServiceConfig.newFileSystem(URI.create("git://config-store-repo"), new HashMap<String, Object>() {{
-            put("init", true);
-        }});
-
         PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, Scope.APP, Scope.USER, Scope.APP);
         PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(Scope.USER);
         PreferenceStore.ScopedPreferenceStore appPreferenceStore = store.forScope(Scope.APP);
