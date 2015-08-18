@@ -13,7 +13,7 @@ import org.uberfire.io.impl.IOServiceDotFileImpl;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.preferences.impl.PreferenceStoreImpl;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 
 public class PreferencesStoreTest {
 
@@ -68,6 +68,18 @@ public class PreferencesStoreTest {
         SimplePojo pojo = (SimplePojo) store.get("mysettings");
 
         Assert.assertThat(pojo.getSimpleProperty(), is("ugh"));
+    }
+
+    @Test
+    public void obeysDefaultScope() {
+        PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, Scope.APP, Scope.USER, Scope.APP);
+        PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(Scope.USER);
+
+        SimplePojo pojo1 = new SimplePojo();
+        pojo1.setSimpleProperty("meh");
+        store.put("mysettings", pojo1);
+
+        Assert.assertThat(userPreferenceStore.get("mysettings"), is(nullValue()));
     }
 
 
