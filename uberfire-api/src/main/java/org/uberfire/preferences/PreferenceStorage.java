@@ -16,16 +16,18 @@
 
 package org.uberfire.preferences;
 
-public interface PreferenceStore extends Store,
-                                         ScopedPreferenceStoreFactory {
+import org.uberfire.mvp.ParameterizedCommand;
 
-    Scope defaultScope();
+public interface PreferenceStorage {
 
-    Scope[] resolutionOrder();
+    <T> void read( final Store store,
+                   final String key,
+                   final ParameterizedCommand<T> value );
 
-    interface ScopedPreferenceStore extends Store {
+    void write( final Store store,
+                final String key,
+                final Object value );
 
-        Scope scope();
-    }
-
+    void delete( final Store store,
+                 final String key );
 }

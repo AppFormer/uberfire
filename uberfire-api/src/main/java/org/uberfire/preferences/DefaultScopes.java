@@ -16,16 +16,12 @@
 
 package org.uberfire.preferences;
 
-public interface PreferenceStore extends Store,
-                                         ScopedPreferenceStoreFactory {
+public enum DefaultScopes implements Scope {
+    USER, APP, MODULE, PROJECT;
 
-    Scope defaultScope();
-
-    Scope[] resolutionOrder();
-
-    interface ScopedPreferenceStore extends Store {
-
-        Scope scope();
+    @Override
+    public String key() {
+        return toString().toLowerCase();
     }
 
 }

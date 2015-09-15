@@ -1,53 +1,46 @@
+/*
+ *   Copyright 2015 JBoss Inc
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package org.uberfire.preferences.impl;
 
-import com.thoughtworks.xstream.XStream;
-import org.uberfire.io.IOService;
-import org.uberfire.java.nio.file.FileSystem;
-import org.uberfire.java.nio.file.Path;
+import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStore;
 import org.uberfire.preferences.Scope;
 
-public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferenceStore {
+import static org.uberfire.commons.validation.PortablePreconditions.*;
 
-    private final FileSystem fileSystem;
-    private final IOService ioService;
+public class ScopedPreferenceStoreImpl extends BaseStore
+        implements PreferenceStore.ScopedPreferenceStore {
+
     private final Scope scope;
-    private final XStream xs = new XStream();
 
-    public ScopedPreferenceStoreImpl(FileSystem fileSystem, IOService ioService, Scope scope) {
-        this.fileSystem = fileSystem;
-        this.ioService = ioService;
-        this.scope = scope;
+    public ScopedPreferenceStoreImpl( final PreferenceStorage storageService,
+                                      final Scope scope ) {
+        super( storageService );
+        this.scope = checkNotNull( "scope", scope );
     }
 
     @Override
-    public void put(String key, Object value) {
-        try {
-            ioService.startBatch(fileSystem);
-            Path path = fileSystem.getPath(buildStoragePath(key));
-            ioService.write(path, xs.toXML(value));
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            ioService.endBatch();
-        }
+    public void put( final String key,
+                     final Object value ) {
+        storage.write( this, key, value );
     }
 
     @Override
-    public Object get(String key) {
-        Path path = fileSystem.getPath(buildStoragePath(key));
-        try {
-            if (ioService.exists(path)) {
-                String content = ioService.readAllString(path);
-                return xs.fromXML(content);
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
-    private String buildStoragePath(String key) {
-        return "/config/" + scope.key() + "/" + key + ".preferences";
+    public Scope scope() {
+        return scope;
     }
 }

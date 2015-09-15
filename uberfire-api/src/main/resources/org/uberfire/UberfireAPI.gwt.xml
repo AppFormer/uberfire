@@ -26,6 +26,7 @@
   <source path='lifecycle'/>
   <source path='mvp'/>
   <source path='paging'/>
+  <source path='preferences'/>
   <source path='rpc'/>
   <source path='security'/>
   <source path='workbench'/>

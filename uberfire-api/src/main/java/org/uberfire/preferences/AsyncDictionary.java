@@ -16,16 +16,20 @@
 
 package org.uberfire.preferences;
 
-public interface PreferenceStore extends Store,
-                                         ScopedPreferenceStoreFactory {
+import org.uberfire.mvp.ParameterizedCommand;
 
-    Scope defaultScope();
+public interface AsyncDictionary {
 
-    Scope[] resolutionOrder();
+    <T> void get( final String key,
+                  final Class<T> clazz,
+                  final ParameterizedCommand<T> value );
 
-    interface ScopedPreferenceStore extends Store {
+    <T> void get( final String key,
+                  final ParameterizedCommand<T> value );
 
-        Scope scope();
-    }
+    <T> void put( final String key,
+                  final T value );
+
+    void remove( final String key );
 
 }

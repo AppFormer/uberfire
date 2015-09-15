@@ -54,9 +54,9 @@ public class PreferencesStoreTest {
 
     @Test
     public void obeysHierarchycalKeyResolution() {
-        PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, Scope.APP, Scope.USER, Scope.APP);
-        PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(Scope.USER);
-        PreferenceStore.ScopedPreferenceStore appPreferenceStore = store.forScope(Scope.APP);
+        PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, DefaultScopes.APP, DefaultScopes.USER, DefaultScopes.APP);
+        PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(DefaultScopes.USER);
+        PreferenceStore.ScopedPreferenceStore appPreferenceStore = store.forScope(DefaultScopes.APP);
 
         SimplePojo pojo1 = new SimplePojo();
         pojo1.setSimpleProperty("meh");
@@ -72,8 +72,8 @@ public class PreferencesStoreTest {
 
     @Test
     public void obeysDefaultScope() {
-        PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, Scope.APP, Scope.USER, Scope.APP);
-        PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(Scope.USER);
+        PreferenceStore store = new PreferenceStoreImpl(fs, ioServiceConfig, DefaultScopes.APP, DefaultScopes.USER, DefaultScopes.APP);
+        PreferenceStore.ScopedPreferenceStore userPreferenceStore = store.forScope(DefaultScopes.USER);
 
         SimplePojo pojo1 = new SimplePojo();
         pojo1.setSimpleProperty("meh");

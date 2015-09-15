@@ -16,16 +16,6 @@
 
 package org.uberfire.preferences;
 
-public interface PreferenceStore extends Store,
-                                         ScopedPreferenceStoreFactory {
-
-    Scope defaultScope();
-
-    Scope[] resolutionOrder();
-
-    interface ScopedPreferenceStore extends Store {
-
-        Scope scope();
-    }
+public interface Store extends AsyncDictionary {
 
 }

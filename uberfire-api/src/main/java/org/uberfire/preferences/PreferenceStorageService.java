@@ -16,16 +16,19 @@
 
 package org.uberfire.preferences;
 
-public interface PreferenceStore extends Store,
-                                         ScopedPreferenceStoreFactory {
+import org.jboss.errai.bus.server.annotations.Remote;
 
-    Scope defaultScope();
+@Remote
+public interface PreferenceStorageService {
 
-    Scope[] resolutionOrder();
+    Object read( final Store preferenceStore,
+                 final String key );
 
-    interface ScopedPreferenceStore extends Store {
+    void write( final Store preferenceStore,
+                final String key,
+                final Object value );
 
-        Scope scope();
-    }
+    void delete( final Store preferenceStore,
+                 final String key );
 
 }
