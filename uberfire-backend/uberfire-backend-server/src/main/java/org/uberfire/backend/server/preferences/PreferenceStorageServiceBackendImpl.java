@@ -24,7 +24,9 @@ import com.thoughtworks.xstream.XStream;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
+import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.DefaultScopes;
+import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStorageService;
 import org.uberfire.preferences.PreferenceStore;
 import org.uberfire.preferences.Scope;
@@ -32,7 +34,8 @@ import org.uberfire.preferences.Store;
 import org.uberfire.rpc.SessionInfo;
 
 @ApplicationScoped
-public class PreferenceStorageServiceBackendImpl implements PreferenceStorageService {
+public class PreferenceStorageServiceBackendImpl implements PreferenceStorageService,
+                                                            PreferenceStorage {
 
     @Inject
     @Named("configIO")
@@ -60,6 +63,13 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
             throw new RuntimeException( e );
         }
         return null;
+    }
+
+    @Override
+    public <T> void read( final Store store,
+                          final String key,
+                          final ParameterizedCommand<T> value ) {
+        value.execute( (T) read( store, key ) );
     }
 
     @Override
