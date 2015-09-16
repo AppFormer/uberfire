@@ -29,8 +29,8 @@ import org.uberfire.preferences.DefaultScopeTypes;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStorageService;
 import org.uberfire.preferences.PreferenceStore;
+import org.uberfire.preferences.ResolutionStrategy;
 import org.uberfire.preferences.Scope;
-import org.uberfire.preferences.ScopeType;
 import org.uberfire.rpc.SessionInfo;
 
 @ApplicationScoped
@@ -53,7 +53,7 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
     @Override
     public <T> T read( final Scope scope,
                        final String key,
-                       final ScopeType[] resolutionOrder ) {
+                       final ResolutionStrategy resolutionStrategy ) {
         //        for ( Scope scope : resolutionOrder ) {
 //            Object result = forScope( scope ).get( key );
 //            if ( result != null ) {
@@ -83,9 +83,9 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
     @Override
     public <T> void read( final Scope store,
                           final String key,
-                          final ScopeType[] resolutionOrder,
+                          final ResolutionStrategy resolutionStrategy,
                           final ParameterizedCommand<T> value ) {
-        value.execute( (T) read( store, key, resolutionOrder ) );
+        value.execute( (T) read( store, key, resolutionStrategy ) );
     }
 
     @Override
@@ -133,10 +133,8 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
             throw new RuntimeException( "Invalid Store" );
         }
         final String path;
-        if ( scope.getType().equals( DefaultScopeTypes.USER ) ) {
+        if ( scope.equals( DefaultScopeTypes.USER.toScope() ) ) {
             path = sessionInfo.getIdentity().getIdentifier();
-        } else if ( scope.getType().equals( DefaultScopeTypes.GLOBAL ) ) {
-            path = DefaultScopeTypes.GLOBAL.toString().toLowerCase();
         } else {
             path = scope.key();
         }

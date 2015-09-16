@@ -17,5 +17,71 @@
 package org.uberfire.preferences;
 
 public enum DefaultScopeTypes implements ScopeType {
-    GLOBAL, USER, APP, MODULE, PROJECT
+    USER {
+        @Override
+        public Scope toScope( final Object... params ) {
+            return USER_SCOPE;
+        }
+    }, COMPONENT {
+        @Override
+        public Scope toScope( final Object... params ) {
+            if ( params.length < 3 ) {
+                throw new RuntimeException();
+            }
+            return null;
+        }
+    }, MODULE {
+        @Override
+        public Scope toScope( final Object... params ) {
+            return null;
+        }
+    }, APP {
+        @Override
+        public Scope toScope( final Object... params ) {
+            return null;
+        }
+    }, GLOBAL {
+        @Override
+        public Scope toScope( final Object... params ) {
+            return GLOBAL_SCOPE;
+        }
+    };
+
+    public abstract Scope toScope( Object... params );
+
+    private static final Scope GLOBAL_SCOPE = new Scope() {
+        @Override
+        public Scope getParent() {
+            return null;
+        }
+
+        @Override
+        public String key() {
+            return "global";
+        }
+
+        @Override
+        public ScopeType getType() {
+            return GLOBAL;
+        }
+    };
+
+    private static final Scope USER_SCOPE = new Scope() {
+        @Override
+        public Scope getParent() {
+            return GLOBAL_SCOPE;
+        }
+
+        @Override
+        public String key() {
+            return null;
+        }
+
+        @Override
+        public ScopeType getType() {
+            return USER;
+        }
+    };
+
 }
+

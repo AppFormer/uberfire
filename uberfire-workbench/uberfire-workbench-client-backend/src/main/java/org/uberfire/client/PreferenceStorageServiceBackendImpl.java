@@ -24,8 +24,8 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStorageService;
+import org.uberfire.preferences.ResolutionStrategy;
 import org.uberfire.preferences.Scope;
-import org.uberfire.preferences.ScopeType;
 
 @Alternative
 public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
@@ -36,14 +36,14 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
     @Override
     public <T> void read( final Scope scope,
                           final String key,
-                          final ScopeType[] resolutionOrder,
+                          final ResolutionStrategy resolutionStrategy,
                           final ParameterizedCommand<T> value ) {
         preferenceStorage.call( new RemoteCallback<T>() {
             @Override
             public void callback( final T o ) {
                 value.execute( o );
             }
-        } ).read( scope, key, resolutionOrder );
+        } ).read( scope, key, resolutionStrategy );
     }
 
     @Override
@@ -70,7 +70,6 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
     public void delete( final Scope scope,
                         final String key ) {
         preferenceStorage.call().delete( scope, key );
-
     }
 
     @Override

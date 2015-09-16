@@ -19,23 +19,23 @@ package org.uberfire.preferences.impl;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStore;
+import org.uberfire.preferences.ResolutionStrategy;
 import org.uberfire.preferences.Scope;
-import org.uberfire.preferences.ScopeType;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
 
 public class PreferenceStoreImpl implements PreferenceStore {
 
     private final PreferenceStorage storage;
-    private final ScopeType[] resolutionOrder;
+    private final ResolutionStrategy resolutionStrategy;
     private final Scope defaultScope;
 
     public PreferenceStoreImpl( final PreferenceStorage storage,
                                 final Scope defaultScope,
-                                final ScopeType... resolutionOrder ) {
+                                final ResolutionStrategy resolutionStrategy ) {
         this.storage = checkNotNull( "storage", storage );
         this.defaultScope = checkNotNull( "defaultScope", defaultScope );
-        this.resolutionOrder = resolutionOrder;
+        this.resolutionStrategy = checkNotNull( "resolutionStrategy", resolutionStrategy );
     }
 
     @Override
@@ -49,8 +49,8 @@ public class PreferenceStoreImpl implements PreferenceStore {
     }
 
     @Override
-    public ScopeType[] resolutionOrder() {
-        return resolutionOrder;
+    public ResolutionStrategy resolutionStrategy() {
+        return resolutionStrategy;
     }
 
     @Override
@@ -63,13 +63,13 @@ public class PreferenceStoreImpl implements PreferenceStore {
     public <T> void get( final String key,
                          final Class<T> clazz,
                          final ParameterizedCommand<T> callback ) {
-        storage.read( defaultScope, key, resolutionOrder, callback );
+        storage.read( defaultScope, key, resolutionStrategy, callback );
     }
 
     @Override
     public <T> void get( final String key,
                          final ParameterizedCommand<T> callback ) {
-        storage.read( defaultScope, key, resolutionOrder, callback );
+        storage.read( defaultScope, key, resolutionStrategy, callback );
     }
 
     @Override

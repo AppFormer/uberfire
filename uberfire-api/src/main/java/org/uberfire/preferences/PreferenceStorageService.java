@@ -23,7 +23,7 @@ public interface PreferenceStorageService {
 
     <T> T read( final Scope scope,
                 final String key,
-                final ScopeType[] resolutionOrder );
+                final ResolutionStrategy resolutionStrategy );
 
     Object read( final Scope scope,
                  final String key );

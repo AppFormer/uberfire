@@ -56,7 +56,7 @@ public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferen
         get( key, new ParameterizedCommand<T>() {
             @Override
             public void execute( final T value ) {
-                callback.execute( clazz.cast( value ) );
+                callback.execute( value );
             }
         } );
     }

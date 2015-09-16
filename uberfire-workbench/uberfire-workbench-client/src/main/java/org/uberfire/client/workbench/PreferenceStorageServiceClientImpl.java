@@ -20,8 +20,8 @@ import javax.enterprise.context.Dependent;
 
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
+import org.uberfire.preferences.ResolutionStrategy;
 import org.uberfire.preferences.Scope;
-import org.uberfire.preferences.ScopeType;
 
 @Dependent
 public class PreferenceStorageServiceClientImpl implements PreferenceStorage {
@@ -31,7 +31,7 @@ public class PreferenceStorageServiceClientImpl implements PreferenceStorage {
     @Override
     public <T> void read( final Scope store,
                           final String key,
-                          final ScopeType[] resolutionOrder,
+                          final ResolutionStrategy resolutionStrategy,
                           final ParameterizedCommand<T> value ) {
 
     }

@@ -21,7 +21,7 @@ public interface PreferenceStore extends Store,
 
     Scope defaultScope();
 
-    ScopeType[] resolutionOrder();
+    ResolutionStrategy resolutionStrategy();
 
     void clear( final String key );
 

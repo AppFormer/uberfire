@@ -16,25 +16,11 @@
 
 package org.uberfire.preferences;
 
-import org.uberfire.mvp.ParameterizedCommand;
+import java.util.List;
 
-public interface PreferenceStorage {
+public interface ResolutionStrategy {
 
-    <T> void read( final Scope store,
-                   final String key,
-                   final ResolutionStrategy resolutionStrategy,
-                   final ParameterizedCommand<T> value );
+    List<Scope> order( final Scope scope,
+                       final Scope... scopes );
 
-    <T> void read( final Scope scope,
-                   final String key,
-                   final ParameterizedCommand<T> callback );
-
-    void write( final Scope store,
-                final String key,
-                final Object value );
-
-    void delete( final Scope store,
-                 final String key );
-
-    void delete( final String key );
 }

@@ -14,13 +14,20 @@
  *   limitations under the License.
  */
 
-package org.uberfire.preferences;
+package org.uberfire.preferences.impl;
 
-public interface Scope {
+import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
-    Scope getParent();
+import org.uberfire.preferences.ResolutionStrategy;
+import org.uberfire.preferences.Scope;
 
-    String key();
+@ApplicationScoped
+public class DefaultResolutionStrategy implements ResolutionStrategy {
 
-    ScopeType getType();
+    @Override
+    public List<Scope> order( final Scope scope,
+                              final Scope... scopes ) {
+        return null;
+    }
 }
