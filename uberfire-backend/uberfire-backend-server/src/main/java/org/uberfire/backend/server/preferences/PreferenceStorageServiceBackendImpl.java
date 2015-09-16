@@ -25,12 +25,12 @@ import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.mvp.ParameterizedCommand;
-import org.uberfire.preferences.DefaultScopes;
+import org.uberfire.preferences.DefaultScopeTypes;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStorageService;
 import org.uberfire.preferences.PreferenceStore;
 import org.uberfire.preferences.Scope;
-import org.uberfire.preferences.Store;
+import org.uberfire.preferences.ScopeType;
 import org.uberfire.rpc.SessionInfo;
 
 @ApplicationScoped
@@ -51,7 +51,22 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
     private final XStream xs = new XStream();
 
     @Override
-    public Object read( final Store store,
+    public <T> T read( final Scope scope,
+                       final String key,
+                       final ScopeType[] resolutionOrder ) {
+        //        for ( Scope scope : resolutionOrder ) {
+//            Object result = forScope( scope ).get( key );
+//            if ( result != null ) {
+//                return result;
+//            }
+//        }
+//
+//        value.execute( null );
+        return null;
+    }
+
+    @Override
+    public Object read( final Scope store,
                         final String key ) {
         Path path = fileSystem.getPath( buildStoragePath( store, key ) );
         try {
@@ -66,14 +81,22 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
     }
 
     @Override
-    public <T> void read( final Store store,
+    public <T> void read( final Scope store,
+                          final String key,
+                          final ScopeType[] resolutionOrder,
+                          final ParameterizedCommand<T> value ) {
+        value.execute( (T) read( store, key, resolutionOrder ) );
+    }
+
+    @Override
+    public <T> void read( final Scope store,
                           final String key,
                           final ParameterizedCommand<T> value ) {
         value.execute( (T) read( store, key ) );
     }
 
     @Override
-    public void write( final Store store,
+    public void write( final Scope store,
                        final String key,
                        final Object value ) {
         try {
@@ -89,12 +112,17 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
     }
 
     @Override
-    public void delete( final Store store,
+    public void delete( final Scope store,
                         final String key ) {
         ioService.deleteIfExists( fileSystem.getPath( buildStoragePath( store, key ) ) );
     }
 
-    private String buildStoragePath( final Store store,
+    @Override
+    public void delete( final String key ) {
+
+    }
+
+    private String buildStoragePath( final Scope store,
                                      final String key ) {
         final Scope scope;
         if ( store instanceof PreferenceStore ) {
@@ -105,9 +133,11 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorageSer
             throw new RuntimeException( "Invalid Store" );
         }
         final String path;
-        if ( scope.key().equals( DefaultScopes.USER.key() ) ) {
+        if ( scope.getType().equals( DefaultScopeTypes.USER ) ) {
             path = sessionInfo.getIdentity().getIdentifier();
-        } else /*if needs something like that for MODULE, PROJECT */ {
+        } else if ( scope.getType().equals( DefaultScopeTypes.GLOBAL ) ) {
+            path = DefaultScopeTypes.GLOBAL.toString().toLowerCase();
+        } else {
             path = scope.key();
         }
         return "/config/" + path + "/" + key + ".preferences";

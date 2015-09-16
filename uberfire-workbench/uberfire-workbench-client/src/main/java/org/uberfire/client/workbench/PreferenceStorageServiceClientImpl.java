@@ -20,7 +20,8 @@ import javax.enterprise.context.Dependent;
 
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
-import org.uberfire.preferences.Store;
+import org.uberfire.preferences.Scope;
+import org.uberfire.preferences.ScopeType;
 
 @Dependent
 public class PreferenceStorageServiceClientImpl implements PreferenceStorage {
@@ -28,22 +29,36 @@ public class PreferenceStorageServiceClientImpl implements PreferenceStorage {
     //LOCAL STORAGE?!
 
     @Override
-    public <T> void read( final Store store,
+    public <T> void read( final Scope store,
                           final String key,
+                          final ScopeType[] resolutionOrder,
                           final ParameterizedCommand<T> value ) {
 
     }
 
     @Override
-    public void write( final Store store,
+    public <T> void read( final Scope scope,
+                          final String key,
+                          final ParameterizedCommand<T> callback ) {
+
+    }
+
+    @Override
+    public void write( final Scope store,
                        final String key,
                        final Object value ) {
 
     }
 
     @Override
-    public void delete( final Store store,
+    public void delete( final Scope store,
                         final String key ) {
 
     }
+
+    @Override
+    public void delete( final String key ) {
+
+    }
+
 }

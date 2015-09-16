@@ -21,14 +21,20 @@ import org.jboss.errai.bus.server.annotations.Remote;
 @Remote
 public interface PreferenceStorageService {
 
-    Object read( final Store preferenceStore,
+    <T> T read( final Scope scope,
+                final String key,
+                final ScopeType[] resolutionOrder );
+
+    Object read( final Scope scope,
                  final String key );
 
-    void write( final Store preferenceStore,
+    void write( final Scope scope,
                 final String key,
                 final Object value );
 
-    void delete( final Store preferenceStore,
+    void delete( final Scope scope,
                  final String key );
+
+    void delete( final String key );
 
 }

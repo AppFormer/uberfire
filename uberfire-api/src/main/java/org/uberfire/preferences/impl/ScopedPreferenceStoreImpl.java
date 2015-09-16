@@ -16,31 +16,63 @@
 
 package org.uberfire.preferences.impl;
 
+import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStore;
 import org.uberfire.preferences.Scope;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
 
-public class ScopedPreferenceStoreImpl extends BaseStore
-        implements PreferenceStore.ScopedPreferenceStore {
+public class ScopedPreferenceStoreImpl implements PreferenceStore.ScopedPreferenceStore {
 
+    private final PreferenceStorage storage;
     private final Scope scope;
 
-    public ScopedPreferenceStoreImpl( final PreferenceStorage storageService,
+    public ScopedPreferenceStoreImpl( final PreferenceStorage storage,
                                       final Scope scope ) {
-        super( storageService );
+        this.storage = checkNotNull( "storage", storage );
         this.scope = checkNotNull( "scope", scope );
-    }
-
-    @Override
-    public void put( final String key,
-                     final Object value ) {
-        storage.write( this, key, value );
     }
 
     @Override
     public Scope scope() {
         return scope;
+    }
+
+    @Override
+    public void put( final String key,
+                     final Object value ) {
+        storage.write( scope, key, value );
+    }
+
+    @Override
+    public <T> void get( final String key,
+                         final Class<T> clazz,
+                         final ParameterizedCommand<T> callback ) {
+        checkNotEmpty( "key", key );
+        checkNotNull( "clazz", clazz );
+        checkNotNull( "callback", callback );
+
+        get( key, new ParameterizedCommand<T>() {
+            @Override
+            public void execute( final T value ) {
+                callback.execute( clazz.cast( value ) );
+            }
+        } );
+    }
+
+    @Override
+    public <T> void get( final String key,
+                         final ParameterizedCommand<T> callback ) {
+        checkNotEmpty( "key", key );
+        checkNotNull( "callback", callback );
+
+        storage.read( scope, key, callback );
+    }
+
+    @Override
+    public void remove( final String key ) {
+        checkNotEmpty( "key", key );
+        storage.delete( scope, key );
     }
 }

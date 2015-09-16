@@ -24,7 +24,8 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.preferences.PreferenceStorage;
 import org.uberfire.preferences.PreferenceStorageService;
-import org.uberfire.preferences.Store;
+import org.uberfire.preferences.Scope;
+import org.uberfire.preferences.ScopeType;
 
 @Alternative
 public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
@@ -33,7 +34,20 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
     private Caller<PreferenceStorageService> preferenceStorage;
 
     @Override
-    public <T> void read( final Store store,
+    public <T> void read( final Scope scope,
+                          final String key,
+                          final ScopeType[] resolutionOrder,
+                          final ParameterizedCommand<T> value ) {
+        preferenceStorage.call( new RemoteCallback<T>() {
+            @Override
+            public void callback( final T o ) {
+                value.execute( o );
+            }
+        } ).read( scope, key, resolutionOrder );
+    }
+
+    @Override
+    public <T> void read( final Scope scope,
                           final String key,
                           final ParameterizedCommand<T> value ) {
         preferenceStorage.call( new RemoteCallback<T>() {
@@ -41,21 +55,26 @@ public class PreferenceStorageServiceBackendImpl implements PreferenceStorage {
             public void callback( final T o ) {
                 value.execute( o );
             }
-        } );
+        } ).read( scope, key );
     }
 
     @Override
-    public void write( final Store store,
+    public void write( final Scope scope,
                        final String key,
                        final Object value ) {
-        preferenceStorage.call().write( store, key, value );
+        preferenceStorage.call().write( scope, key, value );
 
     }
 
     @Override
-    public void delete( final Store store,
+    public void delete( final Scope scope,
                         final String key ) {
-        preferenceStorage.call().delete( store, key );
+        preferenceStorage.call().delete( scope, key );
 
+    }
+
+    @Override
+    public void delete( final String key ) {
+        preferenceStorage.call().delete( key );
     }
 }

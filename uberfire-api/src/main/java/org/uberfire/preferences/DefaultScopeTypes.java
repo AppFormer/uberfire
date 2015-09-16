@@ -16,12 +16,6 @@
 
 package org.uberfire.preferences;
 
-public enum DefaultScopes implements Scope {
-    USER, APP, MODULE, PROJECT;
-
-    @Override
-    public String key() {
-        return toString().toLowerCase();
-    }
-
+public enum DefaultScopeTypes implements ScopeType {
+    GLOBAL, USER, APP, MODULE, PROJECT
 }

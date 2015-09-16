@@ -19,4 +19,6 @@ package org.uberfire.preferences;
 public interface Scope {
 
     String key();
+
+    ScopeType getType();
 }
