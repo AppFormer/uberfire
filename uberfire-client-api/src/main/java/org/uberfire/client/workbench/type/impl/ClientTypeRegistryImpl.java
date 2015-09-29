@@ -23,6 +23,11 @@ public class ClientTypeRegistryImpl implements ClientTypeRegistry {
 
     private final SyncBeanManager iocManager;
 
+    // For proxying
+    public ClientTypeRegistryImpl() {
+        iocManager = null;
+    }
+
     @Inject
     public ClientTypeRegistryImpl( final SyncBeanManager iocManager ) {
         this.iocManager = iocManager;

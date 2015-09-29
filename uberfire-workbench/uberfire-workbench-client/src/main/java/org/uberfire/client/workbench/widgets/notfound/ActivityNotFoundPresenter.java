@@ -34,6 +34,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 @Named("uf.workbench.activity.notfound")
 public class ActivityNotFoundPresenter extends AbstractPopupActivity {
 
+    // For proxying
+    public ActivityNotFoundPresenter() {
+        super( null, null );
+    }
+
     @Inject
     //Constructor injection for testing
     public ActivityNotFoundPresenter( final PlaceManager placeManager, PopupView popupView ) {
