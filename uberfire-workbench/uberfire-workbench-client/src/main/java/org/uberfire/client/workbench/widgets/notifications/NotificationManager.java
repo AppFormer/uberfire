@@ -121,6 +121,12 @@ public class NotificationManager {
         boolean isShowing( final NotificationEvent event );
     }
 
+    // For proxying
+    public NotificationManager() {
+      this.iocManager = null;
+      this.placeManager = null;
+    }
+
     @Inject
     public NotificationManager( final SyncBeanManager iocManager,
                                 final PlaceManager placeManager ) {

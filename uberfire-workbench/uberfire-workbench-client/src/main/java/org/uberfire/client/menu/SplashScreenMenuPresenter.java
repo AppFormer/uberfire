@@ -78,6 +78,12 @@ public class SplashScreenMenuPresenter implements IsWidget {
     private final PlaceManager placeManager;
     private final View view;
 
+    // For proxying
+    public SplashScreenMenuPresenter() {
+        placeManager = null;
+        view = null;
+    }
+
     @Inject
     public SplashScreenMenuPresenter(PlaceManager placeManager, View view) {
         this.placeManager = checkNotNull( "placeManager", placeManager );

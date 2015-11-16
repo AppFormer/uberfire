@@ -52,6 +52,11 @@ public class ErrorPopupPresenter {
 
     private final View view;
 
+    // For proxying
+    public ErrorPopupPresenter() {
+        this.view = null;
+    }
+
     @Inject
     public ErrorPopupPresenter( View view ) {
         this.view = checkNotNull( "view", view );
