@@ -13,6 +13,7 @@ import org.gwtbootstrap3.client.ui.constants.Styles;
 import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.uberfire.client.menu.SplashScreenMenuPresenter;
 import org.uberfire.client.menu.SplashScreenMenuPresenter.SplashScreenListEntry;
+import org.uberfire.client.resources.i18n.WorkbenchConstants;
 
 @Dependent
 public class SplashScreenMenuView extends AnchorListItem implements SplashScreenMenuPresenter.View {
@@ -20,14 +21,14 @@ public class SplashScreenMenuView extends AnchorListItem implements SplashScreen
     final DropDownMenu dropdown = new DropDownMenu();
 
     public SplashScreenMenuView() {
-        addStyleName(Styles.DROPDOWN_TOGGLE);
-        ensureDebugId("MenuSplashList-dropdown");
+        addStyleName( Styles.DROPDOWN_TOGGLE );
+        ensureDebugId( "MenuSplashList-dropdown" );
 
-        anchor.addStyleName(Styles.DROPDOWN_TOGGLE);
-        anchor.setDataToggle(Toggle.DROPDOWN);
-        anchor.setIcon(IconType.QUESTION);
+        anchor.addStyleName( Styles.DROPDOWN_TOGGLE );
+        anchor.setDataToggle( Toggle.DROPDOWN );
+        anchor.setIcon( IconType.QUESTION );
 
-        add(dropdown);
+        add( dropdown );
     }
 
     @Override
@@ -49,7 +50,7 @@ public class SplashScreenMenuView extends AnchorListItem implements SplashScreen
             dropdown.add( item );
         }
         if ( dropdown.getWidgetCount() == 0 ) {
-            dropdown.add( new DropDownHeader( "-- none --" ) );
+            dropdown.add( new DropDownHeader( WorkbenchConstants.INSTANCE.splashScreenNoneAvailable() ) );
         }
     }
 }
