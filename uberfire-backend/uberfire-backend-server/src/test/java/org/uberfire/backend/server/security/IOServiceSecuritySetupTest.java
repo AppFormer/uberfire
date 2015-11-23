@@ -1,5 +1,7 @@
 package org.uberfire.backend.server.security;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -14,7 +16,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.uberfire.java.nio.base.FileSystemId;
 import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.security.FileSystemAuthenticator;
 import org.uberfire.java.nio.security.FileSystemAuthorizer;
 import org.uberfire.java.nio.security.FileSystemUser;
@@ -59,7 +63,16 @@ public class IOServiceSecuritySetupTest {
         FileSystemUser user = mockFsp.authenticator.authenticate( "fake", "fake" );
         assertEquals( MockAuthenticationService.FAKE_USER.getIdentifier(),
                       user.getName() );
-        assertTrue( mockFsp.authorizer.authorize( mock( FileSystem.class ),
+
+        final FileSystem mockfs = mock( FileSystem.class );
+        final FileSystem mockedFSId = mock( FileSystem.class, withSettings().extraInterfaces( FileSystemId.class ) );
+        final Path rootPath = mock( Path.class );
+        when( mockfs.getRootDirectories() ).thenReturn( Arrays.asList( rootPath ) );
+        when( mockedFSId.getRootDirectories() ).thenReturn( Arrays.asList( rootPath ) );
+        when( rootPath.getFileSystem() ).thenReturn( mockedFSId );
+
+
+        assertTrue( mockFsp.authorizer.authorize( mockfs,
                                                   user ) );
     }
 
@@ -95,6 +108,13 @@ public class IOServiceSecuritySetupTest {
         FileSystemAuthorizer installedAuthorizer = MockSecuredFilesystemProvider.LATEST_INSTANCE.authorizer;
         FileSystemAuthenticator installedAuthenticator = MockSecuredFilesystemProvider.LATEST_INSTANCE.authenticator;
         FileSystem mockfs = mock( FileSystem.class );
+
+        final FileSystem mockedFSId = mock( FileSystem.class, withSettings().extraInterfaces( FileSystemId.class ) );
+        final Path rootPath = mock( Path.class );
+        when( mockfs.getRootDirectories() ).thenReturn( Arrays.asList( rootPath ) );
+        when( mockedFSId.getRootDirectories() ).thenReturn( Arrays.asList( rootPath ) );
+        when( rootPath.getFileSystem() ).thenReturn( mockedFSId );
+
         FileSystemUser fileSystemUser = installedAuthenticator.authenticate( "fake", "fake" );
 
         installedAuthorizer.authorize( mockfs, fileSystemUser );
