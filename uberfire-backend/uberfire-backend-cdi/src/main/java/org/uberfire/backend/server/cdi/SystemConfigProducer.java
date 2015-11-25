@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
+import org.uberfire.commons.lifecycle.PriorityDisposableRegistry;
 import org.uberfire.commons.services.cdi.Startable;
 import org.uberfire.commons.services.cdi.Startup;
 import org.uberfire.commons.services.cdi.StartupType;
@@ -257,6 +258,8 @@ public class SystemConfigProducer implements Extension {
                 } catch ( FileSystemAlreadyExistsException e ) {
                     systemFS = ioService.getFileSystem( URI.create( "git://system" ) );
                 }
+
+                PriorityDisposableRegistry.register( "systemFS", systemFS );
 
                 return systemFS;
             }
