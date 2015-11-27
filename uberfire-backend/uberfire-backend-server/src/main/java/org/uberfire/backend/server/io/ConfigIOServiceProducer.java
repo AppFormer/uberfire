@@ -27,12 +27,13 @@ public class ConfigIOServiceProducer {
     @Inject
     @Named("clusterServiceFactory")
     private ClusterServiceFactory clusterServiceFactory;
-
+    
     @Inject
     @IOSecurityAuth
     private Instance<AuthenticationService> applicationProvidedConfigIOAuthService;
 
     private IOService configIOService;
+    private FileSystem configFileSystem;
 
     @PostConstruct
     public void setup() {
@@ -42,6 +43,7 @@ public class ConfigIOServiceProducer {
         } else {
             configIOService = new IOServiceClusterImpl( new IOServiceNio2WrapperImpl( "config" ), clusterServiceFactory, clusterServiceFactory.isAutoStart() );
         }
+        configFileSystem = (FileSystem) PriorityDisposableRegistry.get( "systemFS" );
     }
 
     public void destroy() {
@@ -55,7 +57,10 @@ public class ConfigIOServiceProducer {
     }
 
     public FileSystem configFileSystem() {
-        return (FileSystem) PriorityDisposableRegistry.get( "systemFS" );
+        if ( configFileSystem == null ) {
+            configFileSystem = (FileSystem) PriorityDisposableRegistry.get( "systemFS" );
+        }
+        return configFileSystem;
     }
 
     public static ConfigIOServiceProducer getInstance() {
