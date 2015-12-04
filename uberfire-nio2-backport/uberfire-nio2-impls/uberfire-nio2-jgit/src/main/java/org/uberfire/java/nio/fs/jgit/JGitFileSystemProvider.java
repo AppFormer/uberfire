@@ -176,6 +176,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider {
     public static final String DAEMON_DEFAULT_PORT = "9418";
     public static final String SSH_DEFAULT_ENABLED = "true";
     public static final String SSH_DEFAULT_PORT = "8001";
+    public static final String SSH_IDLE_TIMEOUT = "10000";
     public static final String DEFAULT_COMMIT_LIMIT_TO_GC = "20";
 
     private File gitReposParentDir;
@@ -193,6 +194,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider {
     private String sshHostName;
     private int sshHostPort;
     private File sshFileCertDir;
+    private String sshIdleTimeout;
 
     private final Map<String, JGitFileSystem> fileSystems = new ConcurrentHashMap<String, JGitFileSystem>();
     private final Set<JGitFileSystem> closedFileSystems = new HashSet<JGitFileSystem>();
@@ -227,6 +229,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider {
         final ConfigProperty sshPortProp = config.get( "org.uberfire.nio.git.ssh.port", SSH_DEFAULT_PORT );
         final ConfigProperty sshCertDirProp = config.get( "org.uberfire.nio.git.ssh.cert.dir", currentDirectory );
         final ConfigProperty sshHostPortProp = config.get( "org.uberfire.nio.git.ssh.hostport", SSH_DEFAULT_PORT );
+        final ConfigProperty sshIdleTimeoutProp = config.get( "org.uberfire.nio.git.ssh.idle.timeout", SSH_IDLE_TIMEOUT );
         final ConfigProperty commitLimitProp = config.get( "org.uberfire.nio.git.gc.limit", DEFAULT_COMMIT_LIMIT_TO_GC );
 
         if ( LOG.isDebugEnabled() ) {
@@ -251,6 +254,13 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider {
             sshHostName = sshHostNameProp.getValue();
             sshHostPort = sshHostPortProp.getIntValue();
             sshFileCertDir = new File( sshCertDirProp.getValue(), SSH_FILE_CERT_CONTAINER_DIR );
+            sshIdleTimeout = sshIdleTimeoutProp.getValue();
+            try {
+                Integer.valueOf( sshIdleTimeout );
+            } catch ( final NumberFormatException exception ) {
+                LOG.error( "SSH Idle Timeout value is not a valid integer - Parameter is ignored, now using default value." );
+                sshIdleTimeout = SSH_IDLE_TIMEOUT;
+            }
         }
     }
 
@@ -467,7 +477,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider {
 
         gitSSHService = new GitSSHService();
 
-        gitSSHService.setup( sshFileCertDir, sshHostAddr, sshPort, authenticator, fileSystemAuthorizer, receivePackFactory, new RepositoryResolverImpl<BaseGitCommand>() );
+        gitSSHService.setup( sshFileCertDir, sshHostAddr, sshPort, sshIdleTimeout, authenticator, fileSystemAuthorizer, receivePackFactory, new RepositoryResolverImpl<BaseGitCommand>() );
 
         gitSSHService.start();
     }
