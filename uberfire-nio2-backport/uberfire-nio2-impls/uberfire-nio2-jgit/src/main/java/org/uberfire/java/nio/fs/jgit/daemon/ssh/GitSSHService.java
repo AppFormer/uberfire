@@ -25,6 +25,7 @@ public class GitSSHService {
     public void setup( final File certDir,
                        final String host,
                        final int port,
+                       final String sshIdleTimeout,
                        final FileSystemAuthenticator fileSystemAuthenticator,
                        final FileSystemAuthorizer fileSystemAuthorizer,
                        final ReceivePackFactory receivePackFactory,
@@ -32,7 +33,7 @@ public class GitSSHService {
         this.fileSystemAuthenticator = fileSystemAuthenticator;
         this.fileSystemAuthorizer = fileSystemAuthorizer;
 
-        sshd.getProperties().put( SshServer.IDLE_TIMEOUT, "10000" );
+        sshd.getProperties().put( SshServer.IDLE_TIMEOUT, sshIdleTimeout );
         sshd.setHost( host );
         sshd.setPort( port );
         if ( !certDir.exists() ) {
