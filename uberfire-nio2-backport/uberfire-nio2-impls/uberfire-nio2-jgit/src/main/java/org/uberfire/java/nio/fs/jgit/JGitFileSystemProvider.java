@@ -260,6 +260,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             daemonHostAddr = hostProp.getValue();
             daemonHostName = hostNameProp.getValue();
             daemonHostPort = hostPortProp.getIntValue();
+            daemonHostPort = daemonPort;
         }
 
         sshEnabled = sshEnabledProp.getBooleanValue();
@@ -268,6 +269,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             sshHostAddr = sshHostProp.getValue();
             sshHostName = sshHostNameProp.getValue();
             sshHostPort = sshHostPortProp.getIntValue();
+            sshHostPort = sshPort;
             sshFileCertDir = new File( sshCertDirProp.getValue(), SSH_FILE_CERT_CONTAINER_DIR );
             sshIdleTimeout = sshIdleTimeoutProp.getValue();
             try {
