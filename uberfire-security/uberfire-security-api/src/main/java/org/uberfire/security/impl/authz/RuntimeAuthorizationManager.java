@@ -24,6 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.exception.UnauthorizedException;
 import org.uberfire.security.Resource;
+import org.uberfire.security.authz.AccessController;
 import org.uberfire.security.authz.AuthorizationManager;
 import org.uberfire.security.authz.AuthorizationResult;
 import org.uberfire.security.authz.ProfileDecisionManager;
@@ -34,6 +35,15 @@ public class RuntimeAuthorizationManager implements AuthorizationManager {
     private final RuntimeResourceManager resourceManager = new RuntimeResourceManager();
     private final RuntimeResourceDecisionManager decisionManager = new RuntimeResourceDecisionManager( resourceManager );
     private final ProfileDecisionManager profileDecisionManager = new DefaultProfileDecisionManager();
+    private AccessController accessController;
+
+    public AccessController getAccessController() {
+        return accessController;
+    }
+
+    public void setAccessController(AccessController accessController) {
+        this.accessController = accessController;
+    }
 
     @Override
     public boolean supports( final Resource resource ) {
@@ -41,22 +51,27 @@ public class RuntimeAuthorizationManager implements AuthorizationManager {
     }
 
     @Override
-    public boolean authorize( final Resource resource,
-                              final User user )
-            throws UnauthorizedException {
-        if ( !resourceManager.requiresAuthentication( resource ) ) {
-            return true;
-        }
-
+    public boolean authorize( final Resource resource, final User user ) throws UnauthorizedException {
         checkNotNull( "subject", user );
 
-        final AuthorizationResult finalResult = decisionManager.decide( resource, user, profileDecisionManager );
+        // Ask first the access controller
 
-        if ( finalResult.equals( ACCESS_ABSTAIN ) || finalResult.equals( ACCESS_GRANTED ) ) {
-            return true;
+        AuthorizationResult finalResult = ACCESS_ABSTAIN;
+        if ( accessController != null ) {
+            finalResult = accessController.checkAccess( resource, user );
         }
 
-        return false;
+        // If the access controller abstains then ask the decision manager. Reasons to abstain:
+        // - no security policy defined
+        // - no explicit permissions assigned set over a resource
+
+        if ( finalResult.equals( ACCESS_ABSTAIN ) ) {
+            finalResult = decisionManager.decide( resource, user, profileDecisionManager );
+        }
+
+        // Access is granted if the result is not denied
+
+        return !finalResult.equals( ACCESS_DENIED );
     }
 
     @Override

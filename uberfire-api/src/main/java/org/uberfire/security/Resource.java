@@ -16,9 +16,40 @@
 
 package org.uberfire.security;
 
+import java.security.AccessController;
+import java.util.List;
+
 /**
- * It's just a marker interface.
+ * A generic interface for modelling resources, like UI assets: perspectives, screens or
+ * editors or even backend resources like repositories, projects or data objects.
  */
 public interface Resource {
 
+    /**
+     * An identifier that is unique among all the resources of the same type (see {@link Resource#getType()}).
+     */
+    default String getIdentifier() {
+        return null;
+    }
+
+    /**
+     * Get the resource type classifier
+     */
+    default ResourceType getType() {
+        return null;
+    }
+
+    /**
+     * A list of dependent resources.
+     *
+     * <p>The dependency list is used for instance to determine if a user can access a given resource. Should
+     * the access to all its dependencies is denied, it is denied for this instance as well.</p>
+     *
+     * @return A list of resources or null if this resource has no dependencies.
+     *
+     * @see AccessController
+     */
+    default List<Resource> getDependencies() {
+        return null;
+    }
 }

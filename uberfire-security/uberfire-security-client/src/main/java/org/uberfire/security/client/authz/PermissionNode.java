@@ -1,5 +1,5 @@
-/*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+/**
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.uberfire.security.authz;
+package org.uberfire.security.client.authz;
 
 import java.util.Collection;
 
-import org.uberfire.security.Resource;
+public interface PermissionNode {
 
-public interface RuntimeResource extends Resource {
+    PermissionNode getParent();
 
-    String getSignatureId();
+    Collection<PermissionNode> getChildren();
 
-    Collection<String> getTraits();
-
-    default String getIdentifier() {
-        return getSignatureId();
-    }
+    void accept(PermissionTreeVisitor visitor);
 }

@@ -22,10 +22,12 @@ import javax.inject.Inject;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.annotations.WorkbenchEditor.LockingStrategy;
+import org.uberfire.workbench.model.ActivityType;
 import org.uberfire.client.mvp.LockTarget.TitleProvider;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.PathPlaceRequest;
-    
+import org.uberfire.security.ResourceType;
+
 /**
  * Implementation of behaviour common to all workbench editor activities. Concrete implementations are typically not
  * written by hand; rather, they are generated from classes annotated with {@link WorkbenchEditor}.
@@ -39,6 +41,11 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
 
     public AbstractWorkbenchEditorActivity( final PlaceManager placeManager ) {
         super( placeManager );
+    }
+
+    @Override
+    public ResourceType getType() {
+        return ActivityType.EDITOR;
     }
 
     /**
