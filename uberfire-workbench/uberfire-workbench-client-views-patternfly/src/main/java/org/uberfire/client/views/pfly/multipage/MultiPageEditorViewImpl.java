@@ -65,6 +65,7 @@ public class MultiPageEditorViewImpl extends ResizeTabPanel implements MultiPage
         this.addItem( tab );
         if ( this.getActiveTab() == null ) {
             tab.showTab();
+            tab.setActive(true);
         }
     }
 
