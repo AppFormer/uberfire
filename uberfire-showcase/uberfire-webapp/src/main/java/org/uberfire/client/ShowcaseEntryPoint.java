@@ -51,6 +51,7 @@ import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.WorkbenchScreenActivity;
 import org.uberfire.client.navbar.SearchMenuBuilder;
+import org.uberfire.client.perspectives.SimplePerspectiveNoContext;
 import org.uberfire.client.resources.AppResource;
 import org.uberfire.client.screen.JSWorkbenchScreenActivity;
 import org.uberfire.client.views.pfly.menu.MainBrand;
@@ -211,6 +212,9 @@ public class ShowcaseEntryPoint {
     private List<MenuItem> getPerspectives() {
         final List<MenuItem> perspectives = new ArrayList<MenuItem>();
         for ( final PerspectiveActivity perspective : getPerspectiveActivities() ) {
+            if (SimplePerspectiveNoContext.SIMPLE_PERSPECTIVE_NO_CONTEXT.equals(perspective.getIdentifier())) {
+                continue;
+            }
             final String name = perspective.getDefaultPerspectiveLayout().getName();
             final MenuItem item = MenuFactory.newSimpleItem( name ).perspective( perspective.getIdentifier() ).endMenu().build().getItems().get( 0 );
             perspectives.add( item );
