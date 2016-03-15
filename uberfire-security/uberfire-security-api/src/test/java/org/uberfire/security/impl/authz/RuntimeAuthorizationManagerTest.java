@@ -17,6 +17,7 @@
 package org.uberfire.security.impl.authz;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,14 +27,67 @@ import java.util.List;
 import org.jboss.errai.security.shared.api.RoleImpl;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.api.identity.UserImpl;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.commons.data.Cacheable;
+import org.uberfire.security.Resource;
+import org.uberfire.security.authz.AccessController;
+import org.uberfire.security.authz.PermissionManager;
 import org.uberfire.security.authz.RuntimeFeatureResource;
 import org.uberfire.security.authz.RuntimeResource;
 
 import com.google.common.collect.ImmutableSet;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RuntimeAuthorizationManagerTest {
+
+    AccessController accessController;
+    RuntimeAuthorizationManager authorizationManager;
+
+    @Mock
+    RuntimeResource resource;
+
+    @Before
+    public void setUp() {
+        when(resource.getIdentifier()).thenReturn("resource");
+        when(resource.getDependencies()).thenReturn(null);
+
+        PermissionManager permissionManager = new DefaultPermissionManager(new DefaultPermissionTypeRegistry());
+        permissionManager.setAuthorizationPolicy(
+                permissionManager.newAuthorizationPolicy()
+                        .role("admin").permission("resource", true)
+                        .role("author").permission("resource", false)
+                        .build()
+        );
+
+        accessController = spy(new DefaultAccessController(permissionManager));
+        authorizationManager = new RuntimeAuthorizationManager();
+        authorizationManager.setAccessController(accessController);
+    }
+
+    @Test
+    public void testAccessControllerDisabled() {
+        authorizationManager.setAccessController(null);
+        authorizationManager.authorize(resource, mock(User.class));
+        verify(accessController, never()).checkAccess(any(Resource.class), any(User.class));
+    }
+
+    @Test
+    public void testAccessControllerTakesOver() {
+        User john = new UserImpl( "john", ImmutableSet.of( new RoleImpl( "admin" ) ) );
+        User mary = new UserImpl( "mary", ImmutableSet.of( new RoleImpl( "author") ) );
+
+        boolean authorized = authorizationManager.authorize(resource, john);
+        assertTrue(authorized);
+        verify(accessController).checkAccess(resource, john);
+
+        authorized = authorizationManager.authorize(resource, mary);
+        assertFalse(authorized);
+        verify(accessController).checkAccess(resource, mary);
+    }
 
     @Test
     public void testAuthorizeWithCacheRefreshOnRemoveAllRoles() {

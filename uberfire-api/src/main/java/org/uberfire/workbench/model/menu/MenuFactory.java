@@ -98,6 +98,8 @@ public final class MenuFactory {
 
     public interface SimpleMenuBuilder<T> {
 
+        T idenfifier(final String id);
+
         T order( final int order );
 
         T position( final MenuPosition position );

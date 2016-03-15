@@ -25,4 +25,8 @@ public interface RuntimeResource extends Resource {
     String getSignatureId();
 
     Collection<String> getTraits();
+
+    default String getIdentifier() {
+        return getSignatureId();
+    }
 }
