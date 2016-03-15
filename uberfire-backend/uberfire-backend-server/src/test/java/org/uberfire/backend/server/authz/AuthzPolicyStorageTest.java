@@ -90,13 +90,13 @@ public class AuthzPolicyStorageTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidPolicy() {
-        URL fileURL = Thread.currentThread().getContextClassLoader().getResource("invalid-policy.properties");
+        URL fileURL = Thread.currentThread().getContextClassLoader().getResource("WEB-INF/classes/invalid-policy.properties");
         authzPolicyStorage.loadPolicy(fileURL);
     }
 
     @Test
     public void testPolicyLoad() {
-        URL fileURL = Thread.currentThread().getContextClassLoader().getResource("security-policy.properties");
+        URL fileURL = Thread.currentThread().getContextClassLoader().getResource("WEB-INF/classes/security-policy.properties");
         AuthorizationPolicy policy = authzPolicyStorage.loadPolicy(fileURL);
 
         Set<Role> roles = policy.getRoles();
