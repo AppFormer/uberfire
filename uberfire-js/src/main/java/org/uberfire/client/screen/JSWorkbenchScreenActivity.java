@@ -18,6 +18,7 @@ package org.uberfire.client.screen;
 
 import java.util.Collection;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.uberfire.client.mvp.PlaceManager;
@@ -120,11 +121,17 @@ public class JSWorkbenchScreenActivity implements WorkbenchScreenActivity {
 
     @Override
     public void onOpen() {
-        if ( nativePlugin.getType() != null && nativePlugin.getType().equalsIgnoreCase( "angularjs" ) ) {
-            bind();
-        }
-        nativePlugin.onOpen();
-        placeManager.executeOnOpenCallback( this.place );
+        Scheduler.get().scheduleDeferred( new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+                if ( nativePlugin.getType() != null && nativePlugin.getType().equalsIgnoreCase( "angularjs" ) ) {
+                    bind();
+                }
+
+                nativePlugin.onOpen();
+                placeManager.executeOnOpenCallback( place );
+            }
+        } );
     }
 
     @Override
@@ -144,7 +151,19 @@ public class JSWorkbenchScreenActivity implements WorkbenchScreenActivity {
 
     // Alias registerPlugin with a global JS function.
     private native String bind() /*-{
-        $wnd.angular.bootstrap($wnd.document, []);
+        var apps = $wnd.document.querySelectorAll('[ng-app]'), i;
+
+        for (i = 0; i < apps.length; ++i) {
+            var element = $wnd.angular.element(apps[i]);
+            if (!element.injector()) {
+                var value = apps[i].attributes["ng-app"].value;
+                if (value) {
+                    $wnd.angular.bootstrap(element, [value]);
+                } else {
+                    $wnd.angular.bootstrap(element, []);
+                }
+            }
+        }
     }-*/;
 
     @Override
