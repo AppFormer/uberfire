@@ -153,9 +153,19 @@ public class LockManagerImpl implements LockManager {
         return lockDemandListener;
     }
 
-    private void acquireLock() {
+    @Override
+    public void acquireLock() {
+        if ( lockTarget == null ) {
+            return;
+        }
+        if ( isLockedByCurrentUser() ) {
+            fireChangeTitleEvent();
+            return;
+        }
+
         if ( lockInfo.isLocked() ) {
             handleLockFailure( lockInfo );
+
         } else if ( !lockRequestPending ) {
             lockRequestPending = true;
             final ParameterizedCommand<LockResult> command = new ParameterizedCommand<LockResult>() {
