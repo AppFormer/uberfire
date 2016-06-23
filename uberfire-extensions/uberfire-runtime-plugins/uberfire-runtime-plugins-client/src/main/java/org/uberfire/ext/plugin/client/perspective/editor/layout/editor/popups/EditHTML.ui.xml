@@ -22,8 +22,7 @@
              xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
   <g:HTMLPanel>
-    <b:TextArea size="LARGE" ui:field="textArea"
-                visibleLines="15"/>
+    <b:Container ui:field="container" />
   </g:HTMLPanel>
 
 </ui:UiBinder>

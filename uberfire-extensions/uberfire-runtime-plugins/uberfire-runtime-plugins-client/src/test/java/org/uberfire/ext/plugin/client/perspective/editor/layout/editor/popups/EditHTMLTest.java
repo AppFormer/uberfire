@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.uberfire.ext.layout.editor.client.components.ModalConfigurationContext;
+import org.uberfire.ext.widgets.common.client.htmleditor.HtmlEditorPresenter;
 
 import static org.mockito.Mockito.*;
 
@@ -42,6 +43,8 @@ public class EditHTMLTest {
     private EditHTMLFake editHTML;
 
     private ModalConfigurationContext ctx;
+
+    private HtmlEditorPresenter htmlEditor;
 
     private SimpleEventBus simpleEventBus = new SimpleEventBus();
 
@@ -57,7 +60,8 @@ public class EditHTMLTest {
         } );
 
         ctx = mock( ModalConfigurationContext.class );
-        editHTML = spy( new EditHTMLFake( ctx ) );
+        htmlEditor= mock( HtmlEditorPresenter.class );
+        editHTML = spy( new EditHTMLFake( ctx, htmlEditor ) );
 
         when( editHTML.addHiddenHandler( Mockito.any( ModalHiddenHandler.class ) ) ).thenAnswer( new Answer() {
             public Object answer( InvocationOnMock aInvocation ) throws Throwable {
@@ -101,8 +105,9 @@ public class EditHTMLTest {
 
     private class EditHTMLFake extends EditHTML {
 
-        public EditHTMLFake( ModalConfigurationContext ctx ) {
-            super( ctx );
+        public EditHTMLFake( ModalConfigurationContext ctx,
+                             HtmlEditorPresenter htmlEditor ) {
+            super( ctx, htmlEditor );
         }
 
         public void realAddHiddenHandler() {

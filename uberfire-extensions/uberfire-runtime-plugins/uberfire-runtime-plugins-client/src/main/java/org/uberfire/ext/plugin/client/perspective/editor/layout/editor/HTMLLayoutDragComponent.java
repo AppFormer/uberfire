@@ -18,6 +18,7 @@ package org.uberfire.ext.plugin.client.perspective.editor.layout.editor;
 
 import java.util.Map;
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -31,12 +32,16 @@ import org.uberfire.ext.layout.editor.client.components.RenderingContext;
 import org.uberfire.ext.plugin.client.perspective.editor.api.PerspectiveEditorDragComponent;
 import org.uberfire.ext.plugin.client.perspective.editor.layout.editor.popups.EditHTML;
 import org.uberfire.ext.plugin.client.resources.i18n.CommonConstants;
+import org.uberfire.ext.widgets.common.client.htmleditor.HtmlEditorPresenter;
 
 @Dependent
 public class HTMLLayoutDragComponent implements PerspectiveEditorDragComponent,
                                                 HasModalConfiguration {
 
     public static final String HTML_CODE_PARAMETER = "HTML_CODE";
+
+    @Inject
+    private HtmlEditorPresenter htmlEditor;
 
     @Override
     public IsWidget getDragWidget() {
@@ -61,6 +66,6 @@ public class HTMLLayoutDragComponent implements PerspectiveEditorDragComponent,
 
     @Override
     public Modal getConfigurationModal( ModalConfigurationContext ctx ) {
-        return new EditHTML( ctx );
+        return new EditHTML( ctx, htmlEditor );
     }
 }

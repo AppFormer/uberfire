@@ -16,6 +16,7 @@
 package org.uberfire.ext.plugin.client.perspective.editor.layout.editor.popups;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -25,24 +26,27 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Widget;
 import org.gwtbootstrap3.client.shared.event.ModalHiddenEvent;
 import org.gwtbootstrap3.client.shared.event.ModalHiddenHandler;
+import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.ModalBody;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.uberfire.ext.layout.editor.client.components.ModalConfigurationContext;
 import org.uberfire.ext.plugin.client.perspective.editor.layout.editor.HTMLLayoutDragComponent;
 import org.uberfire.ext.plugin.client.resources.i18n.CommonConstants;
 import org.uberfire.ext.widgets.common.client.common.popups.BaseModal;
 import org.uberfire.ext.widgets.common.client.common.popups.ButtonPressed;
 import org.uberfire.ext.widgets.common.client.common.popups.footers.ModalFooterOKCancelButtons;
+import org.uberfire.ext.widgets.common.client.htmleditor.HtmlEditorPresenter;
 
 public class EditHTML
         extends BaseModal {
 
     private ModalConfigurationContext configContext;
 
+    private HtmlEditorPresenter htmlEditor;
+
     private static final String DEFAULT_HTML = CommonConstants.INSTANCE.HTMLplaceHolder();
 
     @UiField
-    TextArea textArea;
+    Container container;
 
     public interface Listener {
 
@@ -61,8 +65,11 @@ public class EditHTML
 
     private ButtonPressed buttonPressed = ButtonPressed.CLOSE;
 
-    public EditHTML( ModalConfigurationContext ctx ) {
+    public EditHTML( final ModalConfigurationContext ctx,
+                     final HtmlEditorPresenter htmlEditor ) {
         this.configContext = ctx;
+        this.htmlEditor = htmlEditor;
+
         setTitle( CommonConstants.INSTANCE.EditHtml() );
         add( new ModalBody() {{
             add( uiBinder.createAndBindUi( EditHTML.this ) );
@@ -106,17 +113,21 @@ public class EditHTML
     }
 
     private void setupHTMLEditor() {
-        final String html = configContext.getComponentProperty( HTMLLayoutDragComponent.HTML_CODE_PARAMETER );
+        setWidth( "1010px" );
+
+        String html = configContext.getComponentProperty( HTMLLayoutDragComponent.HTML_CODE_PARAMETER );
 
         if ( html == null || html.isEmpty() ) {
-            this.textArea.setText( DEFAULT_HTML );
-        } else {
-            this.textArea.setText( html );
+            html =  DEFAULT_HTML;
         }
+
+        htmlEditor.setContent( html );
+        container.add( htmlEditor.getView() );
     }
 
     public void show() {
         super.show();
+        htmlEditor.show();
     }
 
     public void hide() {
@@ -148,7 +159,7 @@ public class EditHTML
         buttonPressed = ButtonPressed.OK;
 
         hide();
-        configContext.setComponentProperty( HTMLLayoutDragComponent.HTML_CODE_PARAMETER, textArea.getText() );
+        configContext.setComponentProperty( HTMLLayoutDragComponent.HTML_CODE_PARAMETER, htmlEditor.getContent() );
         configContext.configurationFinished();
     }
 
