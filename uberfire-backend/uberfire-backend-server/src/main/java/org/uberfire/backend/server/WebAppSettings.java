@@ -16,7 +16,11 @@
 
 package org.uberfire.backend.server;
 
-import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * It holds some settings regarding the WebApp execution context like, for instance, the home directory where the
@@ -25,6 +29,7 @@ import java.io.File;
 public class WebAppSettings {
 
     private String rootDir = null;
+    String separator = FileSystems.getDefault().getSeparator();
 
     private static WebAppSettings instance = null;
 
@@ -47,10 +52,12 @@ public class WebAppSettings {
     public void setRootDir(String dir) {
         this.rootDir = dir != null ? dir.trim() : null;
         if (rootDir != null) {
-            if (rootDir.endsWith("/")) {
-                this.rootDir = rootDir.substring(0, dir.length() - 1);
-            }
-            if (rootDir.endsWith("\\")) {
+            // Format the directory according to the file system separator
+            rootDir = StringUtils.replace(rootDir, "\\", separator);
+            rootDir = StringUtils.replace(rootDir, "/", separator);
+
+            // Remove the latest separator
+            if (rootDir.endsWith(separator)) {
                 this.rootDir = rootDir.substring(0, dir.length() - 1);
             }
         }
@@ -71,7 +78,7 @@ public class WebAppSettings {
      * @param relativePath The relative path
      * @return An absolute path
      */
-    public String getAbsolutePath(String relativePath) {
-        return rootDir != null ? rootDir + File.separator + relativePath : null;
+    public Path getAbsolutePath(String... relativePath) {
+        return rootDir != null ? Paths.get(rootDir, relativePath) : null;
     }
 }
