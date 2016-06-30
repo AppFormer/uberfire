@@ -26,6 +26,7 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.security.shared.api.Group;
 import org.uberfire.backend.authz.AuthorizationService;
+import org.uberfire.client.authz.PerspectiveAction;
 import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.ext.security.management.client.ClientUserSystemManager;
 import org.uberfire.ext.security.management.client.editor.group.GroupEditorDriver;
@@ -47,6 +48,7 @@ import org.uberfire.ext.security.management.client.widgets.popup.ConfirmBox;
 import org.uberfire.ext.security.management.client.widgets.popup.LoadingBox;
 import org.uberfire.mvp.Command;
 import org.uberfire.security.authz.AuthorizationPolicy;
+import org.uberfire.security.authz.AuthorizationResult;
 import org.uberfire.security.authz.Permission;
 import org.uberfire.security.authz.PermissionCollection;
 import org.uberfire.security.authz.PermissionManager;
@@ -83,6 +85,7 @@ public class GroupEditorWorkflow implements IsWidget {
 
     Group group;
     boolean isDirty;
+    PerspectiveActivity selectedHomePerspective = null;
 
     @Inject
     public GroupEditorWorkflow(final ClientUserSystemManager userSystemManager,
@@ -241,11 +244,15 @@ public class GroupEditorWorkflow implements IsWidget {
         }
     }
 
+    protected void showNotification(String message) {
+        view.showNotification(message);
+    }
+
     protected void setDirty(final boolean isDirty) {
         this.isDirty = isDirty;
         view.setSaveButtonVisible(isDirty);
-        view.setCancelButtonVisible(isDirty);
         view.setSaveButtonEnabled(isDirty);
+        view.setCancelButtonVisible(true);
         if (isDirty) {
             view.showNotification(UsersManagementWidgetsConstants.INSTANCE.groupModified(group.getName()));
         } else {
@@ -282,6 +289,11 @@ public class GroupEditorWorkflow implements IsWidget {
         groupEditorDriver.edit(group, groupEditor);
         view.setCancelButtonVisible(false);
         view.setSaveButtonVisible(false);
+
+        selectedHomePerspective = groupEditor.getAclSettings().getHomePerspective();
+        if (isPerspectiveReadDenied(selectedHomePerspective)) {
+            showNotification(UsersManagementWidgetsConstants.INSTANCE.homePerspectiveReadDenied());
+        }
     }
 
     // Event observers
@@ -302,21 +314,22 @@ public class GroupEditorWorkflow implements IsWidget {
 
     void onHomePerspectiveChangedEvent(@Observes final HomePerspectiveChangedEvent event) {
         if (checkEventContext(event, groupEditor.getAclSettings())) {
-            setDirty(true);
+            selectedHomePerspective = event.getPerspective();
+            checkStatus();
             GWT.log("Home perspective: " + event.getPerspective().getIdentifier());
         }
     }
 
     void onPriorityChangedEvent(@Observes final PriorityChangedEvent event) {
         if (checkEventContext(event, groupEditor.getAclSettings())) {
-            setDirty(true);
+            checkStatus();
             GWT.log("Group priority : " + event.getPriority());
         }
     }
 
     void onPermissionChangedEvent(@Observes final PermissionChangedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
-            setDirty(true);
+            checkStatus();
             if (event.isGranted()) {
                 GWT.log("Permission granted: " + event.getPermission().getName());
             } else {
@@ -327,14 +340,14 @@ public class GroupEditorWorkflow implements IsWidget {
 
     void onPermissionAddedEvent(@Observes final PermissionNodeAddedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
-            setDirty(true);
+            checkStatus();
             GWT.log("New permission node: " + event.getChildNode().getNodeName());
         }
     }
 
     void onPermissionRemovedEvent(@Observes final PermissionNodeRemovedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
-            setDirty(true);
+            checkStatus();
             GWT.log("Permission node removed: " + event.getChildNode().getNodeName());
         }
     }
@@ -347,4 +360,30 @@ public class GroupEditorWorkflow implements IsWidget {
         showError(throwable);
         return false;
     };
+
+    protected void checkStatus() {
+        boolean readDenied = isPerspectiveReadDenied(selectedHomePerspective);
+        if (readDenied) {
+            setDirty(false);
+            showNotification(UsersManagementWidgetsConstants.INSTANCE.homePerspectiveReadDenied());
+        } else {
+            setDirty(true);
+        }
+    }
+
+    protected boolean isPerspectiveReadDenied(PerspectiveActivity perspectiveActivity) {
+        if (perspectiveActivity == null) {
+            return false;
+        }
+        PermissionCollection permissionCollection = groupEditor.permissions();
+        if (permissionCollection == null) {
+            return false;
+        }
+        Permission p = permissionManager.createPermission(perspectiveActivity, PerspectiveAction.READ, false);
+        Permission existing = permissionCollection.get(p.getName());
+        if (existing != null) {
+            return existing.getResult().equals(AuthorizationResult.ACCESS_DENIED);
+        }
+        return permissionCollection.implies(p);
+    }
 }

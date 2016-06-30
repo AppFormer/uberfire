@@ -24,8 +24,11 @@ import javax.inject.Inject;
 import com.google.gwt.core.client.GWT;
 import org.jboss.errai.common.client.api.Caller;
 import org.uberfire.backend.authz.AuthorizationService;
+import org.uberfire.client.authz.PerspectiveAction;
+import org.uberfire.client.mvp.PerspectiveActivity;
 import org.uberfire.ext.security.management.client.ClientUserSystemManager;
 import org.uberfire.ext.security.management.client.editor.role.RoleEditorDriver;
+import org.uberfire.ext.security.management.client.resources.i18n.UsersManagementWidgetsConstants;
 import org.uberfire.ext.security.management.client.widgets.management.editor.role.RoleEditor;
 import org.uberfire.ext.security.management.client.widgets.management.editor.workflow.EntityWorkflowView;
 import org.uberfire.ext.security.management.client.widgets.management.events.HomePerspectiveChangedEvent;
@@ -38,6 +41,9 @@ import org.uberfire.ext.security.management.client.widgets.management.events.Pri
 import org.uberfire.ext.security.management.client.widgets.management.events.SaveRoleEvent;
 import org.uberfire.ext.security.management.client.widgets.popup.ConfirmBox;
 import org.uberfire.ext.security.management.client.widgets.popup.LoadingBox;
+import org.uberfire.security.authz.AuthorizationResult;
+import org.uberfire.security.authz.Permission;
+import org.uberfire.security.authz.PermissionCollection;
 import org.uberfire.security.authz.PermissionManager;
 import org.uberfire.workbench.events.NotificationEvent;
 
@@ -49,6 +55,8 @@ import org.uberfire.workbench.events.NotificationEvent;
  */
 @Dependent
 public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
+
+    private PerspectiveActivity selectedHomePerspective = null;
 
     @Inject
     public RoleEditorWorkflow(final ClientUserSystemManager userSystemManager,
@@ -62,7 +70,7 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
                               final RoleEditorDriver roleEditorDriver,
                               final LoadingBox loadingBox,
                               final EntityWorkflowView view) {
-        
+
         super(userSystemManager, authorizationService, permissionManager, errorEvent, workbenchNotification,
                 saveUserEvent, confirmBox, roleEditor, roleEditorDriver, loadingBox, view);
     }
@@ -70,7 +78,17 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
     public void show(final String roleName) {
         doShow(roleName);
     }
-    
+
+    @Override
+    protected void edit() {
+        super.edit();
+
+        selectedHomePerspective = roleEditor.getAclSettings().getHomePerspective();
+        if (isPerspectiveReadDenied(selectedHomePerspective)) {
+            showNotification(UsersManagementWidgetsConstants.INSTANCE.homePerspectiveReadDenied());
+        }
+    }
+
     void onEditRoleEvent(@Observes final OnEditEvent onEditEvent) {
         if (checkEventContext(onEditEvent, roleEditor)) {
             edit();
@@ -79,21 +97,22 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
 
     void onHomePerspectiveChangedEvent(@Observes final HomePerspectiveChangedEvent event) {
         if (checkEventContext(event, roleEditor.getAclSettings())) {
-            setDirty(true);
+            selectedHomePerspective = event.getPerspective();
+            checkStatus();
             GWT.log("Home perspective: " + event.getPerspective().getIdentifier());
         }
     }
 
     void onPriorityChangedEvent(@Observes final PriorityChangedEvent event) {
         if (checkEventContext(event, roleEditor.getAclSettings())) {
-            setDirty(true);
+            checkStatus();
             GWT.log("Role priority : " + event.getPriority());
         }
     }
 
     void onPermissionChangedEvent(@Observes final PermissionChangedEvent event) {
         if (checkEventContext(event, roleEditor.getAclEditor())) {
-            setDirty(true);
+            checkStatus();
             if (event.isGranted()) {
                 GWT.log("Permission granted: " + event.getPermission().getName());
             } else {
@@ -105,14 +124,37 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
     void onPermissionAddedEvent(@Observes final PermissionNodeAddedEvent event) {
         if (checkEventContext(event, roleEditor.getAclEditor())) {
             setDirty(true);
-            GWT.log("New permission node: " + event.getChildNode().getNodeName());
+            checkStatus();
         }
     }
 
     void onPermissionRemovedEvent(@Observes final PermissionNodeRemovedEvent event) {
         if (checkEventContext(event, roleEditor.getAclEditor())) {
-            setDirty(true);
+            checkStatus();
             GWT.log("Permission node removed: " + event.getChildNode().getNodeName());
         }
+    }
+
+    protected void checkStatus() {
+        boolean readDenied = isPerspectiveReadDenied(selectedHomePerspective);
+        if (readDenied) {
+            setDirty(false);
+            showNotification(UsersManagementWidgetsConstants.INSTANCE.homePerspectiveReadDenied());
+        } else {
+            setDirty(true);
+        }
+    }
+
+    protected boolean isPerspectiveReadDenied(PerspectiveActivity perspectiveActivity) {
+        if (perspectiveActivity == null) {
+            return false;
+        }
+        PermissionCollection permissionCollection = roleEditor.permissions();
+        Permission p = permissionManager.createPermission(perspectiveActivity, PerspectiveAction.READ, false);
+        Permission existing = permissionCollection.get(p.getName());
+        if (existing != null) {
+            return existing.getResult().equals(AuthorizationResult.ACCESS_DENIED);
+        }
+        return permissionCollection.implies(p);
     }
 }
