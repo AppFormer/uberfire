@@ -18,7 +18,6 @@ package org.uberfire.ext.security.management.client.widgets.management.editor.gr
 
 import java.util.Collection;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.bus.client.api.messaging.Message;
@@ -316,39 +315,30 @@ public class GroupEditorWorkflow implements IsWidget {
         if (checkEventContext(event, groupEditor.getAclSettings())) {
             selectedHomePerspective = event.getPerspective();
             checkStatus();
-            GWT.log("Home perspective: " + event.getPerspective().getIdentifier());
         }
     }
 
     void onPriorityChangedEvent(@Observes final PriorityChangedEvent event) {
         if (checkEventContext(event, groupEditor.getAclSettings())) {
             checkStatus();
-            GWT.log("Group priority : " + event.getPriority());
         }
     }
 
     void onPermissionChangedEvent(@Observes final PermissionChangedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
             checkStatus();
-            if (event.isGranted()) {
-                GWT.log("Permission granted: " + event.getPermission().getName());
-            } else {
-                GWT.log("Permission denied: " + event.getPermission().getName());
-            }
         }
     }
 
     void onPermissionAddedEvent(@Observes final PermissionNodeAddedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
             checkStatus();
-            GWT.log("New permission node: " + event.getChildNode().getNodeName());
         }
     }
 
     void onPermissionRemovedEvent(@Observes final PermissionNodeRemovedEvent event) {
         if (checkEventContext(event, groupEditor.getAclEditor())) {
             checkStatus();
-            GWT.log("Permission node removed: " + event.getChildNode().getNodeName());
         }
     }
 

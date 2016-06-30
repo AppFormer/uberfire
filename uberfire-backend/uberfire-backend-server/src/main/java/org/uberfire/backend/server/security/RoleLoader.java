@@ -57,7 +57,7 @@ public class RoleLoader {
                 RoleRegistry.get().registerRole(role);
             }
             if (!roles.isEmpty()) {
-                logger.info("Roles registered \"" + StringUtils.join(roles.toArray(), ",") + "\"");
+                logger.info("Roles registered from web.xml \"" + StringUtils.join(roles.toArray(), ",") + "\"");
             }
         }
         catch (Exception e) {

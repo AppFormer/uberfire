@@ -54,7 +54,7 @@ public class LiveSearchDropDownTest {
                     c.afterSearch(Collections.singletonList("a"));
                     break;
                 case "b":
-                    c.afterSearch(Arrays.asList("c", "b", "a"));
+                    c.afterSearch(Arrays.asList("a", "b", "c"));
                     break;
                 default:
                     c.afterSearch(Collections.emptyList());

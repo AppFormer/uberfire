@@ -21,7 +21,6 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import com.google.gwt.core.client.GWT;
 import org.jboss.errai.common.client.api.Caller;
 import org.uberfire.backend.authz.AuthorizationService;
 import org.uberfire.client.authz.PerspectiveAction;
@@ -99,25 +98,18 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
         if (checkEventContext(event, roleEditor.getAclSettings())) {
             selectedHomePerspective = event.getPerspective();
             checkStatus();
-            GWT.log("Home perspective: " + event.getPerspective().getIdentifier());
         }
     }
 
     void onPriorityChangedEvent(@Observes final PriorityChangedEvent event) {
         if (checkEventContext(event, roleEditor.getAclSettings())) {
             checkStatus();
-            GWT.log("Role priority : " + event.getPriority());
         }
     }
 
     void onPermissionChangedEvent(@Observes final PermissionChangedEvent event) {
         if (checkEventContext(event, roleEditor.getAclEditor())) {
             checkStatus();
-            if (event.isGranted()) {
-                GWT.log("Permission granted: " + event.getPermission().getName());
-            } else {
-                GWT.log("Permission denied: " + event.getPermission().getName());
-            }
         }
     }
 
@@ -131,7 +123,6 @@ public class RoleEditorWorkflow extends BaseRoleEditorWorkflow {
     void onPermissionRemovedEvent(@Observes final PermissionNodeRemovedEvent event) {
         if (checkEventContext(event, roleEditor.getAclEditor())) {
             checkStatus();
-            GWT.log("Permission node removed: " + event.getChildNode().getNodeName());
         }
     }
 

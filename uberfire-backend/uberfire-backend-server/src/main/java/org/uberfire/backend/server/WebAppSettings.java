@@ -52,15 +52,22 @@ public class WebAppSettings {
     public void setRootDir(String dir) {
         this.rootDir = dir != null ? dir.trim() : null;
         if (rootDir != null) {
-            // Format the directory according to the file system separator
-            rootDir = StringUtils.replace(rootDir, "\\", separator);
-            rootDir = StringUtils.replace(rootDir, "/", separator);
-
-            // Remove the latest separator
-            if (rootDir.endsWith(separator)) {
-                this.rootDir = rootDir.substring(0, dir.length() - 1);
-            }
+            rootDir = formatDirectory(rootDir);
         }
+    }
+
+    /**
+     * Format a directory according to the file system separator
+     */
+    protected String formatDirectory(String dir) {
+        String result = StringUtils.replace(dir, "\\", separator);
+        result = StringUtils.replace(result, "/", separator);
+
+        // Remove the latest separator
+        if (result.endsWith(separator)) {
+            result = result.substring(0, dir.length() - 1);
+        }
+        return result;
     }
 
     /**
