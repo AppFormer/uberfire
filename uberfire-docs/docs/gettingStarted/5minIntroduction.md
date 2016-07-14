@@ -10,6 +10,8 @@ This guide assumes you have the following software set up and working on your co
 
 * Maven 3.x
 
+* [Graphviz lib](http://www.graphviz.org/) 
+
 ## Creating your first App
 
  In a command line, run the archetype to create your first app.
