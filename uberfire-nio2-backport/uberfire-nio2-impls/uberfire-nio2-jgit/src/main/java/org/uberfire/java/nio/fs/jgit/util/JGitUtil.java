@@ -84,8 +84,11 @@ import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 
 import static java.util.Collections.*;
 import static org.apache.commons.io.FileUtils.*;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import static org.eclipse.jgit.lib.Constants.*;
 import static org.eclipse.jgit.lib.FileMode.*;
+import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevTree;
 import static org.eclipse.jgit.treewalk.filter.PathFilterGroup.*;
 import static org.eclipse.jgit.util.FS.*;
 import static org.uberfire.commons.data.Pair.*;
@@ -388,6 +391,101 @@ public final class JGitUtil {
         }
     }
 
+    public static void squash(final Repository repo, final String squashedCommitMessage,
+            final String startCommitString) throws GitAPIException, IncorrectObjectTypeException, java.io.IOException {
+
+        if (!repo.isBare()) {
+            throw new IllegalStateException("You cannot squash/rebase in a non BARE repository");
+        }
+
+        final Git git = new Git(repo);
+        // resolve the objectId of the start commit. I will squash from this commit until the HEAD
+        ObjectId startCommitObjectId = resolveObjectId(git, startCommitString);
+
+        RevWalk revWalk = new RevWalk(repo);
+        RevCommit parent = revWalk.parseCommit(startCommitObjectId).getParent(0);
+        if (startCommitObjectId == null) {
+            throw new IllegalStateException("Start Commit must be a valid commit");
+        }
+        Ref head = repo.getRef(HEAD);
+        revWalk.markStart(revWalk.parseCommit(head.getObjectId()));
+        revWalk.markUninteresting(parent);
+        // Let's revert the order of the commits so they are sorted by commit time
+        revWalk.sort(RevSort.REVERSE);
+        
+        PersonIdent commitAuthor = null;
+
+        Map<String, ObjectId> content = new HashMap<String, ObjectId>();
+        // Let's walk through each commit to collect author and changes
+        for (RevCommit commit : revWalk) {
+
+            //Should I check that all the commit authors are the same?
+            commitAuthor = commit.getAuthorIdent();
+            
+            // a commit points to a tree
+            RevTree tree = revWalk.parseTree(commit.getTree().getId());
+            TreeWalk treeWalk = new TreeWalk(repo);
+            treeWalk.addTree(tree);
+            treeWalk.setRecursive(false);
+
+            // let's walk to this commit tree to collect the path - objectId
+            while (treeWalk.next()) {
+                if (treeWalk.isSubtree()) {
+                    treeWalk.enterSubtree();
+                } else {
+                    ObjectId objectId = treeWalk.getObjectId(0);
+                    content.put(treeWalk.getPathString(), objectId);
+                }
+            }
+
+        }
+
+        revWalk.dispose();
+
+        DirCache index = createTemporaryIndexForContent(git, content);
+        final ObjectInserter odi = repo.newObjectInserter();
+        final ObjectId indexTreeId = index.writeTree(odi);
+
+        // Create a commit object
+        final CommitBuilder commit = new CommitBuilder();
+        commit.setAuthor(commitAuthor);
+        commit.setCommitter(commitAuthor);
+        commit.setEncoding(Constants.CHARACTER_ENCODING);
+        commit.setMessage(squashedCommitMessage);
+        commit.setParentId(parent.getId());
+        commit.setTreeId(indexTreeId);
+
+        // Insert the commit into the repository
+        final ObjectId commitId = odi.insert(commit);
+        odi.flush();
+
+        try {
+            //Update the HEAD reference
+            final RevCommit revCommit = revWalk.parseCommit(commitId);
+            // I'm using the master branch, but we can transform this into an argument of the method.
+            final RefUpdate ru = git.getRepository().updateRef("refs/heads/master");
+            ru.setExpectedOldObjectId(repo.resolve(HEAD));
+            ru.setNewObjectId(commitId);
+            ru.setRefLogMessage("commit: " + revCommit.getShortMessage(), false);
+            final RefUpdate.Result rc = ru.forceUpdate();
+            switch (rc) {
+                case NEW:
+                case FORCED:
+                case FAST_FORWARD:
+                    break;
+                case REJECTED:
+                case LOCK_FAILURE:
+                    throw new ConcurrentRefUpdateException(JGitText.get().couldNotLockHEAD, ru.getRef(), rc);
+                default:
+                    throw new JGitInternalException(MessageFormat.format(JGitText.get().updatingRefFailed, Constants.HEAD, commitId.toString(), rc));
+            }
+
+        } finally {
+            revWalk.release();
+        }
+
+    }
+    
     public static void cherryPick( final Repository repo,
                                    final String targetBranch,
                                    final String... _commits ) {
@@ -663,15 +761,44 @@ public final class JGitUtil {
     /**
      * Creates an in-memory index of the issue change.
      */
+    private static DirCache createTemporaryIndexForContent( final Git git, final Map<String, ObjectId> content) {
+
+        final DirCache inCoreIndex = DirCache.newInCore();
+        final ObjectInserter inserter = git.getRepository().newObjectInserter();
+        final DirCacheEditor editor = inCoreIndex.editor();
+
+        try {
+            for ( final String path : content.keySet()) {
+                    editor.add( new DirCacheEditor.PathEdit( new DirCacheEntry( path ) ) {
+                        @Override
+                        public void apply( final DirCacheEntry ent ) {
+                            // do I need to set up something else for each entry?
+                            ent.setFileMode( REGULAR_FILE );
+                            ent.setObjectId( content.get(path) );
+                        }
+                    } );
+
+            }
+            editor.finish();
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        } finally {
+            inserter.release();
+        }
+        return inCoreIndex;
+    }
+    /**
+     * Creates an in-memory index of the issue change.
+     */
     private static DirCache createTemporaryIndex( final Git git,
                                                   final ObjectId headId,
                                                   final DefaultCommitContent commitContent ) {
-
+    
         final Map<String, File> content = commitContent.getContent();
-
+    
         final Map<String, Pair<File, ObjectId>> paths = new HashMap<String, Pair<File, ObjectId>>( content.size() );
         final Set<String> path2delete = new HashSet<String>();
-
+    
         final DirCache inCoreIndex = DirCache.newInCore();
         final ObjectInserter inserter = git.getRepository().newObjectInserter();
         final DirCacheEditor editor = inCoreIndex.editor();
