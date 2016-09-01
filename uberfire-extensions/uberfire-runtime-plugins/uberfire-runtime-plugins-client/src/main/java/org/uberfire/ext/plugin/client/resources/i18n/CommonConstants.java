@@ -134,4 +134,7 @@ public interface CommonConstants
     String EmptySubTitleText();
 
     String PluginsExplorer();
+
+    String PerspectiveEditor();
+
 }
