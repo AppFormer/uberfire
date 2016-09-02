@@ -16,6 +16,14 @@
 
 package org.uberfire.ext.plugin.client.perspective.editor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.Caller;
@@ -24,7 +32,11 @@ import org.jboss.errai.ioc.client.container.IOC;
 import org.jboss.errai.ioc.client.container.SyncBeanDef;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.client.annotations.*;
+import org.uberfire.client.annotations.WorkbenchEditor;
+import org.uberfire.client.annotations.WorkbenchMenu;
+import org.uberfire.client.annotations.WorkbenchPartTitle;
+import org.uberfire.client.annotations.WorkbenchPartTitleDecoration;
+import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
 import org.uberfire.ext.editor.commons.client.BaseEditor;
@@ -57,14 +69,6 @@ import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.events.NotificationEvent;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
-
-import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static org.uberfire.ext.editor.commons.client.menu.MenuItems.*;
 
@@ -206,7 +210,7 @@ public class PerspectiveEditorPresenter extends BaseEditor {
     @Override
     @WorkbenchPartTitle
     public String getTitleText() {
-        return "Perspective Editor [" + plugin.getName() + "]";
+        return org.uberfire.ext.plugin.client.resources.i18n.CommonConstants.INSTANCE.PerspectiveEditor() + " [" + plugin.getName() + "]";
     }
 
     @WorkbenchMenu
