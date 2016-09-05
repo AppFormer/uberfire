@@ -40,6 +40,10 @@ import org.uberfire.workbench.model.menu.MenuPosition;
 import org.uberfire.workbench.model.menu.Menus;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -151,7 +155,7 @@ public class WorkbenchMenuBarPresenterTest {
         when( authzManager.authorize( contextMenus.getItems().get( 0 ), identity ) ).thenReturn( true );
         when( activityManager.getActivity( placeRequest ) ).thenReturn( activity );
 
-        presenter.onPerspectiveChange( new PerspectiveChange(placeRequest, null, contextMenus, perspectiveId) );
+        presenter.onPerspectiveChange( new PerspectiveChange( placeRequest, null, contextMenus, perspectiveId ) );
 
         verify( authzManager ).authorize( contextMenus.getItems().get( 0 ), identity );
         verify( view ).clearContextMenu();
@@ -171,7 +175,7 @@ public class WorkbenchMenuBarPresenterTest {
         when( authzManager.authorize( contextMenus.getItems().get( 0 ), identity ) ).thenReturn( false );
         when( activityManager.getActivity( placeRequest ) ).thenReturn( activity );
 
-        presenter.onPerspectiveChange( new PerspectiveChange(placeRequest, null, contextMenus, perspectiveId) );
+        presenter.onPerspectiveChange( new PerspectiveChange( placeRequest, null, contextMenus, perspectiveId ) );
 
         verify( authzManager ).authorize( contextMenus.getItems().get( 0 ), identity );
         verify( view ).clearContextMenu();
@@ -187,12 +191,16 @@ public class WorkbenchMenuBarPresenterTest {
         when( authzManager.authorize( menus.getItems().get( 0 ), identity ) ).thenReturn( true );
 
         presenter.addMenus( menus );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( true );
-        verify( view ).enableMenuItem( anyString(), eq( true ) );
+        verify( view,
+                times( 2 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( false );
-        verify( view ).enableMenuItem( anyString(), eq( false ) );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( false ) );
     }
 
     @Test
@@ -204,12 +212,16 @@ public class WorkbenchMenuBarPresenterTest {
         when( authzManager.authorize( menus.getItems().get( 0 ), identity ) ).thenReturn( true );
 
         presenter.addMenus( menus );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( true );
-        verify( view ).enableMenuItem( anyString(), eq( true ) );
+        verify( view,
+                times( 2 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( false );
-        verify( view ).enableMenuItem( anyString(), eq( false ) );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( false ) );
     }
 
     @Test
@@ -221,12 +233,16 @@ public class WorkbenchMenuBarPresenterTest {
         when( authzManager.authorize( menus.getItems().get( 0 ), identity ) ).thenReturn( true );
 
         presenter.addMenus( menus );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( true );
-        verify( view ).enableMenuItem( anyString(), eq( true ) );
+        verify( view,
+                times( 2 ) ).enableMenuItem( anyString(), eq( true ) );
 
         menus.getItems().get( 0 ).setEnabled( false );
-        verify( view ).enableMenuItem( anyString(), eq( false ) );
+        verify( view,
+                times( 1 ) ).enableMenuItem( anyString(), eq( false ) );
     }
 
     @Test
@@ -243,9 +259,12 @@ public class WorkbenchMenuBarPresenterTest {
         when( activityManager.getActivity( placeRequest ) ).thenReturn( activity );
 
         presenter.onPerspectiveChange( new PerspectiveChange( placeRequest, null, contextMenus, perspectiveId ) );
+        verify( view,
+                times( 1 ) ).enableContextMenuItem( anyString(), eq( true ) );
 
         contextMenus.getItems().get( 0 ).setEnabled( true );
-        verify( view ).enableContextMenuItem( anyString(), eq( true ) );
+        verify( view,
+                times( 2 ) ).enableContextMenuItem( anyString(), eq( true ) );
 
         contextMenus.getItems().get( 0 ).setEnabled( false );
         verify( view ).enableContextMenuItem( anyString(), eq( false ) );
@@ -275,100 +294,100 @@ public class WorkbenchMenuBarPresenterTest {
 
     @Test
     public void testView() {
-        assertEquals(view, presenter.getView());
+        assertEquals( view, presenter.getView() );
     }
 
     @Test
     public void testCollapse() {
         presenter.collapse();
 
-        assertFalse(presenter.isUseExpandedMode());
-        verify(view).collapse();
+        assertFalse( presenter.isUseExpandedMode() );
+        verify( view ).collapse();
     }
 
     @Test
     public void testExpand() {
         presenter.expand();
 
-        assertTrue(presenter.isUseExpandedMode());
-        verify(view).expand();
+        assertTrue( presenter.isUseExpandedMode() );
+        verify( view ).expand();
     }
 
     @Test
-    public void testAddCollapseHandler(){
-        final Command command = mock(Command.class);
+    public void testAddCollapseHandler() {
+        final Command command = mock( Command.class );
 
-        presenter.addCollapseHandler(command);
+        presenter.addCollapseHandler( command );
 
-        verify(view).addCollapseHandler(command);
+        verify( view ).addCollapseHandler( command );
     }
 
     @Test
-    public void testExpandHandler(){
-        doAnswer(new Answer() {
+    public void testExpandHandler() {
+        doAnswer( new Answer() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((Command) invocation.getArguments()[0]).execute();
+            public Object answer( InvocationOnMock invocation ) throws Throwable {
+                ( (Command) invocation.getArguments()[ 0 ] ).execute();
                 return null;
             }
-        }).when(view).addExpandHandler(any(Command.class));
+        } ).when( view ).addExpandHandler( any( Command.class ) );
 
         presenter.setup();
 
-        assertTrue(presenter.isExpanded());
+        assertTrue( presenter.isExpanded() );
     }
 
     @Test
-    public void testCollapseHandler(){
-        doAnswer(new Answer() {
+    public void testCollapseHandler() {
+        doAnswer( new Answer() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((Command) invocation.getArguments()[0]).execute();
+            public Object answer( InvocationOnMock invocation ) throws Throwable {
+                ( (Command) invocation.getArguments()[ 0 ] ).execute();
                 return null;
             }
-        }).when(view).addCollapseHandler(any(Command.class));
+        } ).when( view ).addCollapseHandler( any( Command.class ) );
 
         presenter.setup();
 
-        assertFalse(presenter.isExpanded());
+        assertFalse( presenter.isExpanded() );
     }
 
     @Test
-    public void testAddExpandHandler(){
-        final Command command = mock(Command.class);
+    public void testAddExpandHandler() {
+        final Command command = mock( Command.class );
 
-        presenter.addExpandHandler(command);
+        presenter.addExpandHandler( command );
 
-        verify(view).addExpandHandler(command);
+        verify( view ).addExpandHandler( command );
     }
 
     @Test
     public void testClear() {
         presenter.clear();
 
-        verify(view).clear();
+        verify( view ).clear();
     }
 
     @Test
     public void testOnPlaceMaximized() {
-        presenter.onPlaceMaximized(mock(PlaceMaximizedEvent.class));
+        presenter.onPlaceMaximized( mock( PlaceMaximizedEvent.class ) );
 
-        verify(view).collapse();
+        verify( view ).collapse();
     }
 
     @Test
     public void testOnPlaceMinimized() {
-        presenter.onPlaceMinimized(mock(PlaceMinimizedEvent.class));
+        presenter.onPlaceMinimized( mock( PlaceMinimizedEvent.class ) );
 
-        verify(view).expand();
+        verify( view ).expand();
     }
 
     @Test
     public void testOnPlaceMinimizedExpandMode() {
         presenter.collapse();
-        presenter.onPlaceMinimized(mock(PlaceMinimizedEvent.class));
+        presenter.onPlaceMinimized( mock( PlaceMinimizedEvent.class ) );
 
-        verify(view, never()).expand();
+        verify( view, never() ).expand();
     }
 
 }
