@@ -54,12 +54,15 @@ import org.uberfire.client.navbar.SearchMenuBuilder;
 import org.uberfire.client.perspectives.SimplePerspectiveNoContext;
 import org.uberfire.client.resources.AppResource;
 import org.uberfire.client.screen.JSWorkbenchScreenActivity;
+import org.uberfire.client.screens.popup.SimplePopUp;
 import org.uberfire.client.views.pfly.menu.MainBrand;
 import org.uberfire.client.views.pfly.menu.UserMenu;
+import org.uberfire.client.views.pfly.modal.ErrorPopupView;
 import org.uberfire.client.workbench.events.ApplicationReadyEvent;
 import org.uberfire.client.workbench.widgets.menu.UtilityMenuBar;
 import org.uberfire.client.workbench.widgets.menu.WorkbenchMenuBar;
 import org.uberfire.mvp.Command;
+import org.uberfire.mvp.Commands;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.MenuItem;
@@ -99,6 +102,9 @@ public class ShowcaseEntryPoint {
 
     @Inject
     private SearchMenuBuilder searchMenuBuilder;
+
+    @Inject
+    private ErrorPopupView errorPopupView;
 
     private static final Set<String> menuItemsToRemove = Sets.newHashSet(
             "IFrameScreen",
@@ -171,6 +177,22 @@ public class ShowcaseEntryPoint {
                         } )
                 .endMenu()
                 .newTopLevelCustomMenu( manager.lookupBean( CustomSplashHelp.class ).getInstance() )
+                .endMenu()
+                .newTopLevelMenu( "Simple Popup" )
+                        .respondsWith(new Command() {
+                            @Override
+                            public void execute() {
+                                placeManager.goTo(new DefaultPlaceRequest(SimplePopUp.SCREEN_ID));
+                            }
+                        })
+                .endMenu()
+                .newTopLevelMenu( "Error Popup" )
+                .respondsWith(new Command() {
+                    @Override
+                    public void execute() {
+                        errorPopupView.showMessage("Something went wrong!", Commands.DO_NOTHING, Commands.DO_NOTHING);
+                    }
+                })
                 .endMenu()
                 .build() );
     }
