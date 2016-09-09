@@ -249,13 +249,17 @@ public class LockManagerTest {
     }
 
     @Test
-    public void reloadEditorOnUpdateFromDifferentUser() {
+    public void reloadEditorOnUpdateFromCurrentUser() {
         lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
                                                                  "",
                                                                  new SessionInfoImpl( user ) ) );
 
-        assertEquals( 0, reloads );
+        assertEquals( 1, reloads );
 
+    }
+
+    @Test
+    public void reloadEditorOnUpdateFromDifferentUser() {
         lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
                                                                  "",
                                                                  new SessionInfoImpl( new UserImpl( "differentUser" ) ) ) );
