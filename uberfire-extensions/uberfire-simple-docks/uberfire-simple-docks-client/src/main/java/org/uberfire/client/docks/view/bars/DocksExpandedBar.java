@@ -20,15 +20,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ProvidesResize;
-import com.google.gwt.user.client.ui.RequiresResize;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -158,18 +152,6 @@ public class DocksExpandedBar
         } );
     }
 
-    protected void resizeTargetPanel() {
-        int height = getOffsetHeight() - titlePanel.getOffsetHeight();
-        int width = getOffsetWidth();
-
-        targetPanel.setSize( width + "px", height + "px" );
-    }
-
-    public void setPanelSize( int width,
-                              int height ) {
-        targetPanel.setPixelSize( width, height );
-    }
-
     public FlowPanel targetPanel() {
         return targetPanel;
     }
@@ -182,4 +164,23 @@ public class DocksExpandedBar
     public UberfireDockPosition getPosition() {
         return position;
     }
+
+    public void setPanelSize( final int width,
+                              final int height ) {
+        targetPanel.setPixelSize( width, height );
+    }
+
+    void resizeTargetPanel() {
+
+        final int height = getOffsetHeight() - ( isTitleSet() ? titlePanel.getOffsetHeight() : 0 );
+        final int width = getOffsetWidth();
+
+        setPanelSize( width, height );
+
+    }
+
+    boolean isTitleSet() {
+        return null != title;
+    }
+
 }

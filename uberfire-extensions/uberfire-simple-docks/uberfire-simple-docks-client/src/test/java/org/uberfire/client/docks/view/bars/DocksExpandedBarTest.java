@@ -16,6 +16,8 @@
 
 package org.uberfire.client.docks.view.bars;
 
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwtmockito.GwtMock;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,14 +31,35 @@ public class DocksExpandedBarTest {
 
     private DocksExpandedBar docksExpandedBar;
 
+    @GwtMock
+    FlowPanel titlePanel;
+
     @Before
     public void setup() {
         docksExpandedBar = spy( new DocksExpandedBar( UberfireDockPosition.WEST ) );
+        when( docksExpandedBar.getOffsetHeight() ).thenReturn( 200 );
+        when( docksExpandedBar.getOffsetWidth() ).thenReturn( 200 );
+        when( titlePanel.getOffsetHeight() ).thenReturn( 100 );
     }
 
     @Test
-    public void resizeTest() {
+    public void onResizeTest() {
         docksExpandedBar.onResize();
-        verify( docksExpandedBar ).resizeTargetPanel();
+        verify( docksExpandedBar, times( 1 ) ).resizeTargetPanel();
     }
+
+    @Test
+    public void resizeAfterTitleSetTest() {
+        when( docksExpandedBar.isTitleSet() ).thenReturn( true );
+        docksExpandedBar.resizeTargetPanel();
+        verify( docksExpandedBar, times( 1 ) ).setPanelSize( 200, 100 );
+    }
+
+    @Test
+    public void resizeBeforeTitleSetTest() {
+        when( docksExpandedBar.isTitleSet() ).thenReturn( false );
+        docksExpandedBar.resizeTargetPanel();
+        verify( docksExpandedBar, times( 1 ) ).setPanelSize( 200, 200 );
+    }
+
 }
