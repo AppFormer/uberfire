@@ -70,6 +70,9 @@ import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.FileTimeImpl;
@@ -92,6 +95,37 @@ import static org.uberfire.commons.data.Pair.*;
 import static org.uberfire.commons.validation.Preconditions.*;
 
 public final class JGitUtil {
+
+    private static final Logger LOG = LoggerFactory.getLogger( JGitUtil.class );
+    private static String DEFAULT_JGIT_RETRY_SLEEP_TIME = "50";
+    private static int JGIT_RETRY_TIMES = initRetryValue();
+    private static int JGIT_RETRY_SLEEP_TIME = initSleepTime();
+
+    private static int initSleepTime() {
+        final ConfigProperties config = new ConfigProperties( System.getProperties() );
+        return config.get( "org.uberfire.nio.git.retry.onfail.sleep", DEFAULT_JGIT_RETRY_SLEEP_TIME ).getIntValue();
+    }
+
+    private static int initRetryValue() {
+        final ConfigProperties config = new ConfigProperties( System.getProperties() );
+        final String osName = config.get( "os.name", "any" ).getValue();
+        final String defaultRetryTimes;
+        if ( osName.toLowerCase().contains( "windows" ) ) {
+            defaultRetryTimes = "10";
+        } else {
+            defaultRetryTimes = "0";
+        }
+        try {
+            return config.get( "org.uberfire.nio.git.retry.onfail.times", defaultRetryTimes ).getIntValue();
+        } catch ( NumberFormatException ex ) {
+            return 0;
+        }
+    }
+
+    //just for test purposes
+    static void setRetryTimes( int retryTimes ) {
+        JGIT_RETRY_TIMES = retryTimes;
+    }
 
     private JGitUtil() {
     }
@@ -161,32 +195,37 @@ public final class JGitUtil {
 
         final String gitPath = fixPath( path );
 
-        RevWalk rw = null;
-        TreeWalk tw = null;
-        try {
-            final ObjectId tree = git.getRepository().resolve( treeRef + "^{tree}" );
-            rw = new RevWalk( git.getRepository() );
-            tw = new TreeWalk( git.getRepository() );
-            tw.setFilter( createFromStrings( singleton( gitPath ) ) );
-            tw.reset( tree );
-            while ( tw.next() ) {
-                if ( tw.isSubtree() && !gitPath.equals( tw.getPathString() ) ) {
-                    tw.enterSubtree();
-                    continue;
+        return retryIfNeeded( NoSuchFileException.class, new ThrowableSupplier<InputStream>() {
+            @Override
+            public InputStream get() throws Throwable {
+                RevWalk rw = null;
+                TreeWalk tw = null;
+                try {
+                    final ObjectId tree = git.getRepository().resolve( treeRef + "^{tree}" );
+                    rw = new RevWalk( git.getRepository() );
+                    tw = new TreeWalk( git.getRepository() );
+                    tw.setFilter( createFromStrings( singleton( gitPath ) ) );
+                    tw.reset( tree );
+                    while ( tw.next() ) {
+                        if ( tw.isSubtree() && !gitPath.equals( tw.getPathString() ) ) {
+                            tw.enterSubtree();
+                            continue;
+                        }
+                        return new ByteArrayInputStream( git.getRepository().open( tw.getObjectId( 0 ), Constants.OBJ_BLOB ).getBytes() );
+                    }
+                } catch ( final Throwable t ) {
+                    throw new NoSuchFileException( "Can't find '" + gitPath + "' in tree '" + treeRef + "'" );
+                } finally {
+                    if ( rw != null ) {
+                        rw.dispose();
+                    }
+                    if ( tw != null ) {
+                        tw.release();
+                    }
                 }
-                return new ByteArrayInputStream( git.getRepository().open( tw.getObjectId( 0 ), Constants.OBJ_BLOB ).getBytes() );
+                throw new NoSuchFileException( "Can't find '" + gitPath + "' in tree '" + treeRef + "'" );
             }
-        } catch ( final Throwable t ) {
-            throw new NoSuchFileException( "Can't find '" + gitPath + "' in tree '" + treeRef + "'" );
-        } finally {
-            if ( rw != null ) {
-                rw.dispose();
-            }
-            if ( tw != null ) {
-                tw.release();
-            }
-        }
-        throw new NoSuchFileException( "Can't find '" + gitPath + "' in tree '" + treeRef + "'" );
+        } );
     }
 
     public static String fixPath( final String path ) {
@@ -479,7 +518,7 @@ public final class JGitUtil {
         try {
             ObjectReader reader = repo.newObjectReader();
             CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-            if (oldRef != null) {
+            if ( oldRef != null ) {
                 oldTreeIter.reset( reader, oldRef );
             }
             CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
@@ -494,25 +533,31 @@ public final class JGitUtil {
                                               final String branch,
                                               final ObjectId startRange,
                                               final ObjectId endRange ) {
-        final List<RevCommit> list = new ArrayList<RevCommit>();
-        RevWalk rw = null;
-        try {
-            // resolve branch
-            rw = new RevWalk( fs.gitRepo().getRepository() );
-            rw.markStart( rw.parseCommit( endRange ) );
-            if ( startRange != null ) {
-                rw.markUninteresting( rw.parseCommit( startRange ) );
+        return retryIfNeeded( RuntimeException.class, new ThrowableSupplier<List<RevCommit>>() {
+            @Override
+            public List<RevCommit> get() throws Throwable {
+                final List<RevCommit> list = new ArrayList<RevCommit>();
+                RevWalk rw = null;
+                try {
+                    // resolve branch
+                    rw = new RevWalk( fs.gitRepo().getRepository() );
+                    rw.markStart( rw.parseCommit( endRange ) );
+                    if ( startRange != null ) {
+                        rw.markUninteresting( rw.parseCommit( startRange ) );
+                    }
+                    for ( RevCommit rev : rw ) {
+                        list.add( rev );
+                    }
+                } catch ( final Exception ex ) {
+                    throw ex;
+                } finally {
+                    if ( rw != null ) {
+                        rw.dispose();
+                    }
+                }
+                return list;
             }
-            for ( RevCommit rev : rw ) {
-                list.add( rev );
-            }
-        } catch ( final Exception ignored ) {
-        } finally {
-            if ( rw != null ) {
-                rw.dispose();
-            }
-        }
-        return list;
+        } );
     }
 
     public static void commit( final Git git,
@@ -1229,21 +1274,28 @@ public final class JGitUtil {
 
     public static RevCommit getLastCommit( final Git git,
                                            final String branchName ) {
-
-        RevWalk walk = null;
-        RevCommit lastCommit = null;
-        try {
-            walk = new RevWalk( git.getRepository() );
-            final RevCommit head = walk.parseCommit( git.getRepository().resolve( branchName ) );
-            walk.markStart( head );
-            lastCommit = walk.next();
-        } catch ( final Exception ignored ) {
-        } finally {
-            if ( walk != null ) {
-                walk.dispose();
+        return retryIfNeeded( RuntimeException.class, new ThrowableSupplier<RevCommit>() {
+            @Override
+            public RevCommit get() throws Throwable {
+                RevWalk walk = null;
+                try {
+                    walk = new RevWalk( git.getRepository() );
+                    final ObjectId branch = git.getRepository().resolve( branchName );
+                    if ( branch == null ) {
+                        return null;
+                    }
+                    final RevCommit head = walk.parseCommit( branch );
+                    walk.markStart( head );
+                    return walk.next();
+                } catch ( final Exception ex ) {
+                    throw ex;
+                } finally {
+                    if ( walk != null ) {
+                        walk.dispose();
+                    }
+                }
             }
-        }
-        return lastCommit;
+        } );
     }
 
     public static enum PathType {
@@ -1263,33 +1315,42 @@ public final class JGitUtil {
             return newPair( PathType.DIRECTORY, null );
         }
 
-        TreeWalk tw = null;
-        try {
-            final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
-            tw = new TreeWalk( git.getRepository() );
-            tw.setFilter( PathFilter.create( gitPath ) );
-            tw.reset( tree );
-            while ( tw.next() ) {
-                if ( tw.getPathString().equals( gitPath ) ) {
-                    if ( tw.getFileMode( 0 ).equals( FileMode.TYPE_TREE ) ) {
-                        return newPair( PathType.DIRECTORY, tw.getObjectId( 0 ) );
-                    } else if ( tw.getFileMode( 0 ).equals( FileMode.TYPE_FILE ) ||
-                            tw.getFileMode( 0 ).equals( FileMode.EXECUTABLE_FILE ) ||
-                            tw.getFileMode( 0 ).equals( FileMode.REGULAR_FILE ) ) {
-                        return newPair( PathType.FILE, tw.getObjectId( 0 ) );
+        return retryIfNeeded( RuntimeException.class, new ThrowableSupplier<Pair<PathType, ObjectId>>() {
+            @Override
+            public Pair<PathType, ObjectId> get() throws Throwable {
+                TreeWalk tw = null;
+                try {
+                    final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
+                    if ( tree == null ) {
+                        return newPair( PathType.NOT_FOUND, null );
+                    }
+                    tw = new TreeWalk( git.getRepository() );
+                    tw.setFilter( PathFilter.create( gitPath ) );
+                    tw.reset( tree );
+                    while ( tw.next() ) {
+                        if ( tw.getPathString().equals( gitPath ) ) {
+                            if ( tw.getFileMode( 0 ).equals( FileMode.TYPE_TREE ) ) {
+                                return newPair( PathType.DIRECTORY, tw.getObjectId( 0 ) );
+                            } else if ( tw.getFileMode( 0 ).equals( FileMode.TYPE_FILE ) ||
+                                    tw.getFileMode( 0 ).equals( FileMode.EXECUTABLE_FILE ) ||
+                                    tw.getFileMode( 0 ).equals( FileMode.REGULAR_FILE ) ) {
+                                return newPair( PathType.FILE, tw.getObjectId( 0 ) );
+                            }
+                        }
+                        if ( tw.isSubtree() ) {
+                            tw.enterSubtree();
+                        }
+                    }
+                } catch ( final Throwable ex ) {
+                    throw ex;
+                } finally {
+                    if ( tw != null ) {
+                        tw.release();
                     }
                 }
-                if ( tw.isSubtree() ) {
-                    tw.enterSubtree();
-                }
+                return newPair( PathType.NOT_FOUND, null );
             }
-        } catch ( final Throwable ignored ) {
-        } finally {
-            if ( tw != null ) {
-                tw.release();
-            }
-        }
-        return newPair( PathType.NOT_FOUND, null );
+        } );
     }
 
     public static JGitPathInfo resolvePath( final Git git,
@@ -1305,33 +1366,39 @@ public final class JGitUtil {
             return new JGitPathInfo( null, "/", TREE );
         }
 
-        TreeWalk tw = null;
-        try {
-            final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
-            tw = new TreeWalk( git.getRepository() );
-            tw.setFilter( PathFilter.create( gitPath ) );
-            tw.reset( tree );
-            while ( tw.next() ) {
-                if ( tw.getPathString().equals( gitPath ) ) {
-                    if ( tw.getFileMode( 0 ).equals( TREE ) ) {
-                        return new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), TREE );
-                    } else if ( tw.getFileMode( 0 ).equals( REGULAR_FILE ) || tw.getFileMode( 0 ).equals( EXECUTABLE_FILE ) ) {
-                        final long size = tw.getObjectReader().getObjectSize( tw.getObjectId( 0 ), OBJ_BLOB );
-                        return new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), REGULAR_FILE, size );
+        return retryIfNeeded( RuntimeException.class, new ThrowableSupplier<JGitPathInfo>() {
+            @Override
+            public JGitPathInfo get() throws Throwable {
+                TreeWalk tw = null;
+                try {
+                    final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
+                    tw = new TreeWalk( git.getRepository() );
+                    tw.setFilter( PathFilter.create( gitPath ) );
+                    tw.reset( tree );
+                    while ( tw.next() ) {
+                        if ( tw.getPathString().equals( gitPath ) ) {
+                            if ( tw.getFileMode( 0 ).equals( TREE ) ) {
+                                return new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), TREE );
+                            } else if ( tw.getFileMode( 0 ).equals( REGULAR_FILE ) || tw.getFileMode( 0 ).equals( EXECUTABLE_FILE ) ) {
+                                final long size = tw.getObjectReader().getObjectSize( tw.getObjectId( 0 ), OBJ_BLOB );
+                                return new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), REGULAR_FILE, size );
+                            }
+                        }
+                        if ( tw.isSubtree() ) {
+                            tw.enterSubtree();
+                        }
+                    }
+                } catch ( final Throwable ex ) {
+                    throw ex;
+                } finally {
+                    if ( tw != null ) {
+                        tw.release();
                     }
                 }
-                if ( tw.isSubtree() ) {
-                    tw.enterSubtree();
-                }
-            }
-        } catch ( final Throwable ignored ) {
-        } finally {
-            if ( tw != null ) {
-                tw.release();
-            }
-        }
 
-        return null;
+                return null;
+            }
+        } );
     }
 
     public static List<JGitPathInfo> listPathContent( final Git git,
@@ -1343,38 +1410,76 @@ public final class JGitUtil {
 
         final String gitPath = fixPath( path );
 
-        TreeWalk tw = null;
-        final List<JGitPathInfo> result = new ArrayList<JGitPathInfo>();
-        try {
-            final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
-            tw = new TreeWalk( git.getRepository() );
-            boolean found = false;
-            if ( gitPath.isEmpty() ) {
-                found = true;
-            } else {
-                tw.setFilter( PathFilter.create( gitPath ) );
-            }
-            tw.reset( tree );
-            while ( tw.next() ) {
-                if ( !found && tw.isSubtree() ) {
-                    tw.enterSubtree();
-                }
-                if ( tw.getPathString().equals( gitPath ) ) {
-                    found = true;
-                    continue;
-                }
-                if ( found ) {
-                    result.add( new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), tw.getFileMode( 0 ) ) );
-                }
-            }
-        } catch ( final Throwable ignored ) {
-        } finally {
-            if ( tw != null ) {
-                tw.release();
-            }
-        }
+        return retryIfNeeded( RuntimeException.class, new ThrowableSupplier<List<JGitPathInfo>>() {
+            @Override
+            public List<JGitPathInfo> get() throws Throwable {
+                TreeWalk tw = null;
+                final List<JGitPathInfo> result = new ArrayList<JGitPathInfo>();
+                try {
+                    final ObjectId tree = git.getRepository().resolve( branchName + "^{tree}" );
+                    if ( tree == null ) {
+                        return result;
+                    }
 
-        return result;
+                    tw = new TreeWalk( git.getRepository() );
+                    boolean found = false;
+                    if ( gitPath.isEmpty() ) {
+                        found = true;
+                    } else {
+                        tw.setFilter( PathFilter.create( gitPath ) );
+                    }
+                    tw.reset( tree );
+                    while ( tw.next() ) {
+                        if ( !found && tw.isSubtree() ) {
+                            tw.enterSubtree();
+                        }
+                        if ( tw.getPathString().equals( gitPath ) ) {
+                            found = true;
+                            continue;
+                        }
+                        if ( found ) {
+                            result.add( new JGitPathInfo( tw.getObjectId( 0 ), tw.getPathString(), tw.getFileMode( 0 ) ) );
+                        }
+                    }
+                } catch ( final Throwable ex ) {
+                    throw ex;
+                } finally {
+                    if ( tw != null ) {
+                        tw.release();
+                    }
+                }
+
+                return result;
+            }
+        } );
+    }
+
+    private static <E extends Throwable, T> T retryIfNeeded( final Class<E> eclazz,
+                                                             final ThrowableSupplier<T> supplier ) throws E {
+        int i = 0;
+        do {
+            try {
+                return supplier.get();
+            } catch ( final Throwable ex ) {
+                if ( i < ( JGIT_RETRY_TIMES - 1 ) ) {
+                    try {
+                        Thread.sleep( JGIT_RETRY_SLEEP_TIME );
+                    } catch ( InterruptedException e ) {
+                    }
+                    LOG.debug( String.format( "Unexpected exception (%d/%d).", i + 1, JGIT_RETRY_TIMES ), ex );
+                } else {
+                    LOG.error( String.format( "Unexpected exception (%d/%d).", i + 1, JGIT_RETRY_TIMES ), ex );
+                    if ( ex.getClass().isAssignableFrom( eclazz ) ) {
+                        throw (E) ex;
+                    }
+                    throw new RuntimeException( ex );
+                }
+            }
+
+            i++;
+        } while ( i < JGIT_RETRY_TIMES );
+
+        return null;
     }
 
     public static class JGitPathInfo {
