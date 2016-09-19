@@ -16,32 +16,23 @@
 
 package org.uberfire.backend.server.security;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.security.acl.Group;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
-
 import org.jboss.errai.security.shared.api.Role;
-import org.jboss.errai.security.shared.api.RoleImpl;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.api.identity.UserImpl;
 import org.jboss.errai.security.shared.exception.FailedAuthenticationException;
 import org.jboss.errai.security.shared.service.AuthenticationService;
-import org.uberfire.commons.validation.PortablePreconditions;
 import org.uberfire.backend.server.security.adapter.GroupAdapterAuthorizationSource;
+import org.uberfire.commons.validation.PortablePreconditions;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
+import javax.security.auth.callback.*;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements stateful, thread-local authentication of a user via the JAAS API (
@@ -56,7 +47,7 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
 
     public static final String DEFAULT_DOMAIN = "ApplicationRealm";
 
-    private static final String DEFAULT_ROLE_PRINCIPLE_NAME = "Roles";
+    static final String DEFAULT_ROLE_PRINCIPLE_NAME = "Roles";
     private final String rolePrincipleName = DEFAULT_ROLE_PRINCIPLE_NAME;
 
     private final ThreadLocal<User> userOnThisThread = new ThreadLocal<User>();
@@ -70,11 +61,13 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
     @Override
     public User login( String username, String password ) {
         try {
-            final LoginContext loginContext = new LoginContext( domain, new UsernamePasswordCallbackHandler( username, password ) );
+            final LoginContext loginContext = createLoginContext( username, password );
             loginContext.login();
-            UserImpl user = new UserImpl( username, loadRoles( username, loginContext.getSubject() ) );
+            List<String> principals = loadEntitiesFromSubjectAndAdapters( username, loginContext.getSubject(), new String[] { rolePrincipleName } );
+            Collection<Role> roles = getRoles( principals );
+            Collection<org.jboss.errai.security.shared.api.Group> groups = getGroups( principals );
+            UserImpl user = new UserImpl( username, roles, groups );
             userOnThisThread.set( user );
-
             return user;
         } catch ( final LoginException ex ) {
             throw new FailedAuthenticationException();
@@ -100,35 +93,8 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
         return userOnThisThread.get() != null;
     }
 
-    private List<Role> loadRoles( String username, Subject subject ) {
-        List<Role> roles = new ArrayList<Role>();
-        try {
-            Set<java.security.Principal> principals = subject.getPrincipals();
-
-            if ( principals != null ) {
-                for ( java.security.Principal p : principals ) {
-                    if ( p instanceof Group && rolePrincipleName.equalsIgnoreCase( p.getName() ) ) {
-                        Enumeration<? extends java.security.Principal> groups = ( (Group) p ).members();
-
-                        while ( groups.hasMoreElements() ) {
-                            final java.security.Principal groupPrincipal = groups.nextElement();
-                            roles.add( new RoleImpl( groupPrincipal.getName() ) );
-                        }
-                        break;
-
-                    }
-
-                }
-            }
-
-            Set<Role> rolesFromAdapters = collectGroupsAsRoles(username, subject);
-            if (rolesFromAdapters != null && !rolesFromAdapters.isEmpty()) {
-                roles.addAll(rolesFromAdapters);
-            }
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
-        }
-        return roles;
+    LoginContext createLoginContext( String username, String password ) throws LoginException {
+        return new LoginContext( domain, new UsernamePasswordCallbackHandler( username, password ) );
     }
 
     class UsernamePasswordCallbackHandler implements CallbackHandler {

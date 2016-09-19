@@ -60,6 +60,11 @@
       <artifactId>prettytime</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
+
     <!-- KIE Commons IO -->
     <dependency>
       <groupId>org.uberfire</groupId>
