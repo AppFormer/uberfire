@@ -1,8 +1,23 @@
 package org.uberfire.ext.layout.editor.client.components.columns;
 
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
 import com.google.gwt.core.client.Scheduler;
-import org.jboss.errai.common.client.dom.*;
-import org.jboss.errai.common.client.ui.ElementWrapperWidget;
+import com.google.gwt.event.dom.client.DragEndEvent;
+import com.google.gwt.event.dom.client.DragLeaveEvent;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragStartEvent;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.gwt.FlowPanel;
+import org.jboss.errai.common.client.dom.Button;
+import org.jboss.errai.common.client.dom.Div;
+import org.jboss.errai.common.client.dom.Document;
+import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.IsElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
@@ -16,14 +31,9 @@ import org.uberfire.ext.layout.editor.client.infra.DragHelperComponentColumn;
 import org.uberfire.ext.layout.editor.client.widgets.KebabWidget;
 import org.uberfire.mvp.Command;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import static org.jboss.errai.common.client.dom.DOMUtil.removeAllChildren;
 import static org.uberfire.ext.layout.editor.client.infra.CSSClassNameHelper.*;
 import static org.uberfire.ext.layout.editor.client.infra.DomUtil.*;
-import static org.uberfire.ext.layout.editor.client.infra.HTML5DnDHelper.extractDndData;
+import static org.uberfire.ext.layout.editor.client.infra.HTML5DnDHelper.*;
 
 @Dependent
 @Templated
@@ -69,7 +79,7 @@ public class ComponentColumnView
 
     @Inject
     @DataField
-    private Div content;
+    private FlowPanel content;
 
     @Inject
     private KebabWidget kebabWidget;
@@ -202,7 +212,7 @@ public class ComponentColumnView
             e.preventDefault();
             if ( presenter.shouldPreviewDrop() && presenter.enableSideDnD() ) {
                 addClassName( right, "columnDropPreview dropPreview" );
-                addClassName( content, "centerPreview" );
+                content.getElement().addClassName( "centerPreview" );
                 removeClassName( colUp, "componentDropInColumnPreview" );
             }
         } );
@@ -210,7 +220,7 @@ public class ComponentColumnView
             e.preventDefault();
             removeClassName( right, "columnDropPreview" );
             removeClassName( right, "dropPreview" );
-            removeClassName( content, "centerPreview" );
+            content.getElement().removeClassName( "centerPreview" );
         } );
         right.setOndragover( event -> event.preventDefault() );
         right.setOndrop( e -> {
@@ -218,7 +228,7 @@ public class ComponentColumnView
             if ( presenter.enableSideDnD() && presenter.shouldPreviewDrop() ) {
                 removeClassName( right, "columnDropPreview" );
                 removeClassName( right, "dropPreview" );
-                removeClassName( content, "centerPreview" );
+                content.getElement().removeClassName( "centerPreview" );
                 presenter.onDrop( ColumnDrop.Orientation.RIGHT, extractDndData( e ) );
             }
         } );
@@ -237,7 +247,7 @@ public class ComponentColumnView
     }
 
     private void setupContentEvents() {
-        content.setOndragover( e -> {
+        content.addDomHandler( e -> {
             e.preventDefault();
             if ( presenter.shouldPreviewDrop() ) {
                 if ( dragOverUp( content, e ) ) {
@@ -251,38 +261,40 @@ public class ComponentColumnView
                     contentDropOrientation = ColumnDrop.Orientation.DOWN;
                 }
             }
-        } );
-        content.setOndragleave( e -> {
+        }, DragOverEvent.getType() );
+        content.addDomHandler( e -> {
             e.preventDefault();
             //ederign
             removeClassName( colDown, "componentDropInColumnPreview" );
             contentDropOrientation = null;
-        } );
-        content.setOndrop( e -> {
+        }, DragLeaveEvent.getType() );
+
+        content.addDomHandler( e -> {
             if ( contentDropOrientation != null ) {
-                presenter.onDrop( contentDropOrientation, extractDndData( e ) );
+                presenter.onDrop( contentDropOrientation, e.getData( "text" ) );
             }
             removeClassName( colUp, "componentDropInColumnPreview" );
             removeClassName( colDown, "componentDropInColumnPreview" );
-        } );
-        content.setOnmouseout( e -> {
-            removeClassName( content, "componentMovePreview" );
-        } );
-        content.setOnmouseover( e -> {
-            e.preventDefault();
-            addClassName( content, "componentMovePreview" );
-        } );
+        }, DropEvent.getType() );
 
-        content.setOndragend( e -> {
+        content.addDomHandler( mouseOutEvent -> content.getElement().removeClassName( "componentMovePreview" ), MouseOutEvent.getType() );
+
+        content.addDomHandler( e -> {
+            e.preventDefault();
+            content.getElement().addClassName( "componentMovePreview" );
+        }, MouseOverEvent.getType() );
+
+        content.addDomHandler( e -> {
             e.stopPropagation();
             removeClassName( row, "rowDndPreview" );
             presenter.dragEndComponent();
-        } );
-        content.setOndragstart( e -> {
+        }, DragEndEvent.getType() );
+
+        content.addDomHandler( e -> {
             e.stopPropagation();
             addClassName( row, "rowDndPreview" );
             presenter.dragStartComponent();
-        } );
+        }, DragStartEvent.getType() );
     }
 
 
@@ -291,14 +303,14 @@ public class ComponentColumnView
             e.preventDefault();
             removeClassName( left, "columnDropPreview" );
             removeClassName( left, "dropPreview" );
-            removeClassName( content, "centerPreview" );
+            content.getElement().removeClassName( "centerPreview" );
         } );
         left.setOndrop( e -> {
             e.preventDefault();
             if ( presenter.enableSideDnD() && presenter.shouldPreviewDrop() ) {
                 removeClassName( left, "columnDropPreview" );
                 removeClassName( left, "dropPreview" );
-                removeClassName( content, "centerPreview" );
+                content.getElement().removeClassName( "centerPreview" );
                 presenter.onDrop( ColumnDrop.Orientation.LEFT, extractDndData( e ) );
             }
         } );
@@ -312,13 +324,13 @@ public class ComponentColumnView
             event.preventDefault();
             removeClassName( left, "columnDropPreview" );
             removeClassName( left, "dropPreview" );
-            removeClassName( content, "centerPreview" );
+            content.getElement().removeClassName( "centerPreview" );
         } );
         left.setOndragenter( e -> {
             e.preventDefault();
             if ( presenter.enableSideDnD() && presenter.shouldPreviewDrop() ) {
                 addClassName( left, "columnDropPreview dropPreview" );
-                addClassName( content, "centerPreview" );
+                content.getElement().addClassName( "centerPreview" );
                 removeClassName( colUp, "componentDropInColumnPreview" );
             }
         } );
@@ -373,7 +385,7 @@ public class ComponentColumnView
         final int colWidth = Integer.parseInt( extractOffSetWidth( col ) );
         final int contentWidth = colWidth - ( originalLeftRightWidth * 2 ) - smallSpace;
         if ( contentWidth >= 0 ) {
-            content.getStyle().setProperty( "width", contentWidth + "px" );
+            content.getElement().getStyle().setProperty( "width", contentWidth + "px" );
             colDown.getStyle().setProperty( "width", "100%" );
             colUp.getStyle().setProperty( "width", "100%" );
         }
@@ -391,18 +403,18 @@ public class ComponentColumnView
 
     @Override
     public void clearContent() {
-        removeAllChildren( content );
+        content.clear();
     }
 
     @Override
     public void setContent() {
         Scheduler.get().scheduleDeferred( () -> {
-            removeAllChildren( content );
-            HTMLElement previewWidget = getPreviewWidget();
-            previewWidget.getStyle().setProperty( "cursor", "default" );
-            previewWidget.setClassName( "le-widget" );
-            content.appendChild( kebabWidget.getElement() );
-            content.appendChild( previewWidget );
+            content.clear();
+            Widget previewWidget = getPreviewWidget();
+            previewWidget.getElement().getStyle().setProperty( "cursor", "default" );
+            previewWidget.getElement().setClassName( "le-widget" );
+            content.getElement().appendChild( kebabWidget.getElement() );
+            content.add( previewWidget );
         } );
     }
 
@@ -423,10 +435,8 @@ public class ComponentColumnView
     }
 
 
-    private HTMLElement getPreviewWidget() {
-        HTMLElement cast = ( HTMLElement ) helper.getPreviewWidget( ElementWrapperWidget.getWidget( content ) )
-                .asWidget().getElement().cast();
-        return cast;
+    private Widget getPreviewWidget() {
+        return helper.getPreviewWidget( content ).asWidget();
     }
 
 
@@ -435,10 +445,10 @@ public class ComponentColumnView
     }
 
 
-    private boolean dragOverUp( Div div, Event e ) {
-        final int absoluteTop = extractAbsoluteTop( div );
-        final int absoluteBottom = extractAbsoluteBottom( div );
-        int dragOverY = Integer.parseInt( extractClientY( e ) );
+    private boolean dragOverUp( Widget div, DragOverEvent e ) {
+        final int absoluteTop = div.getElement().getAbsoluteTop();
+        final int absoluteBottom = div.getElement().getAbsoluteBottom();
+        int dragOverY = e.getNativeEvent().getClientY();
 
         return ( dragOverY - absoluteTop ) < ( absoluteBottom - dragOverY );
     }

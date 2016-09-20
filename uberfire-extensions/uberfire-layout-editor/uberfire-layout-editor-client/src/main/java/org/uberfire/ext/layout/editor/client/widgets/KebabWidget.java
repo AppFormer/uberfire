@@ -1,23 +1,21 @@
 package org.uberfire.ext.layout.editor.client.widgets;
 
-import com.google.gwt.core.client.GWT;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Composite;
 import org.jboss.errai.common.client.dom.Anchor;
 import org.jboss.errai.common.client.dom.Div;
-import org.jboss.errai.ui.client.local.api.IsElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.SinkNative;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.uberfire.mvp.Command;
-import org.uberfire.mvp.ParameterizedCommand;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
 
 @Dependent
 @Templated
-public class KebabWidget implements IsElement {
+public class KebabWidget extends Composite {
 
     @Inject
     @DataField
