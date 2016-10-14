@@ -105,6 +105,7 @@ public class IOServiceSecuritySetup {
                             return null;
 
                         } catch ( final AuthenticationException loginFailed ) {
+                            LOG.warn( "Login failed", loginFailed );
                             return null;
                         }
                     }
