@@ -50,6 +50,8 @@ public class FileUploadServlet
                            HttpServletResponse response ) throws ServletException, IOException {
 
         try {
+            request.setCharacterEncoding( "UTF-8" );
+
             if ( request.getParameter( PARAM_PATH ) != null ) {
 
                 //See https://bugzilla.redhat.com/show_bug.cgi?id=1202926

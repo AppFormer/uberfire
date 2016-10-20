@@ -168,6 +168,8 @@ public class FileUploadServletTest {
         //FileUploadServlet uploadServlet = new FileUploadServlet();
         uploadServlet.doPost( request, response );
 
+        verify( request, times( 1 ) ).setCharacterEncoding( "UTF-8" );
+
         verify( request, times( 1 ) ).getParameter( PARAM_PATH );
         verify( request, times( 2 ) ).getParameter( PARAM_FOLDER );
         verify( request, times( 1 ) ).getParameter( PARAM_FILENAME );
@@ -209,6 +211,8 @@ public class FileUploadServletTest {
         when( response.getWriter() ).thenReturn( printWriter );
 
         uploadServlet.doPost( request, response );
+
+        verify( request, times( 1 ) ).setCharacterEncoding( "UTF-8" );
 
         verify( request, times( 2 ) ).getParameter( PARAM_PATH );
 
