@@ -220,7 +220,7 @@ public final class JGitUtil {
                         rw.dispose();
                     }
                     if ( tw != null ) {
-                        tw.release();
+                        tw.close();
                     }
                 }
                 throw new NoSuchFileException( "Can't find '" + gitPath + "' in tree '" + treeRef + "'" );
@@ -495,7 +495,7 @@ public final class JGitUtil {
         } catch ( final Exception e ) {
             throw new IOException( e );
         } finally {
-            revWalk.release();
+            revWalk.close();
         }
     }
 
@@ -673,13 +673,13 @@ public final class JGitUtil {
                         }
 
                     } finally {
-                        revWalk.release();
+                        revWalk.close();
                     }
                 } else {
                     hadEffecitiveCommit = false;
                 }
             } finally {
-                odi.release();
+                odi.close();
             }
         } catch ( final Throwable t ) {
             throw new RuntimeException( t );
@@ -733,7 +733,7 @@ public final class JGitUtil {
                     while ( treeWalk.next() ) {
                         path2delete.add( treeWalk.getPathString() );
                     }
-                    treeWalk.release();
+                    treeWalk.close();
                 } else {
                     try {
                         final InputStream inputStream = new FileInputStream( pathAndContent.getValue() );
@@ -777,7 +777,7 @@ public final class JGitUtil {
                         } );
                     }
                 }
-                treeWalk.release();
+                treeWalk.close();
             }
 
             for ( final Map.Entry<String, Pair<File, ObjectId>> pathAndContent : paths.entrySet() ) {
@@ -798,7 +798,7 @@ public final class JGitUtil {
         } catch ( Exception e ) {
             throw new RuntimeException( e );
         } finally {
-            inserter.release();
+            inserter.close();
         }
 
         if ( path2delete.isEmpty() && paths.isEmpty() ) {
@@ -856,7 +856,7 @@ public final class JGitUtil {
                         } );
                     }
                 }
-                treeWalk.release();
+                treeWalk.close();
             }
 
             editor.finish();
@@ -914,7 +914,7 @@ public final class JGitUtil {
                         } );
                     }
                 }
-                treeWalk.release();
+                treeWalk.close();
             }
 
             editor.finish();
@@ -954,7 +954,7 @@ public final class JGitUtil {
                         }
                     } );
                 }
-                treeWalk.release();
+                treeWalk.close();
             }
 
             editor.finish();
@@ -1345,7 +1345,7 @@ public final class JGitUtil {
                     throw ex;
                 } finally {
                     if ( tw != null ) {
-                        tw.release();
+                        tw.close();
                     }
                 }
                 return newPair( PathType.NOT_FOUND, null );
@@ -1392,7 +1392,7 @@ public final class JGitUtil {
                     throw ex;
                 } finally {
                     if ( tw != null ) {
-                        tw.release();
+                        tw.close();
                     }
                 }
 
@@ -1445,7 +1445,7 @@ public final class JGitUtil {
                     throw ex;
                 } finally {
                     if ( tw != null ) {
-                        tw.release();
+                        tw.close();
                     }
                 }
 
