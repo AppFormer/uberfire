@@ -72,7 +72,7 @@ public class SaveButton
 
     @Override
     public String getCaption() {
-        return null;
+        return button.getText();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class SaveButton
 
     @Override
     public String getIdentifier() {
-        return null;
+        return this.getClass().getName() + "#Save";
     }
 
     public void setTextToSave() {
