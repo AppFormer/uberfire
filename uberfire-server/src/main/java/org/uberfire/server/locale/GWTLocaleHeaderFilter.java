@@ -29,6 +29,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -67,7 +68,7 @@ public class GWTLocaleHeaderFilter implements Filter {
 
         final byte[] outputBytes = output.getBytes( "UTF-8" );
         response.setContentLength( outputBytes.length );
-        response.getOutputStream().write( outputBytes );
+        response.getWriter().print( output );
     }
 
     protected CharResponseWrapper getWrapper( final HttpServletResponse response ) {
@@ -75,11 +76,15 @@ public class GWTLocaleHeaderFilter implements Filter {
     }
 
     private Locale getLocale( final ServletRequest request ) {
-        Locale locale = null;
+        Locale locale = request.getLocale();
+        final String paramLocale = request.getParameter( "locale" );
+        if ( paramLocale == null || paramLocale.isEmpty() ) {
+            return locale;
+        }
         try {
-            locale = new Locale( request.getParameter( "locale" ) );
+            locale = LocaleUtils.toLocale( paramLocale );
         } catch ( Exception e ) {
-            locale = request.getLocale();
+            //Swallow. Locale is initially set to ServletRequest locale
         }
         return locale;
     }
