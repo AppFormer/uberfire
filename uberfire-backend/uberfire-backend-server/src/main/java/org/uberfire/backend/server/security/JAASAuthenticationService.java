@@ -60,7 +60,14 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
 
     @Override
     public User login( String username, String password ) {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = this.getClass().getClassLoader();
         try {
+            // RHBPMS-473 - TCCL used in javax.security.auth.login.LoginContext
+            // is not the application CL if JSM is enabled.
+            // Setting TCCL to application CL as workaround
+            Thread.currentThread().setContextClassLoader(cl);
+
             final LoginContext loginContext = createLoginContext( username, password );
             loginContext.login();
             List<String> principals = loadEntitiesFromSubjectAndAdapters( username, loginContext.getSubject(), new String[] { rolePrincipleName } );
@@ -71,6 +78,11 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
             return user;
         } catch ( final LoginException ex ) {
             throw new FailedAuthenticationException();
+        } finally {
+            // RHBPMS-473 - Restore original TCCL
+            if(tccl!=null) {
+                Thread.currentThread().setContextClassLoader(tccl);
+            }
         }
     }
 
