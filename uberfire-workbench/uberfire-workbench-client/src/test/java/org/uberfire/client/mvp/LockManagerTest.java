@@ -66,7 +66,7 @@ public class LockManagerTest {
 
     @InjectMocks
     private LockManagerImpl lockManager;
-    
+
     @Mock
     private LockDemandDetector lockDemandDetector;
 
@@ -154,7 +154,7 @@ public class LockManagerTest {
         verify( lockService, times(1) ).acquireLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
     }
-    
+
     @Test
     public void acquireLockDoesNotHitServerIfLocked() {
         lockManager.acquireLockOnDemand();
@@ -163,7 +163,7 @@ public class LockManagerTest {
         simulateLockDemand();
         verify( lockService, times(1) ).acquireLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
-        
+
         simulateLockDemand();
         verify( lockService, times(1) ).acquireLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
@@ -178,7 +178,7 @@ public class LockManagerTest {
 
         verify( lockNotification, times(1) ).fire( any( NotificationEvent.class ) );
     }
-    
+
     @Test
     public void notifyLockError() throws Exception {
         lockManager.acquireLockOnDemand();
@@ -207,12 +207,12 @@ public class LockManagerTest {
         lockManager.onFocus();
         verify( changeTitleEvent, times(1) ).fire( any( ChangeTitleWidgetEvent.class ) );
     }
-    
+
     @Test
     public void handleWindowReparenting() {
         lockManager.acquireLockOnDemand();
         verify( lockDemandDetector, times(1) ).getLockDemandEventTypes();
-        
+
         final ArgumentCaptor<AttachEvent.Handler> handlerCaptor = ArgumentCaptor.forClass(AttachEvent.Handler.class);
         verify( widget, times(1) ).addAttachHandler( handlerCaptor.capture() );
 
@@ -223,55 +223,59 @@ public class LockManagerTest {
     @Test
     public void releaseLockOnSave() {
         lockManager.acquireLockOnDemand();
-        
+
         simulateLockSuccess();
         simulateLockDemand();
-        
+
         lockManager.onSaveInProgress( new SaveInProgressEvent(path) );
-        
+
         verify( lockService, times(1) ).releaseLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
     }
-    
+
     @Test
     public void releaseLockOnUpdate() {
         lockManager.acquireLockOnDemand();
         simulateLockSuccess();
         simulateLockDemand();
-        
+
         lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
                                                                  "",
                                                                  new SessionInfoImpl( user ) ) );
-        
+
         verify( lockService, times(1) ).releaseLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
     }
-    
+
+    @Test
+    public void reloadEditorOnUpdateFromCurrentUser() {
+        lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
+                                                                 "",
+                                                                 new SessionInfoImpl( user ) ) );
+
+        assertEquals( 1, reloads );
+
+    }
+
     @Test
     public void reloadEditorOnUpdateFromDifferentUser() {
         lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
                                                                  "",
-                                                                 new SessionInfoImpl( user ) ) );
-        
-        assertEquals(0, reloads);
-        
-        lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
-                                                                 "",
                                                                  new SessionInfoImpl( new UserImpl ("differentUser") ) ) );
-        
+
         assertEquals(1, reloads);
     }
-    
+
     @Test
     public void releaseOwnedLockOnly() {
         lockManager.acquireLockOnDemand();
         simulateLockFailure();
         simulateLockDemand();
-        
+
         lockManager.onResourceUpdated( new ResourceUpdatedEvent( path,
                                                                  "",
                                                                  new SessionInfoImpl( user ) ) );
-        
+
         verify( lockService, never() ).releaseLock( any( Path.class ),
                                                     any( ParameterizedCommand.class ) );
     }
@@ -279,15 +283,15 @@ public class LockManagerTest {
     @Test
     public void requestAcquireLockNoMoreThanOnce() {
         lockManager.acquireLockOnDemand();
-        
+
         simulateLockNoResponse();
         simulateLockDemand();
         simulateLockDemand();
-        
+
         verify( lockService, times(1) ).acquireLock( any( Path.class ),
                                                      any( ParameterizedCommand.class ) );
     }
-    
+
     private void simulateLockDemand() {
         EventListener listener = lockManager.acquireLockOnDemand( widget.getElement() );
         listener.onBrowserEvent( event );
@@ -309,7 +313,7 @@ public class LockManagerTest {
         } ).when( lockService ).acquireLock( any( Path.class ),
                                              any( ParameterizedCommand.class ) );
     }
-    
+
     private void simulateLockSuccess() {
         doAnswer( new Answer<Object>() {
 
@@ -323,7 +327,7 @@ public class LockManagerTest {
         } ).when( lockService ).acquireLock( any( Path.class ),
                                              any( ParameterizedCommand.class ) );
     }
-    
+
     private void simulateLockError() {
         doAnswer( new Answer<Object>() {
 
@@ -337,7 +341,7 @@ public class LockManagerTest {
         } ).when( lockService ).acquireLock( any( Path.class ),
                                              any( ParameterizedCommand.class ) );
     }
-    
+
     private void simulateLockNoResponse() {
         doAnswer( new Answer<Object>() {
 
@@ -368,5 +372,5 @@ public class LockManagerTest {
                          mockTimer );
 
     }
-    
+
 }
