@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 def ufDeploy=
 """
 sh /home/jenkins/workspace/uberfire/scripts/release/DSL-scripts/UF_Deploy.sh
@@ -17,22 +16,7 @@ sh /home/jenkins/workspace/scripts/release/DSL-scripts/UF_updateNextVersions.sh
 
 // ******************************************************
 
-job("01.UF_release-deploy-1.0.x") {
-=======
-def ufRelease=
-"""
-sh /home/jenkins/workspace/uberfire/scripts/release/DSL-scripts/UF_Release.sh
-"""
-
-def ufPushTags=
-"""
-sh /home/jenkins/workspace/uberfire/scripts/release/DSL-scripts/UF_PushTags.sh
-"""
-
-// ******************************************************
-
-job("01.UF_Release--1.0.x") {
->>>>>>> 2974aa7a3e6c8277940fe98236214ffada63c33c
+job("01.UF_Release-1.0.x") {
 
   description("This job: <br> releases UF, upgrades the version, builds and deploys, copies artifacts to Nexus, closes the release on Nexus  <br> <b>IMPORTANT: Created automatically by Jenkins job DSL plugin. Do not edit manually! The changes will get lost next time the job is generated.<b>")
 
@@ -52,11 +36,7 @@ job("01.UF_Release--1.0.x") {
 
   jdk("jdk1.8")
 
-<<<<<<< HEAD
   customWorkspace("/home/jenkins/workspace/UF_Release-1.0.x")
-=======
-  customWorkspace("/home/jenkins/workspace/UF-Release-1.0.x")
->>>>>>> 2974aa7a3e6c8277940fe98236214ffada63c33c
 
   wrappers {
     timeout {
@@ -85,21 +65,13 @@ job("01.UF_Release--1.0.x") {
     environmentVariables {
         envs(MAVEN_OPTS :"-Xms2g -Xmx3g", MAVEN_HOME: "\$APACHE_MAVEN_3_2_5_HOME", MAVEN_REPO_LOCAL: "/home/jenkins/.m2/repository", PATH :"\$MAVEN_HOME/bin:\$PATH")
     }
-<<<<<<< HEAD
     shell(ufDeploy)
-=======
-    shell(ufRelease)
->>>>>>> 2974aa7a3e6c8277940fe98236214ffada63c33c
   }
 }
 
 // ******************************************************
 
-<<<<<<< HEAD
 job("02.UF_release-pushTags-1.0.x") {
-=======
-job("02.UF_PushTags-1.0.x") {
->>>>>>> 2974aa7a3e6c8277940fe98236214ffada63c33c
 
   description("This job: <br> creates and pushes the tags for <br> community (droolsjbpm) or product (jboss-integration) <br> IMPORTANT: Created automatically by Jenkins job DSL plugin. Do not edit manually! The changes will get lost next time the job is generated.")
 
@@ -149,7 +121,6 @@ job("02.UF_PushTags-1.0.x") {
   }
 }
 
-<<<<<<< HEAD
 // ******************************************************
 
 job("03.UF_release-updateNV-1.0.x") {
@@ -211,17 +182,6 @@ nestedView("UF_Releases-1.0.x") {
                 name("01.UF_release-deploy-1.0.x")
                 name("02.UF_release-pushTag-1.0.x")
                 name("03.UF_release-updateNV-1.0.x")
-=======
-// *************************
-// *************************
-
-nestedView("UF-Releases-1.0.x") {
-    views {
-        listView("uberfire-1.0.x") {
-            jobs {
-                name("01.UF_Release-1.0.x")
-                name("02.UF_PushTags-1.0.x")
->>>>>>> 2974aa7a3e6c8277940fe98236214ffada63c33c
             }
             columns {
                 status()
