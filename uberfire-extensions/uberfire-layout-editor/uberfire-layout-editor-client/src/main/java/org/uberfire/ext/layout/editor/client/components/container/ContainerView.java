@@ -1,6 +1,21 @@
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.uberfire.ext.layout.editor.client.components.container;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import org.jboss.errai.common.client.dom.Div;
 import org.jboss.errai.common.client.dom.Span;
@@ -19,7 +34,10 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import static org.jboss.errai.common.client.dom.DOMUtil.removeAllChildren;
-import static org.uberfire.ext.layout.editor.client.infra.CSSClassNameHelper.*;
+import static org.jboss.errai.common.client.dom.DOMUtil.addCSSClass;
+import static org.jboss.errai.common.client.dom.DOMUtil.removeCSSClass;
+import static org.jboss.errai.common.client.dom.DOMUtil.hasCSSClass;
+
 
 @Dependent
 @Templated
@@ -58,32 +76,32 @@ public class ContainerView
 
     @EventHandler( "mobile" )
     public void mobileSize( ClickEvent e ) {
-        removeClassName( layout, "simulate-sm" );
-        addClassName( layout, "simulate-xs" );
+        removeCSSClass( layout, "simulate-sm" );
+        addCSSClass( layout, "simulate-xs" );
         resizeEvent.fire( new ContainerResizeEvent() );
     }
 
     @EventHandler( "tablet" )
     public void tabletSize( ClickEvent e ) {
-        addClassName( layout, "simulate-sm" );
-        removeClassName( layout, "simulate-xs" );
+        addCSSClass( layout, "simulate-sm" );
+        removeCSSClass( layout, "simulate-xs" );
         resizeEvent.fire( new ContainerResizeEvent() );
     }
 
     @EventHandler( "desktop" )
     public void desktopSize( ClickEvent e ) {
-        removeClassName( layout, "simulate-xs" );
-        removeClassName( layout, "simulate-sm" );
+        removeCSSClass( layout, "simulate-xs" );
+        removeCSSClass( layout, "simulate-sm" );
         resizeEvent.fire( new ContainerResizeEvent() );
     }
 
 
     @Override
     public void addRow( UberElement<Row> view ) {
-        if ( !hasClassName( layout, "container-canvas" ) ) {
-            addClassName( layout, "container-canvas" );
+        if ( !hasCSSClass( layout, "container-canvas" ) ) {
+            addCSSClass( layout, "container-canvas" );
         }
-        removeClassName( layout, "container-empty" );
+        removeCSSClass( layout, "container-empty" );
         layout.appendChild( view.getElement() );
     }
 
@@ -94,8 +112,8 @@ public class ContainerView
 
     @Override
     public void addEmptyRow( UberElement<EmptyDropRow> emptyDropRow ) {
-        removeClassName( layout, "container-canvas" );
-        addClassName( layout, "container-empty" );
+        removeCSSClass( layout, "container-canvas" );
+        addCSSClass( layout, "container-empty" );
         layout.appendChild( emptyDropRow.getElement() );
     }
 

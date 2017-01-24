@@ -23,7 +23,7 @@
     <groupId>org.jboss.integration-platform</groupId>
     <artifactId>jboss-integration-platform-parent</artifactId>
     <!-- Keep in sync with the parent version of ../pom.xml -->
-    <version>7.0.0.CR4</version>
+    <version>7.0.0.CR6</version>
     <relativePath/>
   </parent>
 
@@ -447,7 +447,47 @@
         <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
+      
+      <!-- Social Activities -->
 
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-api</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-backend</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-backend</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-social-activities-client</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
 
       <!-- Layout Editor -->
 
@@ -610,6 +650,19 @@
       <dependency>
         <groupId>org.uberfire</groupId>
         <artifactId>uberfire-preferences-client</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-preferences-ui-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-preferences-ui-client</artifactId>
         <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
