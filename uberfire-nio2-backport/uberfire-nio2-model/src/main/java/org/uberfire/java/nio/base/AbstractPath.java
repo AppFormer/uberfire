@@ -50,6 +50,10 @@ public abstract class AbstractPath<FS extends FileSystem>
 
     public static final Pattern WINDOWS_DRIVER = Pattern.compile( "^/?[A-Z|a-z]+(:).*" );
     public static final String DEFAULT_WINDOWS_DRIVER = "C:";
+    public static final char UNIX_SEPARATOR = '/';
+    public static final char WINDOWS_SEPARATOR = '\\';
+    public static final String UNIX_SEPARATOR_STRING = "/";
+    public static final String WINDOWS_SEPARATOR_STRING = "\\";
 
     protected final FS fs;
     protected final boolean usesWindowsFormat;
@@ -95,19 +99,25 @@ public abstract class AbstractPath<FS extends FileSystem>
         this.host = checkNotNull( "host", host );
         this.isRealPath = isRealPath;
         this.isNormalized = isNormalized;
-        this.usesWindowsFormat = path.matches( ".*\\\\.*" );
+        this.usesWindowsFormat = path.contains(WINDOWS_SEPARATOR_STRING);
 
-        final RootInfo rootInfo = setupRoot( fs, path, host, isRoot );
-        this.path = rootInfo.path;
-
+        String pathx = null;
+        if (path.startsWith(UNIX_SEPARATOR_STRING) && WINDOWS_DRIVER.matcher(path).matches()) {
+       		pathx = path.substring(1);
+        }
+        else
+        	pathx = path;
+        	
+        final RootInfo rootInfo = setupRoot( fs, pathx, host, isRoot );
         checkNotNull( "rootInfo", rootInfo );
 
+        this.path = rootInfo.path;
         this.isAbsolute = rootInfo.isAbsolute;
 
         int lastOffset = rootInfo.startOffset;
         for ( int i = lastOffset; i < this.path.length; i++ ) {
             final byte b = this.path[ i ];
-            if ( b == getSeparator() ) {
+            if ( b == UNIX_SEPARATOR || b==WINDOWS_SEPARATOR ) {
                 offsets.add( newPair( lastOffset, i ) );
                 i++;
                 lastOffset = i;
@@ -119,6 +129,15 @@ public abstract class AbstractPath<FS extends FileSystem>
         }
 
         this.isRoot = rootInfo.isRoot;
+        
+        char separator = usesWindowsFormat ? WINDOWS_SEPARATOR : UNIX_SEPARATOR;
+        char otherSeparator = separator == UNIX_SEPARATOR ? WINDOWS_SEPARATOR : UNIX_SEPARATOR;
+        for (int i = 0; i < this.path.length; i++) {
+            if (this.path[i] == otherSeparator) {
+            	this.path[i] = (byte)separator;
+            }
+        }
+
     }
 
     protected abstract RootInfo setupRoot( final FS fs,
@@ -248,7 +267,7 @@ public abstract class AbstractPath<FS extends FileSystem>
 
     private String toURIString() {
         if ( usesWindowsFormat ) {
-            return encodePath( "/" + toString().replace( "\\", "/" ) );
+            return encodePath( UNIX_SEPARATOR_STRING + toString().replace( WINDOWS_SEPARATOR_STRING, UNIX_SEPARATOR_STRING ) );
         }
         return encodePath( new String( path ) );
     }
@@ -347,10 +366,6 @@ public abstract class AbstractPath<FS extends FileSystem>
                 return false;
             }
             i++;
-        }
-
-        if ( i < path.length && this.path[ i ] != fs.getSeparator().charAt( 0 ) ) {
-            return false;
         }
 
         return true;
@@ -589,9 +604,6 @@ public abstract class AbstractPath<FS extends FileSystem>
     }
 
     private char getSeparator() {
-        if ( usesWindowsFormat ) {
-            return '\\';
-        }
         return fs.getSeparator().toCharArray()[ 0 ];
     }
 
@@ -632,14 +644,34 @@ public abstract class AbstractPath<FS extends FileSystem>
             return false;
         }
 
-        if ( !usesWindowsFormat && !Arrays.equals( path, other.path ) ) {
-            return false;
-        }
+//        if ( !usesWindowsFormat && !Arrays.equals( path, other.path ) ) {
+//            return false;
+//        }
+//
+//        if ( usesWindowsFormat && !( new String( path ).equalsIgnoreCase( new String( other.path ) ) ) ) {
+//            return false;
+//        }
 
-        if ( usesWindowsFormat && !( new String( path ).equalsIgnoreCase( new String( other.path ) ) ) ) {
-            return false;
-        }
+    	String thisDrive = "";
+    	String thisPath = new String(path);
+    	if (WINDOWS_DRIVER.matcher(thisPath).matches())
+    		thisDrive = thisPath.substring(0,2);
+    	String thatDrive = "";
+    	String thatPath = new String(other.path);
+    	if (WINDOWS_DRIVER.matcher(thatPath).matches())
+    		thatDrive = thatPath.substring(0,2);
+    	if (!thisDrive.equals(thatDrive))
+    		return false;
 
+    	int thisNameCount = this.getNameCount();
+        int thatNameCount = other.getNameCount();
+        if (thisNameCount!=thatNameCount)
+        	return false;
+        
+        for (int i=0; i<thisNameCount; ++i) {
+        	if (!this.getName(i).toString().equals(other.getName(i).toString()))
+        		return false;
+        }
         return true;
     }
 

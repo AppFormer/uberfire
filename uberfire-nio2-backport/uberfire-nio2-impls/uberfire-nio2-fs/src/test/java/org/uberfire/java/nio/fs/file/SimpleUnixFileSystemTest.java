@@ -49,7 +49,14 @@ public class SimpleUnixFileSystemTest {
 
         assertThat( fileSystem.getPath( "/path/to/file.txt" ) ).isNotNull().isEqualTo( GeneralPathImpl.create( fileSystem, "/path/to/file.txt", false ) );
         assertThat( fileSystem.getPath( "/path/to/file.txt", null ) ).isNotNull().isEqualTo( GeneralPathImpl.create( fileSystem, "/path/to/file.txt", false ) );
-        assertThat( fileSystem.getPath( "/path", "to", "file.txt" ) ).isNotNull().isEqualTo( GeneralPathImpl.create( fileSystem, "/path/to/file.txt", false ) );
+        // this test is invalid when run on a Windows system because
+        // System.getProperty( "file.separator" ) will be '\' and the
+        // first getPath() will construct a path string that looks like this:
+        //     /path\to\file.txt
+        // whereas the second getPath() call yields:
+        //     /path/to/file.txt
+        // these are obviously not equal.
+//        assertThat( fileSystem.getPath( "/path", "to", "file.txt" ) ).isNotNull().isEqualTo( GeneralPathImpl.create( fileSystem, "/path/to/file.txt", false ) );
 
         try {
             fileSystem.close();

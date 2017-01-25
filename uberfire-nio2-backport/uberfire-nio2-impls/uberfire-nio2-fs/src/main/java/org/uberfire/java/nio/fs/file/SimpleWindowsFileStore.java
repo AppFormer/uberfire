@@ -16,16 +16,18 @@
 
 package org.uberfire.java.nio.fs.file;
 
+import static org.uberfire.commons.validation.PortablePreconditions.checkCondition;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.uberfire.java.nio.IOException;
+import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.base.GeneralPathImpl;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
-
-import static org.uberfire.commons.validation.Preconditions.*;
 
 public class SimpleWindowsFileStore extends BaseSimpleFileStore {
 
@@ -52,12 +54,23 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
         this.roots = roots;
 
         if ( path.isAbsolute() ) {
-            for ( int i = 0; i < listRoots().length; i++ ) {
-                if ( listRoots()[ i ].toString().equals( path.getRoot().toString() ) ) {
-                    fstoreIndex = i;
-                    break;
-                }
-            }
+        	if (AbstractPath.WINDOWS_DRIVER.matcher(path.toString()).matches()) {
+	            for ( int i = 0; i < listRoots().length; i++ ) {
+	                if ( listRoots()[ i ].toString().equals( path.getRoot().toString() ) ) {
+	                    fstoreIndex = i;
+	                    break;
+	                }
+	            }
+        	}
+        	else {
+        		String defaultDrive = AbstractPath.DEFAULT_WINDOWS_DRIVER + AbstractPath.WINDOWS_SEPARATOR_STRING;
+	            for ( int i = 0; i < listRoots().length; i++ ) {
+	                if ( listRoots()[ i ].toString().equals( defaultDrive ) ) {
+	                    fstoreIndex = i;
+	                    break;
+	                }
+	            }
+        	}
         } else {
             for ( int i = 0; i < listRoots().length; i++ ) {
                 if ( !EXCLUDED_DRIVERS.contains( listRoots()[ i ].toString().substring( 0, 1 ).toUpperCase() ) ) {
