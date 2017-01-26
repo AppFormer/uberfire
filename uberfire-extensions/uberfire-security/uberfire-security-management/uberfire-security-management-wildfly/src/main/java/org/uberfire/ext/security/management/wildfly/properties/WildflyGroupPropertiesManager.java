@@ -278,11 +278,12 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
         }
     }
 
-    void updateGroupProperty(final String name, final String groups, final String errorMessage) {
+    void updateGroupProperty(final String name, final String groups, String errorMessage) {
         if (name != null) {
             try {
-                String g = groups != null ? groups : groupsPropertiesFileLoader.getProperties().getProperty(name);
+                String g = groups != null ? groups : groupsPropertiesFileLoader.getProperties().getProperty( name );
                 if ( g != null && g.trim().length() > 0) {
+                    errorMessage += " error -> " + name + "  " + g;
                     groupsPropertiesFileLoader.getProperties().put(name, g);
                 } else {
                     removeEntry(name);   
@@ -290,6 +291,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                 groupsPropertiesFileLoader.persistProperties();
             } catch (IOException e) {
                 LOG.error(errorMessage, e);
+                e.printStackTrace();
                 throw new SecurityManagementException(e);
             }
         }
