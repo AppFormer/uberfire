@@ -24,19 +24,29 @@ import static org.uberfire.java.nio.file.AccessMode.WRITE;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.base.BasicFileAttributesImpl;
 import org.uberfire.java.nio.base.GeneralPathImpl;
 import org.uberfire.java.nio.base.NotImplementedException;
 import org.uberfire.java.nio.file.NoSuchFileException;
 import org.uberfire.java.nio.file.Path;
+import org.uberfire.java.nio.file.StandardOpenOption;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributeView;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
 
 public class SimpleFileSystemProviderAttrsRelatedTest {
 
+	boolean isWindows;
+	
+	@Before
+	public void initialize() {
+		isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+	}
+	
     @Test
     public void checkIsHidden() throws IOException {
         final SimpleFileSystemProvider fsProvider = new SimpleFileSystemProvider();
@@ -63,6 +73,15 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
         final Path path = GeneralPathImpl.create( fsProvider.getFileSystem( URI.create( "file:///" ) ), "/path/to/file.txt", false );
 
         try {
+        	File test = new File(System.getenv("programfiles")+"/test.tst");
+        	test.createNewFile();
+        	test.delete();
+        }
+        catch (Exception e) {
+        	System.out.println(e);
+        }
+        
+        try {
             fsProvider.checkAccess( path, WRITE );
             fail( "can't have write access on non existent file" );
         } catch ( Exception ex ) {
@@ -82,7 +101,10 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
 
         final File tempFile = File.createTempFile( "foo", "bar" );
         final Path path2 = GeneralPathImpl.newFromFile( fsProvider.getFileSystem( URI.create( "file:///" ) ), tempFile );
-
+        final OutputStream os = fsProvider.newOutputStream(path2, StandardOpenOption.READ, StandardOpenOption.WRITE);
+        os.write("#!sh\necho hello world".getBytes());
+        os.close();
+        
         try {
             fsProvider.checkAccess( path2, WRITE );
         } catch ( Exception ex ) {
@@ -107,20 +129,25 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
 
         tempFile.setReadable( false );
 
-        try {
-            fsProvider.checkAccess( path2, READ );
-            fail( "can't have read access on file" );
-        } catch ( Exception ex ) {
+        if (!isWindows) {
+	        try {
+	            fsProvider.checkAccess( path2, READ );
+	            fail( "can't have read access on file" );
+	        } catch ( Exception ex ) {
+	        }
         }
-
+        
         tempFile.setReadable( true );
+        tempFile.setExecutable( false );
 
-        try {
-            fsProvider.checkAccess( path2, EXECUTE );
-            fail( "can't have execute access on file" );
-        } catch ( Exception ex ) {
+        if (!isWindows) {
+	        try {
+	            fsProvider.checkAccess( path2, EXECUTE );
+	            fail( "can't have execute access on file" );
+	        } catch ( Exception ex ) {
+	        }
         }
-
+        
         tempFile.setExecutable( true );
 
         try {
@@ -135,6 +162,7 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
             fail( "all access should be ok" );
         }
 
+        tempFile.delete();
     }
 
     @Test(expected = IllegalArgumentException.class)

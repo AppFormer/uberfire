@@ -86,7 +86,7 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
 
     @Override
     public String name() {
-        return listRoots()[ fstoreIndex ].getName();
+        return listRoots()[ fstoreIndex ].getAbsolutePath();
     }
 
     @Override

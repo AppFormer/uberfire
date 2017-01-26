@@ -213,12 +213,18 @@ public class SimpleFileSystemProviderTest {
         final String userBasedPath = System.getProperty( "user.dir" ) + "/byte_some_file_here.txt";
 
         final Path path = GeneralPathImpl.create( fsProvider.getFileSystem( URI.create( "file:///" ) ), userBasedPath, false );
+        // delete file in case it wasn't cleaned up from a previous test run
+        if (path.toFile().exists())
+        	path.toFile().delete();
+        
         assertThat( path.toFile().exists() ).isFalse();
 
         final SeekableByteChannel channel = fsProvider.newByteChannel( path, null );
 
         assertThat( channel ).isNotNull();
         assertThat( path.toFile().exists() ).isTrue();
+        // can't delete the file unless the I/O channel is closed first!
+        channel.close();
         path.toFile().delete();
         assertThat( path.toFile().exists() ).isFalse();
     }

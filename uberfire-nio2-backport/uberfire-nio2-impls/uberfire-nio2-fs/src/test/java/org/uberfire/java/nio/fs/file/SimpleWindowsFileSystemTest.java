@@ -92,7 +92,8 @@ public class SimpleWindowsFileSystemTest {
 
     @Test(expected = NoSuchElementException.class)
     public void invalidElementFromRootIterator() {
-        final Iterator<Path> iterator = new SimpleWindowsFileSystem( fsProvider, "c:\\" ).getRootDirectories().iterator();
+        File[] singleRoot = new File[] { new File("C:\\") };
+        final Iterator<Path> iterator = new SimpleWindowsFileSystem( singleRoot, fsProvider, "c:\\" ).getRootDirectories().iterator();
         try {
             iterator.next();
         } catch ( Exception e ) {
@@ -108,7 +109,8 @@ public class SimpleWindowsFileSystemTest {
 
     @Test(expected = NoSuchElementException.class)
     public void invalidElementFromFStoreIterator() {
-        final Iterator<FileStore> iterator = new SimpleWindowsFileSystem( fsProvider, "c:\\" ).getFileStores().iterator();
+        File[] singleRoot = new File[] { new File("C:\\") };
+        final Iterator<FileStore> iterator = new SimpleWindowsFileSystem( singleRoot, fsProvider, "c:\\" ).getFileStores().iterator();
         try {
             iterator.next();
         } catch ( Exception e ) {
