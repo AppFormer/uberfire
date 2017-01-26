@@ -48,8 +48,7 @@ public class WildflyGroupsPropertiesManagerTest extends BaseTest {
     protected static final String GROUPS_FILE = "org/uberfire/ext/security/management/wildfly/application-roles.properties";
     protected String groupsFilePath;
     
-    @Spy
-    private WildflyGroupPropertiesManager groupsPropertiesManager = new WildflyGroupPropertiesManager();
+    private WildflyGroupPropertiesManager groupsPropertiesManager;
 
     private static File elHome;
 
@@ -64,6 +63,7 @@ public class WildflyGroupsPropertiesManagerTest extends BaseTest {
     
     @Before
     public void setup() throws Exception {
+        groupsPropertiesManager = spy( new WildflyGroupPropertiesManager() );
         URL templateURL = Thread.currentThread().getContextClassLoader().getResource(GROUPS_FILE);
         File templateFile = new File(templateURL.getFile());
         FileUtils.cleanDirectory(elHome);

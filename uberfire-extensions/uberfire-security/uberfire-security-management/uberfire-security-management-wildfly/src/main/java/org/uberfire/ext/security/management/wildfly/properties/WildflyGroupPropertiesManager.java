@@ -183,6 +183,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("Error removing the folowing group names: " + identifiers, e);
             throw new SecurityManagementException(e);
         }
