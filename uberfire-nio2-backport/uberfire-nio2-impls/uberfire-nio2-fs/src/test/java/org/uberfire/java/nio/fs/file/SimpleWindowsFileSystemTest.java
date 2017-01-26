@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.base.GeneralPathImpl;
 import org.uberfire.java.nio.file.FileStore;
@@ -35,6 +36,12 @@ public class SimpleWindowsFileSystemTest {
 
     final FileSystemProvider fsProvider = mock( FileSystemProvider.class );
     final File[]             roots      = new File[]{ new File( "c:\\" ), new File( "a:\\" ) };
+	boolean isWindows;
+	
+	@Before
+	public void initialize() {
+		isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+	}
 
     @Test
     public void simpleTests() {
