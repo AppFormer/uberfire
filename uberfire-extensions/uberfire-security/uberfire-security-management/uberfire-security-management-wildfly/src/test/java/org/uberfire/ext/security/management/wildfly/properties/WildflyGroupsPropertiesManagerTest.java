@@ -153,8 +153,13 @@ public class WildflyGroupsPropertiesManagerTest extends BaseTest {
 
     @Test(expected = GroupNotFoundException.class)
     public void testDeleteGroup() {
-        groupsPropertiesManager.delete("role3");
-        groupsPropertiesManager.get("role3");
+        try{
+            groupsPropertiesManager.delete("role3");
+            groupsPropertiesManager.get("role3");
+        }
+        catch(Exception e){
+            throw e;
+        }
     }
 
     private List<Group> createGroupList(String... names) {

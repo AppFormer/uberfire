@@ -177,7 +177,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                     final String groupsStr = entry.getValue().toString();
                     if (groupsStr != null && groupsStr.trim().length() > 0) {
                         final String newGroupsStr = deleteGroupsFromSerliazedValue(groupsStr, identifiers);
-                        final String errorMsg = "Error deleting groups for user " + username;
+                        final String errorMsg = "Error deleting groups for user " + username + "| group " + groupsStr + "|";
                         updateGroupProperty(username, newGroupsStr, errorMsg);
                     }
                 }
@@ -283,7 +283,6 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
             try {
                 String g = groups != null ? groups : groupsPropertiesFileLoader.getProperties().getProperty( name );
                 if ( g != null && g.trim().length() > 0) {
-                    errorMessage += " error -> " + name + "  " + g;
                     groupsPropertiesFileLoader.getProperties().put(name, g);
                 } else {
                     removeEntry(name);   
