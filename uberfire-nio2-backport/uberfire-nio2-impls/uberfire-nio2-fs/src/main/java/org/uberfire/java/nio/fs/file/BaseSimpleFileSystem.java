@@ -108,7 +108,7 @@ public abstract class BaseSimpleFileSystem implements FileSystem,
         }
         final StringBuilder sb = new StringBuilder();
         sb.append( first );
-        String separator = first.contains("\\") ? "\\" : "/";
+        String separator = AbstractPath.getSeparator(first);
         for ( final String segment : more ) {
             if ( segment.length() > 0 ) {
                 if ( sb.length() > 0 ) {
@@ -127,14 +127,7 @@ public abstract class BaseSimpleFileSystem implements FileSystem,
             }
         }
 
-        if ( path.endsWith( AbstractPath.UNIX_SEPARATOR_STRING) ) {
-            return path.substring( 0, path.length() - AbstractPath.UNIX_SEPARATOR_STRING.length() );
-        }
-        if ( path.endsWith( AbstractPath.WINDOWS_SEPARATOR_STRING) ) {
-            return path.substring( 0, path.length() - AbstractPath.WINDOWS_SEPARATOR_STRING.length() );
-        }
-
-        return path;
+        return AbstractPath.removeTrailingSeparator(path);
     }
 
     @Override

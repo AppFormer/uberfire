@@ -89,11 +89,6 @@ public class GeneralPathImpl
         return new File( "" ).getAbsolutePath() + UNIX_SEPARATOR_STRING;
     }
 
-    private boolean hasWindowsDriver( final String text ) {
-        checkNotEmpty( "text", text );
-        return WINDOWS_DRIVER.matcher( text ).matches();
-    }
-
     public static GeneralPathImpl newFromFile( final FileSystem fs,
                                                final File file ) {
         checkNotNull( "fs", fs );

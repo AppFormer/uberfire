@@ -17,6 +17,7 @@
 package org.uberfire.java.nio.base;
 
 import static org.uberfire.commons.data.Pair.newPair;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
 import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
 import static org.uberfire.commons.validation.Preconditions.checkInstanceOf;
 
@@ -48,7 +49,10 @@ public abstract class AbstractPath<FS extends FileSystem>
         implements Path,
                    AttrHolder {
 
-    public static final Pattern WINDOWS_DRIVER = Pattern.compile( "^/?[A-Z|a-z]+(:).*" );
+	// NOTE: the Windows drive letter parsing was incorrect: it allowed more
+	// than one drive letter, for example "file:///path/to/file" successfully
+	// matched the drive letter regexp. This really screwed up URI translation!
+    public static final Pattern WINDOWS_DRIVER = Pattern.compile( "^/?[A-Z|a-z](:).*" );
     public static final String DEFAULT_WINDOWS_DRIVER = "C:";
     public static final char UNIX_SEPARATOR = '/';
     public static final char WINDOWS_SEPARATOR = '\\';
@@ -102,7 +106,7 @@ public abstract class AbstractPath<FS extends FileSystem>
         this.usesWindowsFormat = path.contains(WINDOWS_SEPARATOR_STRING);
 
         String pathx = null;
-        if (path.startsWith(UNIX_SEPARATOR_STRING) && WINDOWS_DRIVER.matcher(path).matches()) {
+        if (path.startsWith(UNIX_SEPARATOR_STRING) && hasWindowsDriver(path)) {
        		pathx = path.substring(1);
         }
         else
@@ -266,12 +270,16 @@ public abstract class AbstractPath<FS extends FileSystem>
     }
 
     private String toURIString() {
-        if ( usesWindowsFormat ) {
+        if ( isWindowsPath(this) ) {
             return encodePath( UNIX_SEPARATOR_STRING + toString().replace( WINDOWS_SEPARATOR_STRING, UNIX_SEPARATOR_STRING ) );
         }
         return encodePath( new String( path ) );
     }
 
+    private static boolean isWindowsPath(AbstractPath path) {
+    	return path.usesWindowsFormat || hasWindowsDriver(path.toString());
+    }
+    
     private String encodePath( final String s ) {
         return EncodingUtil.encodePath(s);
     }
@@ -467,14 +475,10 @@ public abstract class AbstractPath<FS extends FileSystem>
             return this;
         }
 
-        final StringBuilder sb = new StringBuilder();
-        sb.append( new String( path ) );
-        if ( path[ path.length - 1 ] != getSeparator() ) {
-            sb.append( getSeparator() );
-        }
-        sb.append( other.toString() );
+        String thisPath = new String( path );
+        String resolved = appendTrailingSeparator(thisPath) + other.toString();
 
-        return newPath( fs, sb.toString(), host, isRealPath, false );
+        return newPath( fs, resolved, host, isRealPath, false );
     }
 
     @Override
@@ -539,17 +543,18 @@ public abstract class AbstractPath<FS extends FileSystem>
         }
 
         final StringBuilder sb = new StringBuilder();
+        final String separator = getSeparator(new String(this.path));
         while ( numberOfDots > 0 ) {
             sb.append( ".." );
             if ( numberOfDots > 1 ) {
-                sb.append( getSeparator() );
+                sb.append( separator );
             }
             numberOfDots--;
         }
 
         if ( i < other.getNameCount() ) {
             if ( sb.length() > 0 ) {
-                sb.append( getSeparator() );
+                sb.append( separator );
             }
             sb.append( ( (AbstractPath<FS>) other.subpath( i, other.getNameCount() ) ).toString( false ) );
         }
@@ -603,10 +608,62 @@ public abstract class AbstractPath<FS extends FileSystem>
         }
     }
 
-    private char getSeparator() {
-        return fs.getSeparator().toCharArray()[ 0 ];
+    public static String getSeparator(final String path) {
+        int unixIndex = path.indexOf(UNIX_SEPARATOR);
+        int windowsIndex = path.indexOf(WINDOWS_SEPARATOR);
+        if (unixIndex>=0) {
+        	if (windowsIndex>=0) {
+				// path contains a mix of '/' and '\' so pick whichever one
+				// appears first, reading left-to-right
+        		if (unixIndex<windowsIndex)
+        			return UNIX_SEPARATOR_STRING;
+        		else
+        			return WINDOWS_SEPARATOR_STRING;
+        	}
+        	return UNIX_SEPARATOR_STRING;
+        }
+    	if (windowsIndex>=0) {
+			return WINDOWS_SEPARATOR_STRING;
+    	}
+        return getSeparator();
+    }
+    
+    public static String getSeparator() {
+    	String separator = System.getProperty( "file.separator", null );
+    	if (separator==null) {
+    		boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+    		if (isWindows)
+    			return WINDOWS_SEPARATOR_STRING;
+    		else
+    			return UNIX_SEPARATOR_STRING;
+    	}
+    	return separator;
     }
 
+
+    public static String removeTrailingSeparator( final String path ) {
+    	if (path.length()>1) {
+	        if ( path.endsWith( UNIX_SEPARATOR_STRING) ) {
+	            return path.substring( 0, path.length() - UNIX_SEPARATOR_STRING.length() );
+	        }
+	        if ( path.endsWith( WINDOWS_SEPARATOR_STRING) ) {
+	            return path.substring( 0, path.length() - WINDOWS_SEPARATOR_STRING.length() );
+	        }
+    	}
+        return path;
+    }
+
+    public static String appendTrailingSeparator( final String path ) {
+    	if (path.length()>1)
+    		return removeTrailingSeparator(path) + getSeparator(path);
+    	return path;
+    }
+    
+    public static boolean hasWindowsDriver( final String path ) {
+        checkNotEmpty( "path", path );
+    	return WINDOWS_DRIVER.matcher(path).matches();
+    }
+    
     public void clearCache() {
         file = null;
         attrsStorage.clear();
@@ -654,11 +711,11 @@ public abstract class AbstractPath<FS extends FileSystem>
 
     	String thisDrive = "";
     	String thisPath = new String(path);
-    	if (WINDOWS_DRIVER.matcher(thisPath).matches())
+    	if (hasWindowsDriver(thisPath))
     		thisDrive = thisPath.substring(0,2);
     	String thatDrive = "";
     	String thatPath = new String(other.path);
-    	if (WINDOWS_DRIVER.matcher(thatPath).matches())
+    	if (hasWindowsDriver(thatPath))
     		thatDrive = thatPath.substring(0,2);
     	if (!thisDrive.equals(thatDrive))
     		return false;

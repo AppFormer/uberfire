@@ -54,7 +54,7 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
         this.roots = roots;
 
         if ( path.isAbsolute() ) {
-        	if (AbstractPath.WINDOWS_DRIVER.matcher(path.toString()).matches()) {
+        	if (AbstractPath.hasWindowsDriver(path.toString())) {
 	            for ( int i = 0; i < listRoots().length; i++ ) {
 	                if ( listRoots()[ i ].toString().equals( path.getRoot().toString() ) ) {
 	                    fstoreIndex = i;
@@ -86,7 +86,7 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
 
     @Override
     public String name() {
-        return listRoots()[ fstoreIndex ].getName();
+        return listRoots()[ fstoreIndex ].getPath();
     }
 
     @Override

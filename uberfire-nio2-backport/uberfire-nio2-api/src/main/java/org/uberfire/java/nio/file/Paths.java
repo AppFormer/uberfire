@@ -16,12 +16,13 @@
 
 package org.uberfire.java.nio.file;
 
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
-
-import static org.uberfire.commons.validation.Preconditions.*;
 
 /**
  * Back port of JSR-203 from Java Platform, Standard Edition 7.
@@ -46,6 +47,10 @@ public final class Paths {
 
         URI uri = null;
         if (more == null || more.length == 0) {
+        	if (AbstractPath.hasWindowsDriver(first)) {
+                return FileSystems.getDefault().getPath(first, more);
+        	}
+        	
             try {
                 uri = new URI(first);
             } catch (URISyntaxException ex) {
