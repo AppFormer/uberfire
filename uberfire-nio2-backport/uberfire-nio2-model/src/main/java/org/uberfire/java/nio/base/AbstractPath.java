@@ -660,7 +660,7 @@ public abstract class AbstractPath<FS extends FileSystem>
     }
     
     public static boolean hasWindowsDriver( final String path ) {
-        checkNotEmpty( "path", path );
+//        checkNotEmpty( "path", path );
     	return WINDOWS_DRIVER.matcher(path).matches();
     }
     
