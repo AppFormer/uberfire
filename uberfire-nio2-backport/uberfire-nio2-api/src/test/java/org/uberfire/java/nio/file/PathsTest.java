@@ -60,7 +60,7 @@ public class PathsTest {
         assertThat( path ).isNotNull();
         assertThat( path.isAbsolute() ).isTrue();
 
-        assertThat( path.toString() ).isEqualTo( "c:\\path" + separator() + "to" + separator() + "file.txt" );
+        assertThat( path.toString() ).isEqualTo( "c:\\path" + "\\" + "to" + "\\" + "file.txt" );
     }
 
     @Test

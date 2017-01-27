@@ -56,16 +56,16 @@ public class SimpleWindowsFileStoreTest {
         final FileStore fileStore = new SimpleWindowsFileStore( roots, path );
 
         if (isWindows) {
-        	assertThat( fileStore.name() ).isNotNull().isEqualTo( "c:\\" );
             assertThat( fileStore.getTotalSpace() ).isNotEqualTo( 0L );
             assertThat( fileStore.getUsableSpace() ).isNotEqualTo( 0L );
         }
         else {
             // Results are different if this test is run on a linux system 
-        	assertThat( fileStore.name() ).isNotNull().isEqualTo( "" );
         	assertThat( fileStore.getTotalSpace() ).isEqualTo( 0L );
         	assertThat( fileStore.getUsableSpace() ).isEqualTo( 0L );
         }
+
+        assertThat( fileStore.name() ).isNotNull().isEqualTo( "c:\\" );
         assertThat( fileStore.type() ).isNull();
         assertThat( fileStore.isReadOnly() ).isFalse();
 
