@@ -18,6 +18,7 @@ package org.uberfire.java.nio.fs.file;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.GeneralPathImpl;
@@ -42,17 +43,31 @@ public class SimpleWindowsFileStoreTest {
     final File[]             roots       = new File[]{ new File( "c:\\" ), new File( "a:\\" ) };
     final FileSystem         fileSystem  = new SimpleWindowsFileSystem( roots, fsProvider, "c:\\" );
     final Path               nonNullPath = GeneralPathImpl.create( fileSystem, "c:\\something", false );
+	boolean isWindows;
+	
+	@Before
+	public void initialize() {
+		isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+	}
 
     @Test
     public void simpleTests() {
         final Path path = GeneralPathImpl.create( fileSystem, "something", false );
         final FileStore fileStore = new SimpleWindowsFileStore( roots, path );
 
+        if (isWindows) {
+            assertThat( fileStore.getTotalSpace() ).isNotEqualTo( 0L );
+            assertThat( fileStore.getUsableSpace() ).isNotEqualTo( 0L );
+        }
+        else {
+            // Results are different if this test is run on a linux system 
+        	assertThat( fileStore.getTotalSpace() ).isEqualTo( 0L );
+        	assertThat( fileStore.getUsableSpace() ).isEqualTo( 0L );
+        }
+
         assertThat( fileStore.name() ).isNotNull().isEqualTo( "c:\\" );
         assertThat( fileStore.type() ).isNull();
         assertThat( fileStore.isReadOnly() ).isFalse();
-        assertThat( fileStore.getTotalSpace() ).isEqualTo( 0L );
-        assertThat( fileStore.getUsableSpace() ).isEqualTo( 0L );
 
         assertThat( fileStore.supportsFileAttributeView( BasicFileAttributeView.class ) ).isTrue();
         assertThat( fileStore.supportsFileAttributeView( MyFileAttributeView.class ) ).isFalse();

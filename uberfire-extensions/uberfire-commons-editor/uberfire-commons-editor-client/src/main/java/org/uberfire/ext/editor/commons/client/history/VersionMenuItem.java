@@ -54,7 +54,7 @@ public class VersionMenuItem
 
     @Override
     public String getCaption() {
-        return null;
+        return "Version";
     }
 
     @Override
@@ -79,7 +79,7 @@ public class VersionMenuItem
 
     @Override
     public String getIdentifier() {
-        return null;
+        return this.getClass().getName() + "#Version";
     }
     
 }

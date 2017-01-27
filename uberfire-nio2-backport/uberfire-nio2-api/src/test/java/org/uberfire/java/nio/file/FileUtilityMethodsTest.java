@@ -123,7 +123,9 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
         writer.write( "content" );
         writer.close();
 
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ) );
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        Files.copy( is, dir.resolve( "my_new_file.txt" ) );
+        is.close();
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
         assertThat( reader ).isNotNull();
@@ -145,7 +147,9 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
         writer2.write( "empty_content" );
         writer2.close();
 
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        Files.copy( is, dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        is.close();
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
         assertThat( reader ).isNotNull();
@@ -162,7 +166,9 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
         writer.write( "content" );
         writer.close();
 
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        Files.copy( is, dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        is.close();
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
         assertThat( reader ).isNotNull();
@@ -178,22 +184,50 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull2() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), null, REPLACE_EXISTING );
+    	InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+    	try {
+    		Files.copy( is, null, REPLACE_EXISTING );
+    	}
+    	catch (Exception e) {
+    		is.close();
+    		throw e;
+    	}
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull3() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), null );
+    	InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+    	try {
+    		Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), null );
+    	}
+    	catch (Exception e) {
+    		is.close();
+    		throw e;
+    	}
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull4() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), new CopyOption[]{ null } );
+    	InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+    	try {
+    		Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), new CopyOption[]{ null } );
+    	}
+    	catch (Exception e) {
+    		is.close();
+    		throw e;
+    	}
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void copyIn2PathInvalidOption() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), NOFOLLOW_LINKS );
+    	InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+    	try {
+    		Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), NOFOLLOW_LINKS );
+    	}
+    	catch (Exception e) {
+    		is.close();
+    		throw e;
+    	}
     }
 
     @Test
@@ -204,7 +238,9 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
         writer.write( "content" );
         writer.close();
 
-        Files.copy( dir.resolve( "myfile.txt" ), Files.newOutputStream( dir.resolve( "my_new_file.txt" ) ) );
+        OutputStream  os = Files.newOutputStream( dir.resolve( "my_new_file.txt" ) );
+        Files.copy( dir.resolve( "myfile.txt" ), os );
+        os.close();
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
         assertThat( reader ).isNotNull();
@@ -215,12 +251,26 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
 
     @Test(expected = NoSuchFileException.class)
     public void copyPath2OutNotExists() throws IOException {
-        Files.copy( newTempDir().resolve( "myfile.txt" ), Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) ) );
+    	OutputStream os = Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) );
+    	try {
+    		Files.copy( newTempDir().resolve( "myfile.txt" ), os );
+    	}
+    	catch (Exception e) {
+    		os.close();
+    		throw e;
+    	}
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyPath2OutNull1() throws IOException {
-        Files.copy( null, Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) ) );
+    	OutputStream os = Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) );
+    	try {
+    		Files.copy( null, os );
+    	}
+    	catch (Exception e) {
+    		os.close();
+    		throw e;
+    	}
     }
 
     @Test(expected = IllegalArgumentException.class)

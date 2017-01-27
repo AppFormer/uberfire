@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 import org.uberfire.java.nio.IOException;
+import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.base.FileSystemId;
 import org.uberfire.java.nio.base.GeneralPathImpl;
 import org.uberfire.java.nio.file.FileSystem;
@@ -107,10 +108,11 @@ public abstract class BaseSimpleFileSystem implements FileSystem,
         }
         final StringBuilder sb = new StringBuilder();
         sb.append( first );
+        String separator = AbstractPath.getSeparator(first);
         for ( final String segment : more ) {
             if ( segment.length() > 0 ) {
                 if ( sb.length() > 0 ) {
-                    sb.append( getSeparator() );
+                    sb.append( separator );
                 }
                 sb.append( segment );
             }
@@ -124,11 +126,8 @@ public abstract class BaseSimpleFileSystem implements FileSystem,
                 return path;
             }
         }
-        if ( path.endsWith( getSeparator() ) ) {
-            return path.substring( 0, path.length() - getSeparator().length() );
-        }
 
-        return path;
+        return AbstractPath.removeTrailingSeparator(path);
     }
 
     @Override

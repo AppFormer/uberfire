@@ -1,0 +1,21 @@
+#!/bin/sh
+awk '
+BEGIN {
+	test = ""
+	totalFailures = 0;
+	totalErrors = 0;
+}
+/^Running / { test = $0 }
+/^Tests run.*Failures: [^0]/ {
+	print test; print
+	totalFailures += $5;
+}
+/^Tests run.*Errors: [^0]/ {
+	print test; print
+	totalErrors += $7;
+}
+END {
+	print "==========================================";
+	print "Total Failures: ",totalFailures," Total Errors: ",totalErrors;
+}
+' <mvn.out

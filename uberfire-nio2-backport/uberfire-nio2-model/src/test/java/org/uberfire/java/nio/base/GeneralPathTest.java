@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.URI;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
@@ -34,8 +35,19 @@ import static org.mockito.Mockito.*;
 public class GeneralPathTest {
 
     private static final String DEFAULT_PATH = new File( "" ).getAbsolutePath().replace('\\','/') + "/";
+    private String DEFAULT_URI = null;
 
     final FileSystem fs = mock( FileSystem.class );
+	boolean isWindows;
+	
+	@Before
+	public void initialize() {
+		isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+		if (isWindows)
+			DEFAULT_URI = "/" + DEFAULT_PATH;
+		else
+			DEFAULT_URI = DEFAULT_PATH;
+	}
 
     @Test
     public void testSimpleAbsoluteUnix() {
@@ -413,9 +425,9 @@ public class GeneralPathTest {
         assertThat( path ).isNotNull();
         assertThat( uri ).isNotNull();
 
-        assertThat( uri.toString() ).isEqualTo( "default://" + DEFAULT_PATH + "path/to/file.txt" );
+        assertThat( uri.toString() ).isEqualTo( "default://" + DEFAULT_URI + "path/to/file.txt" );
 
-        assertThat( path.toRealPath().toUri().toString() ).isEqualTo( "file://" + DEFAULT_PATH + "path/to/file.txt" );
+        assertThat( path.toRealPath().toUri().toString() ).isEqualTo( "file://" + DEFAULT_URI + "path/to/file.txt" );
     }
 
     @Test

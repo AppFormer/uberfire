@@ -79,19 +79,14 @@ public class GeneralPathImpl
     @Override
     protected String defaultDirectory() {
         if ( usesWindowsFormat ) {
-            final String result = new File( "" ).getAbsolutePath().replaceAll( "/", "\\\\" ) + "\\";
+            final String result = new File( "" ).getAbsolutePath().replace( UNIX_SEPARATOR_STRING, WINDOWS_SEPARATOR_STRING ) + WINDOWS_SEPARATOR_STRING;
 
             if ( !hasWindowsDriver( result ) ) {
                 return DEFAULT_WINDOWS_DRIVER + result;
             }
             return result;
         }
-        return new File( "" ).getAbsolutePath() + "/";
-    }
-
-    private boolean hasWindowsDriver( final String text ) {
-        checkNotEmpty( "text", text );
-        return WINDOWS_DRIVER.matcher( text ).matches();
+        return new File( "" ).getAbsolutePath() + UNIX_SEPARATOR_STRING;
     }
 
     public static GeneralPathImpl newFromFile( final FileSystem fs,
