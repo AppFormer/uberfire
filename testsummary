@@ -1,0 +1,9 @@
+#!/bin/sh
+awk '
+BEGIN {
+test = ""
+}
+/^Running / { test = $0 }
+/^Tests run.*Failures: [^0]/ { print test; print }
+/^Tests run.*Errors: [^0]/ { print test; print }
+' <mvn.out
