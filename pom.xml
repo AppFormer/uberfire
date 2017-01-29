@@ -77,7 +77,6 @@
     <!-- Make OSGi happy -->
     <osgi.snapshot.qualifier>${maven.build.timestamp}</osgi.snapshot.qualifier>
     <!-- TODO fix all the modules to have all direct dependencies specified, then remove this property -->
-    <illegaltransitivereportonly>true</illegaltransitivereportonly>
     <!-- Using origin-repository.jboss.org as that is the canonical URL for deployment. repository.jboss.org is just a proxy
          which should delegate the calls to origin-repository.jboss.org, but that is often buggy. Using the canonical URL
          directly should help to avoid some of the issues with deploying artifacts. -->
@@ -207,6 +206,21 @@
                   </banDuplicateClasses>
                 </rules>
                 <fail>true</fail>
+              </configuration>
+            </execution>
+            <execution>
+              <id>enforce-direct-dependencies</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <illegalTransitiveDependencyCheck implementation="de.is24.maven.enforcer.rules.IllegalTransitiveDependencyCheck">
+                    <regexIgnoredClasses combine.children="append">
+                      <regexIgnoredClass>org\.uberfire\..+</regexIgnoredClass>
+                    </regexIgnoredClasses>
+                  </illegalTransitiveDependencyCheck>
+                </rules>
               </configuration>
             </execution>
           </executions>
