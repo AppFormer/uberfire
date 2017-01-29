@@ -82,6 +82,22 @@ public class ConfigProperties {
     }
 
     /**
+     * Returns the ConfigProperty instance corresponding to the configured value of the given property, or the default
+     * if no configured value exists.
+     * If the property does not exist or its value is empty, it throws an unchecked runtime exception.
+     *
+     * @param name The property name. Must not be null.
+     * @param defaultValue The value to use if no configured value exists. May be null.
+     * @return The config property instance.
+     */
+    public ConfigProperty getOrFail( String name, String defaultValue ) {
+        ConfigProperty p = get( name, defaultValue );
+        if (!isConfigPropertySet(p))
+            throw new IllegalArgumentException("Property '" + name + "' is mandatory and not set.");
+        return p;
+    }
+
+    /**
      * Returns a multi-line string containing a list of all the properties that were retrieved from this instance, in
      * the order they were retrieved. Does not list unused values from the map given in the constructor, since these may
      * contain a lot of unrelated information (for example, when using System.getProperties()). This is useful for
@@ -92,7 +108,7 @@ public class ConfigProperties {
      *            a line of text to print before listing the configuration values
      */
     public String getConfigurationSummary( String heading ) {
-        final String newLine = System.getProperty( "line.separator" );
+        final String newLine = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder( heading );
         for ( ConfigProperty cp : configSummary ) {
             sb.append( newLine ).append( cp );
@@ -163,6 +179,16 @@ public class ConfigProperties {
         public String toString() {
             return name + " = \"" + value + "\"" + (isDefault ? " (Defaulted)" : "");
         }
+    }
+
+    protected static boolean isConfigPropertySet(ConfigProperties.ConfigProperty property) {
+        if (property == null) return false;
+        String value = property.getValue();
+        return !isEmpty(value);
+    }
+
+    protected static boolean isEmpty(String s) {
+        return s == null || s.trim().length() == 0;
     }
 
 }
