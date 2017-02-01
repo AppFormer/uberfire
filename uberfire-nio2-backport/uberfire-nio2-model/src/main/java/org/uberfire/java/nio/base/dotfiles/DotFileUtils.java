@@ -82,6 +82,13 @@ public final class DotFileUtils {
         return path.resolveSibling( "." + path.getFileName() );
     }
 
+    public static Path undot(final Path path) {
+        if (!path.getFileName().toString().startsWith(".")) {
+            return path;
+        }
+        return path.resolveSibling(path.getFileName().toString().substring(1));
+    }
+
     public static FileAttribute<?>[] consolidate( final Map<String, Object> props,
                                                   final FileAttribute<?>... attrs ) {
         if ( props == null || props.size() == 0 ) {
