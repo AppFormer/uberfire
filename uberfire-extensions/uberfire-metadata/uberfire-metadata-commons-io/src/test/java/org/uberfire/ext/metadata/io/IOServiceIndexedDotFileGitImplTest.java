@@ -18,6 +18,7 @@ package org.uberfire.ext.metadata.io;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -42,9 +43,12 @@ public class IOServiceIndexedDotFileGitImplTest extends BaseIndexTest {
         return new String[]{this.getClass().getSimpleName()};
     }
 
-    @Test
-    public void testIndexedDotFile() throws IOException, InterruptedException {
+    @Test(timeout = 1000)
+    public void testIndexedDotFile() throws IOException, InterruptedException, ExecutionException {
         final Path path = getBasePath(this.getClass().getSimpleName()).resolve("dotFile.txt");
+        observer.addInformationCallback(IndexObserverCallback.NOP);
+        observer.addInformationCallback(() -> assertIndex(path));
+
         //Write the "real path" with no attributes and hence no "dot file"
         ioService().write(path,
                           "ooooo!",
@@ -56,8 +60,10 @@ public class IOServiceIndexedDotFileGitImplTest extends BaseIndexTest {
                           Collections.<OpenOption>emptySet(),
                           getFileAttributes());
 
-        Thread.sleep(5000); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
+        observer.poll();
+    }
 
+    private void assertIndex(final Path path) throws IOException {
         final MetaObject mo = config.getMetaModelStore().getMetaObject(Path.class.getName());
 
         assertNotNull(mo);
@@ -67,9 +73,7 @@ public class IOServiceIndexedDotFileGitImplTest extends BaseIndexTest {
         assertTrue(mo.getProperty("name").getTypes().contains(String.class));
 
         final Index index = config.getIndexManager().get(toKCluster(path.getFileSystem()));
-
         final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
-
         final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
 
         searcher.search(new TermQuery(new Term("name",

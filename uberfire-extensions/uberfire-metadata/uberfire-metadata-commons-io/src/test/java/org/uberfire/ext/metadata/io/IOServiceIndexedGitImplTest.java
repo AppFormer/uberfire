@@ -29,14 +29,12 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.junit.Test;
 import org.uberfire.ext.metadata.backend.lucene.index.LuceneIndex;
 import org.uberfire.ext.metadata.engine.Index;
-import org.uberfire.ext.metadata.model.KObject;
 import org.uberfire.java.nio.file.OpenOption;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.attribute.FileAttribute;
 
 import static org.junit.Assert.*;
-import static org.uberfire.ext.metadata.backend.lucene.util.KObjectUtil.toKObject;
-import static org.uberfire.ext.metadata.io.KObjectUtil.*;
+import static org.uberfire.ext.metadata.io.KObjectUtil.toKCluster;
 
 public class IOServiceIndexedGitImplTest extends BaseIndexTest {
 
@@ -44,129 +42,142 @@ public class IOServiceIndexedGitImplTest extends BaseIndexTest {
 
     @Override
     protected String[] getRepositoryNames() {
-        return new String[]{ this.getClass().getSimpleName() };
+        return new String[]{this.getClass().getSimpleName()};
     }
 
     @Test
     public void testIndexedFile() throws IOException, InterruptedException {
-        final Path path1 = getBasePath( this.getClass().getSimpleName() ).resolve( "myIndexedFile.txt" );
-        ioService().write( path1,
-                           "ooooo!",
-                           Collections.<OpenOption>emptySet(),
-                           new FileAttribute<Object>() {
-                               @Override
-                               public String name() {
-                                   return "custom";
-                               }
+        final Path path1 = getBasePath(this.getClass().getSimpleName()).resolve("myIndexedFile.txt");
+        final Path path2 = getBasePath(this.getClass().getSimpleName()).resolve("myOtherIndexedFile.txt");
 
-                               @Override
-                               public Object value() {
-                                   return dateValue;
-                               }
-                           },
-                           new FileAttribute<String>() {
-                               @Override
-                               public String name() {
-                                   return "int.hello";
-                               }
+        observer.addInformationCallback(IndexObserverCallback.NOP);
+        observer.addInformationCallback(() -> assertIndex(path2));
 
-                               @Override
-                               public String value() {
-                                   return "hello some world jhere";
-                               }
-                           },
-                           new FileAttribute<Integer>() {
-                               @Override
-                               public String name() {
-                                   return "int";
-                               }
+        ioService().write(path1,
+                          "ooooo!",
+                          Collections.<OpenOption>emptySet(),
+                          new FileAttribute<Object>() {
+                              @Override
+                              public String name() {
+                                  return "custom";
+                              }
 
-                               @Override
-                               public Integer value() {
-                                   return 10;
-                               }
-                           }
-                         );
+                              @Override
+                              public Object value() {
+                                  return dateValue;
+                              }
+                          },
+                          new FileAttribute<String>() {
+                              @Override
+                              public String name() {
+                                  return "int.hello";
+                              }
 
-        final Path path2 = getBasePath( this.getClass().getSimpleName() ).resolve( "myOtherIndexedFile.txt" );
-        ioService().write( path2,
-                           "ooooo!",
-                           Collections.<OpenOption>emptySet(),
-                           new FileAttribute<String>() {
-                               @Override
-                               public String name() {
-                                   return "int.hello";
-                               }
+                              @Override
+                              public String value() {
+                                  return "hello some world jhere";
+                              }
+                          },
+                          new FileAttribute<Integer>() {
+                              @Override
+                              public String name() {
+                                  return "int";
+                              }
 
-                               @Override
-                               public String value() {
-                                   return "jhere";
-                               }
-                           } );
+                              @Override
+                              public Integer value() {
+                                  return 10;
+                              }
+                          }
+        );
 
-        Thread.sleep( 5000 ); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ) );
+        ioService().write(path2,
+                          "ooooo!",
+                          Collections.<OpenOption>emptySet(),
+                          new FileAttribute<String>() {
+                              @Override
+                              public String name() {
+                                  return "int.hello";
+                              }
 
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int" ) );
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int.hello" ) );
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "custom" ) );
+                              @Override
+                              public String value() {
+                                  return "jhere";
+                              }
+                          });
 
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int" ) );
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int.hello" ) );
-        assertNotNull( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "custom" ) );
-
-        assertEquals( 1, config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int" ).getTypes().size() );
-        assertEquals( 1, config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int.hello" ).getTypes().size() );
-        assertEquals( 1, config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "custom" ).getTypes().size() );
-
-        assertTrue( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int" ).getTypes().contains( Integer.class ) );
-        assertTrue( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "int.hello" ).getTypes().contains( String.class ) );
-        assertTrue( config.getMetaModelStore().getMetaObject( Path.class.getName() ).getProperty( "custom" ).getTypes().contains( Date.class ) );
-
-        final Index index = config.getIndexManager().get( toKCluster( path2.getFileSystem() ) );
-
-        final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new TermQuery( new Term( "int.hello", "world" ) ), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 1,
-                          hits.length );
-        }
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new TermQuery( new Term( "int.hello", "jhere" ) ), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 2,
-                          hits.length );
-        }
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new MatchAllDocsQuery(), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 2,
-                          hits.length );
-        }
-
-        ( (LuceneIndex) index ).nrtRelease( searcher );
+        observer.poll();
     }
 
+    private void assertIndex(final Path path) throws IOException {
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()));
+
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int"));
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int.hello"));
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("custom"));
+
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int"));
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int.hello"));
+        assertNotNull(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("custom"));
+
+        assertEquals(1,
+                     config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int").getTypes().size());
+        assertEquals(1,
+                     config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int.hello").getTypes().size());
+        assertEquals(1,
+                     config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("custom").getTypes().size());
+
+        assertTrue(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int").getTypes().contains(Integer.class));
+        assertTrue(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("int.hello").getTypes().contains(String.class));
+        assertTrue(config.getMetaModelStore().getMetaObject(Path.class.getName()).getProperty("custom").getTypes().contains(Date.class));
+
+        final Index index = config.getIndexManager().get(toKCluster(path.getFileSystem()));
+        final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
+
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+            searcher.search(new TermQuery(new Term("int.hello",
+                                                   "world")),
+                            collector);
+
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            listHitPaths(searcher,
+                         hits);
+
+            assertEquals(1,
+                         hits.length);
+        }
+
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+            searcher.search(new TermQuery(new Term("int.hello",
+                                                   "jhere")),
+                            collector);
+
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            listHitPaths(searcher,
+                         hits);
+
+            assertEquals(2,
+                         hits.length);
+        }
+
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+            searcher.search(new MatchAllDocsQuery(),
+                            collector);
+
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            listHitPaths(searcher,
+                         hits);
+
+            assertEquals(2,
+                         hits.length);
+        }
+
+        ((LuceneIndex) index).nrtRelease(searcher);
+    }
 }
