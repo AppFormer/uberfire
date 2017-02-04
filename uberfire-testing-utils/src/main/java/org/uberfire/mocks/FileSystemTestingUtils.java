@@ -81,4 +81,10 @@ public class FileSystemTestingUtils {
     public IOService getIoService() {
         return ioService;
     }
+    
+    public static String normalizeLineEndings( String text ) {
+        if ( text != null && text.length() > 0 )
+            return text.replace( "\r\n", "\n" );
+        return text;
+    }
 }

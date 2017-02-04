@@ -63,7 +63,7 @@ public class LayoutServicesImplTest {
     private static String loadSample( String file ) {
         try {
             return IOUtils.toString(new LayoutServicesImplTest().getClass().getResourceAsStream( file),
-                    "UTF-8");
+                    "UTF-8").replace( "\r\n", "\n" );
         } catch ( IOException e ) {
             return "";
         }

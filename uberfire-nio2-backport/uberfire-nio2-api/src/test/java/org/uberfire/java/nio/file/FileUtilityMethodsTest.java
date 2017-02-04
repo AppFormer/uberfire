@@ -41,16 +41,23 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
         final Path dir = newTempDir();
 
         final OutputStream out = Files.newOutputStream( dir.resolve( "file.txt" ) );
-        assertThat( out ).isNotNull();
-
-        out.write( "content".getBytes() );
-        out.close();
+        try {
+            assertThat( out ).isNotNull();
+            out.write( "content".getBytes() );
+        }
+        finally {
+            out.close();
+        }
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "file.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
         try {
             reader.read();
             fail( "can't read closed stream" );
@@ -87,16 +94,24 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
     public void newBufferedWriter() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
-
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
+        
         Files.newBufferedWriter( Files.createTempFile( null, null ), Charset.defaultCharset() );
     }
 
@@ -119,56 +134,102 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
     public void copyIn2Path() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ) );
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        try {
+            Files.copy( is, dir.resolve( "my_new_file.txt" ) );
+        }
+        finally {
+            is.close();
+        }
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
     }
 
     @Test
     public void copyIn2PathReplaceExisting() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
         final BufferedWriter writer2 = Files.newBufferedWriter( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
-        assertThat( writer2 ).isNotNull();
-        writer2.write( "empty_content" );
-        writer2.close();
-
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
-
+        try {
+            assertThat( writer2 ).isNotNull();
+            writer2.write( "empty_content" );
+        }
+        finally {
+            writer2.close();
+        }
+        
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        try {
+            Files.copy( is, dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        }
+        finally {
+            is.close();
+        }
+        
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
     }
 
     @Test
     public void copyIn2PathReplaceExistingNotExists() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
-        Files.copy( Files.newInputStream( dir.resolve( "myfile.txt" ) ), dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        InputStream is = Files.newInputStream( dir.resolve( "myfile.txt" ) );
+        try {
+            Files.copy( is, dir.resolve( "my_new_file.txt" ), REPLACE_EXISTING );
+        }
+        finally {
+            is.close();
+        }
 
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -178,49 +239,99 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull2() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), null, REPLACE_EXISTING );
+        InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+        try {
+            Files.copy( is, null, REPLACE_EXISTING );
+        }
+        finally {
+            is.close();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull3() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), null );
+        InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+        try {
+            Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), null );
+        }
+        finally {
+            is.close();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyIn2PathNull4() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), new CopyOption[]{ null } );
+        InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+        try {
+            Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), new CopyOption[]{ null } );
+        }
+        finally {
+            is.close();
+        }
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void copyIn2PathInvalidOption() throws IOException {
-        Files.copy( Files.newInputStream( Files.createTempFile( "foo", "bar" ) ), newTempDir().resolve( "my_new_file.txt" ), NOFOLLOW_LINKS );
+        InputStream is = Files.newInputStream( Files.createTempFile( "foo", "bar" ) );
+        try {
+            Files.copy( is, newTempDir().resolve( "my_new_file.txt" ), NOFOLLOW_LINKS );
+        }
+        finally {
+            is.close();
+        }
     }
 
     @Test
     public void copyPath2Out() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
-        Files.copy( dir.resolve( "myfile.txt" ), Files.newOutputStream( dir.resolve( "my_new_file.txt" ) ) );
-
+        OutputStream  os = Files.newOutputStream( dir.resolve( "my_new_file.txt" ) );
+        try {
+            Files.copy( dir.resolve( "myfile.txt" ), os );
+        }
+        finally {
+            os.close();
+        }
+        
         final BufferedReader reader = Files.newBufferedReader( dir.resolve( "my_new_file.txt" ), Charset.defaultCharset() );
-        assertThat( reader ).isNotNull();
-        assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
-        assertThat( reader.readLine() ).isNull();
-        reader.close();
+        try {
+            assertThat( reader ).isNotNull();
+            assertThat( reader.readLine() ).isNotNull().isEqualTo( "content" );
+            assertThat( reader.readLine() ).isNull();
+        }
+        finally {
+            reader.close();
+        }
     }
 
     @Test(expected = NoSuchFileException.class)
     public void copyPath2OutNotExists() throws IOException {
-        Files.copy( newTempDir().resolve( "myfile.txt" ), Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) ) );
+        OutputStream os = Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) );
+        try {
+            Files.copy( newTempDir().resolve( "myfile.txt" ), os );
+        }
+        finally {
+            os.close();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void copyPath2OutNull1() throws IOException {
-        Files.copy( null, Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) ) );
+        OutputStream os = Files.newOutputStream( newTempDir().resolve( "my_new_file.txt" ) );
+        try {
+            Files.copy( null, os );
+        }
+        finally {
+            os.close();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -237,9 +348,13 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
     public void readAllBytes() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+           finally {
+               writer.close();
+           }
 
         final byte[] result = Files.readAllBytes( dir.resolve( "myfile.txt" ) );
 
@@ -251,9 +366,12 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
     public void readAllBytesOutOfMemory() throws IOException {
         final Path file = newTempDir().resolve( "file.big" );
         final RandomAccessFile f = new RandomAccessFile( file.toFile(), "rw" );
-        f.setLength( Integer.MAX_VALUE + 1L );
-
-        f.close();
+        try {
+            f.setLength( Integer.MAX_VALUE + 1L );
+        }
+        finally {
+            f.close();
+        }
 
         Files.readAllBytes( file );
     }
@@ -277,17 +395,25 @@ public class FileUtilityMethodsTest extends AbstractBaseTest {
     public void readAllLines() throws IOException {
         final Path dir = newTempDir();
         final BufferedWriter writer = Files.newBufferedWriter( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
-        assertThat( writer ).isNotNull();
-        writer.write( "content" );
-        writer.close();
+        try {
+            assertThat( writer ).isNotNull();
+            writer.write( "content" );
+        }
+        finally {
+            writer.close();
+        }
 
         final List<String> result = Files.readAllLines( dir.resolve( "myfile.txt" ), Charset.defaultCharset() );
         assertThat( result ).isNotEmpty().hasSize( 1 ).contains( "content", Index.atIndex( 0 ) );
 
         final BufferedWriter writer2 = Files.newBufferedWriter( dir.resolve( "myfile2.txt" ), Charset.defaultCharset() );
-        assertThat( writer2 ).isNotNull();
-        writer2.write( "content\nnewFile\nline" );
-        writer2.close();
+        try {
+            assertThat( writer2 ).isNotNull();
+            writer2.write( "content\nnewFile\nline" );
+        }
+        finally {
+            writer2.close();
+        }
 
         final List<String> result2 = Files.readAllLines( dir.resolve( "myfile2.txt" ), Charset.defaultCharset() );
         assertThat( result2 ).isNotEmpty().hasSize( 3 )

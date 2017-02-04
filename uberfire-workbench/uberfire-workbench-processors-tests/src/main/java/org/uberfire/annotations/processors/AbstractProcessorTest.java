@@ -35,6 +35,7 @@ import javax.tools.ToolProvider;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.uberfire.mocks.FileSystemTestingUtils.normalizeLineEndings;
 
 /**
  * Base miscfeatures to generate source code with an Annotation Processor
@@ -56,7 +57,7 @@ public abstract class AbstractProcessorTest {
         }
 
         public void setExpectedCode( final String expectedCode ) {
-            this.expectedCode = expectedCode;
+            this.expectedCode = normalizeLineEndings( expectedCode );
         }
 
         public String getActualCode() {
@@ -64,7 +65,7 @@ public abstract class AbstractProcessorTest {
         }
 
         public void setActualCode( final String actualCode ) {
-            this.actualCode = actualCode;
+            this.actualCode = normalizeLineEndings( actualCode );
         }
     }
 

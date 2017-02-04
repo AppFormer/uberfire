@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.uberfire.mocks.FileSystemTestingUtils.normalizeLineEndings;
 
 public class GWTLocaleHeaderFilterTest {
 
@@ -50,7 +51,9 @@ public class GWTLocaleHeaderFilterTest {
 
         localeHeaderFilter.doFilter( req, resp, chain );
 
-        assertEquals( new Scanner( getClass().getResourceAsStream( "/expected-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next(), sw.toString() );
+        String s1 = new Scanner( getClass().getResourceAsStream( "/expected-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next();
+        String s2 = sw.toString();
+        assertEquals( normalizeLineEndings( s1 ), normalizeLineEndings( s2 ) );
     }
 
     @Test
@@ -69,7 +72,9 @@ public class GWTLocaleHeaderFilterTest {
 
         localeHeaderFilter.doFilter( req, resp, chain );
 
-        assertEquals( new Scanner( getClass().getResourceAsStream( "/expected-2-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next(), sw.toString() );
+        String s1 = new Scanner( getClass().getResourceAsStream( "/expected-2-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next();
+        String s2 = sw.toString();
+        assertEquals( normalizeLineEndings( s1 ), normalizeLineEndings( s2 ) );
     }
 
     @Test
@@ -88,7 +93,9 @@ public class GWTLocaleHeaderFilterTest {
 
         localeHeaderFilter.doFilter( req, resp, chain );
 
-        assertEquals( new Scanner( getClass().getResourceAsStream( "/expected-3-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next(), sw.toString() );
+        String s1 = new Scanner( getClass().getResourceAsStream( "/expected-3-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next();
+        String s2 = sw.toString();
+        assertEquals( normalizeLineEndings( s1 ), normalizeLineEndings( s2 ) );
     }
 
     @Test
@@ -108,7 +115,9 @@ public class GWTLocaleHeaderFilterTest {
 
         localeHeaderFilter.doFilter( req, resp, chain );
 
-        assertEquals( new Scanner( getClass().getResourceAsStream( "/expected-4-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next(), sw.toString() );
+        String s1 = new Scanner( getClass().getResourceAsStream( "/expected-4-sample.html" ), "UTF-8" ).useDelimiter( "\\A" ).next();
+        String s2 = sw.toString();
+        assertEquals( normalizeLineEndings( s1 ), normalizeLineEndings( s2 ) );
     }
 
     private GWTLocaleHeaderFilter getFilter() {

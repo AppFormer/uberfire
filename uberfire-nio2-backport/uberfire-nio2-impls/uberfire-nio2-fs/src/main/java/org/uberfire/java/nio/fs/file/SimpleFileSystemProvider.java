@@ -66,6 +66,7 @@ import org.uberfire.java.nio.file.spi.FileSystemProvider;
 
 import static org.uberfire.commons.validation.Preconditions.*;
 import static org.uberfire.java.nio.file.StandardOpenOption.*;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 public class SimpleFileSystemProvider implements FileSystemProvider {
 
@@ -74,17 +75,6 @@ public class SimpleFileSystemProvider implements FileSystemProvider {
     private boolean isDefault;
     private final OSType osType;
     private final File[] roots;
-
-    enum OSType {
-        WINDOWS, UNIX_LIKE;
-
-        public static OSType currentOS() {
-            if ( System.getProperty( "os.name" ).toLowerCase().indexOf( "win" ) >= 0 ) {
-                return WINDOWS;
-            }
-            return UNIX_LIKE;
-        }
-    }
 
     public SimpleFileSystemProvider() {
         this( File.listRoots(), OSType.currentOS() );

@@ -32,6 +32,7 @@ import org.uberfire.java.nio.file.attribute.FileTime;
 import org.uberfire.java.nio.file.spi.FileSystemProvider;
 import org.uberfire.java.nio.fs.file.SimpleWindowsFileStore;
 import org.uberfire.java.nio.fs.file.SimpleWindowsFileSystem;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,11 +49,19 @@ public class SimpleWindowsFileStoreTest {
         final Path path = GeneralPathImpl.create( fileSystem, "something", false );
         final FileStore fileStore = new SimpleWindowsFileStore( roots, path );
 
+        if ( OSType.currentOS() == OSType.WINDOWS ) {
+            assertThat( fileStore.getTotalSpace() ).isNotEqualTo( 0L );
+            assertThat( fileStore.getUsableSpace() ).isNotEqualTo( 0L );
+        }
+        else {
+            // Results are different if this windows-specific test is run on a linux system 
+            assertThat( fileStore.getTotalSpace() ).isEqualTo( 0L );
+            assertThat( fileStore.getUsableSpace() ).isEqualTo( 0L );
+        }
+
         assertThat( fileStore.name() ).isNotNull().isEqualTo( "c:\\" );
         assertThat( fileStore.type() ).isNull();
         assertThat( fileStore.isReadOnly() ).isFalse();
-        assertThat( fileStore.getTotalSpace() ).isEqualTo( 0L );
-        assertThat( fileStore.getUsableSpace() ).isEqualTo( 0L );
 
         assertThat( fileStore.supportsFileAttributeView( BasicFileAttributeView.class ) ).isTrue();
         assertThat( fileStore.supportsFileAttributeView( MyFileAttributeView.class ) ).isFalse();
@@ -119,6 +128,45 @@ public class SimpleWindowsFileStoreTest {
         new SimpleWindowsFileStore( roots, nonNullPath ).getAttribute( "" );
     }
 
+    @Test
+    public void absoluteAndRelativePathTest() {
+        Path absolutePathWithDriveSpec = GeneralPathImpl.create( fileSystem, "c:\\path\\to\\file", false );
+        Path absolutePathWithoutDriveSpec = GeneralPathImpl.create( fileSystem, "\\path\\to\\file", false );
+        Path relativePath = GeneralPathImpl.create( fileSystem, "path\\to\\file", false );
+        SimpleWindowsFileStore fs;
+        
+        fs = new SimpleWindowsFileStore( roots, absolutePathWithDriveSpec );
+        System.out.println( fs.name() );
+        
+        fs = new SimpleWindowsFileStore( roots, absolutePathWithoutDriveSpec );
+        System.out.println( fs.name() );
+        
+        fs = new SimpleWindowsFileStore( roots, relativePath );
+        System.out.println( fs.name() );
+
+        try {
+            fs = new SimpleWindowsFileStore( new File[] { new File("d:\\") }, absolutePathWithDriveSpec );
+            fail("Should not be able to create FS with D: root given C: path");
+        }
+        catch ( IllegalStateException e ) {
+        }
+
+        try {
+            fs = new SimpleWindowsFileStore( new File[] { new File("d:\\") }, absolutePathWithoutDriveSpec );
+            fail("Should not be able to create FS with D: root given relative path");
+        }
+        catch ( IllegalStateException e ) {
+        }
+        
+
+        try {
+            fs = new SimpleWindowsFileStore( new File[] { new File("a:\\") }, relativePath );
+            fail("Should not be able to create FS with A: root given relative path");
+        }
+        catch ( IllegalStateException e ) {
+        }
+    }
+    
     private static class MyFileAttributeView implements FileAttributeView {
 
         @Override
