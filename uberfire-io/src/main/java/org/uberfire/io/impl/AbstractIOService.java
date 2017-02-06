@@ -626,7 +626,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable,
                        final byte[] bytes,
                        final Set<? extends OpenOption> options,
                        final FileAttribute<?>... attrs ) throws IllegalArgumentException, IOException, UnsupportedOperationException {
-        SeekableByteChannel byteChannel = null;
+        SeekableByteChannel byteChannel;
         try {
             byteChannel = newByteChannel( path, buildOptions( options ), attrs );
         } catch ( final FileAlreadyExistsException ex ) {
@@ -639,11 +639,13 @@ public abstract class AbstractIOService implements IOServiceIdentifiable,
         } catch ( final java.io.IOException e ) {
             throw new IOException( e );
         }
-        if (byteChannel!=null) {
-            try {
-                byteChannel.close();
-            } catch (java.io.IOException e) {
-                throw new IOException( e );
+        finally {
+            if ( byteChannel != null ) {
+                try {
+                    byteChannel.close();
+                } catch (java.io.IOException e) {
+                    throw new IOException( e );
+                }
             }
         }
 

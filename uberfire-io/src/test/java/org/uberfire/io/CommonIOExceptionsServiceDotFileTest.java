@@ -16,6 +16,8 @@
 
 package org.uberfire.io;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
 
@@ -72,6 +74,7 @@ public abstract class CommonIOExceptionsServiceDotFileTest extends CommonIOServi
         try {
             channel.close();
         } catch ( IOException e ) {
+            fail("Can't close output channel");
         }
     }
 
