@@ -16,27 +16,26 @@
 
 package org.uberfire.ext.metadata.io;
 
-import static org.uberfire.ext.metadata.backend.lucene.util.KObjectUtil.toKObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.uberfire.ext.metadata.backend.lucene.LuceneConfig;
 import org.uberfire.ext.metadata.backend.lucene.LuceneConfigBuilder;
+import org.uberfire.ext.metadata.engine.Observer;
 import org.uberfire.ext.metadata.model.KObject;
 import org.uberfire.io.IOService;
 import org.uberfire.io.attribute.DublinCoreView;
@@ -44,9 +43,11 @@ import org.uberfire.java.nio.base.version.VersionAttributeView;
 import org.uberfire.java.nio.file.FileSystemAlreadyExistsException;
 import org.uberfire.java.nio.file.Path;
 
+import static org.uberfire.ext.metadata.backend.lucene.util.KObjectUtil.toKObject;
+
 public abstract class BaseIndexTest {
 
-    private int seed = new Random( 10L ).nextInt();
+    private int seed = new Random(10L).nextInt();
 
     protected boolean created = false;
     protected static final Map<String, Path> basePaths = new HashMap<String, Path>();
@@ -54,69 +55,144 @@ public abstract class BaseIndexTest {
     protected LuceneConfig config;
     protected IOService ioService = null;
 
+    protected interface IndexObserverCallback {
+
+        IndexObserverCallback NOP = () -> {/*nothing*/};
+
+        void onCallback() throws Exception;
+    }
+
+    protected class IndexObserver implements Observer {
+
+        private int observedInfoMessages = 0;
+        private List<Optional<IndexObserverCallback>> infoCallbacks = new ArrayList<>();
+
+        private List<String> informationMessages = new ArrayList<String>();
+        private List<String> warningMessages = new ArrayList<String>();
+        private List<String> errorMessages = new ArrayList<String>();
+
+        public void reset() {
+            infoCallbacks.clear();
+            warningMessages.clear();
+            errorMessages.clear();
+            infoCallbacks.clear();
+            observedInfoMessages = 0;
+        }
+
+        public void addInformationCallback(final IndexObserverCallback infoCallback) {
+            this.infoCallbacks.add(Optional.ofNullable(infoCallback));
+        }
+
+        @Override
+        public void information(final String message) {
+            informationMessages.add(message);
+            try {
+                infoCallbacks.get(observedInfoMessages++).orElse(IndexObserverCallback.NOP).onCallback();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        @Override
+        public void warning(final String message) {
+            warningMessages.add(message);
+        }
+
+        @Override
+        public void error(final String message) {
+            errorMessages.add(message);
+        }
+
+        public void poll() throws java.lang.InterruptedException {
+            while (informationMessages.size() < infoCallbacks.size()) {
+                Thread.sleep(10);
+            }
+        }
+
+        public List<String> getInformationMessages() {
+            return informationMessages;
+        }
+
+        public List<String> getWarningMessages() {
+            return warningMessages;
+        }
+
+        public List<String> getErrorMessages() {
+            return errorMessages;
+        }
+    }
+
+    protected IndexObserver observer = new IndexObserver();
+
     protected static final List<File> tempFiles = new ArrayList<File>();
 
     @AfterClass
     @BeforeClass
     public static void cleanup() {
-        for ( final File tempFile : tempFiles ) {
-            FileUtils.deleteQuietly( tempFile );
+        for (final File tempFile : tempFiles) {
+            FileUtils.deleteQuietly(tempFile);
+        }
+    }
+
+    @After
+    public void dispose() {
+        if(ioService!=null) {
+            ioService.dispose();
         }
     }
 
     protected IOService ioService() {
-        if ( ioService == null ) {
+        if (ioService == null) {
             config = new LuceneConfigBuilder()
                     .withInMemoryMetaModelStore()
                     .useDirectoryBasedIndex()
                     .useInMemoryDirectory()
                     .build();
 
-            ioService = new IOServiceIndexedImpl( config.getIndexEngine(),
-                                                  DublinCoreView.class,
-                                                  VersionAttributeView.class );
+            ioService = new IOServiceIndexedImpl(config.getIndexEngine(),
+                                                 observer,
+                                                 DublinCoreView.class,
+                                                 VersionAttributeView.class);
         }
         return ioService;
     }
 
     protected static File createTempDirectory() throws IOException {
-        final File temp = File.createTempFile( "temp", Long.toString( System.nanoTime() ) );
-        if ( !( temp.delete() ) ) {
-            throw new IOException( "Could not delete temp file: " + temp.getAbsolutePath() );
+        final File temp = File.createTempFile("temp",
+                                              Long.toString(System.nanoTime()));
+        if (!(temp.delete())) {
+            throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
         }
-        if ( !( temp.mkdir() ) ) {
-            throw new IOException( "Could not create temp directory: " + temp.getAbsolutePath() );
+        if (!(temp.mkdir())) {
+            throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
         }
-        tempFiles.add( temp );
+        tempFiles.add(temp);
         return temp;
     }
 
     @Before
     public void setup() throws IOException {
         IndexersFactory.clear();
-        if ( !created ) {
+        if (!created) {
             final String path = createTempDirectory().getAbsolutePath();
-            System.setProperty( "org.uberfire.nio.git.dir",
-                                path );
-            System.out.println( ".niogit: " + path );
+            System.setProperty("org.uberfire.nio.git.dir",
+                               path);
+            System.out.println(".niogit: " + path);
 
-            for ( String repositoryName : getRepositoryNames() ) {
+            for (String repositoryName : getRepositoryNames()) {
 
-                final URI newRepo = URI.create( "git://" + repositoryName );
+                final URI newRepo = URI.create("git://" + repositoryName);
 
                 try {
-                    ioService().newFileSystem( newRepo,
-                                               new HashMap<String, Object>() );
+                    ioService().newFileSystem(newRepo,
+                                              new HashMap<String, Object>());
 
-                    final Path basePath = getDirectoryPath( repositoryName ).resolveSibling( "root" );
-                    basePaths.put( repositoryName,
-                                   basePath );
-
-                }
-                catch ( final FileSystemAlreadyExistsException ex ) {
+                    final Path basePath = getDirectoryPath(repositoryName).resolveSibling("root");
+                    basePaths.put(repositoryName,
+                                  basePath);
+                } catch (final FileSystemAlreadyExistsException ex) {
                     // ignored
-                }
-                finally {
+                } finally {
                     created = true;
                 }
             }
@@ -125,22 +201,21 @@ public abstract class BaseIndexTest {
 
     protected abstract String[] getRepositoryNames();
 
-    protected Path getBasePath( final String repositoryName ) {
-        return basePaths.get( repositoryName );
+    protected Path getBasePath(final String repositoryName) {
+        return basePaths.get(repositoryName);
     }
 
-    protected void listHitPaths( final IndexSearcher searcher,
-                                 final ScoreDoc[] hits ) throws IOException {
-        for ( int i = 0; i < hits.length; i++ ) {
-            final KObject ko = toKObject( searcher.doc( hits[ i ].doc ) );
-            System.out.println( ko.getKey() );
+    protected void listHitPaths(final IndexSearcher searcher,
+                                final ScoreDoc[] hits) throws IOException {
+        for (int i = 0; i < hits.length; i++) {
+            final KObject ko = toKObject(searcher.doc(hits[i].doc));
+            System.out.println(ko.getKey());
         }
     }
 
-    private Path getDirectoryPath( final String repositoryName ) {
-        final Path dir = ioService().get( URI.create( "git://" + repositoryName + "/_someDir" + seed ) );
-        ioService().deleteIfExists( dir );
+    private Path getDirectoryPath(final String repositoryName) {
+        final Path dir = ioService().get(URI.create("git://" + repositoryName + "/_someDir" + seed));
+        ioService().deleteIfExists(dir);
         return dir;
     }
-
 }

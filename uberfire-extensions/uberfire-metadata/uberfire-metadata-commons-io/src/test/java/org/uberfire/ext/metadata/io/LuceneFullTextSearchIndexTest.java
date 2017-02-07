@@ -38,25 +38,26 @@ import org.uberfire.java.nio.base.version.VersionAttributeView;
 import org.uberfire.java.nio.file.Path;
 
 import static org.junit.Assert.*;
-import static org.uberfire.ext.metadata.engine.MetaIndexEngine.*;
-import static org.uberfire.ext.metadata.io.KObjectUtil.*;
+import static org.uberfire.ext.metadata.engine.MetaIndexEngine.FULL_TEXT_FIELD;
+import static org.uberfire.ext.metadata.io.KObjectUtil.toKCluster;
 
 public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
 
     @Override
     protected IOService ioService() {
-        if ( ioService == null ) {
+        if (ioService == null) {
             config = new LuceneConfigBuilder()
                     .withInMemoryMetaModelStore()
                     .useDirectoryBasedIndex()
                     .useInMemoryDirectory()
                     .build();
 
-            ioService = new IOServiceIndexedImpl( config.getIndexEngine(),
-                                                  DublinCoreView.class,
-                                                  VersionAttributeView.class );
+            ioService = new IOServiceIndexedImpl(config.getIndexEngine(),
+                                                 observer,
+                                                 DublinCoreView.class,
+                                                 VersionAttributeView.class);
 
-            IndexersFactory.addIndexer( new MockIndexer() );
+            IndexersFactory.addIndexer(new MockIndexer());
         }
         return ioService;
     }
@@ -64,33 +65,32 @@ public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
     private static class MockIndexer implements Indexer {
 
         @Override
-        public boolean supportsPath( final Path path ) {
+        public boolean supportsPath(final Path path) {
             return true;
         }
 
         @Override
-        public KObject toKObject( final Path path ) {
-            return new TestKObjectWrapper( KObjectUtil.toKObject( path ) );
+        public KObject toKObject(final Path path) {
+            return new TestKObjectWrapper(KObjectUtil.toKObject(path));
         }
 
         @Override
-        public KObjectKey toKObjectKey( final Path path ) {
-            return new TestKObjectKeyWrapper( KObjectUtil.toKObjectKey( path ) );
+        public KObjectKey toKObjectKey(final Path path) {
+            return new TestKObjectKeyWrapper(KObjectUtil.toKObjectKey(path));
         }
-
     }
 
     private static class TestKObjectKeyWrapper implements KObjectKey {
 
         protected KObjectKey delegate;
 
-        private TestKObjectKeyWrapper( final KObjectKey delegate ) {
+        private TestKObjectKeyWrapper(final KObjectKey delegate) {
             this.delegate = delegate;
         }
 
         @Override
         public String getId() {
-            return delegate.getId()+"-refactoring";
+            return delegate.getId() + "-refactoring";
         }
 
         @Override
@@ -116,13 +116,13 @@ public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
 
     private static class TestKObjectWrapper extends TestKObjectKeyWrapper implements KObject {
 
-        private TestKObjectWrapper( final KObject delegate ) {
-            super( delegate );
+        private TestKObjectWrapper(final KObject delegate) {
+            super(delegate);
         }
 
         @Override
         public Iterable<KProperty<?>> getProperties() {
-            return ( (KObject) delegate ).getProperties();
+            return ((KObject) delegate).getProperties();
         }
 
         @Override
@@ -133,66 +133,78 @@ public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
 
     @Override
     protected String[] getRepositoryNames() {
-        return new String[]{ this.getClass().getSimpleName() };
+        return new String[]{this.getClass().getSimpleName()};
     }
 
-    @Test
+    @Test(timeout = 1000)
     public void testFullTextIndexedFile() throws IOException, InterruptedException {
-        final Path path1 = getBasePath( this.getClass().getSimpleName() ).resolve( "mydrlfile1.drl" );
-        ioService().write( path1,
-                           "Some cheese" );
+        final Path path1 = getBasePath(this.getClass().getSimpleName()).resolve("mydrlfile1.drl");
+        final Path path2 = getBasePath(this.getClass().getSimpleName()).resolve("a.drl");
 
-        Thread.sleep( 5000 ); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
+        observer.addInformationCallback(() -> assertIndexForPath1(path1));
+        observer.addInformationCallback(() -> assertIndexForPath2(path1));
 
-        final Index index = config.getIndexManager().get( toKCluster( path1.getFileSystem() ) );
+        ioService().write(path1,
+                          "Some cheese");
+        ioService().write(path2,
+                          "Some cheese");
 
-        final IndexSearcher searcher = ( (LuceneIndex) index ).nrtSearcher();
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new WildcardQuery( new Term( FULL_TEXT_FIELD, "*file*" ) ), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 1,
-                          hits.length );
-        }
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new WildcardQuery( new Term( FULL_TEXT_FIELD, "*mydrlfile1*" ) ), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 1,
-                          hits.length );
-        }
-
-
-        final Path path2 = getBasePath( this.getClass().getSimpleName() ).resolve( "a.drl" );
-        ioService().write( path2,
-                           "Some cheese" );
-
-        {
-            final TopScoreDocCollector collector = TopScoreDocCollector.create( 10 );
-
-            searcher.search( new WildcardQuery( new Term( FULL_TEXT_FIELD, "a*" ) ), collector );
-
-            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            listHitPaths( searcher,
-                          hits );
-
-            assertEquals( 1,
-                          hits.length );
-        }
-
-        ( (LuceneIndex) index ).nrtRelease( searcher );
+        observer.poll();
     }
 
+    private void assertIndexForPath1(final Path path1) throws IOException {
+        final Index index = config.getIndexManager().get(toKCluster(path1.getFileSystem()));
+        final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
+
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+            searcher.search(new WildcardQuery(new Term(FULL_TEXT_FIELD,
+                                                       "*file*")),
+                            collector);
+
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            listHitPaths(searcher,
+                         hits);
+
+            assertEquals(1,
+                         hits.length);
+        }
+
+        {
+            final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+            searcher.search(new WildcardQuery(new Term(FULL_TEXT_FIELD,
+                                                       "*mydrlfile1*")),
+                            collector);
+
+            final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            listHitPaths(searcher,
+                         hits);
+
+            assertEquals(1,
+                         hits.length);
+        }
+
+        ((LuceneIndex) index).nrtRelease(searcher);
+    }
+
+    private void assertIndexForPath2(final Path path2) throws IOException {
+        final Index index = config.getIndexManager().get(toKCluster(path2.getFileSystem()));
+        final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
+        final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
+
+        searcher.search(new WildcardQuery(new Term(FULL_TEXT_FIELD,
+                                                   "a*")),
+                        collector);
+
+        final ScoreDoc[] hits = collector.topDocs().scoreDocs;
+        listHitPaths(searcher,
+                     hits);
+
+        assertEquals(1,
+                     hits.length);
+
+        ((LuceneIndex) index).nrtRelease(searcher);
+    }
 }

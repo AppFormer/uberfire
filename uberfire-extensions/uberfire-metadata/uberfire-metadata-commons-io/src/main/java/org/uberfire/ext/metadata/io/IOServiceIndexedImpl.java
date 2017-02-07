@@ -373,6 +373,7 @@ public class IOServiceIndexedImpl extends IOServiceDotFileImpl {
                                                  ex);
                                 }
                             }
+                            observer.information("WatchService batch completed.");
                         }
 
                         private boolean isDisposed() {

@@ -40,9 +40,15 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
         return new String[]{this.getClass().getSimpleName()};
     }
 
-    @Test
+    @Test(timeout = 1000)
     public void testDeleteFile() throws IOException, InterruptedException {
         final Path path = getBasePath(this.getClass().getSimpleName()).resolve("delete-me.txt");
+
+        observer.addInformationCallback(() -> assertIndexCreated(path));
+        //Delete seems to be a 2-phase process in VFS, "real file" then "dot file"
+        observer.addInformationCallback(() -> assertIndexDeleted(path));
+        observer.addInformationCallback(IndexObserverCallback.NOP);
+
         ioService().write(path,
                           "content",
                           Collections.<OpenOption>emptySet(),
@@ -58,12 +64,12 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
                               }
                           });
 
-        Thread.sleep(5000); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
+        observer.poll();
+    }
 
+    private void assertIndexCreated(final Path path) throws IOException {
         final Index index = config.getIndexManager().get(toKCluster(path.getFileSystem()));
-
         final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
-
         final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
 
         //Check the file has been indexed
@@ -71,7 +77,7 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
                                                "me")),
                         collector);
 
-        ScoreDoc[] hits = collector.topDocs().scoreDocs;
+        final ScoreDoc[] hits = collector.topDocs().scoreDocs;
         listHitPaths(searcher,
                      hits);
         assertEquals(1,
@@ -79,17 +85,20 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
 
         //Delete and re-check the index
         ioService().delete(path);
+    }
 
-        Thread.sleep(5000); //wait for events to be consumed from jgit -> (notify changes -> watcher -> index) -> lucene index
+    private void assertIndexDeleted(final Path path) throws IOException {
+        final Index index = config.getIndexManager().get(toKCluster(path.getFileSystem()));
+        final IndexSearcher searcher = ((LuceneIndex) index).nrtSearcher();
+        final TopScoreDocCollector collector = TopScoreDocCollector.create(10);
 
         searcher.search(new TermQuery(new Term("delete",
                                                "me")),
                         collector);
 
-        hits = collector.topDocs().scoreDocs;
+        final ScoreDoc[] hits = collector.topDocs().scoreDocs;
         assertEquals(0,
                      hits.length);
-
         ((LuceneIndex) index).nrtRelease(searcher);
     }
 }
