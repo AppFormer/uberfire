@@ -23,6 +23,7 @@ import org.uberfire.java.nio.file.Path;
 
 import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 public class GeneralPathEqualsTest {
 
@@ -79,4 +80,52 @@ public class GeneralPathEqualsTest {
         assertThat(path.hashCode()).isNotEqualTo(wpath.hashCode());
     }
 
+    @Test
+    public void testSeparators() {
+        final Path path1 = GeneralPathImpl.create(fs, "/path/to/file.txt", false);
+        printPath(path1);
+        final Path path2 = GeneralPathImpl.create(fs, "/path\\to/file.txt", false);
+        printPath(path2);
+        assertThat( path1.equals( path2 ) );
+
+        final Path path3 = GeneralPathImpl.create(fs, "\\path/to/file.txt", false);
+        printPath(path3);
+        assertThat( !path2.equals( path3 ) );
+
+        final Path path4 = GeneralPathImpl.create(fs, "file:///C:/path/to/file.txt", false);
+        printPath(path4);
+        final Path path5 = GeneralPathImpl.create(fs, "file:///C:\\path\\to\\file.txt", false);
+        printPath(path5);
+        assertThat( !path4.equals( path5 ) );
+        
+        final Path path6 = GeneralPathImpl.create(fs, "C:/path/to/file.txt", false);
+        printPath(path6);
+        final Path path7 = GeneralPathImpl.create(fs, "/C:/path/", false);
+        printPath(path7);
+        assertThat( path6.startsWith( path7 ) );
+     
+        final Path path8 = GeneralPathImpl.create(fs, "to/file.txt", false);
+        assertThat( path7.resolve( path8 ).equals( path6 ) ); 
+        printPath( path7.resolve( path8 ) );
+        
+        if ( OSType.currentOS() == OSType.WINDOWS ) {
+            assertThat( AbstractPath.getSeparator( "path" ).equals( "\\" ) );
+            assertThat( AbstractPath.getSeparator().equals( "\\" ) );
+        }
+        else {
+            assertThat( AbstractPath.getSeparator( "path" ).equals( "/" ) );
+            assertThat( AbstractPath.getSeparator().equals( "/" ) );
+        }
+        assertThat( AbstractPath.getSeparator( "/path\\to\\file.txt" ).equals( "/" ) );
+        assertThat( AbstractPath.getSeparator( "\\path/to/file.txt" ).equals( "\\" ) );
+        
+        assertThat( AbstractPath.removeTrailingSeparator( "/path/to/folder/" ).equals( "/path/to/folder" ) );
+        assertThat( AbstractPath.appendTrailingSeparator( "/path/to/folder" ).equals( "/path/to/folder/" ) );
+    }
+    
+    private void printPath( Path path )
+    {
+        System.out.println( path.toString() );
+//        System.out.println( path.toUri().toString() );
+    }
 }

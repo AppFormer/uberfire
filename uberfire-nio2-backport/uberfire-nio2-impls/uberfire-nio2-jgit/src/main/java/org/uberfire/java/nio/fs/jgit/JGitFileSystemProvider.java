@@ -170,6 +170,7 @@ import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.*;
 import static org.uberfire.java.nio.file.StandardOpenOption.*;
 import static org.uberfire.java.nio.fs.jgit.util.JGitUtil.PathType.*;
 import static org.uberfire.java.nio.fs.jgit.util.JGitUtil.*;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                                                Disposable {
@@ -1096,7 +1097,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                 if ( options != null && options.contains( new DotFileOption() ) ) {
                     deleteIfExists( dot( path ), extractCommentedOption( options ) );
                     tempDot = File.createTempFile( "meta", "dot" );
-                    hasDotContent = buildDotFile( path, new FileOutputStream( tempDot ), attrs );
+                    hasDotContent = buildDotFile( path, tempDot, attrs );
                 } else {
                     hasDotContent = false;
                 }
@@ -1300,7 +1301,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         fileSystem.dispose();
 
         try {
-            if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) ) {
+            if ( AbstractPath.OSType.currentOS() == AbstractPath.OSType.WINDOWS ) {
                 //this operation forces a cache clean freeing any lock -> windows only issue!
                 WindowCache.reconfigure( new WindowCacheConfig() );
             }

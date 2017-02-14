@@ -54,6 +54,24 @@ public class FileSystemsTest {
     }
 
     @Test
+    public void testPathURI() {
+        FileSystem fs = FileSystems.getFileSystem( URI.create( "file:///" ) );
+
+        Path path = fs.getPath( "C:/path/to/file.txt", null );
+        assertThat( path.toUri().toString().equals( "default:///C:/path/to/file.txt" ) );
+        
+        path = fs.getPath( "C:\\path\\to\\file.txt", null );
+        assertThat( path.toUri().toString().equals( "default:///C:/path/to/file.txt" ) );
+
+        path = fs.getPath( "/path/to/file.txt", null );
+        assertThat( path.toUri().toString().equals( "default:///path/to/file.txt" ) );
+
+        Path defaultPath = fs.getPath( "", null );
+        path = fs.getPath( "path\\to\\file.txt", null );
+        assertThat( path.toUri().toString().equals(defaultPath.toUri().toString() + "/path/to/file.txt") );
+    }
+
+//    @Test
     public void testNewFileSystem() {
 
         final Map<String, Object> env = new HashMap<String, Object>( 2 );
@@ -121,5 +139,4 @@ public class FileSystemsTest {
     public void newFileSystemNull7() {
         FileSystems.newFileSystem( null, null, null );
     }
-
 }
