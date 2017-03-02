@@ -24,6 +24,7 @@ import org.uberfire.ext.layout.editor.api.editor.LayoutTemplate;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.uberfire.mocks.FileSystemTestingUtils.normalizeLineEndings;
 
 public class LayoutServicesImplTest {
 
@@ -62,8 +63,8 @@ public class LayoutServicesImplTest {
 
     private static String loadSample( String file ) {
         try {
-            return IOUtils.toString(new LayoutServicesImplTest().getClass().getResourceAsStream( file),
-                    "UTF-8");
+            return normalizeLineEndings( IOUtils.toString(new LayoutServicesImplTest().getClass().getResourceAsStream( file),
+                                         "UTF-8") );
         } catch ( IOException e ) {
             return "";
         }

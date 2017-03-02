@@ -34,9 +34,11 @@ import org.uberfire.java.nio.file.NoSuchFileException;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributeView;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 public class SimpleFileSystemProviderAttrsRelatedTest {
 
+    
     @Test
     public void checkIsHidden() throws IOException {
         final SimpleFileSystemProvider fsProvider = new SimpleFileSystemProvider();
@@ -107,18 +109,23 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
 
         tempFile.setReadable( false );
 
-        try {
-            fsProvider.checkAccess( path2, READ );
-            fail( "can't have read access on file" );
-        } catch ( Exception ex ) {
+        if ( OSType.currentOS() != OSType.WINDOWS ) {
+            try {
+                fsProvider.checkAccess( path2, READ );
+                fail( "can't have read access on file" );
+            } catch ( Exception ex ) {
+            }
         }
 
         tempFile.setReadable( true );
+        tempFile.setExecutable( false );
 
-        try {
-            fsProvider.checkAccess( path2, EXECUTE );
-            fail( "can't have execute access on file" );
-        } catch ( Exception ex ) {
+        if ( OSType.currentOS() != OSType.WINDOWS ) {
+            try {
+                fsProvider.checkAccess( path2, EXECUTE );
+                fail( "can't have execute access on file" );
+            } catch ( Exception ex ) {
+            }
         }
 
         tempFile.setExecutable( true );
@@ -135,6 +142,7 @@ public class SimpleFileSystemProviderAttrsRelatedTest {
             fail( "all access should be ok" );
         }
 
+        tempFile.delete();
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -36,6 +36,8 @@ import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
 import org.uberfire.java.nio.fs.file.BaseSimpleFileStore;
 import org.uberfire.java.nio.fs.jgit.JGitFileStore;
 
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
+
 public class FilesTest extends AbstractBaseTest {
 
     @Test
@@ -60,6 +62,7 @@ public class FilesTest extends AbstractBaseTest {
             }
             sb.append( (char) i );
         }
+        in.close();
         assertThat( sb.toString() ).isEqualTo( "content" );
     }
 
@@ -98,7 +101,7 @@ public class FilesTest extends AbstractBaseTest {
 
         final SeekableByteChannel sbc2 = Files.newByteChannel( newTempDir().resolve( "file.temp2.txt" ) );
         assertThat( sbc ).isNotNull();
-        sbc.close();
+        sbc2.close();
     }
 
     @Test(expected = FileAlreadyExistsException.class)
@@ -558,9 +561,18 @@ public class FilesTest extends AbstractBaseTest {
         final Map<String, Object> env = new HashMap<String, Object>( 2 );
         env.put( "userName", "user" );
         env.put( "password", "pass" );
-        FileSystems.newFileSystem( URI.create( "git://testXXXXXXX" ), env );
+        URI uri = URI.create( "git://testXXXXXXX" );
+        try {
+            // first check if the "testXXXXXXX" git filesystem already exists
+            // it may have been created in a previous test...
+            FileSystems.getFileSystem(uri);
+        }
+        catch (FileSystemNotFoundException e) {
+            // otherwise create it
+            FileSystems.newFileSystem( uri, env );
+        }
 
-        Files.move( Paths.get( URI.create( "git://testXXXXXXX" ) ), newTempDir() );
+        Files.move( Paths.get( uri ), newTempDir() );
     }
 
     @Test
@@ -1028,11 +1040,13 @@ public class FilesTest extends AbstractBaseTest {
 
     @Test
     public void isExecutable() throws IOException {
-        final Path path = Files.createTempFile( "foo", "bar" );
-
-        assertThat( Files.isExecutable( path ) ).isFalse();
-        assertThat( Files.isExecutable( newTempDir() ) ).isTrue();
-        assertThat( Files.isExecutable( Paths.get( "/some/file" ) ) ).isFalse();
+        if ( OSType.currentOS() != OSType.WINDOWS ) {
+            final Path path = Files.createTempFile( "foo", "bar" );
+    
+            assertThat( Files.isExecutable( path ) ).isFalse();
+            assertThat( Files.isExecutable( newTempDir() ) ).isTrue();
+            assertThat( Files.isExecutable( Paths.get( "/some/file" ) ) ).isFalse();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)

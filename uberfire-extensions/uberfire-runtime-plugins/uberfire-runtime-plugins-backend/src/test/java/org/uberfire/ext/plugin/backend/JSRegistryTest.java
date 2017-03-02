@@ -22,37 +22,42 @@ import org.uberfire.ext.plugin.model.PluginSimpleContent;
 
 import static org.junit.Assert.*;
 import static org.uberfire.ext.plugin.backend.PluginSamples.*;
+import static org.uberfire.mocks.FileSystemTestingUtils.normalizeLineEndings;
 
 public class JSRegistryTest {
 
     @Test
     public void createEmptyScreenRegistry() {
         PluginSimpleContent pluginContent = getEmptyScreen();
-        assertEquals( loadSample( EMPTY_SCREEN_REGISTRY ), JSRegistry.convertToJSRegistry( pluginContent ) );
+        assertEquals( loadSample( EMPTY_SCREEN_REGISTRY ), convertToJSRegistry( pluginContent ) );
     }
 
     @Test
     public void createScreenWithTitleRegistry() {
         PluginSimpleContent pluginContent = getScreenWithTitle();
-        assertEquals( loadSample( SCREEN_WITH_TITLE_REGISTRY ), JSRegistry.convertToJSRegistry( pluginContent ) );
+        assertEquals( loadSample( SCREEN_WITH_TITLE_REGISTRY ), convertToJSRegistry( pluginContent ) );
     }
 
     @Test
     public void createScreenWithTitleAndMainRegistry() {
         PluginSimpleContent pluginContent = getScreenWithMainAndTitle();
-        assertEquals( loadSample( SCREEN_WITH_TITLE_AND_NAME_REGISTRY ), JSRegistry.convertToJSRegistry( pluginContent ) );
+        assertEquals( loadSample( SCREEN_WITH_TITLE_AND_NAME_REGISTRY ), convertToJSRegistry( pluginContent ) );
     }
 
     @Test
     public void createAngularScreenRegistry() {
         PluginSimpleContent pluginContent = getTodoAngularPluginSimpleContent();
-        assertEquals( loadSample( ANGULAR_TODO_REGISTRY ), JSRegistry.convertToJSRegistry( pluginContent ) );
+        assertEquals( loadSample( ANGULAR_TODO_REGISTRY ), convertToJSRegistry( pluginContent ) );
     }
 
     @Test
     public void createSplashScreenRegistry() {
         PluginSimpleContent pluginContent = getSplashScreen();
-        assertEquals( loadSample( SPLASH_SCREEN_REGISTRY ), JSRegistry.convertToJSRegistry( pluginContent ) );
+        assertEquals( loadSample( SPLASH_SCREEN_REGISTRY ), convertToJSRegistry( pluginContent ) );
+    }
+
+    private String convertToJSRegistry( PluginSimpleContent pluginContent ) {
+        return normalizeLineEndings( JSRegistry.convertToJSRegistry( pluginContent ) );
     }
 
     @Test

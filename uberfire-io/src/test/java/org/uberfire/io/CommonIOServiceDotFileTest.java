@@ -441,8 +441,14 @@ public abstract class CommonIOServiceDotFileTest {
         ioService.write( file, content );
         assertTrue( ioService().exists( file ) );
 
+        String readContent = null;
         final SeekableByteChannel sbc = ioService().newByteChannel( file, StandardOpenOption.READ );
-        String readContent = readSbc( sbc );
+        try {
+            readContent = readSbc( sbc );
+        }
+        finally {
+            sbc.close();
+        }
 
         assertEquals( content, readContent );
 

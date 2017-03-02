@@ -16,6 +16,8 @@
 
 package org.uberfire.java.nio.base.dotfiles;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -36,11 +38,40 @@ public final class DotFileUtils {
 
     }
 
-    public static boolean buildDotFile(final Path path,
-                                       final OutputStream out,
-                                       final FileAttribute<?>... attrs) {
+    public static boolean buildDotFile( final Path path, final FileAttribute<?>... attrs ) {
+        Path dotPath = dot( path );
+        OutputStream out = path.getFileSystem().provider().newOutputStream( dotPath );
         boolean hasContent = false;
-        if (attrs != null && attrs.length > 0) {
+        try {
+            hasContent = buildDotFile( path, out, attrs);
+            out.close();
+        } catch (final Exception e) {
+            throw new IOException(e);
+        }
+
+        return hasContent;
+    }
+
+    public static boolean buildDotFile( final Path path, File dotFile, final FileAttribute<?>... attrs ) {
+        OutputStream out = null;
+        boolean hasContent = false;
+        try {
+            out = new FileOutputStream( dotFile );
+            hasContent = buildDotFile( path, out, attrs);
+            out.close();
+        } catch (final Exception e) {
+            throw new IOException(e);
+        }
+
+        return hasContent;
+    }
+    
+    @Deprecated
+    public static boolean buildDotFile( final Path path,
+                                        final OutputStream out,
+                                        final FileAttribute<?>... attrs ) {
+        boolean hasContent = false;
+        if ( attrs != null && attrs.length > 0 ) {
             final Properties properties = new Properties();
 
             for (final FileAttribute<?> attr : attrs) {
@@ -63,13 +94,19 @@ public final class DotFileUtils {
                 ((AttrHolder) path).getAttrStorage().loadContent(properties);
             }
         } else {
-            path.getFileSystem().provider().deleteIfExists(dot(path));
+            if (out!=null) {
+                try {
+                    out.close();
+                } catch ( Exception e ) {
+                }
+            }
+            path.getFileSystem().provider().deleteIfExists( dot( path ) );
         }
 
         if (!hasContent) {
             try {
                 out.close();
-            } catch (java.io.IOException e) {
+            } catch ( Exception e ) {
             }
         }
 

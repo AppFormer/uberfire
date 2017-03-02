@@ -114,7 +114,7 @@ public class IOServiceDotFileImpl
         final SeekableByteChannel result = Files.newByteChannel( path, buildOptions( options ), allAttrs );
 
         if ( isFileScheme( path ) ) {
-            buildDotFile( path, newOutputStream( dot( path ) ), allAttrs );
+            buildDotFile( path, allAttrs );
         }
 
         return result;
@@ -135,7 +135,7 @@ public class IOServiceDotFileImpl
             IOException, SecurityException {
         final Path result = Files.createDirectories( dir, attrs );
 
-        buildDotFile( dir, newOutputStream( dot( dir ) ), attrs );
+        buildDotFile( dir, attrs );
 
         return result;
     }
@@ -336,7 +336,7 @@ public class IOServiceDotFileImpl
             }
         }
 
-        buildDotFile( dir, newOutputStream( dot( dir ) ), allAttrs );
+        buildDotFile( dir, allAttrs );
 
         return dir;
     }
