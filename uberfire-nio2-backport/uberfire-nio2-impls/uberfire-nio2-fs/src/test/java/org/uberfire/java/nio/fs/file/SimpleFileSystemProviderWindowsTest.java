@@ -27,12 +27,12 @@ import org.uberfire.java.nio.fs.file.SimpleWindowsFileStore;
 import org.uberfire.java.nio.fs.file.SimpleWindowsFileSystem;
 
 import static org.fest.assertions.api.Assertions.*;
-import static org.uberfire.java.nio.fs.file.SimpleFileSystemProvider.OSType.*;
+import static org.uberfire.java.nio.base.AbstractPath.OSType;
 
 public class SimpleFileSystemProviderWindowsTest {
 
     final File[]                   roots      = new File[]{ new File( "c:\\" ), new File( "a:\\" ) };
-    final SimpleFileSystemProvider fsProvider = new SimpleFileSystemProvider( roots, WINDOWS );
+    final SimpleFileSystemProvider fsProvider = new SimpleFileSystemProvider( roots, OSType.WINDOWS );
 
     @Test
     public void simpleStateTest() {

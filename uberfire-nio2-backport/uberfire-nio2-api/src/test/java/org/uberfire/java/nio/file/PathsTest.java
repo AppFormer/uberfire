@@ -16,11 +16,12 @@
 
 package org.uberfire.java.nio.file;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.net.URI;
 
 import org.junit.Test;
-
-import static org.fest.assertions.api.Assertions.*;
+import org.uberfire.java.nio.base.AbstractPath;
 
 public class PathsTest {
 
@@ -60,7 +61,7 @@ public class PathsTest {
         assertThat( path ).isNotNull();
         assertThat( path.isAbsolute() ).isTrue();
 
-        assertThat( path.toString() ).isEqualTo( "c:\\path" + separator() + "to" + separator() + "file.txt" );
+        assertThat( path.toString() ).isEqualTo( "c:\\path" + "\\" + "to" + "\\" + "file.txt" );
     }
 
     @Test
@@ -115,8 +116,14 @@ public class PathsTest {
         Paths.get( (URI) null );
     }
 
-    private String separator() {
-        return System.getProperty( "file.separator", "/" );
+    @Test
+    public void windowsDriverTest() {
+        assertThat( AbstractPath.hasWindowsDriver( "C:\\\\\\path\\to\\file" ) );
+        assertThat( AbstractPath.hasWindowsDriver( "C:///path/to/file" ) );
+        assertThat( AbstractPath.hasWindowsDriver( "\\C:\\\\\\path\\to\\file" ) );
+        assertThat( AbstractPath.hasWindowsDriver( "/C:///path/to/file" ) );
+        assertThat( !AbstractPath.hasWindowsDriver( "file:///path/to/file" ) );
+        assertThat( !AbstractPath.hasWindowsDriver( "git://user:password@localhost:8080/path/to/file" ) );
+        assertThat( !AbstractPath.hasWindowsDriver( "default:///path/to/file" ) );
     }
-
 }

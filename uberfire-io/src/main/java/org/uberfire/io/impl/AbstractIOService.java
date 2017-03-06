@@ -636,9 +636,17 @@ public abstract class AbstractIOService implements IOServiceIdentifiable,
 
         try {
             byteChannel.write( ByteBuffer.wrap( bytes ) );
-            byteChannel.close();
         } catch ( final java.io.IOException e ) {
             throw new IOException( e );
+        }
+        finally {
+            if ( byteChannel != null ) {
+                try {
+                    byteChannel.close();
+                } catch (java.io.IOException e) {
+                    throw new IOException( e );
+                }
+            }
         }
 
         return path;

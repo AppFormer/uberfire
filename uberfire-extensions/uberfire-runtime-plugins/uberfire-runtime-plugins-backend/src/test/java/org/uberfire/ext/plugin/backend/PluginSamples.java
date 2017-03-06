@@ -29,6 +29,7 @@ import org.uberfire.ext.plugin.model.Framework;
 import org.uberfire.ext.plugin.model.Language;
 import org.uberfire.ext.plugin.model.PluginSimpleContent;
 import org.uberfire.ext.plugin.model.PluginType;
+import static org.uberfire.mocks.FileSystemTestingUtils.normalizeLineEndings;
 
 public class PluginSamples {
 
@@ -96,8 +97,8 @@ public class PluginSamples {
 
     public static String loadSample( String file ) {
         try {
-            return IOUtils.toString( new PluginSamples().getClass().getResourceAsStream( file ),
-                                     "UTF-8" );
+            return normalizeLineEndings( IOUtils.toString( new PluginSamples().getClass().getResourceAsStream( file ),
+                                         "UTF-8" ) );
         } catch ( IOException e ) {
             return "";
         }

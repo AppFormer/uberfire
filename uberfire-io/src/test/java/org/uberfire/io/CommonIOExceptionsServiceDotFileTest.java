@@ -16,6 +16,11 @@
 
 package org.uberfire.io;
 
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.nio.channels.ByteChannel;
+
 import org.junit.Test;
 import org.uberfire.java.nio.file.DirectoryNotEmptyException;
 import org.uberfire.java.nio.file.FileAlreadyExistsException;
@@ -65,7 +70,12 @@ public abstract class CommonIOExceptionsServiceDotFileTest extends CommonIOServi
 
         ioService().write( path, "ooooo!" );
 
-        ioService().newByteChannel( path );
+        ByteChannel channel = ioService().newByteChannel( path );
+        try {
+            channel.close();
+        } catch ( IOException e ) {
+            fail("Can't close output channel");
+        }
     }
 
     @Test(expected = FileAlreadyExistsException.class)

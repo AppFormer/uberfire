@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.uberfire.java.nio.IOException;
+import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.base.GeneralPathImpl;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
@@ -52,10 +53,21 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
         this.roots = roots;
 
         if ( path.isAbsolute() ) {
-            for ( int i = 0; i < listRoots().length; i++ ) {
-                if ( listRoots()[ i ].toString().equals( path.getRoot().toString() ) ) {
-                    fstoreIndex = i;
-                    break;
+            if ( AbstractPath.hasWindowsDriver( path.toString() ) ) {
+                for ( int i = 0; i < listRoots().length; i++ ) {
+                    if ( listRoots()[ i ].toString().equalsIgnoreCase( path.getRoot().toString() ) ) {
+                        fstoreIndex = i;
+                        break;
+                    }
+                }
+            }
+            else {
+                String defaultDrive = AbstractPath.DEFAULT_WINDOWS_DRIVER + AbstractPath.WINDOWS_SEPARATOR_STRING;
+                for ( int i = 0; i < listRoots().length; i++ ) {
+                    if ( listRoots()[ i ].toString().equalsIgnoreCase( defaultDrive ) ) {
+                        fstoreIndex = i;
+                        break;
+                    }
                 }
             }
         } else {
@@ -73,7 +85,9 @@ public class SimpleWindowsFileStore extends BaseSimpleFileStore {
 
     @Override
     public String name() {
-        return listRoots()[ fstoreIndex ].getName();
+        // the File.getName() for the root path "C:/" will always be an empty string
+        // so use File.getPath() instead
+        return listRoots()[ fstoreIndex ].getPath();
     }
 
     @Override
