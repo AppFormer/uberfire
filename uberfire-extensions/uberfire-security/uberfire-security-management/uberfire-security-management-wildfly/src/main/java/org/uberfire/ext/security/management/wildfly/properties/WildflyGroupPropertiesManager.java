@@ -176,7 +176,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                     final String groupsStr = groupsPropertiesFileLoader.getProperties().getProperty(username);
                     if (groupsStr != null && groupsStr.trim().length() > 0) {
                         final String newGroupsStr = deleteGroupsFromSerliazedValue(groupsStr, identifiers);
-                        final String errorMsg = "Error deleting groups for user " + username;
+                        final String errorMsg = "Error deleting groups for user " + username + "| group " + groupsStr + "|";
                         updateGroupProperty(username, newGroupsStr, errorMsg);
                     }
                 } catch (final IOException e) {
@@ -184,6 +184,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("Error removing the folowing group names: " + identifiers, e);
             throw new SecurityManagementException(e);
         }
@@ -278,10 +279,10 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
         }
     }
 
-    void updateGroupProperty(final String name, final String groups, final String errorMessage) {
+    void updateGroupProperty(final String name, final String groups, String errorMessage) {
         if (name != null) {
             try {
-                String g = groups != null ? groups : groupsPropertiesFileLoader.getProperties().getProperty(name);
+                String g = groups != null ? groups : groupsPropertiesFileLoader.getProperties().getProperty( name );
                 if ( g != null && g.trim().length() > 0) {
                     groupsPropertiesFileLoader.getProperties().put(name, g);
                 } else {
@@ -290,6 +291,7 @@ public class WildflyGroupPropertiesManager extends BaseWildflyPropertiesManager 
                 groupsPropertiesFileLoader.persistProperties();
             } catch (IOException e) {
                 LOG.error(errorMessage, e);
+                e.printStackTrace();
                 throw new SecurityManagementException(e);
             }
         }
