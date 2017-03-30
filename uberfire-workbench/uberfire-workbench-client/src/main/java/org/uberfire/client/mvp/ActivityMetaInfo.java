@@ -29,7 +29,7 @@ import org.uberfire.commons.data.Pair;
 
 public class ActivityMetaInfo {
 
-    static Pair<Integer, List<Class<? extends ClientResourceType>>> generate(final IOCBeanDef<?> beanDefinition){
+    static Pair<Integer, List<String>> generate(final IOCBeanDef<?> beanDefinition){
 
         AssociatedResources associatedResources = null;
         Priority priority = null;
@@ -57,9 +57,9 @@ public class ActivityMetaInfo {
             priorityValue = priority.value();
         }
 
-        final List<Class<? extends ClientResourceType>> types = new ArrayList<Class<? extends ClientResourceType>>();
+        final List<String> types = new ArrayList<String>();
         for ( Class<? extends ClientResourceType> type : associatedResources.value() ) {
-            types.add( type );
+            types.add( type.getName() );
         }
 
         return Pair.newPair( priorityValue, types );

@@ -39,7 +39,7 @@ public class ActivityBeansCacheUnitTestWrapper extends ActivityBeansCache {
     private SplashScreenActivity splashScreenActivity;
     private Collection<IOCBeanDef<Activity>> availableActivities = new HashSet<IOCBeanDef<Activity>>();
     private List<ActivityAndMetaInfo> activitiesAndMetaInfo = new ArrayList<ActivityAndMetaInfo>();
-    private  Pair<Integer, List<Class<? extends ClientResourceType>>> metaInfo;
+    private  Pair<Integer, List<String>> metaInfo;
     private boolean mockSplashcreen = true;
 
     public ActivityBeansCacheUnitTestWrapper() {
@@ -100,7 +100,7 @@ public class ActivityBeansCacheUnitTestWrapper extends ActivityBeansCache {
         return super.getResourceActivities();
     }
 
-    Pair<Integer, List<Class<? extends ClientResourceType>>> generateActivityMetaInfo( IOCBeanDef<Activity> activityBean ) {
+    Pair<Integer, List<String>> generateActivityMetaInfo( IOCBeanDef<Activity> activityBean )  {
         return metaInfo;
     }
 
@@ -109,6 +109,6 @@ public class ActivityBeansCacheUnitTestWrapper extends ActivityBeansCache {
 
         metaInfo = mock(Pair.class);
         when( metaInfo.getK1() ).thenReturn( new Integer(1) );
-        when( metaInfo.getK2() ).thenReturn( new ArrayList<Class<? extends ClientResourceType>>(  ) );
+        when( metaInfo.getK2() ).thenReturn( new ArrayList<String>() );
     }
 }

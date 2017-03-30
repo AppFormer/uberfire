@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.uberfire.backend.vfs.ObservablePath;
+import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.mvp.AbstractWorkbenchEditorActivity;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.mvp.Command;
@@ -135,7 +136,7 @@ public class JSEditorActivity extends AbstractWorkbenchEditorActivity {
 
     @Override
     public IsWidget getWidget() {
-        return new HTML( nativeEditor.getElement().getInnerHTML() );
+        return new HTML(nativeEditor.getElement().getInnerHTML());
     }
 
     @Override
@@ -155,5 +156,9 @@ public class JSEditorActivity extends AbstractWorkbenchEditorActivity {
 
     public JSNativeEditor getNativeEditor() {
         return nativeEditor;
+    }
+
+    protected WorkbenchEditor.LockingStrategy getLockingStrategy() {
+        return WorkbenchEditor.LockingStrategy.OPTIMISTIC;
     }
 }

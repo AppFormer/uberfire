@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Element;
@@ -53,6 +54,11 @@ public abstract class JSNativePlugin {
     public native String getId()  /*-{
         return this.@org.uberfire.client.plugin.JSNativePlugin::obj.id;
     }-*/;
+
+    public native String getPriority()  /*-{
+        return this.@org.uberfire.client.plugin.JSNativePlugin::obj.priority;
+    }-*/;
+
 
     public Element getElement() {
         return element;

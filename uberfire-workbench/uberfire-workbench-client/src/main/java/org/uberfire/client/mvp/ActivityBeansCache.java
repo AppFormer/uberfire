@@ -16,17 +16,15 @@
 
 package org.uberfire.client.mvp;
 
-import static java.util.Collections.*;
-
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -41,6 +39,8 @@ import org.uberfire.client.workbench.events.NewPerspectiveEvent;
 import org.uberfire.client.workbench.events.NewWorkbenchScreenEvent;
 import org.uberfire.client.workbench.type.ClientResourceType;
 import org.uberfire.commons.data.Pair;
+
+import static java.util.Collections.sort;
 
 /**
  *
@@ -90,7 +90,7 @@ public class ActivityBeansCache {
             if ( isSplashScreen( activityBean.getQualifiers() ) ) {
                 splashActivities.add( (SplashScreenActivity) activityBean.getInstance() );
             } else {
-                final Pair<Integer, List<Class<? extends ClientResourceType>>> metaInfo = generateActivityMetaInfo( activityBean );
+                final Pair<Integer, List<String>> metaInfo = generateActivityMetaInfo( activityBean );
                 if ( metaInfo != null ) {
                     getResourceActivities().add( new ActivityAndMetaInfo( activityBean, metaInfo.getK1(), metaInfo.getK2() ) );
                 }
@@ -180,16 +180,17 @@ public class ActivityBeansCache {
 
     /** Used for runtime plugins. */
     public void addNewEditorActivity( final IOCBeanDef<Activity> activityBean,
-                                      Class<? extends ClientResourceType> resourceTypeClass ) {
+                                      String priority,
+                                      String resourceTypeName ) {
         final String id = activityBean.getName();
 
         if ( activitiesById.keySet().contains( id ) ) {
             throw new RuntimeException( "Conflict detected. Activity Id already exists. " + activityBean.getBeanClass().toString() );
         }
 
-        final List<Class<? extends ClientResourceType>> resourceTypes = new ArrayList<Class<? extends ClientResourceType>>();
-        resourceTypes.add( resourceTypeClass );
-        resourceActivities.add( new ActivityAndMetaInfo( activityBean, 0, resourceTypes ) );
+        resourceActivities.add( new ActivityAndMetaInfo(activityBean, Integer.valueOf(priority),
+                                                        Arrays.asList(resourceTypeName) ) );
+        sortResourceActivitiesByPriority();
     }
 
     public void addNewSplashScreenActivity( final IOCBeanDef<Activity> activityBean ) {
@@ -243,7 +244,7 @@ public class ActivityBeansCache {
         throw new EditorResourceTypeNotFound();
     }
 
-    Pair<Integer, List<Class<? extends ClientResourceType>>> generateActivityMetaInfo( IOCBeanDef<Activity> activityBean ) {
+    Pair<Integer, List<String>> generateActivityMetaInfo(IOCBeanDef<Activity> activityBean ) {
         return ActivityMetaInfo.generate( activityBean );
     }
 
@@ -255,18 +256,15 @@ public class ActivityBeansCache {
 
         private final IOCBeanDef<Activity> activityBean;
         private final int priority;
-        private final ClientResourceType[] resourceTypes;
+        final List<String> resourceTypesNames;
+        private  ClientResourceType[] resourceTypes;
 
         ActivityAndMetaInfo( final IOCBeanDef<Activity> activityBean,
                              final int priority,
-                             final List<Class<? extends ClientResourceType>> resourceTypes ) {
+                             final List<String> resourceTypesNames ) {
             this.activityBean = activityBean;
             this.priority = priority;
-            this.resourceTypes = new ClientResourceType[ resourceTypes.size() ];
-
-            for ( int i = 0; i < resourceTypes.size(); i++ ) {
-                this.resourceTypes[ i ] = iocManager.lookupBean( resourceTypes.get( i ) ).getInstance();
-            }
+            this.resourceTypesNames = resourceTypesNames;
         }
 
         public IOCBeanDef<Activity> getActivityBean() {
@@ -278,7 +276,45 @@ public class ActivityBeansCache {
         }
 
         public ClientResourceType[] getResourceTypes() {
+            if (resourceTypes == null) {
+                dynamicLookupResourceTypes();
+            }
             return resourceTypes;
+        }
+
+        //this lookup need to be dynamic, because we don't
+        //want to force a js registration order (resource -> editor)
+        private void dynamicLookupResourceTypes() {
+            this.resourceTypes = new ClientResourceType[resourceTypesNames.size()];
+            for (int i = 0; i < resourceTypesNames.size(); i++) {
+                final String resourceTypeIdentifier = resourceTypesNames.get(i);
+                final Collection<IOCBeanDef> resourceTypeBeans = iocManager.lookupBeans(resourceTypeIdentifier);
+                if (isADynamicResource(resourceTypeBeans)) {
+                    this.resourceTypes[i] = (ClientResourceType) resourceTypeBeans.iterator().next().getInstance();
+                } else {
+                    IOCBeanDef<ClientResourceType> resourceTypeClass = getResourceTypeClass(resourceTypeIdentifier);
+                    if (resourceTypeClass == null) {
+                        throw new RuntimeException("ClientResourceType " + resourceTypeIdentifier + " not found");
+                    }
+                    this.resourceTypes[i] = resourceTypeClass.getInstance();
+                }
+            }
+        }
+
+        private boolean isADynamicResource(Collection<IOCBeanDef> resourceTypeBeans) {
+            return !resourceTypeBeans.isEmpty();
+        }
+
+        private IOCBeanDef<ClientResourceType> getResourceTypeClass(String resourceName) {
+
+            Collection<IOCBeanDef<ClientResourceType>> iocBeanDefs = iocManager.lookupBeans(ClientResourceType.class);
+            for (IOCBeanDef<ClientResourceType> iocBeanDef : iocBeanDefs) {
+                String beanClassName = iocBeanDef.getBeanClass().getName();
+                if (beanClassName.equalsIgnoreCase(resourceName)) {
+                    return iocBeanDef;
+                }
+            }
+            return null;
         }
     }
 

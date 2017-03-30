@@ -40,38 +40,39 @@ public class ActivityMetaInfoTest {
         IOCBeanDef<?> beanDefinition = mock( IOCBeanDef.class );
         when( beanDefinition.getQualifiers() ).thenReturn( Collections.<Annotation>emptySet() );
 
-        Pair<Integer, List<Class<? extends ClientResourceType>>> nullGenerated = ActivityMetaInfo.generate( beanDefinition );
+        Pair<Integer, List<String>> nullGenerated = ActivityMetaInfo.generate( beanDefinition );
 
         assertNull( nullGenerated );
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void generateActivityMetaInfo() {
-
-        IOCBeanDef<?> beanDefinition = mock( IOCBeanDef.class );
-        Priority priority = mock( Priority.class );
+        IOCBeanDef<?> beanDefinition = mock(IOCBeanDef.class);
+        Priority priority = mock(Priority.class);
         Integer priorityValue = 1;
-        when(priority.value()).thenReturn( priorityValue );
+        when(priority.value()).thenReturn(priorityValue);
 
         Set<Annotation> qualifiers = new HashSet<Annotation>();
-        AssociatedResources associatedResources = mock( AssociatedResources.class );
+        AssociatedResources associatedResources = mock(AssociatedResources.class);
 
         final List<Class<? extends ClientResourceType>> typesList = new ArrayList<Class<? extends ClientResourceType>>();
         typesList.add(ClientResourceType.class);
 
-        Class<? extends ClientResourceType>[] array = toArray( typesList );
-        when(associatedResources.value()).thenReturn( array );
+        Class<? extends ClientResourceType>[] array = typesList.toArray(new Class[typesList.size()]);
+        when(associatedResources.value()).thenReturn(array);
 
-        qualifiers.add( associatedResources );
-        qualifiers.add( priority );
+        qualifiers.add(associatedResources);
+        qualifiers.add(priority);
 
-        when( beanDefinition.getQualifiers() ).thenReturn( qualifiers );
+        when(beanDefinition.getQualifiers()).thenReturn(qualifiers);
 
-        Pair<Integer, List<Class<? extends ClientResourceType>>> generated = ActivityMetaInfo.generate( beanDefinition );
+        Pair<Integer, List<String>> generated = ActivityMetaInfo.generate(beanDefinition);
 
-        assertEquals( priorityValue, generated.getK1() );
-        assertTrue(generated.getK2().contains(ClientResourceType.class  ));
+        assertEquals(priorityValue,
+                     generated.getK1());
+        assertTrue(generated.getK2().contains(ClientResourceType.class.getName()));
     }
 
     private static <T> T[] toArray(List<T> list) {

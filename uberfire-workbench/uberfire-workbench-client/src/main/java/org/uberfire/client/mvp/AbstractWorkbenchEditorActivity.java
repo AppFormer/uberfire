@@ -15,6 +15,7 @@
  */
 package org.uberfire.client.mvp;
 
+import static org.uberfire.client.annotations.WorkbenchEditor.LockingStrategy.OPTIMISTIC;
 import static org.uberfire.client.annotations.WorkbenchEditor.LockingStrategy.PESSIMISTIC;
 
 import javax.inject.Inject;
@@ -77,12 +78,13 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
                 return (activity.open) ? activity.getTitle() : "";
             }
         };
-        
-        lockManager.init( new LockTarget( path,
-                                          getWidget().asWidget(),
-                                          getPlace(),
-                                          titleProvider,
-                                          reloadRunnable ) );
+        if (getLockingStrategy() == PESSIMISTIC) {
+            lockManager.init(new LockTarget(path,
+                                            getWidget().asWidget(),
+                                            getPlace(),
+                                            titleProvider,
+                                            reloadRunnable));
+        }
     }
 
     @Override
@@ -106,7 +108,9 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
 
     @Override
     public void onClose() {
-        lockManager.releaseLock();
+        if (getLockingStrategy() == PESSIMISTIC) {
+            lockManager.releaseLock();
+        }
         super.onClose();
     }
     
@@ -114,7 +118,9 @@ public abstract class AbstractWorkbenchEditorActivity extends AbstractWorkbenchA
     public void onFocus() {
         super.onFocus();
         if ( path != null ) {
-            lockManager.onFocus();
+            if (getLockingStrategy() == PESSIMISTIC) {
+                lockManager.onFocus();
+            }
         }
     }
     

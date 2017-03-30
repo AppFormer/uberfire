@@ -30,6 +30,7 @@ import org.uberfire.client.editor.JSEditorActivity;
 import org.uberfire.client.editor.JSNativeEditor;
 import org.uberfire.client.mvp.Activity;
 import org.uberfire.client.mvp.ActivityBeansCache;
+import org.uberfire.client.mvp.LockManager;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.WorkbenchEditorActivity;
 import org.uberfire.client.workbench.type.ClientResourceType;
@@ -64,23 +65,9 @@ public class EditorJSExporter implements UberfireJSExporter {
             ( (SyncBeanManagerImpl) beanManager ).addBean( (Class) WorkbenchEditorActivity.class, JSEditorActivity.class, null, activity, DEFAULT_QUALIFIERS, newNativeEditor.getId(), true, null );
             ( (SyncBeanManagerImpl) beanManager ).addBean( (Class) JSEditorActivity.class, JSEditorActivity.class, null, activity, DEFAULT_QUALIFIERS, newNativeEditor.getId(), true, null );
 
-            Class<? extends ClientResourceType> resourceTypeClass = getResourceTypeClass( beanManager, newNativeEditor );
-            activityBeansCache.addNewEditorActivity( beanManager.lookupBeans( newNativeEditor.getId() ).iterator().next(), resourceTypeClass );
+            activityBeansCache.addNewEditorActivity( beanManager.lookupBeans( newNativeEditor.getId() ).iterator().next(), newNativeEditor.getPriority(), newNativeEditor.getResourceType() );
 
         }
-    }
-
-    private static Class<? extends ClientResourceType> getResourceTypeClass( SyncBeanManager beanManager,
-                                                                             JSNativeEditor newNativeEditor ) {
-
-        Collection<IOCBeanDef<ClientResourceType>> iocBeanDefs = beanManager.lookupBeans( ClientResourceType.class );
-        for ( IOCBeanDef<ClientResourceType> iocBeanDef : iocBeanDefs ) {
-            String beanClassName = iocBeanDef.getBeanClass().getName();
-            if ( beanClassName.equalsIgnoreCase( newNativeEditor.getResourceType() ) ) {
-                return (Class<? extends ClientResourceType>) iocBeanDef.getBeanClass();
-            }
-        }
-        throw new EditorResourceTypeNotFound();
     }
 
     public static class EditorResourceTypeNotFound extends RuntimeException {

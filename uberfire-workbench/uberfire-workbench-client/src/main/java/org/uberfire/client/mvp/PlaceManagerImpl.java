@@ -29,6 +29,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -597,7 +598,6 @@ public class PlaceManagerImpl
         getPlaceHistoryHandler().onPlaceChange( place );
 
         UIPart uiPart = new UIPart( activity.getTitle(), activity.getTitleDecoration(), activity.getWidget() );
-
         panelManager.addWorkbenchPart( place,
                                        part,
                                        panel,
