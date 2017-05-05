@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.common.client.dom.Element;
+import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.mvp.UberElement;
 import org.uberfire.client.workbench.docks.UberfireDockContainerReadyEvent;
 import org.uberfire.client.workbench.docks.UberfireDocksContainer;
+import org.uberfire.ext.widgets.common.client.breadcrumbs.header.UberfireBreadcrumbsContainer;
 import org.uberfire.ext.widgets.common.client.breadcrumbs.widget.BreadcrumbsPresenter;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
@@ -44,7 +46,7 @@ import static org.mockito.Mockito.*;
 public class UberfireBreadcrumbsTest {
 
     @Mock
-    private UberfireDocksContainer uberfireDocksContainer;
+    private UberfireBreadcrumbsContainer uberfireBreadcrumbsContainer;
 
     @Mock
     private ManagedInstance<BreadcrumbsPresenter> breadcrumbsPresenters;
@@ -62,7 +64,7 @@ public class UberfireBreadcrumbsTest {
                 .thenReturn(mock(BreadcrumbsPresenter.class)).thenReturn(mock(BreadcrumbsPresenter.class));
 
         view = mock(UberfireBreadcrumbs.View.class);
-        uberfireBreadcrumbs = spy(new UberfireBreadcrumbs(uberfireDocksContainer,
+        uberfireBreadcrumbs = spy(new UberfireBreadcrumbs(uberfireBreadcrumbsContainer,
                                                           breadcrumbsPresenters,
                                                           placeManager,
                                                           view) {
@@ -70,12 +72,10 @@ public class UberfireBreadcrumbsTest {
     }
 
     @Test
-    public void setupTest() {
-        uberfireBreadcrumbs.setup(new UberfireDockContainerReadyEvent());
+    public void createBreadCrumbsTest() {
+        uberfireBreadcrumbs.createBreadCrumbs();
 
-        assertNotNull(uberfireBreadcrumbs);
-        verify(uberfireDocksContainer).addBreadcrumbs(any(IsElement.class),
-                                                      eq(UberfireBreadcrumbs.SIZE));
+        verify(uberfireBreadcrumbsContainer).init(any(HTMLElement.class));
     }
 
     @Test
@@ -297,5 +297,28 @@ public class UberfireBreadcrumbsTest {
                                                   new DefaultPlaceRequest("screen"),
                                                   null,
                                                   command);
+    }
+
+    @Test
+    public void updateBreadCrumbsContainerTest() {
+        assertTrue(uberfireBreadcrumbs.breadcrumbsPerPerspective.isEmpty());
+
+        uberfireBreadcrumbs.currentPerspective = "myperspective";
+        uberfireBreadcrumbs.addBreadCrumb("myperspective",
+                                          "label",
+                                          new DefaultPlaceRequest("screen"));
+
+        verify(uberfireBreadcrumbsContainer).enable();
+    }
+
+    @Test
+    public void updateBreadCrumbsWithNoBreadcrumbsContainerTest() {
+        assertTrue(uberfireBreadcrumbs.breadcrumbsPerPerspective.isEmpty());
+
+        uberfireBreadcrumbs.currentPerspective = "myperspective";
+
+        uberfireBreadcrumbs.updateBreadCrumbsContainer();
+
+        verify(uberfireBreadcrumbsContainer).disable();
     }
 }
