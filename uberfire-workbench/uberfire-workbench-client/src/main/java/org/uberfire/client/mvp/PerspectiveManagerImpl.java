@@ -28,9 +28,10 @@ import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.PanelDefinition;
+import org.uberfire.workbench.model.PartDefinition;
 import org.uberfire.workbench.model.PerspectiveDefinition;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
 
 @ApplicationScoped
 public class PerspectiveManagerImpl implements PerspectiveManager {
@@ -43,6 +44,9 @@ public class PerspectiveManagerImpl implements PerspectiveManager {
 
     @Inject
     private Event<PerspectiveChange> perspectiveChangeEvent;
+
+    @Inject
+    private ActivityBeansCache activityBeansCache;
 
     private PerspectiveActivity currentPerspective;
 
@@ -109,35 +113,63 @@ public class PerspectiveManagerImpl implements PerspectiveManager {
         private final PerspectiveActivity perspective;
         private final ParameterizedCommand<PerspectiveDefinition> doAfterFetch;
 
-        public FetchPerspectiveCommand( PerspectiveActivity perspective,
-                                        ParameterizedCommand<PerspectiveDefinition> doAfterFetch ) {
-            this.perspective = checkNotNull( "perspective", perspective );
-            this.doAfterFetch = checkNotNull( "doAfterFetch", doAfterFetch );
+        public FetchPerspectiveCommand(PerspectiveActivity perspective,
+                                       ParameterizedCommand<PerspectiveDefinition> doAfterFetch) {
+            this.perspective = checkNotNull("perspective",
+                                            perspective);
+            this.doAfterFetch = checkNotNull("doAfterFetch",
+                                             doAfterFetch);
         }
 
         @Override
         public void execute() {
             currentPerspective = perspective;
-            if ( perspective.isTransient() ) {
+            if (perspective.isTransient()) {
                 //Transient Perspectives are not saved and hence cannot be loaded
-                doAfterFetch.execute( perspective.getDefaultPerspectiveLayout() );
-
+                doAfterFetch.execute(perspective.getDefaultPerspectiveLayout());
             } else {
 
-                wbServices.loadPerspective( perspective.getIdentifier(), new ParameterizedCommand<PerspectiveDefinition>() {
-                    @Override
-                    public void execute( final PerspectiveDefinition response ) {
-                        if ( response == null ) {
-                            doAfterFetch.execute( perspective.getDefaultPerspectiveLayout() );
-                        } else {
-                            doAfterFetch.execute( response );
-                        }
-                    }
-                } );
+                wbServices.loadPerspective(perspective.getIdentifier(),
+                                           new ParameterizedCommand<PerspectiveDefinition>() {
+                                               @Override
+                                               public void execute(final PerspectiveDefinition response) {
+                                                   if (isAValidDefinition(response)) {
+                                                       doAfterFetch.execute(response);
+                                                   } else {
+                                                       doAfterFetch.execute(perspective.getDefaultPerspectiveLayout());
+                                                   }
+                                               }
+                                           });
             }
         }
-    }
 
+        boolean isAValidDefinition(PerspectiveDefinition response) {
+            return response != null && allThePartsAreValid(response.getRoot());
+        }
+
+        private boolean allThePartsAreValid(PanelDefinition panel) {
+            if (!checkIfAllPlacesAreValidActivities(panel)) {
+                return false;
+            } else {
+                for (PanelDefinition child : panel.getChildren()) {
+                    if (!allThePartsAreValid(child)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private boolean checkIfAllPlacesAreValidActivities(PanelDefinition child) {
+            for (PartDefinition partDefinition : child.getParts()) {
+                PlaceRequest place = partDefinition.getPlace();
+                if (!activityBeansCache.hasActivity(place.getIdentifier())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
     /**
      * Builds up the panels of a perspective based on the structure described in a given {@link PerspectiveDefinition}.
      */
