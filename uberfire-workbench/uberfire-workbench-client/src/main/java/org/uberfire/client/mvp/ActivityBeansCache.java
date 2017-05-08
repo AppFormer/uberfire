@@ -188,6 +188,9 @@ public class ActivityBeansCache {
             throw new RuntimeException( "Conflict detected. Activity Id already exists. " + activityBean.getBeanClass().toString() );
         }
 
+        activitiesById.put(id,
+                           activityBean);
+
         resourceActivities.add( new ActivityAndMetaInfo(activityBean, Integer.valueOf(priority),
                                                         Arrays.asList(resourceTypeName) ) );
         sortResourceActivitiesByPriority();
@@ -202,6 +205,10 @@ public class ActivityBeansCache {
 
         activitiesById.put( id, activityBean );
         splashActivities.add( (SplashScreenActivity) activityBean.getInstance() );
+    }
+
+    public boolean hasActivity(String id){
+        return activitiesById.containsKey(id);
     }
 
     /**

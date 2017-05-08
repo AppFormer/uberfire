@@ -16,17 +16,14 @@
 
 package org.uberfire.client.mvp;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.enterprise.event.Event;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -49,6 +46,13 @@ import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 import org.uberfire.workbench.model.impl.PartDefinitionImpl;
 import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.refEq;
+import static org.mockito.Mockito.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class PerspectiveManagerTest {
 
@@ -57,6 +61,7 @@ public class PerspectiveManagerTest {
     @Mock ActivityManager activityManager;
     @Mock WorkbenchServicesProxy wbServices;
     @Mock Event<PerspectiveChange> perspectiveChangeEvent;
+    @Mock ActivityBeansCache activityBeansCache;
 
     @InjectMocks PerspectiveManagerImpl perspectiveManager;
 
@@ -65,7 +70,15 @@ public class PerspectiveManagerTest {
     private PerspectiveActivity oz;
     private PlaceRequest pr;
     private ParameterizedCommand<PerspectiveDefinition> doWhenFinished;
+    private ParameterizedCommand<PerspectiveDefinition> doAfterFetch;
     private Command doWhenFinishedSave;
+    private PerspectiveManagerImpl.FetchPerspectiveCommand fetchCommand;
+    private List<PartDefinitionImpl> partDefinitionsRoot;
+    private List<PartDefinitionImpl> partDefinitionRootChild1;
+    private List<PartDefinitionImpl> partDefinitionRootChild2;
+    private List<PartDefinitionImpl> partDefinitionRootChild2Child;
+
+
 
     @SuppressWarnings("unchecked")
     @Before
@@ -79,7 +92,15 @@ public class PerspectiveManagerTest {
         when( oz.isTransient() ).thenReturn( true );
 
         doWhenFinished = mock( ParameterizedCommand.class );
+        doAfterFetch = spy(new ParameterizedCommand<PerspectiveDefinition>() {
+            @Override
+            public void execute(final PerspectiveDefinition parameter) {
+            }
+        });
         doWhenFinishedSave = mock( Command.class );
+
+        fetchCommand = spy(perspectiveManager.new FetchPerspectiveCommand(oz,
+                                                                          doAfterFetch));
 
         // simulate "finished saving" callback on wbServices.save()
         doAnswer( new Answer<Void>() {
@@ -244,37 +265,117 @@ public class PerspectiveManagerTest {
         verify( panelManager, never() ).removeWorkbenchPanel( rootPanel );
     }
 
-    @Test @Ignore // TODO this is PlaceManager's job now
-    public void shouldLaunchPartsFoundInPanels() throws Exception {
-        PartDefinitionImpl rootPart1 = new PartDefinitionImpl( new DefaultPlaceRequest( "rootPart1" ) );
-        PartDefinitionImpl southPart1 = new PartDefinitionImpl( new DefaultPlaceRequest( "southPart1" ) );
-        PartDefinitionImpl southPart2 = new PartDefinitionImpl( new DefaultPlaceRequest( "southPart2" ) );
-        PartDefinitionImpl southWestPart1 = new PartDefinitionImpl( new DefaultPlaceRequest( "southWestPart1" ) );
-        PartDefinitionImpl southWestPart2 = new PartDefinitionImpl( new DefaultPlaceRequest( "southWestPart2" ) );
+    @Test
+    public void fetchPerspectiveCommandForAnInvalidDefinitionShouldLoadedPerspectiveDefinitionTest() throws Exception {
 
-        ozDefinition.getRoot().addPart( rootPart1 );
-
-        PanelDefinition southPanel = new PanelDefinitionImpl( MultiListWorkbenchPanelPresenter.class.getName() );
-        southPanel.addPart( southPart1 );
-        southPanel.addPart( southPart2 );
-        ozDefinition.getRoot().appendChild( CompassPosition.SOUTH, southPanel );
-
-        PanelDefinition southWestPanel = new PanelDefinitionImpl( MultiListWorkbenchPanelPresenter.class.getName() );
-        southWestPanel.addPart( southWestPart1 );
-        southWestPanel.addPart( southWestPart2 );
-        southPanel.appendChild( CompassPosition.WEST, southWestPanel );
-
-        // we assume this will be set correctly (verified elsewhere)
-        when( panelManager.getRoot() ).thenReturn( ozDefinition.getRoot() );
-
-        perspectiveManager.switchToPerspective( pr, oz, doWhenFinished );
-
-        InOrder inOrder = inOrder( placeManager );
-        inOrder.verify( placeManager ).goTo( rootPart1, ozDefinition.getRoot() );
-        inOrder.verify( placeManager ).goTo( southPart1, southPanel );
-        inOrder.verify( placeManager ).goTo( southPart2, southPanel );
-        inOrder.verify( placeManager ).goTo( southWestPart1, southWestPanel );
-        inOrder.verify( placeManager ).goTo( southWestPart2, southWestPanel );
+        when(oz.isTransient()).thenReturn(false);
+        when(fetchCommand.isAValidDefinition(any(PerspectiveDefinition.class))).thenReturn(false);
+        fetchCommand.execute();
+//
+        assertEquals(oz,
+                     perspectiveManager.getCurrentPerspective());
+        verify(doAfterFetch).execute(eq(ozDefinition));
     }
 
+    @Test
+    public void fetchPerspectivesForTransientPerspectivesShouldAlwaysLoadDefaultLayoutTest() throws Exception {
+
+        when(fetchCommand.isAValidDefinition(any(PerspectiveDefinition.class))).thenReturn(true);
+        fetchCommand.execute();
+
+        assertEquals(oz,
+                     perspectiveManager.getCurrentPerspective());
+        verify(doAfterFetch).execute(eq(ozDefinition));
+    }
+
+    @Test
+    public void isAValidPerspectiveDefinitionTest() throws Exception {
+        createPartDefinitions();
+
+        when(activityBeansCache.hasActivity(any(String.class))).thenReturn(true);
+
+        assertTrue(fetchCommand.isAValidDefinition(createPerspectiveDefinition()));
+        verify(activityBeansCache,
+               times(getTotalOfPartDefinitions())).hasActivity(any(String.class));
+    }
+
+    @Test
+    public void isAnInvalidPerspectiveDefinitionTest() throws Exception {
+        when(activityBeansCache.hasActivity(any(String.class))).thenReturn(true);
+
+        assertFalse(fetchCommand.isAValidDefinition(null));
+    }
+
+    @Test
+    public void isAnInvalidPerspectiveDefinition2Test() throws Exception {
+        createPartDefinitions();
+        when(activityBeansCache.hasActivity(any(String.class))).thenReturn(true);
+        when(activityBeansCache.hasActivity("part3-rootChild2")).thenReturn(false);
+
+        assertFalse(fetchCommand.isAValidDefinition(createPerspectiveDefinition()));
+    }
+
+    private PerspectiveDefinition createPerspectiveDefinition() {
+        PerspectiveDefinitionImpl perspectiveDefinition = new PerspectiveDefinitionImpl();
+        PanelDefinition root = perspectiveDefinition.getRoot();
+        for (PartDefinitionImpl partDefinition : partDefinitionsRoot) {
+            root.addPart(partDefinition);
+        }
+
+        PanelDefinitionImpl rootChild1 = new PanelDefinitionImpl("org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter");
+        for (PartDefinitionImpl partDefinition : partDefinitionRootChild1) {
+            rootChild1.addPart(partDefinition);
+        }
+
+        PanelDefinitionImpl rootChild2 = new PanelDefinitionImpl("org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter");
+        for (PartDefinitionImpl partDefinition : partDefinitionRootChild2) {
+            rootChild2.addPart(partDefinition);
+        }
+
+        PanelDefinitionImpl rootChild2Child = new PanelDefinitionImpl("org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter");
+
+        for (PartDefinitionImpl partDefinition : partDefinitionRootChild2Child) {
+            rootChild2Child.addPart(partDefinition);
+        }
+
+        root.insertChild(mock(Position.class),
+                         rootChild1);
+        rootChild2.insertChild(mock(Position.class),
+                               rootChild2Child);
+        root.insertChild(mock(Position.class),
+                         rootChild2);
+
+        return perspectiveDefinition;
+    }
+
+    private void createPartDefinitions() {
+        partDefinitionsRoot = new ArrayList<>();
+        partDefinitionsRoot.add(new PartDefinitionImpl(new DefaultPlaceRequest("part1")));
+        partDefinitionsRoot.add(new PartDefinitionImpl(new DefaultPlaceRequest("part2")));
+
+        partDefinitionRootChild1 = new ArrayList<>();
+        partDefinitionRootChild1.add(new PartDefinitionImpl(new DefaultPlaceRequest("part1-rootChild1")));
+        partDefinitionRootChild1.add(new PartDefinitionImpl(new DefaultPlaceRequest("part2-rootChild1")));
+        partDefinitionRootChild1.add(new PartDefinitionImpl(new DefaultPlaceRequest("part3-rootChild1")));
+
+        partDefinitionRootChild2 = new ArrayList<>();
+        partDefinitionRootChild2.add(new PartDefinitionImpl(new DefaultPlaceRequest("part1-rootChild2")));
+        partDefinitionRootChild2.add(new PartDefinitionImpl(new DefaultPlaceRequest("part2-rootChild2")));
+        partDefinitionRootChild2.add(new PartDefinitionImpl(new DefaultPlaceRequest("part3-rootChild2")));
+
+        partDefinitionRootChild2Child = new ArrayList<>();
+        partDefinitionRootChild2Child.add(new PartDefinitionImpl(new DefaultPlaceRequest("part1-rootChild2Child")));
+        partDefinitionRootChild2Child.add(new PartDefinitionImpl(new DefaultPlaceRequest("part2-rootChild2Child")));
+        partDefinitionRootChild2Child.add(new PartDefinitionImpl(new DefaultPlaceRequest("part3-rootChild2Child")));
+        partDefinitionRootChild2Child.add(new PartDefinitionImpl(new DefaultPlaceRequest("part4-rootChild2Child")));
+
+    }
+
+    private int getTotalOfPartDefinitions() {
+        int total = partDefinitionsRoot.size() +
+                partDefinitionRootChild1.size() +
+                partDefinitionRootChild2.size() +
+                partDefinitionRootChild2Child.size();
+        return total;
+    }
 }
