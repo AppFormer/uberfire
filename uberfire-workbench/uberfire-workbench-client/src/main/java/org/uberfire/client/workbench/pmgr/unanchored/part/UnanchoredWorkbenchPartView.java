@@ -18,6 +18,7 @@ package org.uberfire.client.workbench.pmgr.unanchored.part;
 
 import javax.enterprise.context.Dependent;
 
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -38,6 +39,10 @@ public class UnanchoredWorkbenchPartView
 
     public UnanchoredWorkbenchPartView() {
         setWidget(sp);
+
+        // Make sure the panel gets enough vertical space when available
+        sp.getElement().getStyle().setHeight(100,
+                                             Style.Unit.PCT);
 
         // ScrollPanel creates an additional internal div that we need to style
         sp.getElement().getFirstChildElement().setClassName("uf-scroll-panel");
