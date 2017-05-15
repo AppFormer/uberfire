@@ -78,12 +78,12 @@ public class UberfireDocksImpl implements UberfireDocks {
                                         uberfireDocks);
             }
         }
-        updateDocks();
+        updateDocks(docks);
     }
 
     public void perspectiveChangeEvent(@Observes PerspectiveChange perspectiveChange) {
         this.currentSelectedPerspective = perspectiveChange.getIdentifier();
-        updateDocks();
+        updateAllDocks();
         fireDockReadyEvent();
     }
 
@@ -101,7 +101,7 @@ public class UberfireDocksImpl implements UberfireDocks {
                                         uberfireDocks);
             }
         }
-        updateDocks();
+        updateDocks(docks);
     }
 
     @Override
@@ -150,17 +150,27 @@ public class UberfireDocksImpl implements UberfireDocks {
         }
     }
 
-    private void updateDocks() {
+    private void updateDocks(UberfireDock... docks) {
         if (docksBars.isReady()) {
-            docksBars.clearAndCollapseAllDocks();
-            if (currentSelectedPerspective != null) {
-                List<UberfireDock> docks = docksPerPerspective.get(currentSelectedPerspective);
-                if (docks != null && !docks.isEmpty()) {
-                    for (UberfireDock dock : docks) {
-                        docksBars.addDock(dock);
+            if (docks != null) {
+                List<UberfireDockPosition> processedPositions = new ArrayList<>();
+                for (UberfireDock dock : docks) {
+                    if (!processedPositions.contains(dock.getDockPosition())) {
+                        processedPositions.add(dock.getDockPosition());
+                        docksBars.clearAndCollapse(dock.getDockPosition());
                     }
-                    expandAllAvailableDocks();
                 }
+            }
+        }
+    }
+
+    private void updateAllDocks() {
+        docksBars.clearAndCollapseAllDocks();
+        if (currentSelectedPerspective != null) {
+            List<UberfireDock> activeDocks = docksPerPerspective.get(currentSelectedPerspective);
+            if (activeDocks != null && !activeDocks.isEmpty()) {
+                activeDocks.forEach(activeDock -> docksBars.addDock(activeDock));
+                expandAllAvailableDocks();
             }
         }
     }

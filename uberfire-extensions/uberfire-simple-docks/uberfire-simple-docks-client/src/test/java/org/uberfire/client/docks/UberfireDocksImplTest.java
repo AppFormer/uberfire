@@ -140,8 +140,7 @@ public class UberfireDocksImplTest {
 
         assertEquals(SOME_PERSPECTIVE,
                      uberfireDocks.currentSelectedPerspective);
-        verify(this.docksBars,
-               times(2)).clearAndCollapseAllDocks();
+        verify(this.docksBars).clearAndCollapseAllDocks();
         verify(this.docksBars).addDock(dock0);
         verify(this.docksBars).addDock(dock1);
 
@@ -159,11 +158,11 @@ public class UberfireDocksImplTest {
         uberfireDocks.currentSelectedPerspective = SOME_PERSPECTIVE;
 
         uberfireDocks.remove(dock0);
-        verify(docksBars).clearAndCollapseAllDocks();
+        verify(docksBars).clearAndCollapse(dock0.getDockPosition());
 
         verify(docksBars,
                never()).addDock(dock0);
-        verify(docksBars).addDock(dock1);
+        verify(docksBars, never()).addDock(dock1);
     }
 
     @Test
