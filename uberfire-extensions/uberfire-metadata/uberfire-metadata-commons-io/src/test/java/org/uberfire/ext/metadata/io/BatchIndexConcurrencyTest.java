@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 import org.jboss.byteman.contrib.bmunit.BMScript;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.uberfire.java.nio.file.Path;
@@ -36,6 +37,7 @@ public class BatchIndexConcurrencyTest extends BaseIndexTest {
         return new String[]{this.getClass().getSimpleName()};
     }
 
+    @Ignore// see https://issues.jboss.org/browse/UF-512
     @Test
     //See https://bugzilla.redhat.com/show_bug.cgi?id=1288132
     public void testSingleConcurrentBatchIndexExecution() throws IOException, InterruptedException {
