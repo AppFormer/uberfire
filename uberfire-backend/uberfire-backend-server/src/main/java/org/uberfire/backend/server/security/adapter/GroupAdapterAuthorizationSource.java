@@ -37,19 +37,26 @@ public class GroupAdapterAuthorizationSource {
         try {
 
             List<String> principals = collectEntitiesFromSubject( username, subject, rolePrincipleNames );
-            if ( principals != null && !principals.isEmpty() ) {
-                roles.addAll( principals );
-            }
+            roles.addAll( filterValidPrincipals( principals ) );
 
             List<String> principalsFromAdapters = collectEntitiesFromAdapters( username, subject );
-            if (principalsFromAdapters != null && !principalsFromAdapters.isEmpty()) {
-                roles.addAll( principalsFromAdapters );
-            }
-
+            roles.addAll( filterValidPrincipals(principalsFromAdapters ) );
         } catch ( Exception e ) {
             throw new RuntimeException( e );
         }
         return roles;
+    }
+
+    private List<String> filterValidPrincipals(List<String> principals) {
+        List<String> validPrincipals = new ArrayList<>();
+        if ( principals != null ) {
+            for (String principal : principals) {
+                if (principal != null) {
+                    validPrincipals.add(principal);
+                }
+            }
+        }
+        return validPrincipals;
     }
 
     protected List<String> collectEntitiesFromAdapters( String username,
