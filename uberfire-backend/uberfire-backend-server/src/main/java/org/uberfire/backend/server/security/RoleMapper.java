@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 JBoss, by Red Hat, Inc
+ * Copyright 2017 JBoss, by Red Hat, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,9 +63,11 @@ public class RoleMapper {
         try {
             HashMap<String, JSONObject> roleMappers = loadRoleMappers();
             for (Entry<String, JSONObject> jo : roleMappers.entrySet()) {
+                // Regex role mapping provider a set of Regex patterns to be applied in determining if a user/group is authorized for a role.
                 if (jo.getKey().equals("org.uberfire.regex.role_mapping")) {
                     Set<String> principalPatterns = new HashSet<String>(RoleRegistry.get().getRegisteredRoles().size());
                     String template = jo.getValue().getString("regex");
+                    // create Regex pattern for each role using template found in regex provider
                     for (Role role : RoleRegistry.get().getRegisteredRoles()) {
                         String pattern = template;
                         principalPatterns.add(pattern.replaceAll("\\{role\\}", role.getName()));
@@ -73,6 +75,7 @@ public class RoleMapper {
                     RolePrincipalsRegistry.get().registerRolePrincipals("regex", principalPatterns);
 
                 } else {
+                    // all other mappers provide exact role to principal name mapping to be used in determining if a user/group is authorized for a role.
                     for (Role role : RoleRegistry.get().getRegisteredRoles()) {
 
                         JSONArray principalsJSON = jo.getValue().getJSONArray(role.getName());
@@ -81,19 +84,19 @@ public class RoleMapper {
                             for (int i = 0; i < principalsJSON.length(); i++) {
                                 principalList.add(principalsJSON.getString(i));
                             }
-
                             RolePrincipalsRegistry.get().registerRolePrincipals(role.getName(), principalList);
-
                         }
                     }
                 }
             }
-
         } catch (Exception e) {
             logger.error("Error mapping roles to principals.", e);
         }
     }
 
+    /*
+     * Role mappers are JSON files mapping an application roles to security users and groups. The location of the mapper(s) is a system property.
+     */
     protected HashMap<String, JSONObject> loadRoleMappers() throws Exception {
         try {
             final String resourceName = System.getProperty("org.uberfire.role.mappers", "role-mapping-providers.properties");

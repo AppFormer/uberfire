@@ -49,7 +49,7 @@ public class RolePrincipalsRegistry {
     }
 
     /**
-     * Registers given <code>role</code> into the registry
+     * Registers given role name into the registry
      */
     public void registerRolePrincipals(String role, Set<String> principals) {
         if (rolePrincipals.get(role) != null) {
@@ -68,7 +68,7 @@ public class RolePrincipalsRegistry {
 
     /**
     /**
-     * Returns unmodifiable copy of all reqistered role to principal mappings
+     * Returns unmodifiable copy of all registered role to principal mappings
      */
     public Map<String, Set<String>> getRegisteredRolePrincipals() {
         return Collections.unmodifiableMap(this.rolePrincipals);

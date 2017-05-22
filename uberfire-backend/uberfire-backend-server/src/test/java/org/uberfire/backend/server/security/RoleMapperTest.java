@@ -28,6 +28,8 @@ public class RoleMapperTest {
 
     @Before
     public void setUp() {
+        
+        // load roles available to the Web application
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("WEB-INF/classes/security-policy.properties");
         String homeDir = new File(fileURL.getPath()).getParentFile().getParentFile().getParent();
         WebAppSettings.get().setRootDir(homeDir);
@@ -36,13 +38,14 @@ public class RoleMapperTest {
         roleLoader.registerRolesFromwWebXml();
     }
 
+    
     @Test
     public void testRolesMappedToPrincipals() {
         RolePrincipalsRegistry.get().clear();
         RoleMapper roleMapper = new RoleMapper();
         roleMapper.registerRolePrincipals();
         Map<String, Set<String>> rolePrincipals = RolePrincipalsRegistry.get().getRegisteredRolePrincipals();
-
+        //role2 is mapped in file and ldap providers so expectec count is 2
         assertEquals("Unexpected number of Principals mapped to role.", 2, rolePrincipals.get("role2").size());
     }
 
@@ -53,6 +56,7 @@ public class RoleMapperTest {
         roleMapper.registerRolePrincipals();
         Set<String> rolePrincipals = RolePrincipalsRegistry.get().getRegisteredRolePrincipals("regex");
 
+        // one regex expression is defined with a variable placeholder for the role.  Therefore, one pattern per role is registered.
         assertEquals("Unexpected number of regex patterns.  Should be equal to the number of available roles.", 2, rolePrincipals.size());
     }
 }
