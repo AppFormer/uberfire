@@ -1,0 +1,7 @@
+{
+	"admin" : ["cn=admin, ou=groups, dc=example, dc=com"],
+	"analyst" : ["cn=analyst, ou=groups, dc=example, dc=com"],
+	"developer" : ["cn=developer, ou=groups, dc=example, dc=com"],
+	"role1" : ["cn=role1, ou=groups, dc=example, dc=com"],
+	"role2" : ["cn=role2, ou=groups, dc=example, dc=com"]
+}
