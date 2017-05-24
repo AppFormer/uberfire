@@ -338,3 +338,8 @@
 .uf-perspective-context-menu-empty {
     padding-top: 43px;
 }
+
+/*https://issues.jboss.org/browse/UF-517*/
+.bootstrap-select.btn-group .btn .caret {
+    margin-top: -4px !important;
+}
