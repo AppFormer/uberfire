@@ -59,8 +59,9 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
 
     private final String domain;
 
-    public JAASAuthenticationService(String domain) {
-        this.domain = PortablePreconditions.checkNotNull( "domain", domain );
+    public JAASAuthenticationService( String domain ) {
+        this.domain = PortablePreconditions.checkNotNull( "domain",
+                                                          domain );
     }
 
     @Override
@@ -77,7 +78,8 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
                 // Setting TCCL to application CL as workaround
                 Thread.currentThread().setContextClassLoader( cl );
 
-                return executeLogin( username, password );
+                return executeLogin( username,
+                                     password );
             } catch ( final LoginException ex ) {
                 throw new FailedAuthenticationException();
             } finally {
@@ -88,7 +90,8 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
             }
         } else {
             try {
-                return executeLogin( username, password );
+                return executeLogin( username,
+                                     password );
             } catch ( final LoginException ex ) {
                 throw new FailedAuthenticationException();
             }
@@ -97,12 +100,17 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
 
     private User executeLogin( final String username,
                                final String password ) throws LoginException {
-        final LoginContext loginContext = createLoginContext( username, password );
+        final LoginContext loginContext = createLoginContext( username,
+                                                              password );
         loginContext.login();
-        List<String> principals = loadEntitiesFromSubjectAndAdapters( username, loginContext.getSubject(), new String[]{ rolePrincipleName } );
+        List<String> principals = loadEntitiesFromSubjectAndAdapters( username,
+                                                                      loginContext.getSubject(),
+                                                                      new String[]{rolePrincipleName} );
         Collection<Role> roles = getRoles( principals );
         Collection<org.jboss.errai.security.shared.api.Group> groups = getGroups( principals );
-        UserImpl user = new UserImpl( username, roles, groups );
+        UserImpl user = new UserImpl( username,
+                                      roles,
+                                      groups );
         userOnThisThread.set( user );
         return user;
     }
@@ -115,7 +123,7 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
     @Override
     public User getUser() {
         User user = userOnThisThread.get();
-        if (user == null) {
+        if ( user == null ) {
             return User.ANONYMOUS;
         }
         return user;
@@ -126,8 +134,11 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
         return userOnThisThread.get() != null;
     }
 
-    LoginContext createLoginContext( String username, String password ) throws LoginException {
-        return new LoginContext( domain, new UsernamePasswordCallbackHandler( username, password ) );
+    LoginContext createLoginContext( String username,
+                                     String password ) throws LoginException {
+        return new LoginContext( domain,
+                                 new UsernamePasswordCallbackHandler( username,
+                                                                      password ) );
     }
 
     class UsernamePasswordCallbackHandler implements CallbackHandler {
@@ -135,7 +146,8 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
         private final String username;
         private final String password;
 
-        public UsernamePasswordCallbackHandler( final String username, final String password ) {
+        public UsernamePasswordCallbackHandler( final String username,
+                                                final String password ) {
             this.username = username;
             this.password = password;
         }
@@ -151,8 +163,10 @@ public class JAASAuthenticationService extends GroupAdapterAuthorizationSource i
                     passwordCB.setPassword( password.toCharArray() );
                 } else {
                     try {
-                        final Method method = callback.getClass().getMethod( "setObject", Object.class );
-                        method.invoke( callback, password );
+                        final Method method = callback.getClass().getMethod( "setObject",
+                                                                             Object.class );
+                        method.invoke( callback,
+                                       password );
                     } catch ( Exception e ) {
                     }
                 }

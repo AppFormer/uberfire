@@ -130,17 +130,6 @@
       <artifactId>powermock-api-mockito</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <!-- Marshalling -->
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
-
-	<dependency>
-	  <groupId>org.codehaus.jackson</groupId>
-	  <artifactId>jackson-mapper-asl</artifactId>
-	</dependency>
 
   </dependencies>
 

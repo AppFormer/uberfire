@@ -20,28 +20,51 @@ import org.jboss.errai.security.shared.api.Group;
 import org.jboss.errai.security.shared.api.GroupImpl;
 import org.jboss.errai.security.shared.api.Role;
 import org.jboss.errai.security.shared.api.RoleImpl;
-
 import org.uberfire.backend.server.security.RoleRegistry;
 import org.uberfire.security.authz.adapter.GroupsAdapter;
 
 import javax.security.auth.Subject;
 
-
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GroupAdapterAuthorizationSource {
 
-    private final ServiceLoader<GroupsAdapter> groupsAdapterServiceLoader = ServiceLoader.load(GroupsAdapter.class);
+    private final String roleRegexTemplate = System.getProperty( "org.uberfire.regex.role_mapper",
+                                                                 null );
+    
+    private HashMap<String, Pattern> regexPatterns = new HashMap<String, Pattern>();
 
-    protected List<String> loadEntitiesFromSubjectAndAdapters(String username, Subject subject, String[] rolePrincipleNames) {
+    private Iterator<GroupsAdapter> groupsAdapters = null;
+
+    public GroupAdapterAuthorizationSource() {
+        this( ServiceLoader.load( GroupsAdapter.class ).iterator() );
+    }
+
+    /**
+     * Constructor allowing custom {@link GroupsAdapter}s to be used.
+     * 
+     * @param groupsAdapters
+     */
+    public GroupAdapterAuthorizationSource( final Iterator<GroupsAdapter> groupsAdapters ) {
+        this.groupsAdapters = groupsAdapters;
+    }
+
+    protected List<String> loadEntitiesFromSubjectAndAdapters( String username,
+                                                               Subject subject,
+                                                               String... rolePrincipleNames ) {
         List<String> roles = new ArrayList<String>();
         try {
 
-            List<String> principals = collectEntitiesFromSubject( username, subject, rolePrincipleNames );
+            List<String> principals = collectEntitiesFromSubject( username,
+                                                                  subject,
+                                                                  rolePrincipleNames );
             roles.addAll( filterValidPrincipals( principals ) );
 
-            List<String> principalsFromAdapters = collectEntitiesFromAdapters( username, subject );
-            roles.addAll( filterValidPrincipals(principalsFromAdapters ) );            
+            List<String> principalsFromAdapters = collectEntitiesFromAdapters( username,
+                                                                               subject );
+            roles.addAll( filterValidPrincipals( principalsFromAdapters ) );
         } catch ( Exception e ) {
             throw new RuntimeException( e );
 
@@ -49,88 +72,86 @@ public class GroupAdapterAuthorizationSource {
         return roles;
     }
 
-    private List<String> filterValidPrincipals(List<String> principals) {
-        List<String> validPrincipals = new ArrayList<>();
-        if ( principals != null ) {
-            for (String principal : principals) {
-                if (principal != null) {
-                    validPrincipals.add(principal);
-                }
-            }
-        }
-        return validPrincipals;
-    }
-
     protected List<String> collectEntitiesFromAdapters( String username,
-                                                Subject subject ) {
+                                                        Subject subject ) {
 
         Set<String> userGroups = new HashSet<String>();
-        for (final GroupsAdapter adapter : groupsAdapterServiceLoader) {
-            final List<Group> groupRoles = adapter.getGroups(username, subject);
-            if (groupRoles != null) {
-                for (Group group : groupRoles) {
-                    userGroups.add(group.getName());
+
+        while ( groupsAdapters.hasNext() ) {
+            final List<Group> groupRoles = groupsAdapters.next().getGroups( username,
+                                                                            subject );
+            if ( groupRoles != null ) {
+
+                for ( Group group : groupRoles ) {
+                    // apply configurable regex pattern for adapters that do not return simple group names     
+                    if ( roleRegexTemplate == null || roleRegexTemplate.isEmpty() ) {
+                        userGroups.add( group.getName() );
+                    } else {
+                        userGroups.add( getSimpleName( group.getName() ) );
+                    }
                 }
             }
         }
 
-        return new LinkedList<String>(userGroups);
+        return new LinkedList<String>( userGroups );
     }
 
     /**
      * Collects the principals for a given subject.
      */
-    protected List<String> collectEntitiesFromSubject(String username, Subject subject, String[] rolePrincipleNames) {
-        if (null == subject) {
+    protected List<String> collectEntitiesFromSubject( String username,
+                                                       Subject subject,
+                                                       String... rolePrincipleNames ) {
+        if ( subject == null ) {
             return null;
         }
 
         List<String> roles = new ArrayList<String>();
         try {
             Set<java.security.Principal> principals = subject.getPrincipals();
-            if (principals != null) {
-                for (java.security.Principal p : principals) {
-                    if (p instanceof java.security.acl.Group) {
-                        for (final String rolePrincipleName : rolePrincipleNames) {
-                            if (rolePrincipleName.equalsIgnoreCase(p.getName())) {
+            if ( principals != null ) {
+                for ( java.security.Principal p : principals ) {
+                    if ( p instanceof java.security.acl.Group ) {
+                        for ( final String rolePrincipleName : rolePrincipleNames ) {
+                            if ( rolePrincipleName.equalsIgnoreCase( p.getName() ) ) {
                                 Enumeration<? extends java.security.Principal> groups = ((java.security.acl.Group) p).members();
-                                while (groups.hasMoreElements()) {
+                                while ( groups.hasMoreElements() ) {
                                     final java.security.Principal groupPrincipal = groups.nextElement();
-                                    roles.add(groupPrincipal.getName());
+                                    roles.add( groupPrincipal.getName() );
                                 }
                             }
                         }
 
                     } else {
-                        roles.add(p.getName());
+                        roles.add( p.getName() );
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
         }
         return roles;
     }
 
     /**
-     * For a given collection of principal names, return the Role instances for the ones
-     * that are considered roles, so the ones that exist on the RoleRegistry.
+     * For a given collection of principal names, return the Role instances for the ones that are considered roles, so
+     * the ones that exist on the RoleRegistry.
      */
-    protected List<Role> getRoles(List<String> principals) {
+    protected List<Role> getRoles( List<String> principals ) {
 
-        if (null != principals && !principals.isEmpty()) {
+        if ( principals != null && !principals.isEmpty() ) {
 
             Set<Role> registeredRoles = RoleRegistry.get().getRegisteredRoles();
 
-            if (null != registeredRoles && !registeredRoles.isEmpty()) {
+            if ( registeredRoles != null && !registeredRoles.isEmpty() ) {
 
                 List<Role> result = new LinkedList<Role>();
 
-                for (String role : principals) {
+                for ( String principal : principals ) {
 
-                    if (null != RoleRegistry.get().getRegisteredRole(role)) {
+                    if ( RoleRegistry.get().getRegisteredRole( principal ) != null ) {
 
-                        result.add(new RoleImpl(role));
+                        result.add( new RoleImpl( principal ) );
 
                     }
 
@@ -143,27 +164,28 @@ public class GroupAdapterAuthorizationSource {
         }
 
         return null;
+
     }
 
     /**
-     * For a given collection of principal names, return the Group instances for the ones
-     * that are considered roles, so the ones that exist on the RoleRegistry.
+     * For a given collection of principal names, return the Group instances for the ones that are not considered roles,
+     * so the ones that do not exist in the RoleRegistry.
      */
-    protected List<Group> getGroups(List<String> principals) {
+    protected List<Group> getGroups( List<String> principals ) {
 
-        if (null != principals && !principals.isEmpty()) {
+        if ( null != principals && !principals.isEmpty() ) {
 
             Set<Role> registeredRoles = RoleRegistry.get().getRegisteredRoles();
 
-            if (null != registeredRoles && !registeredRoles.isEmpty()) {
+            if ( null != registeredRoles && !registeredRoles.isEmpty() ) {
 
                 List<Group> result = new LinkedList<Group>();
 
-                for (String role : principals) {
+                for ( String role : principals ) {
 
-                    if (null == RoleRegistry.get().getRegisteredRole(role)) {
+                    if ( RoleRegistry.get().getRegisteredRole( role ) == null ) {
 
-                        result.add(new GroupImpl(role));
+                        result.add( new GroupImpl( role ) );
 
                     }
 
@@ -176,6 +198,40 @@ public class GroupAdapterAuthorizationSource {
         }
 
         return null;
-    }  
 
+    }
+
+    private List<String> filterValidPrincipals( List<String> principals ) {
+        List<String> validPrincipals = new ArrayList<>();
+        if ( principals != null ) {
+            for ( String principal : principals ) {
+                if ( principal != null ) {
+                    validPrincipals.add( principal );
+                }
+            }
+        }
+        return validPrincipals;
+    }
+
+    /*
+     * Return simple role name if name provided by adapter matches a regex pattern
+     * 
+     */
+    private String getSimpleName( String name ) {
+        for ( Role role : RoleRegistry.get().getRegisteredRoles() ) {
+            if ( !regexPatterns.containsKey( role.getName() ) ) {
+                regexPatterns.put( role.getName(),
+                                   Pattern.compile( roleRegexTemplate.replaceAll( "role",
+                                                                                  role.getName() ) ) );
+            }
+
+            Matcher matcher = regexPatterns.get( role.getName() ).matcher( name );
+            while ( matcher.find() ) {
+                if ( matcher.group( 0 ) != null ) {
+                    return role.getName();
+                }
+            }
+        }
+        return name;
+    }
 }
