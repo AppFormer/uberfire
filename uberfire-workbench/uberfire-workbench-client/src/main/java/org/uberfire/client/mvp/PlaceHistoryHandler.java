@@ -28,6 +28,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import org.uberfire.client.workbench.docks.UberfireDocksInteractionEvent;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.mvp.impl.PathPlaceRequest;
 import org.uberfire.workbench.model.ActivityResourceType;
 
 @ApplicationScoped
@@ -70,6 +71,8 @@ public class PlaceHistoryHandler {
                 historian.addValueChangeHandler(event -> {
                     //Temporarily disabled until https://issues.jboss.org/browse/AF-523 is ready
 //                    handleHistoryToken(event.getValue());
+                        String token = event.getValue();
+                        handleHistoryToken(token);
                 });
 
         return () -> {
@@ -80,6 +83,12 @@ public class PlaceHistoryHandler {
     }
 
     private void updateHistoryBar() {
+        if (currentBookmarkableURLStatus.endsWith(BookmarkableUrlHelper.OTHER_SCREEN_SEP)) {
+
+            currentBookmarkableURLStatus =
+                    currentBookmarkableURLStatus.substring(0,
+                                                           currentBookmarkableURLStatus.length() - 1);
+        }
         historian.newItem(currentBookmarkableURLStatus,
                               false);
     }
@@ -170,6 +179,12 @@ public class PlaceHistoryHandler {
     public void registerClose(Activity activity,
                               PlaceRequest place) {
         if (place.isUpdateLocationBarAllowed()) {
+            if (place instanceof PathPlaceRequest) {
+                // handle editors
+                currentBookmarkableURLStatus =
+                        BookmarkableUrlHelper.registerCloseEditor(currentBookmarkableURLStatus,
+                                                                  place);
+            } else {
             final String id = place.getIdentifier();
             if (activity.isType(ActivityResourceType.SCREEN.name())) {
                 final String token = BookmarkableUrlHelper.getUrlToken(currentBookmarkableURLStatus,
@@ -178,6 +193,7 @@ public class PlaceHistoryHandler {
                 currentBookmarkableURLStatus =
                         BookmarkableUrlHelper.registerClose(currentBookmarkableURLStatus,
                                                             token);
+                }
             }
             updateHistoryBar();
         }
