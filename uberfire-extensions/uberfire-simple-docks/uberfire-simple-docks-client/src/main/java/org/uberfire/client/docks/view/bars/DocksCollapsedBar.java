@@ -164,7 +164,7 @@ public class DocksCollapsedBar
     public void expand(UberfireDock targetDock) {
         for (AbstractDockItem abstractDockItem : getDocksItems()) {
             UberfireDock candidate = abstractDockItem.getDock();
-            if (candidate.equals(targetDock)) {
+            if (candidate.getPlaceRequest().equals(targetDock.getPlaceRequest())) {
                 abstractDockItem.selectAndExecuteExpandCommand();
             }
         }
