@@ -31,6 +31,8 @@ public interface UberfireDocks {
 
     void expand(UberfireDock dock);
 
+    void deselect(UberfireDock dock);
+
     void disable(UberfireDockPosition position,
                  String perspectiveName);
 

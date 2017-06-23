@@ -22,7 +22,6 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.client.docks.view.bars.DocksCollapsedBar;
@@ -214,6 +213,7 @@ public class DocksBars {
 
     void selectDock(UberfireDock targetDock,
                     DocksBar docksBar) {
+        docksBar.setExpandedDock(targetDock);
         DocksCollapsedBar collapsedBar = docksBar.getCollapsedBar();
         DocksExpandedBar expandedBar = docksBar.getExpandedBar();
         PlaceRequest placeRequest = targetDock.getPlaceRequest();
@@ -268,28 +268,48 @@ public class DocksBars {
                                                     docksBar));
     }
 
-    ParameterizedCommand<String> createDockDeselectCommand(final UberfireDock targetDock,
-                                                           final DocksBar docksBar) {
-        return new ParameterizedCommand<String>() {
-            @Override
-            public void execute(String clickDockName) {
-                if (targetDock != null) {
-                    deselectDock(docksBar);
-                    if (docksBar.isCollapsedBarInSingleMode()) {
-                        expand(docksBar.getCollapsedBar());
-                    }
-                    uberfireDocksContainer.resize();
-                    dockInteractionEvent.fire(new UberfireDocksInteractionEvent(targetDock,
-                                                                                UberfireDocksInteractionEvent.InteractionType.DESELECTED));
-                }
-            }
-        };
+    public void expand(UberfireDock dock) {
+        DocksBar dockBar = getDockBar(dock);
+        if (dockBar != null) {
+            dockBar.expand(dock);
+        }
     }
 
-    void deselectDock(DocksBar docksBar) {
+    public void deselect(UberfireDock dock) {
+        DocksBar dockBar = getDockBar(dock);
+        if (dockBar != null) {
+            if (dockBar.isExpandedWith(dock.getPlaceRequest())) {
+                deselectDockProcess(dock,
+                                    dockBar);
+            }
+        }
+    }
+
+    ParameterizedCommand<String> createDockDeselectCommand(final UberfireDock targetDock,
+                                                           final DocksBar docksBar) {
+        return clickDockName -> deselectDockProcess(targetDock,
+                                                    docksBar);
+    }
+
+    private void deselectDockProcess(UberfireDock targetDock,
+                                     DocksBar docksBar) {
+        if (targetDock != null) {
+            deselectDock(targetDock,
+                         docksBar);
+            if (docksBar.isCollapsedBarInSingleMode()) {
+                expand(docksBar.getCollapsedBar());
+            }
+            uberfireDocksContainer.resize();
+            dockInteractionEvent.fire(new UberfireDocksInteractionEvent(targetDock,
+                                                                        UberfireDocksInteractionEvent.InteractionType.DESELECTED));
+        }
+    }
+
+    void deselectDock(UberfireDock dock,
+                      DocksBar docksBar) {
         DocksCollapsedBar collapsedBar = docksBar.getCollapsedBar();
         DocksExpandedBar dockExpandedBar = docksBar.getExpandedBar();
-
+        docksBar.clearExpandedDock(dock);
         collapsedBar.deselectAllDocks();
         dockExpandedBar.clear();
         collapse(dockExpandedBar);
@@ -353,13 +373,6 @@ public class DocksBars {
     public void setIDEdock(Boolean IDEdock) {
         for (DocksBar dock : getDocksBars()) {
             dock.setupDnD();
-        }
-    }
-
-    public void expand(UberfireDock dock) {
-        DocksBar dockBar = getDockBar(dock);
-        if (dockBar != null) {
-            dockBar.expand(dock);
         }
     }
 }

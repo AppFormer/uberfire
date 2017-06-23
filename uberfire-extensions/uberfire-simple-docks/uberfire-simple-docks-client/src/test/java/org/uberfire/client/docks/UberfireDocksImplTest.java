@@ -201,6 +201,23 @@ public class UberfireDocksImplTest {
         verify(this.docksBars).expand(UberfireDockPosition.WEST);
     }
 
+    @Test
+    public void deselectDockTest() {
+        when(docksBars.isReady()).thenReturn(true);
+        uberfireDocks.add(dock0,
+                          dock1);
+        uberfireDocks.currentSelectedPerspective = SOME_PERSPECTIVE;
+
+        when(docksBars.isReady()).thenReturn(true);
+        List<DocksBar> docksBars = generateDocksBars();
+        when(this.docksBars.getDocksBars()).thenReturn(docksBars);
+
+        uberfireDocks.expand(dock0);
+        uberfireDocks.deselect(dock0);
+
+        verify(this.docksBars).deselect(dock0);
+    }
+
     private List<DocksBar> generateDocksBars() {
 
         List<DocksBar> docksBar = new ArrayList<DocksBar>();

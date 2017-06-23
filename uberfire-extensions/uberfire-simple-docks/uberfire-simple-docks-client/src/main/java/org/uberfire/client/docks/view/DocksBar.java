@@ -22,6 +22,7 @@ import org.uberfire.client.docks.view.items.AbstractDockItem;
 import org.uberfire.client.workbench.docks.UberfireDock;
 import org.uberfire.client.workbench.docks.UberfireDockPosition;
 import org.uberfire.mvp.ParameterizedCommand;
+import org.uberfire.mvp.PlaceRequest;
 
 public class DocksBar {
 
@@ -36,6 +37,7 @@ public class DocksBar {
 
     private DockResizeBar dockResizeBar;
     private Double dockResizeBarDefaultSize = 2.0;
+    private UberfireDock expandedDock;
 
     public DocksBar(UberfireDockPosition position) {
         this.position = position;
@@ -115,5 +117,23 @@ public class DocksBar {
         collapsedBar.expand(dock);
         AbstractDockItem docksItems = collapsedBar.getDocksItems().get(0);
         docksItems.select();
+    }
+
+    public void setExpandedDock(UberfireDock expandedDock) {
+        this.expandedDock = expandedDock;
+    }
+
+    public boolean isExpanded() {
+        return expandedDock != null;
+    }
+
+    public boolean isExpandedWith(PlaceRequest placeRequest) {
+        return isExpanded() && expandedDock.getPlaceRequest().equals(placeRequest);
+    }
+
+    public void clearExpandedDock(UberfireDock expandedDock) {
+        if (this.expandedDock == expandedDock) {
+            this.expandedDock = null;
+        }
     }
 }
