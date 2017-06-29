@@ -236,7 +236,7 @@ public class JAASAuthenticationServiceTest {
         list.add( wsga );
         Whitebox.setInternalState( sshClient,
                                    "groupsAdapters",
-                                   list.iterator() );
+                                   list );
 
         User user = sshClient.login( username,
                                      password );
