@@ -31,15 +31,21 @@ import java.util.regex.Pattern;
 
 public class GroupAdapterAuthorizationSource {
 
+    private final ServiceLoader<GroupsAdapter> groupsAdapterServiceLoader = ServiceLoader.load( GroupsAdapter.class );
     private final String roleRegexTemplate = System.getProperty( "org.uberfire.regex.role_mapper",
                                                                  null );
     
     private HashMap<String, Pattern> regexPatterns = new HashMap<String, Pattern>();
 
-    private Iterator<GroupsAdapter> groupsAdapters = null;
+    private List<GroupsAdapter> groupsAdapters = null;
 
     public GroupAdapterAuthorizationSource() {
-        this( ServiceLoader.load( GroupsAdapter.class ).iterator() );
+        List<GroupsAdapter> defaultList = new ArrayList<GroupsAdapter>();
+
+        for (GroupsAdapter adapter : groupsAdapterServiceLoader) {
+            defaultList.add(adapter);
+        }
+        this.groupsAdapters = defaultList;
     }
 
     /**
@@ -47,7 +53,7 @@ public class GroupAdapterAuthorizationSource {
      * 
      * @param groupsAdapters
      */
-    public GroupAdapterAuthorizationSource( final Iterator<GroupsAdapter> groupsAdapters ) {
+    public GroupAdapterAuthorizationSource( final List<GroupsAdapter> groupsAdapters ) {
         this.groupsAdapters = groupsAdapters;
     }
 
@@ -77,8 +83,8 @@ public class GroupAdapterAuthorizationSource {
 
         Set<String> userGroups = new HashSet<String>();
 
-        while ( groupsAdapters.hasNext() ) {
-            final List<Group> groupRoles = groupsAdapters.next().getGroups( username,
+        for ( GroupsAdapter groupsAdapter : groupsAdapters ) {
+            final List<Group> groupRoles = groupsAdapter.getGroups( username,
                                                                             subject );
             if ( groupRoles != null ) {
 
