@@ -15,20 +15,36 @@
  */
 package org.uberfire.client.mvp;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.context.Dependent;
+
+import com.google.gwt.http.client.URL;
 import com.google.gwtmockito.GwtMockitoTestRunner;
+import org.jboss.errai.ioc.client.QualifierUtil;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.jboss.errai.ioc.client.container.SyncBeanManagerImpl;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.internal.verification.Times;
+import org.uberfire.backend.vfs.ObservablePath;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.backend.vfs.PathFactory;
+import org.uberfire.backend.vfs.impl.ObservablePathImpl;
+import org.uberfire.client.util.MockIOCBeanDef;
 import org.uberfire.client.workbench.docks.UberfireDock;
 import org.uberfire.client.workbench.docks.UberfireDockPosition;
 import org.uberfire.client.workbench.docks.UberfireDocksInteractionEvent;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
+import org.uberfire.mvp.impl.PathPlaceRequest;
 import org.uberfire.workbench.model.ActivityResourceType;
 
 import static org.junit.Assert.*;
@@ -50,7 +66,6 @@ public class PlaceHistoryHandlerTest {
 
     @Before
     public void setup() {
-
         when(screenActivity.isDynamic()).thenReturn(false);
         when(screenActivity.isType(ActivityResourceType.SCREEN.name())).thenReturn(true);
         when(screenActivity.onMayClose()).thenReturn(true);
@@ -63,6 +78,19 @@ public class PlaceHistoryHandlerTest {
         when(perspectiveActivity.onMayClose()).thenReturn(true);
         when(perspectiveActivity.preferredWidth()).thenReturn(26);
         when(perspectiveActivity.preferredHeight()).thenReturn(77);
+
+    }
+
+    @BeforeClass
+    public static void setupBeans() {
+        ((SyncBeanManagerImpl) IOC.getBeanManager()).reset();
+
+        IOC.getBeanManager().registerBean(new MockIOCBeanDef<ObservablePath, ObservablePathImpl>(new ObservablePathImpl(),
+                                                                                                 ObservablePath.class,
+                                                                                                 Dependent.class,
+                                                                                                 new HashSet<Annotation>(Arrays.asList(QualifierUtil.DEFAULT_QUALIFIERS)),
+                                                                                                 null,
+                                                                                                 true));
     }
 
     @Test
@@ -209,6 +237,36 @@ public class PlaceHistoryHandlerTest {
         assertEquals(URL,
                      placeHistoryHandler.getCurrentBookmarkableURLStatus());
     }
+
+    @Test
+    public void testScreenCloseEditor() {
+        final String perspectiveName = "perspective";
+        final String screenName = "screen1";
+        final PlaceRequest screen = new DefaultPlaceRequest(screenName);
+        final PlaceRequest perspective = new DefaultPlaceRequest(perspectiveName);
+        final Path path = PathFactory.newPath("file",
+                                              "default://master@repo/path/to/file");
+        final PlaceRequest ppr = new PathPlaceRequest(path);
+
+        ppr.setIdentifier("Perspective Editor");
+
+        placeHistoryHandler.registerOpen(screenActivity,
+                                          ppr);
+        placeHistoryHandler.registerOpen(screenActivity,
+                                         screen);
+        placeHistoryHandler.registerOpen(perspectiveActivity,
+                                         perspective);
+
+        String expectedUrl = "perspective|Perspective Editor?path_uri=default%3A%2F%2Fmaster%40repo%2Fpath%2Fto%2Ffile&file_name=file&has_version_support=false,screen1";
+        assertEquals(expectedUrl,
+                     placeHistoryHandler.getCurrentBookmarkableURLStatus());
+        expectedUrl = "perspective|screen1";
+        placeHistoryHandler.registerClose(screenActivity,
+                                         ppr);
+        assertEquals(expectedUrl,
+                     placeHistoryHandler.getCurrentBookmarkableURLStatus());
+    }
+
 
     @Test
     public void testOtherScreen() {
