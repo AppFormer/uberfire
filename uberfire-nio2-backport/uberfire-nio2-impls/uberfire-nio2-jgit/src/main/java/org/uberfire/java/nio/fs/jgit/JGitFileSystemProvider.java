@@ -1144,37 +1144,59 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
         return new SeekableByteChannelFileBasedImpl(new RandomAccessFile(file,
                                                                          "rw").getChannel()) {
+            /**by
+             * The method makes sure a 'dot' file removal and actual file changes are done in a single commit.
+             *
+             * If a batch is already enabled on the filesystem being used, no action is required
+             * If a batch is not enabled on the filesystem, enable it
+             */
             @Override
             public void close() throws java.io.IOException {
                 super.close();
 
                 File tempDot = null;
                 final boolean hasDotContent;
-                if (options != null && options.contains(new DotFileOption())) {
-                    deleteIfExists(dot(path),
-                                   extractCommentedOption(options));
-                    tempDot = File.createTempFile("meta",
-                                                  "dot");
-                    hasDotContent = buildDotFile(path,
-                                                 new FileOutputStream(tempDot),
-                                                 attrs);
-                } else {
-                    hasDotContent = false;
+                boolean batchSet = false;
+                if (!gPath.getFileSystem().isOnBatch()) {
+                    setAttribute(gPath,
+                                 FileSystemState.FILE_SYSTEM_STATE_ATTR,
+                                 FileSystemState.BATCH);
+                    batchSet = true;
                 }
+                try {
+                    if (options != null && options.contains(new DotFileOption())) {
+                        deleteIfExists(dot(path),
+                                       extractCommentedOption(options),
+                                       null);
+                        tempDot = File.createTempFile("meta",
+                                                      "dot");
+                        hasDotContent = buildDotFile(path,
+                                                     new FileOutputStream(tempDot),
+                                                     attrs);
+                    } else {
+                        hasDotContent = false;
+                    }
 
-                final File dotfile = tempDot;
+                    final File dotfile = tempDot;
 
-                commit(gPath,
-                       buildCommitInfo("{" + toPathImpl(path).getPath() + "}",
-                                       options),
-                       new DefaultCommitContent(new HashMap<String, File>() {{
-                           put(gPath.getPath(),
-                               file);
-                           if (hasDotContent) {
-                               put(toPathImpl(dot(gPath)).getPath(),
-                                   dotfile);
-                           }
-                       }}));
+                    commit(gPath,
+                           buildCommitInfo("{" + toPathImpl(path).getPath() + "}",
+                                           options),
+                           new DefaultCommitContent(new HashMap<String, File>() {{
+                               put(gPath.getPath(),
+                                   file);
+                               if (hasDotContent) {
+                                   put(toPathImpl(dot(gPath)).getPath(),
+                                       dotfile);
+                               }
+                           }}));
+                } finally {
+                    if (batchSet) {
+                        setAttribute(gPath,
+                                     FileSystemState.FILE_SYSTEM_STATE_ATTR,
+                                     FileSystemState.NORMAL);
+                    }
+                }
             }
         };
     }
