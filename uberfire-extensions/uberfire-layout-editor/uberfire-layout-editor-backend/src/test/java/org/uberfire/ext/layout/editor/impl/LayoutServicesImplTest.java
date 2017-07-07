@@ -45,6 +45,13 @@ public class LayoutServicesImplTest {
     }
 
     @Test
+    public void emptyOrNullStringShouldReturnEmptyLayout() {
+        assertTrue(layoutServices.convertLayoutFromString(null).isEmpty());
+        assertTrue(layoutServices.convertLayoutFromString("").isEmpty());
+        assertTrue(layoutServices.convertLayoutFromString(" ").isEmpty());
+    }
+
+    @Test
     public void layoutMarshaller12withHTMLComponent() {
         String expected = loadSample("12withHTMLComponent.txt");
         LayoutTemplate template = layoutServices.convertLayoutFromString(expected);
