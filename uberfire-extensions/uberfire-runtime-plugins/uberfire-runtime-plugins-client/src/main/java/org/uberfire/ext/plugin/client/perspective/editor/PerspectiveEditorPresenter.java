@@ -51,6 +51,7 @@ import org.uberfire.ext.layout.editor.api.editor.LayoutTemplate;
 import org.uberfire.ext.layout.editor.client.api.LayoutDragComponent;
 import org.uberfire.ext.layout.editor.client.api.LayoutDragComponentGroup;
 import org.uberfire.ext.layout.editor.client.api.LayoutEditorPlugin;
+import org.uberfire.ext.plugin.client.perspective.editor.api.PerspectiveDragComponentUtils;
 import org.uberfire.ext.plugin.client.perspective.editor.api.PerspectiveEditorDragComponent;
 import org.uberfire.ext.plugin.client.perspective.editor.components.popup.AddTag;
 import org.uberfire.ext.plugin.client.perspective.editor.generator.PerspectiveEditorGenerator;
@@ -140,7 +141,7 @@ public class PerspectiveEditorPresenter extends BaseEditor {
              menuItems);
 
         this.layoutEditorPlugin.init(name,
-                                     lookupPerspectiveDragComponents(),
+                                     PerspectiveDragComponentUtils.lookupPerspectiveDragComponents(),
                                      org.uberfire.ext.plugin.client.resources.i18n.CommonConstants.INSTANCE.EmptyTitleText(),
                                      org.uberfire.ext.plugin.client.resources.i18n.CommonConstants.INSTANCE.EmptySubTitleText(),
                                      LayoutTemplate.Style.PAGE);
@@ -155,36 +156,6 @@ public class PerspectiveEditorPresenter extends BaseEditor {
         }
     }
 
-    protected LayoutDragComponentGroup lookupPerspectiveDragComponents() {
-        List<LayoutDragComponent> perspectiveDragComponents = scanPerspectiveDragComponents();
-
-        LayoutDragComponentGroup group = convertToDragComponentGroup(perspectiveDragComponents);
-
-        return group;
-    }
-
-    private LayoutDragComponentGroup convertToDragComponentGroup(
-            List<LayoutDragComponent> perspectiveDragComponents) {
-        LayoutDragComponentGroup group = new LayoutDragComponentGroup("Uberfire Widgets");
-        int id = 0;
-        for (LayoutDragComponent layoutDragComponent : perspectiveDragComponents) {
-            group.addLayoutDragComponent(String.valueOf(id),
-                                         layoutDragComponent);
-            id++;
-        }
-        return group;
-    }
-
-    private List<LayoutDragComponent> scanPerspectiveDragComponents() {
-        List<LayoutDragComponent> result = new ArrayList<>();
-        Collection<SyncBeanDef<PerspectiveEditorDragComponent>> beanDefs = IOC
-                .getBeanManager().lookupBeans(PerspectiveEditorDragComponent.class);
-        for (SyncBeanDef<PerspectiveEditorDragComponent> beanDef : beanDefs) {
-            PerspectiveEditorDragComponent dragComponent = beanDef.getInstance();
-            result.add(dragComponent);
-        }
-        return result;
-    }
 
     @Override
     protected void makeMenuBar() {

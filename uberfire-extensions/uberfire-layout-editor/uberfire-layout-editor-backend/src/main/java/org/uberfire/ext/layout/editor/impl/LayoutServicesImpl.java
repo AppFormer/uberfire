@@ -45,9 +45,8 @@ public class LayoutServicesImpl implements LayoutServices {
     @Override
     public LayoutTemplate convertLayoutFromString(String layoutEditorModel) {
         try {
-            if (needsUpgrade(layoutEditorModel)) {
-                throw new RuntimeException("not yet supported");
-//                return LayoutUpgradeTool.convert( layoutEditorModel );
+            if (emptyModel(layoutEditorModel)) {
+                return new LayoutTemplate();
             } else {
                 LayoutTemplate layoutTemplate = gson.fromJson(layoutEditorModel,
                                                               LayoutTemplate.class);
@@ -58,8 +57,7 @@ public class LayoutServicesImpl implements LayoutServices {
         }
     }
 
-    private boolean needsUpgrade(String layoutEditorModel) {
-        //return !version1( layoutEditorModel );
-        return false;
+    private boolean emptyModel(String layoutEditorModel) {
+        return layoutEditorModel == null || layoutEditorModel.trim().isEmpty();
     }
 }
