@@ -33,8 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.slf4j.Logger;
@@ -58,76 +56,57 @@ import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.Watchable;
 import org.uberfire.java.nio.file.attribute.UserPrincipalLookupService;
 import org.uberfire.java.nio.file.spi.FileSystemProvider;
+import org.uberfire.java.nio.fs.jgit.util.Git;
+import org.uberfire.java.nio.fs.jgit.util.model.CommitInfo;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableSet;
-import static org.eclipse.jgit.lib.Repository.shortenRefName;
-import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
-import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
-import static org.uberfire.java.nio.fs.jgit.util.JGitUtil.branchList;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
+import static org.eclipse.jgit.lib.Repository.*;
+import static org.uberfire.commons.validation.PortablePreconditions.*;
 
 public class JGitFileSystem implements FileSystem,
                                        FileSystemId,
                                        FileSystemStateAware {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JGitFileSystem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( JGitFileSystem.class );
 
-    private static final Set<String> SUPPORTED_ATTR_VIEWS = unmodifiableSet(new HashSet<String>(asList("basic",
-                                                                                                       "version")));
+    private static final Set<String> SUPPORTED_ATTR_VIEWS = unmodifiableSet( new HashSet<String>( asList( "basic", "version" ) ) );
 
     private final JGitFileSystemProvider provider;
-    private final Git gitRepo;
-    private final ListBranchCommand.ListMode listMode;
+    private final Git git;
     private final String toStringContent;
+    private boolean isClosed = false;
     private final FileStore fileStore;
     private final String name;
     private final CredentialsProvider credential;
     private final Map<WatchService, Queue<WatchKey>> events = new ConcurrentHashMap<WatchService, Queue<WatchKey>>();
     private final Collection<WatchService> watchServices = new ArrayList<WatchService>();
-    private final AtomicInteger numberOfCommitsSinceLastGC = new AtomicInteger(0);
-    private final Lock lock = new Lock();
-    private boolean isClosed = false;
+    private final AtomicInteger numberOfCommitsSinceLastGC = new AtomicInteger( 0 );
+
     private FileSystemState state = FileSystemState.NORMAL;
     private CommitInfo batchCommitInfo = null;
     private Map<Path, Boolean> hadCommitOnBatchState = new ConcurrentHashMap<Path, Boolean>();
 
-    JGitFileSystem(final JGitFileSystemProvider provider,
-                   final Map<String, String> fullHostNames,
-                   final Git git,
-                   final String name,
-                   final CredentialsProvider credential) {
-        this(provider,
-             fullHostNames,
-             git,
-             name,
-             null,
-             credential);
-    }
+    private final Lock lock = new Lock();
 
-    JGitFileSystem(final JGitFileSystemProvider provider,
-                   final Map<String, String> fullHostNames,
-                   final Git git,
-                   final String name,
-                   final ListBranchCommand.ListMode listMode,
-                   final CredentialsProvider credential) {
-        this.provider = checkNotNull("provider",
-                                     provider);
-        this.gitRepo = checkNotNull("git",
-                                    git);
-        this.name = checkNotEmpty("name",
-                                  name);
-        this.credential = checkNotNull("credential",
-                                       credential);
-        this.listMode = listMode;
-        this.fileStore = new JGitFileStore(gitRepo.getRepository());
-        if (fullHostNames != null && !fullHostNames.isEmpty()) {
+    JGitFileSystem( final JGitFileSystemProvider provider,
+                    final Map<String, String> fullHostNames,
+                    final Git git,
+                    final String name,
+                    final CredentialsProvider credential ) {
+        this.provider = checkNotNull( "provider", provider );
+        this.git = checkNotNull( "git", git );
+        this.name = checkNotEmpty( "name", name );
+        this.credential = checkNotNull( "credential", credential );
+        this.fileStore = new JGitFileStore( this.git.getRepository() );
+        if ( fullHostNames != null && !fullHostNames.isEmpty() ) {
             final StringBuilder sb = new StringBuilder();
             final Iterator<Map.Entry<String, String>> iterator = fullHostNames.entrySet().iterator();
-            while (iterator.hasNext()) {
+            while ( iterator.hasNext() ) {
                 final Map.Entry<String, String> entry = iterator.next();
-                sb.append(entry.getKey()).append("://").append(entry.getValue()).append("/").append(name);
-                if (iterator.hasNext()) {
-                    sb.append("\n");
+                sb.append( entry.getKey() ).append( "://" ).append( entry.getValue() ).append( "/" ).append( name );
+                if ( iterator.hasNext() ) {
+                    sb.append( "\n" );
                 }
             }
             toStringContent = sb.toString();
@@ -145,8 +124,8 @@ public class JGitFileSystem implements FileSystem,
         return name;
     }
 
-    public Git gitRepo() {
-        return gitRepo;
+    public Git getGit() {
+        return git;
     }
 
     public CredentialsProvider getCredential() {
@@ -176,54 +155,46 @@ public class JGitFileSystem implements FileSystem,
     @Override
     public Iterable<Path> getRootDirectories() {
         checkClosed();
-        return new Iterable<Path>() {
+        return () -> new Iterator<Path>() {
+
+            Iterator<Ref> branches = null;
+
             @Override
-            public Iterator<Path> iterator() {
-                return new Iterator<Path>() {
+            public boolean hasNext() {
+                if ( branches == null ) {
+                    init();
+                }
+                return branches.hasNext();
+            }
 
-                    Iterator<Ref> branches = null;
+            private void init() {
+                branches = git.listRefs().iterator();
+            }
 
-                    @Override
-                    public boolean hasNext() {
-                        if (branches == null) {
-                            init();
-                        }
-                        return branches.hasNext();
-                    }
+            @Override
+            public Path next() {
 
-                    private void init() {
-                        branches = branchList(gitRepo,
-                                              listMode).iterator();
-                    }
+                if ( branches == null ) {
+                    init();
+                }
+                try {
+                    return JGitPathImpl.createRoot( JGitFileSystem.this, "/",
+                                                    shortenRefName( branches.next().getName() ) + "@" + name,
+                                                    false );
+                } catch ( NoSuchElementException e ) {
+                    throw new IllegalStateException(
+                            "The gitnio directory is in an invalid state. " +
+                                    "If you are an IntelliJ IDEA user, " +
+                                    "there is a known bug which requires specifying " +
+                                    "a custom directory for your git repository. " +
+                                    "You can specify a custom directory using '-Dorg.uberfire.nio.git.dir=/tmp/dir'. " +
+                                    "For more details please see https://issues.jboss.org/browse/UF-275.", e );
+                }
+            }
 
-                    @Override
-                    public Path next() {
-
-                        if (branches == null) {
-                            init();
-                        }
-                        try {
-                            return JGitPathImpl.createRoot(JGitFileSystem.this,
-                                                           "/",
-                                                           shortenRefName(branches.next().getName()) + "@" + name,
-                                                           false);
-                        } catch (NoSuchElementException e) {
-                            throw new IllegalStateException(
-                                    "The gitnio directory is in an invalid state. " +
-                                            "If you are an IntelliJ IDEA user, " +
-                                            "there is a known bug which requires specifying " +
-                                            "a custom directory for your git repository. " +
-                                            "You can specify a custom directory using '-Dorg.uberfire.nio.git.dir=/tmp/dir'. " +
-                                            "For more details please see https://issues.jboss.org/browse/UF-275.",
-                                    e);
-                        }
-                    }
-
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
             }
         };
     }
@@ -231,33 +202,28 @@ public class JGitFileSystem implements FileSystem,
     @Override
     public Iterable<FileStore> getFileStores() {
         checkClosed();
-        return new Iterable<FileStore>() {
+        return () -> new Iterator<FileStore>() {
+
+            private int i = 0;
+
             @Override
-            public Iterator<FileStore> iterator() {
-                return new Iterator<FileStore>() {
+            public boolean hasNext() {
+                return i < 1;
+            }
 
-                    private int i = 0;
+            @Override
+            public FileStore next() {
+                if ( i < 1 ) {
+                    i++;
+                    return fileStore;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
 
-                    @Override
-                    public boolean hasNext() {
-                        return i < 1;
-                    }
-
-                    @Override
-                    public FileStore next() {
-                        if (i < 1) {
-                            i++;
-                            return fileStore;
-                        } else {
-                            throw new NoSuchElementException();
-                        }
-                    }
-
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
             }
         };
     }
@@ -269,42 +235,35 @@ public class JGitFileSystem implements FileSystem,
     }
 
     @Override
-    public Path getPath(final String first,
-                        final String... more)
+    public Path getPath( final String first,
+                         final String... more )
             throws InvalidPathException {
         checkClosed();
-        if (first == null || first.trim().isEmpty()) {
-            return new JGitFSPath(this);
+        if ( first == null || first.trim().isEmpty() ) {
+            return new JGitFSPath( this );
         }
 
-        if (more == null || more.length == 0) {
-            return JGitPathImpl.create(this,
-                                       first,
-                                       JGitPathImpl.DEFAULT_REF_TREE + "@" + name,
-                                       false);
+        if ( more == null || more.length == 0 ) {
+            return JGitPathImpl.create( this, first, JGitPathImpl.DEFAULT_REF_TREE + "@" + name, false );
         }
 
         final StringBuilder sb = new StringBuilder();
-        for (final String segment : more) {
-            if (segment.length() > 0) {
-                if (sb.length() > 0) {
-                    sb.append(getSeparator());
+        for ( final String segment : more ) {
+            if ( segment.length() > 0 ) {
+                if ( sb.length() > 0 ) {
+                    sb.append( getSeparator() );
                 }
-                sb.append(segment);
+                sb.append( segment );
             }
         }
-        return JGitPathImpl.create(this,
-                                   sb.toString(),
-                                   first + "@" + name,
-                                   false);
+        return JGitPathImpl.create( this, sb.toString(), first + "@" + name, false );
     }
 
     @Override
-    public PathMatcher getPathMatcher(final String syntaxAndPattern)
+    public PathMatcher getPathMatcher( final String syntaxAndPattern )
             throws IllegalArgumentException, PatternSyntaxException, UnsupportedOperationException {
         checkClosed();
-        checkNotEmpty("syntaxAndPattern",
-                      syntaxAndPattern);
+        checkNotEmpty( "syntaxAndPattern", syntaxAndPattern );
         throw new UnsupportedOperationException();
     }
 
@@ -324,26 +283,26 @@ public class JGitFileSystem implements FileSystem,
 
             @Override
             public WatchKey poll() throws ClosedWatchServiceException {
-                return events.get(this).poll();
+                return events.get( this ).poll();
             }
 
             @Override
-            public WatchKey poll(long timeout,
-                                 TimeUnit unit) throws ClosedWatchServiceException, org.uberfire.java.nio.file.InterruptedException {
-                return events.get(this).poll();
+            public WatchKey poll( long timeout,
+                                  TimeUnit unit ) throws ClosedWatchServiceException, org.uberfire.java.nio.file.InterruptedException {
+                return events.get( this ).poll();
             }
 
             @Override
             public synchronized WatchKey take() throws ClosedWatchServiceException, InterruptedException {
-                while (true) {
-                    if (wsClose || isClosed) {
-                        throw new ClosedWatchServiceException("This service is closed.");
-                    } else if (events.get(this).size() > 0) {
-                        return events.get(this).poll();
+                while ( true ) {
+                    if ( wsClose || isClosed ) {
+                        throw new ClosedWatchServiceException( "This service is closed." );
+                    } else if ( events.get( this ).size() > 0 ) {
+                        return events.get( this ).poll();
                     } else {
                         try {
                             this.wait();
-                        } catch (final java.lang.InterruptedException e) {
+                        } catch ( final java.lang.InterruptedException e ) {
                         }
                     }
                 }
@@ -358,7 +317,7 @@ public class JGitFileSystem implements FileSystem,
             public synchronized void close() throws IOException {
                 wsClose = true;
                 notifyAll();
-                watchServices.remove(this);
+                watchServices.remove( this );
             }
 
             @Override
@@ -368,69 +327,63 @@ public class JGitFileSystem implements FileSystem,
                         '}';
             }
         };
-        events.put(ws,
-                   new ConcurrentLinkedQueue<WatchKey>());
-        watchServices.add(ws);
+        events.put( ws, new ConcurrentLinkedQueue<>() );
+        watchServices.add( ws );
         return ws;
     }
 
     @Override
     public void close() throws IOException {
-        if (isClosed) {
+        if ( isClosed ) {
             return;
         }
-        gitRepo.getRepository().close();
+        git.getRepository().close();
         isClosed = true;
         try {
 
-            for (final WatchService ws : new ArrayList<WatchService>(watchServices)) {
+            for ( final WatchService ws : new ArrayList<>( watchServices ) ) {
                 try {
                     ws.close();
-                } catch (final Exception ex) {
-                    LOGGER.error("Can't close watch service [" + toString() + "]",
-                                 ex);
+                } catch ( final Exception ex ) {
+                    LOGGER.error( "Can't close watch service [" + toString() + "]", ex );
                 }
             }
             watchServices.clear();
             events.clear();
-        } catch (final Exception ex) {
-            LOGGER.error("Error during close of WatchServices [" + toString() + "]",
-                         ex);
+        } catch ( final Exception ex ) {
+            LOGGER.error( "Error during close of WatchServices [" + toString() + "]", ex );
         } finally {
-            provider.onCloseFileSystem(this);
+            provider.onCloseFileSystem( this );
         }
     }
 
     private void checkClosed() throws IllegalStateException {
-        if (isClosed) {
-            throw new IllegalStateException("FileSystem is closed.");
+        if ( isClosed ) {
+            throw new IllegalStateException( "FileSystem is closed." );
         }
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals( Object o ) {
+        if ( this == o ) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ( o == null || getClass() != o.getClass() ) {
             return false;
         }
 
         JGitFileSystem that = (JGitFileSystem) o;
 
-        if (fileStore != null ? !fileStore.equals(that.fileStore) : that.fileStore != null) {
+        if ( fileStore != null ? !fileStore.equals( that.fileStore ) : that.fileStore != null ) {
             return false;
         }
-        if (!gitRepo.equals(that.gitRepo)) {
+        if ( !git.equals( that.git ) ) {
             return false;
         }
-        if (listMode != that.listMode) {
+        if ( !name.equals( that.name ) ) {
             return false;
         }
-        if (!name.equals(that.name)) {
-            return false;
-        }
-        if (!provider.equals(that.provider)) {
+        if ( !provider.equals( that.provider ) ) {
             return false;
         }
 
@@ -445,16 +398,15 @@ public class JGitFileSystem implements FileSystem,
     @Override
     public int hashCode() {
         int result = provider.hashCode();
-        result = 31 * result + gitRepo.hashCode();
-        result = 31 * result + (listMode != null ? listMode.hashCode() : 0);
-        result = 31 * result + (fileStore != null ? fileStore.hashCode() : 0);
+        result = 31 * result + git.hashCode();
+        result = 31 * result + ( fileStore != null ? fileStore.hashCode() : 0 );
         result = 31 * result + name.hashCode();
         return result;
     }
 
-    public void publishEvents(final Path watchable,
-                              final List<WatchEvent<?>> elist) {
-        if (this.events.isEmpty()) {
+    public void publishEvents( final Path watchable,
+                               final List<WatchEvent<?>> elist ) {
+        if ( this.events.isEmpty() ) {
             return;
         }
 
@@ -467,7 +419,7 @@ public class JGitFileSystem implements FileSystem,
 
             @Override
             public List<WatchEvent<?>> pollEvents() {
-                return new ArrayList<WatchEvent<?>>(elist);
+                return new ArrayList<WatchEvent<?>>( elist );
             }
 
             @Override
@@ -485,10 +437,10 @@ public class JGitFileSystem implements FileSystem,
             }
         };
 
-        for (final Map.Entry<WatchService, Queue<WatchKey>> watchServiceQueueEntry : events.entrySet()) {
-            watchServiceQueueEntry.getValue().add(wk);
+        for ( final Map.Entry<WatchService, Queue<WatchKey>> watchServiceQueueEntry : events.entrySet() ) {
+            watchServiceQueueEntry.getValue().add( wk );
             final WatchService ws = watchServiceQueueEntry.getKey();
-            synchronized (ws) {
+            synchronized ( ws ) {
                 ws.notifyAll();
             }
         }
@@ -496,18 +448,26 @@ public class JGitFileSystem implements FileSystem,
 
     @Override
     public void dispose() {
-        if (!isClosed) {
+        if ( !isClosed ) {
             close();
         }
-        provider.onDisposeFileSystem(this);
+        provider.onDisposeFileSystem( this );
     }
 
     public boolean isOnBatch() {
-        return state.equals(FileSystemState.BATCH);
+        return state.equals( FileSystemState.BATCH );
     }
 
-    private CommitInfo buildCommitInfo(final String defaultMessage,
-                                       final CommentedOption op) {
+    public void setState( String state ) {
+        try {
+            this.state = FileSystemState.valueOf( state );
+        } catch ( final Exception ex ) {
+            this.state = FileSystemState.NORMAL;
+        }
+    }
+
+    private CommitInfo buildCommitInfo( final String defaultMessage,
+                                        final CommentedOption op ) {
         String sessionId = null;
         String name = null;
         String email = null;
@@ -515,57 +475,48 @@ public class JGitFileSystem implements FileSystem,
         TimeZone timeZone = null;
         Date when = null;
 
-        if (op != null) {
+        if ( op != null ) {
             sessionId = op.getSessionId();
             name = op.getName();
             email = op.getEmail();
-            if (op.getMessage() != null && !op.getMessage().trim().isEmpty()) {
+            if ( op.getMessage() != null && !op.getMessage().trim().isEmpty() ) {
                 message = op.getMessage();
             }
             timeZone = op.getTimeZone();
             when = op.getWhen();
         }
 
-        return new CommitInfo(sessionId,
-                              name,
-                              email,
-                              message,
-                              timeZone,
-                              when);
+        return new CommitInfo( sessionId, name, email, message, timeZone, when );
     }
 
-    public void setBatchCommitInfo(final String defaultMessage,
-                                   final CommentedOption op) {
-        this.batchCommitInfo = buildCommitInfo(defaultMessage,
-                                               op);
+    public void setBatchCommitInfo( final String defaultMessage,
+                                    final CommentedOption op ) {
+        this.batchCommitInfo = buildCommitInfo( defaultMessage, op );
     }
 
-    public void setHadCommitOnBatchState(final Path path,
-                                         final boolean hadCommitOnBatchState) {
-        final Path root = checkNotNull("path",
-                                       path).getRoot();
-        this.hadCommitOnBatchState.put(root.getRoot(),
-                                       hadCommitOnBatchState);
+    public void setHadCommitOnBatchState( final Path path,
+                                          final boolean hadCommitOnBatchState ) {
+        final Path root = checkNotNull( "path", path ).getRoot();
+        this.hadCommitOnBatchState.put( root.getRoot(), hadCommitOnBatchState );
     }
 
-    public void setHadCommitOnBatchState(final boolean value) {
-        for (Map.Entry<Path, Boolean> entry : hadCommitOnBatchState.entrySet()) {
-            entry.setValue(value);
+    public void setHadCommitOnBatchState( final boolean value ) {
+        for ( Map.Entry<Path, Boolean> entry : hadCommitOnBatchState.entrySet() ) {
+            entry.setValue( value );
         }
     }
 
-    public boolean isHadCommitOnBatchState(final Path path) {
-        final Path root = checkNotNull("path",
-                                       path).getRoot();
-        return hadCommitOnBatchState.containsKey(root) ? hadCommitOnBatchState.get(root) : false;
+    public boolean isHadCommitOnBatchState( final Path path ) {
+        final Path root = checkNotNull( "path", path ).getRoot();
+        return hadCommitOnBatchState.containsKey( root ) ? hadCommitOnBatchState.get( root ) : false;
+    }
+
+    public void setBatchCommitInfo( CommitInfo batchCommitInfo ) {
+        this.batchCommitInfo = batchCommitInfo;
     }
 
     public CommitInfo getBatchCommitInfo() {
         return batchCommitInfo;
-    }
-
-    public void setBatchCommitInfo(CommitInfo batchCommitInfo) {
-        this.batchCommitInfo = batchCommitInfo;
     }
 
     public int incrementAndGetCommitCount() {
@@ -573,7 +524,7 @@ public class JGitFileSystem implements FileSystem,
     }
 
     public void resetCommitCount() {
-        numberOfCommitsSinceLastGC.set(0);
+        numberOfCommitsSinceLastGC.set( 0 );
     }
 
     int getNumberOfCommitsSinceLastGC() {
@@ -585,18 +536,10 @@ public class JGitFileSystem implements FileSystem,
         return state;
     }
 
-    public void setState(String state) {
-        try {
-            this.state = FileSystemState.valueOf(state);
-        } catch (final Exception ex) {
-            this.state = FileSystemState.NORMAL;
-        }
-    }
-
     public void lock() {
         try {
             lock.lock();
-        } catch (java.lang.InterruptedException e) {
+        } catch ( final java.lang.InterruptedException ignored ) {
         }
     }
 
@@ -606,18 +549,18 @@ public class JGitFileSystem implements FileSystem,
 
     private static class Lock {
 
-        private final AtomicBoolean isLocked = new AtomicBoolean(false);
+        private final AtomicBoolean isLocked = new AtomicBoolean( false );
 
         public synchronized void lock() throws java.lang.InterruptedException {
-            while (!isLocked.compareAndSet(false,
-                                           true)) {
+            while ( !isLocked.compareAndSet( false, true ) ) {
                 wait();
             }
         }
 
         public synchronized void unlock() {
-            isLocked.set(false);
+            isLocked.set( false );
             notifyAll();
         }
     }
+
 }

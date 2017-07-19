@@ -23,15 +23,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.sshd.SshServer;
-import org.apache.sshd.common.util.SecurityUtils;
-import org.apache.sshd.server.Command;
-import org.apache.sshd.server.CommandFactory;
-import org.apache.sshd.server.PasswordAuthenticator;
-import org.apache.sshd.server.command.UnknownCommand;
+import org.apache.sshd.common.util.security.SecurityUtils;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.pubkey.CachingPublicKeyAuthenticator;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
+import org.apache.sshd.server.scp.UnknownCommand;
 import org.eclipse.jgit.transport.resolver.ReceivePackFactory;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 import org.uberfire.java.nio.security.FileSystemAuthenticator;
@@ -46,124 +43,93 @@ public class GitSSHService {
     private final SshServer sshd = SshServer.setUpDefaultServer();
     private FileSystemAuthenticator fileSystemAuthenticator;
     private FileSystemAuthorizer fileSystemAuthorizer;
-    private ExecutorService executorService;
 
-    public void setup(final File certDir,
-                      final InetSocketAddress inetSocketAddress,
-                      final String sshIdleTimeout,
-                      final String algorithm,
-                      final ReceivePackFactory receivePackFactory,
-                      final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
-                      final ExecutorService executorService) {
-        checkNotNull("certDir",
-                     certDir);
-        checkNotEmpty("sshIdleTimeout",
-                      sshIdleTimeout);
-        checkNotEmpty("algorithm",
-                      algorithm);
-        checkNotNull("receivePackFactory",
-                     receivePackFactory);
-        checkNotNull("repositoryResolver",
-                     repositoryResolver);
-        checkNotNull("executorService",
-                     executorService);
+    public void setup( final File certDir,
+                       final InetSocketAddress inetSocketAddress,
+                       final String sshIdleTimeout,
+                       final String algorithm,
+                       final ReceivePackFactory receivePackFactory,
+                       final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
+                       final ExecutorService executorService ) {
+        checkNotNull( "certDir", certDir );
+        checkNotEmpty( "sshIdleTimeout", sshIdleTimeout );
+        checkNotEmpty( "algorithm", algorithm );
+        checkNotNull( "receivePackFactory", receivePackFactory );
+        checkNotNull( "repositoryResolver", repositoryResolver );
 
-        this.executorService = executorService;
+        sshd.getProperties().put( SshServer.IDLE_TIMEOUT, sshIdleTimeout );
 
-        sshd.getProperties().put(SshServer.IDLE_TIMEOUT,
-                                 sshIdleTimeout);
-
-        if (inetSocketAddress != null) {
-            sshd.setHost(inetSocketAddress.getHostName());
-            sshd.setPort(inetSocketAddress.getPort());
+        if ( inetSocketAddress != null ) {
+            sshd.setHost( inetSocketAddress.getHostName() );
+            sshd.setPort( inetSocketAddress.getPort() );
         }
 
-        if (!certDir.exists()) {
+        if ( !certDir.exists() ) {
             certDir.mkdirs();
         }
 
-        final AbstractGeneratorHostKeyProvider keyPairProvider = new SimpleGeneratorHostKeyProvider(new File(certDir,
-                                                                                                             "hostkey.ser").getAbsolutePath());
+        final AbstractGeneratorHostKeyProvider keyPairProvider = new SimpleGeneratorHostKeyProvider( new File( certDir, "hostkey.ser" ) );
 
         try {
-            SecurityUtils.getKeyPairGenerator(algorithm);
-            keyPairProvider.setAlgorithm(algorithm);
-        } catch (final Exception ignore) {
-            throw new RuntimeException(String.format("Can't use '%s' algorithm for ssh key pair generator.",
-                                                     algorithm),
-                                       ignore);
+            SecurityUtils.getKeyPairGenerator(algorithm );
+            keyPairProvider.setAlgorithm( algorithm );
+        } catch ( final Exception ignore ) {
+            throw new RuntimeException( String.format( "Can't use '%s' algorithm for ssh key pair generator.", algorithm ), ignore );
         }
 
-        sshd.setKeyPairProvider(keyPairProvider);
-        sshd.setCommandFactory(new CommandFactory() {
-            @Override
-            public Command createCommand(String command) {
-                if (command.startsWith("git-upload-pack")) {
-                    return new GitUploadCommand(command,
-                                                repositoryResolver,
-                                                getAuthorizationManager(),
-                                                executorService);
-                } else if (command.startsWith("git-receive-pack")) {
-                    return new GitReceiveCommand(command,
-                                                 repositoryResolver,
-                                                 getAuthorizationManager(),
-                                                 receivePackFactory,
-                                                 executorService);
-                } else {
-                    return new UnknownCommand(command);
-                }
+        sshd.setKeyPairProvider( keyPairProvider );
+        sshd.setCommandFactory( command -> {
+            if ( command.startsWith( "git-upload-pack" ) ) {
+                return new GitUploadCommand( command, repositoryResolver, getAuthorizationManager(), executorService );
+            } else if ( command.startsWith( "git-receive-pack" ) ) {
+                return new GitReceiveCommand( command, repositoryResolver, getAuthorizationManager(), receivePackFactory, executorService );
+            } else {
+                return new UnknownCommand( command );
             }
-        });
-        sshd.setPasswordAuthenticator(new PasswordAuthenticator() {
-            @Override
-            public boolean authenticate(final String username,
-                                        final String password,
-                                        final ServerSession session) {
-                FileSystemUser user = getUserPassAuthenticator().authenticate(username,
-                                                                              password);
-                if (user == null) {
-                    return false;
-                }
-                session.setAttribute(BaseGitCommand.SUBJECT_KEY,
-                                     user);
-                return true;
+        } );
+        sshd.setPublickeyAuthenticator( new CachingPublicKeyAuthenticator( ( username, key, session ) -> false ) );
+        sshd.setPasswordAuthenticator( ( username, password, session ) -> {
+            final FileSystemUser user = getUserPassAuthenticator().authenticate( username, password );
+            if ( user == null ) {
+                return false;
             }
-        });
+            session.setAttribute( BaseGitCommand.SUBJECT_KEY, user );
+            return true;
+        } );
     }
 
     public void stop() {
         try {
-            sshd.stop(true);
-        } catch (final InterruptedException ignored) {
+            sshd.stop( true );
+        } catch ( IOException ignored ) {
         }
     }
 
     public void start() {
         try {
             sshd.start();
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't start SSH daemon at " + sshd.getHost() + ":" + sshd.getPort(),
-                                       e);
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Couldn't start SSH daemon at " + sshd.getHost() + ":" + sshd.getPort(), e );
         }
     }
 
     public boolean isRunning() {
-        return !(sshd.isClosed() || sshd.isClosing());
+        return !( sshd.isClosed() || sshd.isClosing() );
     }
 
     SshServer getSshServer() {
         return sshd;
     }
 
-    public Map<String, String> getProperties() {
-        return Collections.unmodifiableMap(sshd.getProperties());
+    public Map<String, Object> getProperties() {
+        return Collections.unmodifiableMap( sshd.getProperties() );
     }
 
     public FileSystemAuthenticator getUserPassAuthenticator() {
         return fileSystemAuthenticator;
     }
 
-    public void setUserPassAuthenticator(FileSystemAuthenticator fileSystemAuthenticator) {
+    public void setUserPassAuthenticator( FileSystemAuthenticator fileSystemAuthenticator ) {
         this.fileSystemAuthenticator = fileSystemAuthenticator;
     }
 
@@ -171,7 +137,7 @@ public class GitSSHService {
         return fileSystemAuthorizer;
     }
 
-    public void setAuthorizationManager(FileSystemAuthorizer fileSystemAuthorizer) {
+    public void setAuthorizationManager( FileSystemAuthorizer fileSystemAuthorizer ) {
         this.fileSystemAuthorizer = fileSystemAuthorizer;
     }
 }

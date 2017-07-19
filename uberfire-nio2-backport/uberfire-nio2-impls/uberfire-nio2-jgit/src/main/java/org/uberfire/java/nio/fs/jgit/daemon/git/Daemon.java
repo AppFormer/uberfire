@@ -25,6 +25,9 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,10 +36,17 @@ import java.util.zip.Deflater;
 
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.internal.JGitText;
+import org.eclipse.jgit.internal.ketch.KetchLeader;
+import org.eclipse.jgit.internal.ketch.KetchLeaderCache;
+import org.eclipse.jgit.internal.ketch.KetchPreReceive;
+import org.eclipse.jgit.internal.ketch.KetchText;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.pack.PackConfig;
+import org.eclipse.jgit.transport.ReceivePack;
 import org.eclipse.jgit.transport.ServiceMayNotContinueException;
 import org.eclipse.jgit.transport.UploadPack;
+import org.eclipse.jgit.transport.resolver.ReceivePackFactory;
 import org.eclipse.jgit.transport.resolver.RepositoryResolver;
 import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException;
 import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException;
@@ -45,28 +55,40 @@ import org.uberfire.commons.async.DescriptiveRunnable;
 import org.uberfire.commons.async.DescriptiveThreadFactory;
 import org.uberfire.java.nio.fs.jgit.daemon.filters.HiddenBranchRefFilter;
 
-import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.commons.validation.PortablePreconditions.*;
 
 /**
  * Basic daemon for the anonymous <code>git://</code> transport protocol.
  */
 public class Daemon {
 
-    /**
-     * 9418: IANA assigned port number for Git.
-     */
-    public static final int DEFAULT_PORT = 9418;
-
     private static final int BACKLOG = 5;
-    private final DaemonService[] services;
-    private final AtomicBoolean run = new AtomicBoolean(false);
-    private final Executor acceptThreadPool;
+
     private InetSocketAddress myAddress;
+
+    private final DaemonService[] services;
+
+    private final AtomicBoolean run = new AtomicBoolean( false );
+
     private int timeout;
+
     private volatile RepositoryResolver<DaemonClient> repositoryResolver;
+
     private volatile UploadPackFactory<DaemonClient> uploadPackFactory;
+
+    private volatile ReceivePackFactory<DaemonClient> receivePackFactory;
+
     private ServerSocket listenSock = null;
+
     private ExecutorService executorService;
+
+    private final Executor acceptThreadPool;
+
+    public Daemon( final InetSocketAddress addr,
+                   final Executor acceptThreadPool,
+                   final ExecutorService executorService) {
+        this( addr, acceptThreadPool, executorService, null );
+    }
 
     /**
      * Configures a new daemon for the specified network address. The daemon will not attempt to bind to an address or
@@ -76,54 +98,98 @@ public class Daemon {
      * @param acceptThreadPool source of threads for waiting for inbound socket connections. Every time the daemon is started or
      * restarted, a new task will be submitted to this pool. When the daemon is stopped, the task completes.
      */
-    public Daemon(final InetSocketAddress addr,
-                  Executor acceptThreadPool,
-                  ExecutorService executorService) {
+    public Daemon( final InetSocketAddress addr,
+                   final Executor acceptThreadPool,
+                   final ExecutorService executorService,
+                   final KetchLeaderCache leaders ) {
         myAddress = addr;
-        this.acceptThreadPool = checkNotNull("acceptThreadPool",
-                                             acceptThreadPool);
+        this.acceptThreadPool = checkNotNull( "acceptThreadPool", acceptThreadPool );
 
         this.executorService = executorService;
 
         repositoryResolver = (RepositoryResolver<DaemonClient>) RepositoryResolver.NONE;
 
-        uploadPackFactory = new UploadPackFactory<DaemonClient>() {
-            @Override
-            public UploadPack create(DaemonClient req,
-                                     Repository db)
-                    throws ServiceNotEnabledException,
-                    ServiceNotAuthorizedException {
-                final UploadPack up = new UploadPack(db);
-                up.setTimeout(getTimeout());
-                up.setRefFilter(new HiddenBranchRefFilter());
-                final PackConfig config = new PackConfig(db);
-                config.setCompressionLevel(Deflater.BEST_COMPRESSION);
-                up.setPackConfig(config);
+        uploadPackFactory = ( req, db ) -> {
+            final UploadPack up = new UploadPack( db );
+            up.setTimeout( getTimeout() );
+            up.setRefFilter( new HiddenBranchRefFilter() );
+            final PackConfig config = new PackConfig( db );
+            config.setCompressionLevel( Deflater.BEST_COMPRESSION );
+            up.setPackConfig( config );
 
-                return up;
-            }
+            return up;
         };
 
-        services = new DaemonService[]{new DaemonService("upload-pack",
-                                                         "uploadpack") {
+        final ReceivePackFactory<DaemonClient> factory = ( req, db ) -> {
+            final ReceivePack rp = new KetchCustomReceivePack( db );
+
+            final InetAddress peer = req.getRemoteAddress();
+            String host = peer.getCanonicalHostName();
+            if ( host == null ) {
+                host = peer.getHostAddress();
+            }
+            final String name = "anonymous";
+            final String email = name + "@" + host;
+            rp.setRefLogIdent( new PersonIdent( "system", "system", new Date( 1L ), TimeZone.getDefault() ) );
+            rp.setTimeout( getTimeout() );
+
+            rp.setPreReceiveHook( ( rp12, commands ) ->
+                                          System.out.println( "[" + addr.getHostString() + "]" + " onPreReceive!" ) );
+            rp.setPostReceiveHook( ( rp1, commands ) ->
+                                           System.out.println( "[" + addr.getHostString() + "]" + " onPostReceive!" ) );
+
+            return rp;
+        };
+
+//        if ( leaders == null ) {
+        if ( true ) {
+            receivePackFactory = factory;
+        } else {
+            receivePackFactory = ( req, repo ) -> {
+                final ReceivePack rp = factory.create( req, repo );
+                final KetchLeader leader;
+                try {
+                    leader = leaders.get( repo );
+                } catch ( URISyntaxException err ) {
+                    throw new ServiceNotEnabledException(
+                            KetchText.get().invalidFollowerUri, err );
+                }
+                rp.setPreReceiveHook( new KetchPreReceive( leader ) );
+                return rp;
+            };
+        }
+
+        services = new DaemonService[]{ new DaemonService( "upload-pack", "uploadpack" ) {
             {
-                setEnabled(true);
+                setEnabled( true );
             }
 
             @Override
-            protected void execute(final DaemonClient dc,
-                                   final Repository db) throws IOException,
+            protected void execute( final DaemonClient dc,
+                                    final Repository db ) throws IOException,
                     ServiceNotEnabledException,
                     ServiceNotAuthorizedException {
-                UploadPack up = uploadPackFactory.create(dc,
-                                                         db);
-                InputStream in = dc.getInputStream();
-                OutputStream out = dc.getOutputStream();
-                up.upload(in,
-                          out,
-                          null);
+                final UploadPack up = uploadPackFactory.create( dc, db );
+                final InputStream in = dc.getInputStream();
+                final OutputStream out = dc.getOutputStream();
+                up.upload( in, out, null );
             }
-        }};
+        }, new DaemonService( "receive-pack", "receivepack" ) {
+            {
+                setEnabled( true );
+            }
+
+            @Override
+            protected void execute( final DaemonClient dc,
+                                    final Repository db ) throws IOException,
+                    ServiceNotEnabledException,
+                    ServiceNotAuthorizedException {
+                final ReceivePack rp = receivePackFactory.create( dc, db );
+                final InputStream in = dc.getInputStream();
+                final OutputStream out = dc.getOutputStream();
+                rp.receive( in, out, null );
+            }
+        } };
     }
 
     /**
@@ -140,12 +206,12 @@ public class Daemon {
      * @return the service; null if this daemon implementation doesn't support
      * the requested service type.
      */
-    public synchronized DaemonService getService(String name) {
-        if (!name.startsWith("git-")) {
+    public synchronized DaemonService getService( String name ) {
+        if ( !name.startsWith( "git-" ) ) {
             name = "git-" + name;
         }
-        for (final DaemonService s : services) {
-            if (s.getCommandName().equals(name)) {
+        for ( final DaemonService s : services ) {
+            if ( s.getCommandName().equals( name ) ) {
                 return s;
             }
         }
@@ -165,7 +231,7 @@ public class Daemon {
      * before aborting an IO read or write operation with the
      * connected client.
      */
-    public void setTimeout(final int seconds) {
+    public void setTimeout( final int seconds ) {
         timeout = seconds;
     }
 
@@ -173,7 +239,7 @@ public class Daemon {
      * Sets the resolver that locates repositories by name.
      * @param resolver the resolver instance.
      */
-    public void setRepositoryResolver(RepositoryResolver<DaemonClient> resolver) {
+    public void setRepositoryResolver( RepositoryResolver<DaemonClient> resolver ) {
         repositoryResolver = resolver;
     }
 
@@ -182,8 +248,8 @@ public class Daemon {
      * @param factory the factory. If null upload-pack is disabled.
      */
     @SuppressWarnings("unchecked")
-    public void setUploadPackFactory(UploadPackFactory<DaemonClient> factory) {
-        if (factory != null) {
+    public void setUploadPackFactory( UploadPackFactory<DaemonClient> factory ) {
+        if ( factory != null ) {
             uploadPackFactory = factory;
         } else {
             uploadPackFactory = (UploadPackFactory<DaemonClient>) UploadPackFactory.DISABLED;
@@ -197,25 +263,22 @@ public class Daemon {
      * @throws IllegalStateException the daemon is already running.
      */
     public synchronized void start() throws IOException {
-        if (run.get()) {
-            throw new IllegalStateException(JGitText.get().daemonAlreadyRunning);
+        if ( run.get() ) {
+            throw new IllegalStateException( JGitText.get().daemonAlreadyRunning );
         }
 
         InetAddress listenAddress = myAddress != null ? myAddress.getAddress() : null;
         int listenPort = myAddress != null ? myAddress.getPort() : 0;
 
         try {
-            this.listenSock = new ServerSocket(listenPort,
-                                               BACKLOG,
-                                               listenAddress);
-        } catch (IOException e) {
-            throw new IOException("Failed to open server socket for " + listenAddress + ":" + listenPort,
-                                  e);
+            this.listenSock = new ServerSocket( listenPort, BACKLOG, listenAddress );
+        } catch ( IOException e ) {
+            throw new IOException( "Failed to open server socket for " + listenAddress + ":" + listenPort, e );
         }
         myAddress = (InetSocketAddress) listenSock.getLocalSocketAddress();
 
-        run.set(true);
-        acceptThreadPool.execute(new DescriptiveRunnable() {
+        run.set( true );
+        acceptThreadPool.execute( new DescriptiveRunnable() {
             @Override
             public String getDescription() {
                 return "Git-Daemon-Accept";
@@ -223,20 +286,20 @@ public class Daemon {
 
             @Override
             public void run() {
-                while (isRunning() && !Thread.currentThread().isInterrupted()) {
+                while ( isRunning() && !Thread.currentThread().isInterrupted() ) {
                     try {
-                        listenSock.setSoTimeout(5000);
-                        startClient(listenSock.accept());
-                    } catch (InterruptedIOException e) {
+                        listenSock.setSoTimeout( 5000 );
+                        startClient( listenSock.accept() );
+                    } catch ( InterruptedIOException e ) {
                         // Test again to see if we should keep accepting.
-                    } catch (IOException e) {
+                    } catch ( IOException e ) {
                         break;
                     }
                 }
 
                 stop();
             }
-        });
+        } );
     }
 
     /**
@@ -251,23 +314,23 @@ public class Daemon {
      * has no effect.
      */
     public synchronized void stop() {
-        if (run.getAndSet(false)) {
+        if ( run.getAndSet( false ) ) {
             try {
                 listenSock.close();
-            } catch (IOException e) {
+            } catch ( IOException e ) {
             }
         }
     }
 
-    private void startClient(final Socket s) {
-        final DaemonClient dc = new DaemonClient(this);
+    private void startClient( final Socket s ) {
+        final DaemonClient dc = new DaemonClient( this );
 
         final SocketAddress peer = s.getRemoteSocketAddress();
-        if (peer instanceof InetSocketAddress) {
-            dc.setRemoteAddress(((InetSocketAddress) peer).getAddress());
+        if ( peer instanceof InetSocketAddress ) {
+            dc.setRemoteAddress( ( (InetSocketAddress) peer ).getAddress() );
         }
 
-        executorService.execute(new DescriptiveRunnable() {
+        executorService.execute( new DescriptiveRunnable() {
             @Override
             public String getDescription() {
                 return "Git-Daemon-Client " + peer.toString();
@@ -276,65 +339,59 @@ public class Daemon {
             @Override
             public void run() {
                 try {
-                    dc.execute(s);
-                } catch (ServiceNotEnabledException e) {
+                    dc.execute( s );
+                } catch ( ServiceNotEnabledException | ServiceNotAuthorizedException | IOException e ) {
                     // Ignored. Client cannot use this repository.
-                } catch (ServiceNotAuthorizedException e) {
-                    // Ignored. Client cannot use this repository.
-                } catch (IOException e) {
-                    // Ignore unexpected IO exceptions from clients
                 } finally {
                     try {
                         s.getInputStream().close();
-                    } catch (IOException e) {
+                    } catch ( IOException e ) {
                         // Ignore close exceptions
                     }
                     try {
                         s.getOutputStream().close();
-                    } catch (IOException e) {
+                    } catch ( IOException e ) {
                         // Ignore close exceptions
                     }
                 }
             }
-        });
+        } );
     }
 
-    synchronized DaemonService matchService(final String cmd) {
-        for (final DaemonService d : services) {
-            if (d.handles(cmd)) {
+    synchronized DaemonService matchService( final String cmd ) {
+        for ( final DaemonService d : services ) {
+            if ( d.handles( cmd ) ) {
                 return d;
             }
         }
         return null;
     }
 
-    Repository openRepository(DaemonClient client,
-                              String name)
+    Repository openRepository( DaemonClient client,
+                               String name )
             throws ServiceMayNotContinueException {
         // Assume any attempt to use \ was by a Windows client
         // and correct to the more typical / used in Git URIs.
         //
-        name = name.replace('\\',
-                            '/');
+        name = name.replace( '\\', '/' );
 
         // git://thishost/path should always be name="/path" here
         //
-        if (!name.startsWith("/")) {
+        if ( !name.startsWith( "/" ) ) {
             return null;
         }
 
         try {
-            return repositoryResolver.open(client,
-                                           name.substring(1));
-        } catch (RepositoryNotFoundException e) {
+            return repositoryResolver.open( client, name.substring( 1 ) );
+        } catch ( RepositoryNotFoundException e ) {
             // null signals it "wasn't found", which is all that is suitable
             // for the remote client to know.
             return null;
-        } catch (ServiceNotAuthorizedException e) {
+        } catch ( ServiceNotAuthorizedException e ) {
             // null signals it "wasn't found", which is all that is suitable
             // for the remote client to know.
             return null;
-        } catch (ServiceNotEnabledException e) {
+        } catch ( ServiceNotEnabledException e ) {
             // null signals it "wasn't found", which is all that is suitable
             // for the remote client to know.
             return null;

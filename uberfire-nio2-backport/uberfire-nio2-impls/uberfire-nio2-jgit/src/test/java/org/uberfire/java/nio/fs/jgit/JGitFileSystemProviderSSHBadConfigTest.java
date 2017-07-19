@@ -19,7 +19,7 @@ package org.uberfire.java.nio.fs.jgit;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.sshd.SshServer;
+import org.apache.sshd.server.SshServer;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -30,19 +30,16 @@ public class JGitFileSystemProviderSSHBadConfigTest extends AbstractTestInfra {
     public Map<String, String> getGitPreferences() {
         Map<String, String> gitPrefs = super.getGitPreferences();
 
-        gitPrefs.put("org.uberfire.nio.git.ssh.enabled",
-                     "true");
-        gitPrefs.put("org.uberfire.nio.git.ssh.port",
-                     String.valueOf(findFreePort()));
-        gitPrefs.put("org.uberfire.nio.git.ssh.idle.timeout",
-                     "bz");
+        gitPrefs.put( "org.uberfire.nio.git.ssh.enabled", "true" );
+        gitPrefs.put( "org.uberfire.nio.git.ssh.port", String.valueOf( findFreePort() ) );
+        gitPrefs.put( "org.uberfire.nio.git.ssh.idle.timeout", "bz" );
 
         return gitPrefs;
     }
 
     @Test
     public void testCheckDefaultSSHIdleWithInvalidArg() throws IOException {
-        assertEquals(JGitFileSystemProvider.SSH_IDLE_TIMEOUT,
-                     provider.getGitSSHService().getProperties().get(SshServer.IDLE_TIMEOUT));
+        assertEquals( JGitFileSystemProvider.SSH_IDLE_TIMEOUT, provider.getGitSSHService().getProperties().get(SshServer.IDLE_TIMEOUT ) );
     }
+
 }

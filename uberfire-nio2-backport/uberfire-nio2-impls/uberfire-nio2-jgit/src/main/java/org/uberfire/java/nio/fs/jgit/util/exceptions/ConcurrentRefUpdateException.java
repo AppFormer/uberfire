@@ -27,11 +27,10 @@ public class ConcurrentRefUpdateException extends GitException {
     private RefUpdate.Result rc;
     private Ref ref;
 
-    public ConcurrentRefUpdateException(String message,
-                                        Ref ref,
-                                        RefUpdate.Result rc) {
-        super(rc == null ? message : message + ". " + MessageFormat.format(JGitText.get().refUpdateReturnCodeWas,
-                                                                           new Object[]{rc}));
+    public ConcurrentRefUpdateException( final String message,
+                                         final Ref ref,
+                                         final RefUpdate.Result rc ) {
+        super( rc == null ? message : message + ". " + MessageFormat.format( JGitText.get().refUpdateReturnCodeWas, new Object[]{ rc } ) );
         this.rc = rc;
         this.ref = ref;
     }

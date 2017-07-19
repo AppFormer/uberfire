@@ -16,12 +16,15 @@
 
 package org.uberfire.java.nio.fs.jgit;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.*;
 
 public class URITest {
 
@@ -66,4 +69,5 @@ public class URITest {
         assertThat(uri6.getPath()).isEqualTo("/master@my-repo/path/to/some/place.txt");
         assertThat(uri6.getQuery()).isNull();
     }
+
 }

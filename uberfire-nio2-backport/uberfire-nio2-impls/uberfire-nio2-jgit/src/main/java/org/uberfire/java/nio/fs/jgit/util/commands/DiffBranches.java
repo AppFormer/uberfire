@@ -22,21 +22,18 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.patch.FileHeader;
 import org.uberfire.java.nio.base.FileDiff;
-import org.uberfire.java.nio.fs.jgit.util.JGitUtil;
+import org.uberfire.java.nio.fs.jgit.util.Git;
 import org.uberfire.java.nio.fs.jgit.util.exceptions.GitException;
 
-import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
-import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.commons.validation.PortablePreconditions.*;
 
 /**
  * Implements the Git Diff command between branches for bare repositories.
@@ -44,67 +41,56 @@ import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull
  * to diff.
  * It returns a list of DiffFile with differences between branches.
  */
-public class DiffBranches extends GitCommand {
+public class DiffBranches {
 
-    private final Repository repository;
+    private final Git git;
     private final String branchA;
     private final String branchB;
 
-    public DiffBranches(Repository repository,
-                        String branchA,
-                        String branchB) {
-        this.repository = checkNotNull("repository",
-                                       repository);
-        this.branchA = checkNotEmpty("branchA",
-                                     branchA);
-        this.branchB = checkNotEmpty("branchB",
-                                     branchB);
+    public DiffBranches( Git git,
+                         String branchA,
+                         String branchB ) {
+        this.git = checkNotNull( "git", git );
+        this.branchA = checkNotEmpty( "branchA", branchA );
+        this.branchB = checkNotEmpty( "branchB", branchB );
     }
 
-    @Override
-    public Optional<List<FileDiff>> execute() {
-        List<FileDiff> diffs = new ArrayList<>();
+    public List<FileDiff> execute() {
+        final List<FileDiff> diffs = new ArrayList<>();
 
-        final List<DiffEntry> result = JGitUtil.getDiff(repository,
-                                                        JGitUtil.getTreeRefObjectId(repository,
-                                                                                    this.branchA).toObjectId(),
-                                                        JGitUtil.getTreeRefObjectId(repository,
-                                                                                    this.branchB).toObjectId());
+        final List<DiffEntry> result = git.listDiffs( git.getTreeFromRef( this.branchA ),
+                                                      git.getTreeFromRef( this.branchB ) );
 
-        DiffFormatter formatter = createFormatter();
+        final DiffFormatter formatter = createFormatter();
 
-        result.forEach(elem -> {
-            FileHeader header = getFileHeader(formatter,
-                                              elem);
-            header.toEditList().forEach(edit -> diffs.add(createFileDiff(elem,
-                                                                         header,
-                                                                         edit)));
-        });
+        result.forEach( elem -> {
+            final FileHeader header = getFileHeader( formatter, elem );
+            header.toEditList().forEach( edit -> diffs.add( createFileDiff( elem, header, edit ) ) );
+        } );
 
-        return Optional.of(diffs);
+        return diffs;
     }
 
-    private FileHeader getFileHeader(final DiffFormatter formatter,
-                                     final DiffEntry elem) {
+    private FileHeader getFileHeader( final DiffFormatter formatter,
+                                      final DiffEntry elem ) {
         try {
-            return formatter.toFileHeader(elem);
-        } catch (IOException e) {
-            throw new GitException("A problem occurred when trying to obtain diffs between files",
-                                   e);
+            return formatter.toFileHeader( elem );
+        } catch ( IOException e ) {
+            throw new GitException( "A problem occurred when trying to obtain diffs between files", e );
         }
     }
 
     private DiffFormatter createFormatter() {
 
         OutputStream outputStream = new ByteArrayOutputStream();
-        DiffFormatter formatter = new DiffFormatter(outputStream);
-        formatter.setRepository(repository);
+        DiffFormatter formatter = new DiffFormatter( outputStream );
+        formatter.setRepository( git.getRepository() );
         return formatter;
     }
 
-    private FileDiff createFileDiff(final DiffEntry elem,
-                                    final FileHeader header,
-                                    final Edit edit) {
+    private FileDiff createFileDiff( final DiffEntry elem,
+                                     final FileHeader header,
+                                     final Edit edit ) {
         try {
             final String changeType = header.getChangeType().toString();
             final int startA = edit.getBeginA();
@@ -115,41 +101,28 @@ public class DiffBranches extends GitCommand {
             String pathA = header.getOldPath();
             String pathB = header.getNewPath();
 
-            final List<String> linesA = getLines(elem.getOldId().toObjectId(),
-                                                 startA,
-                                                 endA);
-            final List<String> linesB = getLines(elem.getNewId().toObjectId(),
-                                                 startB,
-                                                 endB);
+            final List<String> linesA = getLines( elem.getOldId().toObjectId(), startA, endA );
+            final List<String> linesB = getLines( elem.getNewId().toObjectId(), startB, endB );
 
-            FileDiff diff = new FileDiff(pathA,
-                                         pathB,
-                                         startA,
-                                         endA,
-                                         startB,
-                                         endB,
-                                         changeType,
-                                         linesA,
-                                         linesB);
-            return diff;
-        } catch (IOException e) {
-            throw new GitException("A problem occurred when trying to obtain diffs between files",
-                                   e);
+            return new FileDiff( pathA, pathB, startA, endA, startB, endB, changeType, linesA, linesB );
+
+        } catch ( IOException e ) {
+            throw new GitException( "A problem occurred when trying to obtain diffs between files", e );
         }
+
     }
 
-    private List<String> getLines(final ObjectId id,
-                                  final int fromStart,
-                                  final int fromEnd) throws IOException {
+    private List<String> getLines( final ObjectId id,
+                                   final int fromStart,
+                                   final int fromEnd ) throws IOException {
         List<String> lines = new ArrayList<>();
-        if (!id.equals(ObjectId.zeroId())) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            final ObjectLoader loader = repository.open(id);
-            loader.copyTo(stream);
+        if ( !id.equals( ObjectId.zeroId() ) ) {
+            final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            final ObjectLoader loader = git.getRepository().open( id );
+            loader.copyTo( stream );
             final String content = stream.toString();
-            List<String> filteredLines = Arrays.asList(content.split("\n"));
-            lines = filteredLines.subList(fromStart,
-                                          fromEnd);
+            final List<String> filteredLines = Arrays.asList( content.split( "\n" ) );
+            lines = filteredLines.subList( fromStart, fromEnd );
         }
         return lines;
     }
