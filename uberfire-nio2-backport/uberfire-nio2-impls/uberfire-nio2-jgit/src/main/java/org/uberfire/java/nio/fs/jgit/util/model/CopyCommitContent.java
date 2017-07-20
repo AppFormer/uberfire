@@ -22,7 +22,7 @@ public class CopyCommitContent implements CommitContent {
 
     private final Map<String, String> content;
 
-    public CopyCommitContent( final Map<String, String> content ) {
+    public CopyCommitContent(final Map<String, String> content) {
         this.content = content;
     }
 

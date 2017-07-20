@@ -41,13 +41,13 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.fs.jgit.util.Git;
+import org.uberfire.java.nio.fs.jgit.util.commands.Commit;
 import org.uberfire.java.nio.fs.jgit.util.model.CommitInfo;
 import org.uberfire.java.nio.fs.jgit.util.model.DefaultCommitContent;
-import org.uberfire.java.nio.fs.jgit.util.commands.Commit;
 
 public abstract class AbstractTestInfra {
 
-    private static final Logger logger = LoggerFactory.getLogger( AbstractTestInfra.class );
+    private static final Logger logger = LoggerFactory.getLogger(AbstractTestInfra.class);
 
     protected static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
@@ -57,7 +57,7 @@ public abstract class AbstractTestInfra {
 
     @Before
     public void createGitFsProvider() {
-        provider = new JGitFileSystemProvider( getGitPreferences() );
+        provider = new JGitFileSystemProvider(getGitPreferences());
     }
 
     /*
@@ -67,74 +67,92 @@ public abstract class AbstractTestInfra {
     public Map<String, String> getGitPreferences() {
         Map<String, String> gitPrefs = new HashMap<String, String>();
         // disable the daemons by default as they not needed in most of the cases
-        gitPrefs.put( "org.uberfire.nio.git.daemon.enabled", "false" );
-        gitPrefs.put( "org.uberfire.nio.git.ssh.enabled", "false" );
+        gitPrefs.put("org.uberfire.nio.git.daemon.enabled",
+                     "false");
+        gitPrefs.put("org.uberfire.nio.git.ssh.enabled",
+                     "false");
         return gitPrefs;
     }
 
     @After
     public void destroyGitFsProvider() throws IOException {
-        if ( provider == null ) {
+        if (provider == null) {
             // this would mean that setup failed. no need to clean up.
             return;
         }
 
         provider.shutdown();
 
-        if ( provider.getGitRepoContainerDir() != null && provider.getGitRepoContainerDir().exists() ) {
-            FileUtils.delete( provider.getGitRepoContainerDir(), FileUtils.RECURSIVE );
+        if (provider.getGitRepoContainerDir() != null && provider.getGitRepoContainerDir().exists()) {
+            FileUtils.delete(provider.getGitRepoContainerDir(),
+                             FileUtils.RECURSIVE);
         }
     }
 
     @AfterClass
     @BeforeClass
     public static void cleanup() {
-        for ( final File tempFile : tempFiles ) {
+        for (final File tempFile : tempFiles) {
             try {
-                FileUtils.delete( tempFile, FileUtils.RECURSIVE );
-            } catch ( IOException e ) {
+                FileUtils.delete(tempFile,
+                                 FileUtils.RECURSIVE);
+            } catch (IOException e) {
             }
         }
     }
 
     protected Git setupGit() throws IOException, GitAPIException {
-        return setupGit( createTempDirectory() );
+        return setupGit(createTempDirectory());
     }
 
-    protected Git setupGit( final File tempDir ) throws IOException, GitAPIException {
+    protected Git setupGit(final File tempDir) throws IOException, GitAPIException {
 
-        final Git git = Git.createRepository( tempDir );
+        final Git git = Git.createRepository(tempDir);
 
-        new Commit( git, "master", new CommitInfo( null, "name", "name@example.com", "cool1", null, null ), false, null, new DefaultCommitContent( new HashMap<String, File>() {{
-            put( "file1.txt", tempFile( "content" ) );
-            put( "file2.txt", tempFile( "content2" ) );
-        }}) ).execute();
+        new Commit(git,
+                   "master",
+                   new CommitInfo(null,
+                                  "name",
+                                  "name@example.com",
+                                  "cool1",
+                                  null,
+                                  null),
+                   false,
+                   null,
+                   new DefaultCommitContent(new HashMap<String, File>() {{
+                       put("file1.txt",
+                           tempFile("content"));
+                       put("file2.txt",
+                           tempFile("content2"));
+                   }})).execute();
 
         return git;
     }
 
     protected static File createTempDirectory()
             throws IOException {
-        final File temp = File.createTempFile( "temp", Long.toString( System.nanoTime() ) );
-        if ( !( temp.delete() ) ) {
-            throw new IOException( "Could not delete temp file: " + temp.getAbsolutePath() );
+        final File temp = File.createTempFile("temp",
+                                              Long.toString(System.nanoTime()));
+        if (!(temp.delete())) {
+            throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
         }
 
-        if ( !( temp.mkdir() ) ) {
-            throw new IOException( "Could not create temp directory: " + temp.getAbsolutePath() );
+        if (!(temp.mkdir())) {
+            throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
         }
 
-        tempFiles.add( temp );
+        tempFiles.add(temp);
 
         return temp;
     }
 
-    public File tempFile( final String content ) throws IOException {
-        final File file = File.createTempFile( "bar", "foo" );
-        final OutputStream out = new FileOutputStream( file );
+    public File tempFile(final String content) throws IOException {
+        final File file = File.createTempFile("bar",
+                                              "foo");
+        final OutputStream out = new FileOutputStream(file);
 
-        if ( content != null && !content.isEmpty() ) {
-            out.write( content.getBytes() );
+        if (content != null && !content.isEmpty()) {
+            out.write(content.getBytes());
             out.flush();
         }
 
@@ -142,12 +160,13 @@ public abstract class AbstractTestInfra {
         return file;
     }
 
-    public File tempFile( final byte[] content ) throws IOException {
-        final File file = File.createTempFile( "bar", "foo" );
-        final FileOutputStream out = new FileOutputStream( file );
+    public File tempFile(final byte[] content) throws IOException {
+        final File file = File.createTempFile("bar",
+                                              "foo");
+        final FileOutputStream out = new FileOutputStream(file);
 
-        if ( content != null && content.length > 0 ) {
-            out.write( content );
+        if (content != null && content.length > 0) {
+            out.write(content);
             out.flush();
         }
 
@@ -156,28 +175,29 @@ public abstract class AbstractTestInfra {
     }
 
     public PersonIdent getAuthor() {
-        return new PersonIdent( "user", "user@example.com" );
+        return new PersonIdent("user",
+                               "user@example.com");
     }
 
     public static int findFreePort() {
         int port = 0;
         try {
             ServerSocket server =
-                    new ServerSocket( 0 );
+                    new ServerSocket(0);
             port = server.getLocalPort();
             server.close();
-        } catch ( IOException e ) {
-            Assert.fail( "Can't find free port!" );
+        } catch (IOException e) {
+            Assert.fail("Can't find free port!");
         }
-        logger.debug( "Found free port " + port );
+        logger.debug("Found free port " + port);
         return port;
     }
 
-    protected byte[] loadImage( final String path ) throws IOException {
-        final InputStream stream = this.getClass().getClassLoader().getResourceAsStream( path );
+    protected byte[] loadImage(final String path) throws IOException {
+        final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(path);
         StringWriter writer = new StringWriter();
-        IOUtils.copy( stream, writer );
+        IOUtils.copy(stream,
+                     writer);
         return writer.toString().getBytes();
     }
-
 }

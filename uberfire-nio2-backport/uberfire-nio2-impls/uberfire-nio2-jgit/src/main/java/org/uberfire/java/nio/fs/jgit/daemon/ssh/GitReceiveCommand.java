@@ -32,12 +32,15 @@ public class GitReceiveCommand extends BaseGitCommand {
 
     private final ReceivePackFactory<BaseGitCommand> receivePackFactory;
 
-    public GitReceiveCommand( final String command,
-                              final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
-                              final FileSystemAuthorizer fileSystemAuthorizer,
-                              final ReceivePackFactory<BaseGitCommand> receivePackFactory,
-                              final ExecutorService executorService ) {
-        super( command, fileSystemAuthorizer, repositoryResolver, executorService );
+    public GitReceiveCommand(final String command,
+                             final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
+                             final FileSystemAuthorizer fileSystemAuthorizer,
+                             final ReceivePackFactory<BaseGitCommand> receivePackFactory,
+                             final ExecutorService executorService) {
+        super(command,
+              fileSystemAuthorizer,
+              repositoryResolver,
+              executorService);
         this.receivePackFactory = receivePackFactory;
     }
 
@@ -47,20 +50,23 @@ public class GitReceiveCommand extends BaseGitCommand {
     }
 
     @Override
-    protected void execute( final FileSystemUser user,
-                            final Repository repository,
-                            final InputStream in,
-                            final OutputStream out,
-                            final OutputStream err,
-                            final JGitFileSystem fileSystem ) {
+    protected void execute(final FileSystemUser user,
+                           final Repository repository,
+                           final InputStream in,
+                           final OutputStream out,
+                           final OutputStream err,
+                           final JGitFileSystem fileSystem) {
         try {
-            final ReceivePack rp = receivePackFactory.create( this, repository );
-            rp.receive( in, out, err );
-            rp.setPostReceiveHook( ( rp1, commands ) -> {
+            final ReceivePack rp = receivePackFactory.create(this,
+                                                             repository);
+            rp.receive(in,
+                       out,
+                       err);
+            rp.setPostReceiveHook((rp1, commands) -> {
                 fileSystem.getGit().gc();
                 fileSystem.resetCommitCount();
-            } );
-        } catch ( final Exception ignored ) {
+            });
+        } catch (final Exception ignored) {
         }
     }
 }

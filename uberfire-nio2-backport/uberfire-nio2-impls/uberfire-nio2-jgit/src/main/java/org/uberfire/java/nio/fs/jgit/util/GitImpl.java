@@ -85,47 +85,51 @@ import org.uberfire.java.nio.fs.jgit.util.model.CommitContent;
 import org.uberfire.java.nio.fs.jgit.util.model.CommitInfo;
 import org.uberfire.java.nio.fs.jgit.util.model.PathInfo;
 
-import static org.uberfire.java.nio.fs.jgit.util.commands.PathUtil.*;
+import static org.uberfire.java.nio.fs.jgit.util.commands.PathUtil.normalize;
 
 public class GitImpl implements Git {
 
-    private static final Logger LOG = LoggerFactory.getLogger( GitImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger(GitImpl.class);
     private static final String DEFAULT_JGIT_RETRY_SLEEP_TIME = "50";
     private static int JGIT_RETRY_TIMES = initRetryValue();
     private static final int JGIT_RETRY_SLEEP_TIME = initSleepTime();
     private boolean isEnabled = false;
 
     private static int initSleepTime() {
-        final ConfigProperties config = new ConfigProperties( System.getProperties() );
-        return config.get( "org.uberfire.nio.git.retry.onfail.sleep", DEFAULT_JGIT_RETRY_SLEEP_TIME ).getIntValue();
+        final ConfigProperties config = new ConfigProperties(System.getProperties());
+        return config.get("org.uberfire.nio.git.retry.onfail.sleep",
+                          DEFAULT_JGIT_RETRY_SLEEP_TIME).getIntValue();
     }
 
     private static int initRetryValue() {
-        final ConfigProperties config = new ConfigProperties( System.getProperties() );
-        final String osName = config.get( "os.name", "any" ).getValue();
+        final ConfigProperties config = new ConfigProperties(System.getProperties());
+        final String osName = config.get("os.name",
+                                         "any").getValue();
         final String defaultRetryTimes;
-        if ( osName.toLowerCase().contains( "windows" ) ) {
+        if (osName.toLowerCase().contains("windows")) {
             defaultRetryTimes = "10";
         } else {
             defaultRetryTimes = "0";
         }
         try {
-            return config.get( "org.uberfire.nio.git.retry.onfail.times", defaultRetryTimes ).getIntValue();
-        } catch ( NumberFormatException ex ) {
+            return config.get("org.uberfire.nio.git.retry.onfail.times",
+                              defaultRetryTimes).getIntValue();
+        } catch (NumberFormatException ex) {
             return 0;
         }
     }
 
     private org.eclipse.jgit.api.Git git;
     private KetchLeaderCache leaders;
-    private final AtomicBoolean isHeadInitialized = new AtomicBoolean( false );
+    private final AtomicBoolean isHeadInitialized = new AtomicBoolean(false);
 
-    public GitImpl( final org.eclipse.jgit.api.Git git ) {
-        this( git, null );
+    public GitImpl(final org.eclipse.jgit.api.Git git) {
+        this(git,
+             null);
     }
 
-    public GitImpl( final org.eclipse.jgit.api.Git git,
-                    final KetchLeaderCache leaders ) {
+    public GitImpl(final org.eclipse.jgit.api.Git git,
+                   final KetchLeaderCache leaders) {
         this.git = git;
         this.leaders = leaders;
     }
@@ -133,56 +137,70 @@ public class GitImpl implements Git {
     @Override
     public void convertRefTree() {
         try {
-            new ConvertRefTree( this ).execute();
-        } catch ( IOException e ) {
+            new ConvertRefTree(this).execute();
+        } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException( e );
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteRef( final Ref ref ) {
-        new DeleteBranch( this, ref ).execute();
+    public void deleteRef(final Ref ref) {
+        new DeleteBranch(this,
+                         ref).execute();
     }
 
     @Override
-    public Ref getRef( final String ref ) {
-        return new GetRef( git.getRepository(), ref ).execute();
+    public Ref getRef(final String ref) {
+        return new GetRef(git.getRepository(),
+                          ref).execute();
     }
 
     @Override
-    public void push( final CredentialsProvider credentialsProvider,
-                      final Pair<String, String> remote,
-                      final boolean force,
-                      final Collection<RefSpec> refSpecs ) throws InvalidRemoteException {
-        new Push( this, credentialsProvider, remote, force, refSpecs ).execute();
+    public void push(final CredentialsProvider credentialsProvider,
+                     final Pair<String, String> remote,
+                     final boolean force,
+                     final Collection<RefSpec> refSpecs) throws InvalidRemoteException {
+        new Push(this,
+                 credentialsProvider,
+                 remote,
+                 force,
+                 refSpecs).execute();
     }
 
     @Override
     public void gc() {
-        new GarbageCollector( this ).execute();
+        new GarbageCollector(this).execute();
     }
 
     @Override
-    public RevCommit getLastCommit( final String refName ) {
-        return retryIfNeeded( RuntimeException.class, () -> new GetLastCommit( this, refName ).execute() );
+    public RevCommit getLastCommit(final String refName) {
+        return retryIfNeeded(RuntimeException.class,
+                             () -> new GetLastCommit(this,
+                                                     refName).execute());
     }
 
     @Override
-    public RevCommit getLastCommit( final Ref ref ) throws IOException {
-        return new GetLastCommit( this, ref ).execute();
+    public RevCommit getLastCommit(final Ref ref) throws IOException {
+        return new GetLastCommit(this,
+                                 ref).execute();
     }
 
     @Override
-    public List<RevCommit> listCommits( final Ref ref,
-                                        final String path ) throws IOException, GitAPIException {
-        return new ListCommits( this, ref, path ).execute();
+    public List<RevCommit> listCommits(final Ref ref,
+                                       final String path) throws IOException, GitAPIException {
+        return new ListCommits(this,
+                               ref,
+                               path).execute();
     }
 
     @Override
-    public List<RevCommit> listCommits( final ObjectId startRange,
-                                        final ObjectId endRange ) {
-        return retryIfNeeded( RuntimeException.class, () -> new ListCommits( this, startRange, endRange ).execute() );
+    public List<RevCommit> listCommits(final ObjectId startRange,
+                                       final ObjectId endRange) {
+        return retryIfNeeded(RuntimeException.class,
+                             () -> new ListCommits(this,
+                                                   startRange,
+                                                   endRange).execute());
     }
 
     @Override
@@ -215,58 +233,75 @@ public class GitImpl implements Git {
     }
 
     @Override
-    public ObjectId getTreeFromRef( final String treeRef ) {
-        return new GetTreeFromRef( this, treeRef ).execute();
+    public ObjectId getTreeFromRef(final String treeRef) {
+        return new GetTreeFromRef(this,
+                                  treeRef).execute();
     }
 
     @Override
-    public void fetch( final CredentialsProvider credential,
-                       final Pair<String, String> remote,
-                       final Collection<RefSpec> refSpecs ) throws InvalidRemoteException {
-        new Fetch( this, credential, remote, refSpecs ).execute();
+    public void fetch(final CredentialsProvider credential,
+                      final Pair<String, String> remote,
+                      final Collection<RefSpec> refSpecs) throws InvalidRemoteException {
+        new Fetch(this,
+                  credential,
+                  remote,
+                  refSpecs).execute();
     }
 
     @Override
-    public void syncRemote( final Pair<String, String> remote ) throws InvalidRemoteException {
-        new SyncRemote( this, remote ).execute();
+    public void syncRemote(final Pair<String, String> remote) throws InvalidRemoteException {
+        new SyncRemote(this,
+                       remote).execute();
     }
 
     @Override
-    public List<String> merge( final String source,
-                               final String target ) {
-        return new Merge( this, source, target ).execute();
+    public List<String> merge(final String source,
+                              final String target) {
+        return new Merge(this,
+                         source,
+                         target).execute();
     }
 
     @Override
-    public void cherryPick( final JGitPathImpl target,
-                            final String... commits ) {
-        new CherryPick( this, target.getRefTree(), commits ).execute();
+    public void cherryPick(final JGitPathImpl target,
+                           final String... commits) {
+        new CherryPick(this,
+                       target.getRefTree(),
+                       commits).execute();
     }
 
     @Override
-    public void cherryPick( final String targetBranch,
-                            final String[] commitsIDs ) {
-        new CherryPick( this, targetBranch, commitsIDs ).execute();
+    public void cherryPick(final String targetBranch,
+                           final String[] commitsIDs) {
+        new CherryPick(this,
+                       targetBranch,
+                       commitsIDs).execute();
     }
 
     @Override
-    public void createRef( final String source,
-                           final String target ) {
-        new CreateBranch( this, source, target ).execute();
-
+    public void createRef(final String source,
+                          final String target) {
+        new CreateBranch(this,
+                         source,
+                         target).execute();
     }
 
     @Override
-    public List<FileDiff> diffRefs( final String branchA,
-                                    final String branchB ) {
-        return new DiffBranches( this, branchA, branchB ).execute();
+    public List<FileDiff> diffRefs(final String branchA,
+                                   final String branchB) {
+        return new DiffBranches(this,
+                                branchA,
+                                branchB).execute();
     }
 
     @Override
-    public void squash( final String branch,
-                        final String startCommit,
-                        final String commitMessage ) {
-        new Squash( this, branch, startCommit, commitMessage ).execute();
+    public void squash(final String branch,
+                       final String startCommit,
+                       final String commitMessage) {
+        new Squash(this,
+                   branch,
+                   startCommit,
+                   commitMessage).execute();
     }
 
     public LogCommand _log() {
@@ -274,53 +309,65 @@ public class GitImpl implements Git {
     }
 
     @Override
-    public boolean commit( final String branchName,
-                           final CommitInfo commitInfo,
-                           final boolean amend,
-                           final ObjectId originId,
-                           final CommitContent content ) {
-        return new Commit( this, branchName, commitInfo, amend, null, content ).execute();
+    public boolean commit(final String branchName,
+                          final CommitInfo commitInfo,
+                          final boolean amend,
+                          final ObjectId originId,
+                          final CommitContent content) {
+        return new Commit(this,
+                          branchName,
+                          commitInfo,
+                          amend,
+                          null,
+                          content).execute();
     }
 
     @Override
-    public List<DiffEntry> listDiffs( final ObjectId refA,
-                                      final ObjectId refB ) {
-        return new ListDiffs( this, refA, refB ).execute();
+    public List<DiffEntry> listDiffs(final ObjectId refA,
+                                     final ObjectId refB) {
+        return new ListDiffs(this,
+                             refA,
+                             refB).execute();
     }
 
     @Override
-    public InputStream blobAsInputStream( final String treeRef,
-                                          final String path ) {
-        return retryIfNeeded( NoSuchFileException.class,
-                              () -> new BlobAsInputStream( this,
-                                                           treeRef,
-                                                           normalize( path ) ).execute().get() );
+    public InputStream blobAsInputStream(final String treeRef,
+                                         final String path) {
+        return retryIfNeeded(NoSuchFileException.class,
+                             () -> new BlobAsInputStream(this,
+                                                         treeRef,
+                                                         normalize(path)).execute().get());
     }
 
     @Override
-    public RevCommit getFirstCommit( final Ref ref ) throws IOException {
-        return new GetFirstCommit( this, ref ).execute();
+    public RevCommit getFirstCommit(final Ref ref) throws IOException {
+        return new GetFirstCommit(this,
+                                  ref).execute();
     }
 
     @Override
     public List<Ref> listRefs() {
-        return new ListRefs( git.getRepository() ).execute();
+        return new ListRefs(git.getRepository()).execute();
     }
 
     @Override
-    public List<ObjectId> resolveObjectIds( final String... commits ) {
-        return new ResolveObjectIds( this, commits ).execute();
+    public List<ObjectId> resolveObjectIds(final String... commits) {
+        return new ResolveObjectIds(this,
+                                    commits).execute();
     }
 
     @Override
-    public RevCommit resolveRevCommit( final ObjectId objectId ) throws IOException {
-        return new ResolveRevCommit( git.getRepository(), objectId ).execute();
+    public RevCommit resolveRevCommit(final ObjectId objectId) throws IOException {
+        return new ResolveRevCommit(git.getRepository(),
+                                    objectId).execute();
     }
 
     @Override
-    public List<RefSpec> updateRemoteConfig( final Pair<String, String> remote,
-                                             final Collection<RefSpec> refSpecs ) throws IOException, URISyntaxException {
-        return new UpdateRemoteConfig( this, remote, refSpecs ).execute();
+    public List<RefSpec> updateRemoteConfig(final Pair<String, String> remote,
+                                            final Collection<RefSpec> refSpecs) throws IOException, URISyntaxException {
+        return new UpdateRemoteConfig(this,
+                                      remote,
+                                      refSpecs).execute();
     }
 
     public AddCommand _add() {
@@ -340,15 +387,21 @@ public class GitImpl implements Git {
     }
 
     @Override
-    public PathInfo getPathInfo( final String branchName,
-                                 final String path ) {
-        return retryIfNeeded( RuntimeException.class, () -> new GetPathInfo( this, branchName, path ).execute() );
+    public PathInfo getPathInfo(final String branchName,
+                                final String path) {
+        return retryIfNeeded(RuntimeException.class,
+                             () -> new GetPathInfo(this,
+                                                   branchName,
+                                                   path).execute());
     }
 
     @Override
-    public List<PathInfo> listPathContent( final String branchName,
-                                           final String path ) {
-        return retryIfNeeded( RuntimeException.class, () -> new ListPathContent( this, branchName, path ).execute() );
+    public List<PathInfo> listPathContent(final String branchName,
+                                          final String path) {
+        return retryIfNeeded(RuntimeException.class,
+                             () -> new ListPathContent(this,
+                                                       branchName,
+                                                       path).execute());
     }
 
     @Override
@@ -358,26 +411,30 @@ public class GitImpl implements Git {
 
     @Override
     public void setHeadAsInitialized() {
-        isHeadInitialized.set( true );
+        isHeadInitialized.set(true);
     }
 
     @Override
-    public void refUpdate( final String branch,
-                           final RevCommit commit )
+    public void refUpdate(final String branch,
+                          final RevCommit commit)
             throws IOException, ConcurrentRefUpdateException {
-        if (getRepository().getRefDatabase() instanceof RefTreeDatabase){
-            new RefTreeUpdateCommand(this, branch, commit ).execute();
+        if (getRepository().getRefDatabase() instanceof RefTreeDatabase) {
+            new RefTreeUpdateCommand(this,
+                                     branch,
+                                     commit).execute();
         } else {
-            new SimpleRefUpdateCommand(this, branch, commit ).execute();
+            new SimpleRefUpdateCommand(this,
+                                       branch,
+                                       commit).execute();
         }
     }
 
     @Override
     public KetchLeader getKetchLeader() {
         try {
-            return leaders.get( getRepository() );
-        } catch ( URISyntaxException e ) {
-            throw new RuntimeException( e );
+            return leaders.get(getRepository());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -392,46 +449,51 @@ public class GitImpl implements Git {
     }
 
     @Override
-    public void updateRepo( final Repository repo ) {
-        this.git = new org.eclipse.jgit.api.Git( repo );
+    public void updateRepo(final Repository repo) {
+        this.git = new org.eclipse.jgit.api.Git(repo);
     }
 
     @Override
-    public void updateLeaders( final KetchLeaderCache leaders ) {
+    public void updateLeaders(final KetchLeaderCache leaders) {
         this.leaders = leaders;
     }
 
     //just for test purposes
-    static void setRetryTimes( int retryTimes ) {
+    static void setRetryTimes(int retryTimes) {
         JGIT_RETRY_TIMES = retryTimes;
     }
 
-    public static <E extends Throwable, T> T retryIfNeeded( final Class<E> eclazz,
-                                                            final ThrowableSupplier<T> supplier ) throws E {
+    public static <E extends Throwable, T> T retryIfNeeded(final Class<E> eclazz,
+                                                           final ThrowableSupplier<T> supplier) throws E {
         int i = 0;
         do {
             try {
                 return supplier.get();
-            } catch ( final Throwable ex ) {
-                if ( i < ( JGIT_RETRY_TIMES - 1 ) ) {
+            } catch (final Throwable ex) {
+                if (i < (JGIT_RETRY_TIMES - 1)) {
                     try {
-                        Thread.sleep( JGIT_RETRY_SLEEP_TIME );
-                    } catch ( final InterruptedException ignored ) {
+                        Thread.sleep(JGIT_RETRY_SLEEP_TIME);
+                    } catch (final InterruptedException ignored) {
                     }
-                    LOG.debug( String.format( "Unexpected exception (%d/%d).", i + 1, JGIT_RETRY_TIMES ), ex );
+                    LOG.debug(String.format("Unexpected exception (%d/%d).",
+                                            i + 1,
+                                            JGIT_RETRY_TIMES),
+                              ex);
                 } else {
-                    LOG.error( String.format( "Unexpected exception (%d/%d).", i + 1, JGIT_RETRY_TIMES ), ex );
-                    if ( ex.getClass().isAssignableFrom( eclazz ) ) {
+                    LOG.error(String.format("Unexpected exception (%d/%d).",
+                                            i + 1,
+                                            JGIT_RETRY_TIMES),
+                              ex);
+                    if (ex.getClass().isAssignableFrom(eclazz)) {
                         throw (E) ex;
                     }
-                    throw new RuntimeException( ex );
+                    throw new RuntimeException(ex);
                 }
             }
 
             i++;
-        } while ( i < JGIT_RETRY_TIMES );
+        } while (i < JGIT_RETRY_TIMES);
 
         return null;
     }
-
 }

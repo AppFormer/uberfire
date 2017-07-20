@@ -47,124 +47,137 @@ import org.uberfire.java.nio.fs.jgit.util.model.PathInfo;
 
 public interface Git {
 
-    static Git createRepository( final File repoDir ) {
-        return createRepository( repoDir, null );
+    static Git createRepository(final File repoDir) {
+        return createRepository(repoDir,
+                                null);
     }
 
-    static Git createRepository( final File repoDir,
-                                 final File hookDir ) {
-        return createRepository( repoDir, hookDir, null );
+    static Git createRepository(final File repoDir,
+                                final File hookDir) {
+        return createRepository(repoDir,
+                                hookDir,
+                                null);
     }
 
-    static Git createRepository( final File repoDir,
-                                 final File hookDir,
-                                 final KetchLeaderCache leaders ) {
-        return new CreateRepository( repoDir, hookDir, leaders ).execute().get();
+    static Git createRepository(final File repoDir,
+                                final File hookDir,
+                                final KetchLeaderCache leaders) {
+        return new CreateRepository(repoDir,
+                                    hookDir,
+                                    leaders).execute().get();
     }
 
-    static Git fork( final File gitRepoContainerDir,
+    static Git fork(final File gitRepoContainerDir,
+                    final String origin,
+                    final String name,
+                    final CredentialsProvider credential,
+                    final KetchLeaderCache leaders) throws InvalidRemoteException {
+        return new Fork(gitRepoContainerDir,
+                        origin,
+                        name,
+                        credential,
+                        leaders).execute();
+    }
+
+    static Git clone(final File repoDest,
                      final String origin,
-                     final String name,
+                     final boolean b,
                      final CredentialsProvider credential,
-                     final KetchLeaderCache leaders ) throws InvalidRemoteException {
-        return new Fork( gitRepoContainerDir, origin, name, credential, leaders ).execute();
-    }
-
-    static Git clone( final File repoDest,
-                      final String origin,
-                      final boolean b,
-                      final CredentialsProvider credential,
-                      final KetchLeaderCache leaders ) throws InvalidRemoteException {
-        return new Clone( repoDest, origin, true, credential, leaders ).execute().get();
+                     final KetchLeaderCache leaders) throws InvalidRemoteException {
+        return new Clone(repoDest,
+                         origin,
+                         true,
+                         credential,
+                         leaders).execute().get();
     }
 
     void convertRefTree();
 
-    void deleteRef( final Ref ref );
+    void deleteRef(final Ref ref);
 
-    Ref getRef( final String ref );
+    Ref getRef(final String ref);
 
-    void push( final CredentialsProvider credentialsProvider,
-               final Pair<String, String> remote,
-               final boolean force,
-               final Collection<RefSpec> refSpecs ) throws InvalidRemoteException;
+    void push(final CredentialsProvider credentialsProvider,
+              final Pair<String, String> remote,
+              final boolean force,
+              final Collection<RefSpec> refSpecs) throws InvalidRemoteException;
 
     void gc();
 
-    RevCommit getLastCommit( final String refName );
+    RevCommit getLastCommit(final String refName);
 
-    RevCommit getLastCommit( final Ref ref ) throws IOException;
+    RevCommit getLastCommit(final Ref ref) throws IOException;
 
-    List<RevCommit> listCommits( final Ref ref,
-                                 final String path ) throws IOException, GitAPIException;
+    List<RevCommit> listCommits(final Ref ref,
+                                final String path) throws IOException, GitAPIException;
 
-    List<RevCommit> listCommits( final ObjectId startRange,
-                                 final ObjectId endRange );
+    List<RevCommit> listCommits(final ObjectId startRange,
+                                final ObjectId endRange);
 
     Repository getRepository();
 
-    ObjectId getTreeFromRef( final String treeRef );
+    ObjectId getTreeFromRef(final String treeRef);
 
-    void fetch( final CredentialsProvider credential,
-                final Pair<String, String> remote,
-                final Collection<RefSpec> refSpecs ) throws InvalidRemoteException;
+    void fetch(final CredentialsProvider credential,
+               final Pair<String, String> remote,
+               final Collection<RefSpec> refSpecs) throws InvalidRemoteException;
 
-    void syncRemote( final Pair<String, String> remote ) throws InvalidRemoteException;
+    void syncRemote(final Pair<String, String> remote) throws InvalidRemoteException;
 
-    List<String> merge( final String source,
-                        final String target );
+    List<String> merge(final String source,
+                       final String target);
 
-    void cherryPick( final JGitPathImpl target,
-                     final String... commits );
+    void cherryPick(final JGitPathImpl target,
+                    final String... commits);
 
-    void cherryPick( final String targetBranch,
-                     final String... commitsIDs );
+    void cherryPick(final String targetBranch,
+                    final String... commitsIDs);
 
-    void createRef( final String source,
-                    final String target );
+    void createRef(final String source,
+                   final String target);
 
-    List<FileDiff> diffRefs( final String branchA,
-                             final String branchB );
+    List<FileDiff> diffRefs(final String branchA,
+                            final String branchB);
 
-    void squash( final String branch,
-                 final String startCommit,
-                 final String commitMessage );
+    void squash(final String branch,
+                final String startCommit,
+                final String commitMessage);
 
-    boolean commit( final String branchName,
-                    final CommitInfo commitInfo,
-                    final boolean amend,
-                    final ObjectId originId,
-                    final CommitContent content );
+    boolean commit(final String branchName,
+                   final CommitInfo commitInfo,
+                   final boolean amend,
+                   final ObjectId originId,
+                   final CommitContent content);
 
-    List<DiffEntry> listDiffs( final ObjectId refA,
-                               final ObjectId refB );
+    List<DiffEntry> listDiffs(final ObjectId refA,
+                              final ObjectId refB);
 
-    InputStream blobAsInputStream( final String treeRef,
-                                   final String path );
+    InputStream blobAsInputStream(final String treeRef,
+                                  final String path);
 
-    RevCommit getFirstCommit( final Ref ref ) throws IOException;
+    RevCommit getFirstCommit(final Ref ref) throws IOException;
 
     List<Ref> listRefs();
 
-    List<ObjectId> resolveObjectIds( final String... commits );
+    List<ObjectId> resolveObjectIds(final String... commits);
 
-    RevCommit resolveRevCommit( final ObjectId objectId ) throws IOException;
+    RevCommit resolveRevCommit(final ObjectId objectId) throws IOException;
 
-    List<RefSpec> updateRemoteConfig( final Pair<String, String> remote,
-                                      final Collection<RefSpec> refSpecs ) throws IOException, URISyntaxException;
+    List<RefSpec> updateRemoteConfig(final Pair<String, String> remote,
+                                     final Collection<RefSpec> refSpecs) throws IOException, URISyntaxException;
 
-    PathInfo getPathInfo( final String branchName,
-                          final String path );
+    PathInfo getPathInfo(final String branchName,
+                         final String path);
 
-    List<PathInfo> listPathContent( final String branchName,
-                                    final String path );
+    List<PathInfo> listPathContent(final String branchName,
+                                   final String path);
 
     boolean isHEADInitialized();
 
     void setHeadAsInitialized();
 
-    void refUpdate( final String branch,
-                    final RevCommit commit ) throws IOException, ConcurrentRefUpdateException;
+    void refUpdate(final String branch,
+                   final RevCommit commit) throws IOException, ConcurrentRefUpdateException;
 
     KetchLeader getKetchLeader();
 
@@ -172,7 +185,7 @@ public interface Git {
 
     void enableKetch();
 
-    void updateRepo( Repository repo );
+    void updateRepo(Repository repo);
 
-    void updateLeaders( final KetchLeaderCache leaders );
+    void updateLeaders(final KetchLeaderCache leaders);
 }

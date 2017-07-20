@@ -29,16 +29,15 @@ public class ListRefs {
 
     private final Repository repo;
 
-    public ListRefs( final Repository repo ) {
+    public ListRefs(final Repository repo) {
         this.repo = repo;
     }
 
-    public List<Ref> execute(){
+    public List<Ref> execute() {
         try {
-            return new ArrayList<>( repo.getRefDatabase().getRefs( "refs/heads/" ).values() );
-        } catch ( java.io.IOException e ) {
-            throw new RuntimeException( e );
+            return new ArrayList<>(repo.getRefDatabase().getRefs("refs/heads/").values());
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 }

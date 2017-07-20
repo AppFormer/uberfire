@@ -22,9 +22,6 @@ import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.Deflater;
 
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.internal.storage.reftree.RefTreeDatabase;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.pack.PackConfig;
 import org.eclipse.jgit.transport.UploadPack;
@@ -36,11 +33,14 @@ import org.uberfire.java.nio.security.FileSystemUser;
 
 public class GitUploadCommand extends BaseGitCommand {
 
-    public GitUploadCommand( final String command,
-                             final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
-                             final FileSystemAuthorizer fileSystemAuthorizer,
-                             final ExecutorService executorService ) {
-        super( command, fileSystemAuthorizer, repositoryResolver, executorService );
+    public GitUploadCommand(final String command,
+                            final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
+                            final FileSystemAuthorizer fileSystemAuthorizer,
+                            final ExecutorService executorService) {
+        super(command,
+              fileSystemAuthorizer,
+              repositoryResolver,
+              executorService);
     }
 
     @Override
@@ -49,24 +49,25 @@ public class GitUploadCommand extends BaseGitCommand {
     }
 
     @Override
-    protected void execute( final FileSystemUser user,
-                            final Repository repository,
-                            final InputStream in,
-                            final OutputStream out,
-                            final OutputStream err,
-                            final JGitFileSystem fileSystem ) {
-        final UploadPack up = new UploadPack( repository );
+    protected void execute(final FileSystemUser user,
+                           final Repository repository,
+                           final InputStream in,
+                           final OutputStream out,
+                           final OutputStream err,
+                           final JGitFileSystem fileSystem) {
+        final UploadPack up = new UploadPack(repository);
 
-        final PackConfig config = new PackConfig( repository );
-        config.setCompressionLevel( Deflater.BEST_COMPRESSION );
-        up.setPackConfig( config );
+        final PackConfig config = new PackConfig(repository);
+        config.setCompressionLevel(Deflater.BEST_COMPRESSION);
+        up.setPackConfig(config);
 
-        up.setRefFilter( new HiddenBranchRefFilter() );
+        up.setRefFilter(new HiddenBranchRefFilter());
 
         try {
-            up.upload( in, out, err );
-        } catch ( final IOException ignored ) {
+            up.upload(in,
+                      out,
+                      err);
+        } catch (final IOException ignored) {
         }
     }
-
 }

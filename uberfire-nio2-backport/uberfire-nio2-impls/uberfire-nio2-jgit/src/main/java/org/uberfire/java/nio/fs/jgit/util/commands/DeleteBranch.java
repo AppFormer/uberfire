@@ -26,19 +26,17 @@ public class DeleteBranch {
     private final GitImpl git;
     private final Ref branch;
 
-    public DeleteBranch( final GitImpl git,
-                         final Ref branch ) {
+    public DeleteBranch(final GitImpl git,
+                        final Ref branch) {
         this.git = git;
         this.branch = branch;
     }
 
     public void execute() {
         try {
-            git._branchDelete().setBranchNames( branch.getName() ).setForce( true ).call();
-        } catch ( final GitAPIException e ) {
-            throw new IOException( e );
+            git._branchDelete().setBranchNames(branch.getName()).setForce(true).call();
+        } catch (final GitAPIException e) {
+            throw new IOException(e);
         }
-
     }
-
 }

@@ -26,46 +26,60 @@ import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.fs.jgit.util.Git;
 import org.uberfire.java.nio.fs.jgit.util.exceptions.GitException;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
 
 public class Fork {
 
     private static final String DOT_GIT_EXT = ".git";
     private final KetchLeaderCache leaders;
-    private Logger logger = LoggerFactory.getLogger( Fork.class );
+    private Logger logger = LoggerFactory.getLogger(Fork.class);
 
     private File parentFolder;
     private final String source;
     private final String target;
     private CredentialsProvider credentialsProvider;
 
-    public Fork( final File parentFolder,
-                 final String source,
-                 final String target,
-                 final CredentialsProvider credentialsProvider,
-                 final KetchLeaderCache leaders ) {
-        this.parentFolder = checkNotNull( "parentFolder", parentFolder );
-        this.source = checkNotEmpty( "source", source );
-        this.target = checkNotEmpty( "target", target );
-        this.credentialsProvider = checkNotNull( "credentialsProvider", credentialsProvider );
+    public Fork(final File parentFolder,
+                final String source,
+                final String target,
+                final CredentialsProvider credentialsProvider,
+                final KetchLeaderCache leaders) {
+        this.parentFolder = checkNotNull("parentFolder",
+                                         parentFolder);
+        this.source = checkNotEmpty("source",
+                                    source);
+        this.target = checkNotEmpty("target",
+                                    target);
+        this.credentialsProvider = checkNotNull("credentialsProvider",
+                                                credentialsProvider);
         this.leaders = leaders;
     }
 
     public Git execute() throws InvalidRemoteException {
 
-        if ( logger.isDebugEnabled() ) {
-            logger.debug( "Forking repository <{}> to <{}>", source, target );
+        if (logger.isDebugEnabled()) {
+            logger.debug("Forking repository <{}> to <{}>",
+                         source,
+                         target);
         }
 
-        final File origin = new File( parentFolder, source + DOT_GIT_EXT );
-        final File destination = new File( parentFolder, target + DOT_GIT_EXT );
+        final File origin = new File(parentFolder,
+                                     source + DOT_GIT_EXT);
+        final File destination = new File(parentFolder,
+                                          target + DOT_GIT_EXT);
 
-        if ( destination.exists() ) {
-            String message = String.format( "Cannot fork because destination repository <%s> already exists", target );
-            logger.error( message );
-            throw new GitException( message );
+        if (destination.exists()) {
+            String message = String.format("Cannot fork because destination repository <%s> already exists",
+                                           target);
+            logger.error(message);
+            throw new GitException(message);
         }
 
-        return Git.clone( destination, origin.toPath().toUri().toString(), false, credentialsProvider, leaders );
+        return Git.clone(destination,
+                         origin.toPath().toUri().toString(),
+                         false,
+                         credentialsProvider,
+                         leaders);
     }
 }

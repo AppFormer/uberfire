@@ -38,9 +38,9 @@ public class ListCommits {
     private final Ref ref;
     private final String path;
 
-    public ListCommits( final GitImpl git,
-                        final Ref ref,
-                        final String path ) {
+    public ListCommits(final GitImpl git,
+                       final Ref ref,
+                       final String path) {
         this.git = git;
         this.ref = ref;
         this.path = path;
@@ -48,9 +48,9 @@ public class ListCommits {
         this.endRange = null;
     }
 
-    public ListCommits( final GitImpl git,
-                        final ObjectId startRange,
-                        final ObjectId endRange ) {
+    public ListCommits(final GitImpl git,
+                       final ObjectId startRange,
+                       final ObjectId endRange) {
         this.git = git;
         this.startRange = startRange;
         this.endRange = endRange;
@@ -60,30 +60,29 @@ public class ListCommits {
 
     public List<RevCommit> execute() throws IOException, GitAPIException {
         final List<RevCommit> list = new ArrayList<>();
-        try ( final RevWalk rw = buildWalk() ) {
-            if ( ref == null ) {
-                rw.markStart( rw.parseCommit( endRange ) );
-                if ( startRange != null ) {
-                    rw.markUninteresting( rw.parseCommit( startRange ) );
+        try (final RevWalk rw = buildWalk()) {
+            if (ref == null) {
+                rw.markStart(rw.parseCommit(endRange));
+                if (startRange != null) {
+                    rw.markUninteresting(rw.parseCommit(startRange));
                 }
             }
-            for ( RevCommit rev : rw ) {
-                list.add( rev );
+            for (RevCommit rev : rw) {
+                list.add(rev);
             }
             return list;
         }
     }
 
     private RevWalk buildWalk() throws GitAPIException, IncorrectObjectTypeException, MissingObjectException {
-        if ( ref != null ) {
-            final LogCommand logCommand = git._log().add( ref.getObjectId() );
-            if ( path != null && !path.isEmpty() ) {
-                logCommand.addPath( path );
+        if (ref != null) {
+            final LogCommand logCommand = git._log().add(ref.getObjectId());
+            if (path != null && !path.isEmpty()) {
+                logCommand.addPath(path);
             }
             return (RevWalk) logCommand.call();
         }
 
-        return new RevWalk( git.getRepository() );
+        return new RevWalk(git.getRepository());
     }
-
 }

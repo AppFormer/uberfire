@@ -28,18 +28,17 @@ public class GetTreeFromRef {
     private final Git git;
     private final String treeRefName;
 
-    public GetTreeFromRef( final Git git,
-                           final String treeRefName ) {
+    public GetTreeFromRef(final Git git,
+                          final String treeRefName) {
         this.git = git;
         this.treeRefName = treeRefName;
     }
 
     public ObjectId execute() {
-        final RevCommit commit = git.getLastCommit( treeRefName );
-        if ( commit == null ) {
+        final RevCommit commit = git.getLastCommit(treeRefName);
+        if (commit == null) {
             return null;
         }
         return commit.getTree().getId();
     }
-
 }

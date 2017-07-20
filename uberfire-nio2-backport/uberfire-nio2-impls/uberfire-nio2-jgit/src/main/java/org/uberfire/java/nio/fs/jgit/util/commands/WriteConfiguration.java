@@ -14,20 +14,19 @@ public class WriteConfiguration {
     private final Repository repo;
     private final Consumer<StoredConfig> consumer;
 
-    public WriteConfiguration( final Repository repo,
-                               final Consumer<StoredConfig> consumer ) {
+    public WriteConfiguration(final Repository repo,
+                              final Consumer<StoredConfig> consumer) {
         this.repo = repo;
         this.consumer = consumer;
     }
 
     public void execute() {
         final StoredConfig cfg = repo.getConfig();
-        consumer.accept( cfg );
+        consumer.accept(cfg);
         try {
             cfg.save();
-        } catch ( IOException e ) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

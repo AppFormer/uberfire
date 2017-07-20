@@ -27,18 +27,17 @@ public class GarbageCollector {
 
     private final GitImpl git;
 
-    public GarbageCollector( final GitImpl git ) {
+    public GarbageCollector(final GitImpl git) {
         this.git = git;
     }
 
     public void execute() {
         try {
-            if ( !( git.getRepository().getRefDatabase() instanceof RefTreeDatabase ) ) {
+            if (!(git.getRepository().getRefDatabase() instanceof RefTreeDatabase)) {
                 git._gc().call();
             }
-        } catch ( GitAPIException e ) {
-            throw new RuntimeException( e );
+        } catch (GitAPIException e) {
+            throw new RuntimeException(e);
         }
     }
-
 }

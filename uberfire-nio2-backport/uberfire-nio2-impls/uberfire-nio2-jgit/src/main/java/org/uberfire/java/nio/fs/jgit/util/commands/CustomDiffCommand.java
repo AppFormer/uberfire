@@ -40,7 +40,7 @@ import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.eclipse.jgit.util.io.NullOutputStream;
 import org.uberfire.java.nio.fs.jgit.util.Git;
 
-import static org.eclipse.jgit.lib.Constants.*;
+import static org.eclipse.jgit.lib.Constants.HEAD;
 
 public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
 
@@ -68,8 +68,8 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
     /**
      * @param repo
      */
-    protected CustomDiffCommand( Git git ) {
-        super( git.getRepository() );
+    protected CustomDiffCommand(Git git) {
+        super(git.getRepository());
         this.git = git;
     }
 
@@ -82,61 +82,64 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      */
     public List<DiffEntry> call() throws GitAPIException {
         final DiffFormatter diffFmt;
-        if ( out != null && !showNameAndStatusOnly ) {
-            diffFmt = new DiffFormatter( new BufferedOutputStream( out ) );
+        if (out != null && !showNameAndStatusOnly) {
+            diffFmt = new DiffFormatter(new BufferedOutputStream(out));
         } else {
-            diffFmt = new DiffFormatter( NullOutputStream.INSTANCE );
+            diffFmt = new DiffFormatter(NullOutputStream.INSTANCE);
         }
-        diffFmt.setRepository( repo );
-        diffFmt.setProgressMonitor( monitor );
-        diffFmt.setDetectRenames( true );
+        diffFmt.setRepository(repo);
+        diffFmt.setProgressMonitor(monitor);
+        diffFmt.setDetectRenames(true);
         try {
-            if ( cached ) {
-                if ( oldTree == null ) {
-                    ObjectId head = git.getTreeFromRef( HEAD );
-                    if ( head == null ) {
-                        throw new NoHeadException( JGitText.get().cannotReadTree );
+            if (cached) {
+                if (oldTree == null) {
+                    ObjectId head = git.getTreeFromRef(HEAD);
+                    if (head == null) {
+                        throw new NoHeadException(JGitText.get().cannotReadTree);
                     }
                     CanonicalTreeParser p = new CanonicalTreeParser();
                     ObjectReader reader = repo.newObjectReader();
                     try {
-                        p.reset( reader, head );
+                        p.reset(reader,
+                                head);
                     } finally {
                         reader.close();
                     }
                     oldTree = p;
                 }
-                newTree = new DirCacheIterator( repo.readDirCache() );
+                newTree = new DirCacheIterator(repo.readDirCache());
             } else {
-                if ( oldTree == null ) {
-                    oldTree = new DirCacheIterator( repo.readDirCache() );
+                if (oldTree == null) {
+                    oldTree = new DirCacheIterator(repo.readDirCache());
                 }
-                if ( newTree == null ) {
-                    newTree = new FileTreeIterator( repo );
+                if (newTree == null) {
+                    newTree = new FileTreeIterator(repo);
                 }
             }
 
-            diffFmt.setPathFilter( pathFilter );
+            diffFmt.setPathFilter(pathFilter);
 
-            List<DiffEntry> result = diffFmt.scan( oldTree, newTree );
-            if ( showNameAndStatusOnly ) {
+            List<DiffEntry> result = diffFmt.scan(oldTree,
+                                                  newTree);
+            if (showNameAndStatusOnly) {
                 return result;
             } else {
-                if ( contextLines >= 0 ) {
-                    diffFmt.setContext( contextLines );
+                if (contextLines >= 0) {
+                    diffFmt.setContext(contextLines);
                 }
-                if ( destinationPrefix != null ) {
-                    diffFmt.setNewPrefix( destinationPrefix );
+                if (destinationPrefix != null) {
+                    diffFmt.setNewPrefix(destinationPrefix);
                 }
-                if ( sourcePrefix != null ) {
-                    diffFmt.setOldPrefix( sourcePrefix );
+                if (sourcePrefix != null) {
+                    diffFmt.setOldPrefix(sourcePrefix);
                 }
-                diffFmt.format( result );
+                diffFmt.format(result);
                 diffFmt.flush();
                 return result;
             }
-        } catch ( IOException e ) {
-            throw new JGitInternalException( e.getMessage(), e );
+        } catch (IOException e) {
+            throw new JGitInternalException(e.getMessage(),
+                                            e);
         } finally {
             diffFmt.close();
         }
@@ -146,7 +149,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param cached whether to view the changes you staged for the next commit
      * @return this instance
      */
-    public CustomDiffCommand setCached( boolean cached ) {
+    public CustomDiffCommand setCached(boolean cached) {
         this.cached = cached;
         return this;
     }
@@ -155,7 +158,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param pathFilter parameter, used to limit the diff to the named path
      * @return this instance
      */
-    public CustomDiffCommand setPathFilter( TreeFilter pathFilter ) {
+    public CustomDiffCommand setPathFilter(TreeFilter pathFilter) {
         this.pathFilter = pathFilter;
         return this;
     }
@@ -164,7 +167,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param oldTree the previous state
      * @return this instance
      */
-    public CustomDiffCommand setOldTree( AbstractTreeIterator oldTree ) {
+    public CustomDiffCommand setOldTree(AbstractTreeIterator oldTree) {
         this.oldTree = oldTree;
         return this;
     }
@@ -173,7 +176,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param newTree the updated state
      * @return this instance
      */
-    public CustomDiffCommand setNewTree( AbstractTreeIterator newTree ) {
+    public CustomDiffCommand setNewTree(AbstractTreeIterator newTree) {
         this.newTree = newTree;
         return this;
     }
@@ -182,7 +185,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param showNameAndStatusOnly whether to return only names and status of changed files
      * @return this instance
      */
-    public CustomDiffCommand setShowNameAndStatusOnly( boolean showNameAndStatusOnly ) {
+    public CustomDiffCommand setShowNameAndStatusOnly(boolean showNameAndStatusOnly) {
         this.showNameAndStatusOnly = showNameAndStatusOnly;
         return this;
     }
@@ -191,7 +194,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param out the stream to write line data
      * @return this instance
      */
-    public CustomDiffCommand setOutputStream( OutputStream out ) {
+    public CustomDiffCommand setOutputStream(OutputStream out) {
         this.out = out;
         return this;
     }
@@ -201,7 +204,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param contextLines the number of context lines
      * @return this instance
      */
-    public CustomDiffCommand setContextLines( int contextLines ) {
+    public CustomDiffCommand setContextLines(int contextLines) {
         this.contextLines = contextLines;
         return this;
     }
@@ -211,7 +214,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param sourcePrefix the prefix
      * @return this instance
      */
-    public CustomDiffCommand setSourcePrefix( String sourcePrefix ) {
+    public CustomDiffCommand setSourcePrefix(String sourcePrefix) {
         this.sourcePrefix = sourcePrefix;
         return this;
     }
@@ -221,7 +224,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @param destinationPrefix the prefix
      * @return this instance
      */
-    public CustomDiffCommand setDestinationPrefix( String destinationPrefix ) {
+    public CustomDiffCommand setDestinationPrefix(String destinationPrefix) {
         this.destinationPrefix = destinationPrefix;
         return this;
     }
@@ -233,7 +236,7 @@ public class CustomDiffCommand extends GitCommand<List<DiffEntry>> {
      * @return this instance
      * @see NullProgressMonitor
      */
-    public CustomDiffCommand setProgressMonitor( ProgressMonitor monitor ) {
+    public CustomDiffCommand setProgressMonitor(ProgressMonitor monitor) {
         this.monitor = monitor;
         return this;
     }

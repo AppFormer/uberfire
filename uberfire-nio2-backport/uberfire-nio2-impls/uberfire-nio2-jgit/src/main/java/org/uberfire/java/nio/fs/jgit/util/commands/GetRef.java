@@ -22,7 +22,7 @@ import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
-import static org.eclipse.jgit.lib.Constants.*;
+import static org.eclipse.jgit.lib.Constants.OBJ_TREE;
 
 /**
  * TODO: update me
@@ -32,28 +32,30 @@ public class GetRef {
     private final Repository repo;
     private final String name;
 
-    public GetRef( final Repository repo,
-                   final String name ) {
+    public GetRef(final Repository repo,
+                  final String name) {
         this.repo = repo;
         this.name = name;
     }
 
     public Ref execute() {
         try {
-            final Ref value = repo.getRefDatabase().getRef( name );
-            if ( value != null ) {
+            final Ref value = repo.getRefDatabase().getRef(name);
+            if (value != null) {
                 return value;
             }
-            final ObjectId treeRef = repo.resolve( name + "^{tree}" );
-            if ( treeRef != null ) {
-                final ObjectLoader loader = repo.getObjectDatabase().newReader().open( treeRef );
-                if ( loader.getType() == OBJ_TREE ) {
-                    return new ObjectIdRef.PeeledTag( Ref.Storage.NEW, name, ObjectId.fromString( name ), treeRef );
+            final ObjectId treeRef = repo.resolve(name + "^{tree}");
+            if (treeRef != null) {
+                final ObjectLoader loader = repo.getObjectDatabase().newReader().open(treeRef);
+                if (loader.getType() == OBJ_TREE) {
+                    return new ObjectIdRef.PeeledTag(Ref.Storage.NEW,
+                                                     name,
+                                                     ObjectId.fromString(name),
+                                                     treeRef);
                 }
             }
-        } catch ( final Exception ignored ) {
+        } catch (final Exception ignored) {
         }
         return null;
     }
-
 }

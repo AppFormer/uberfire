@@ -42,39 +42,43 @@ public class JGitVersionAttributeView extends VersionAttributeView<JGitPathImpl>
 
     private VersionAttributes attrs = null;
 
-    public JGitVersionAttributeView( final JGitPathImpl path ) {
-        super( path );
+    public JGitVersionAttributeView(final JGitPathImpl path) {
+        super(path);
     }
 
     @Override
     public VersionAttributes readAttributes() throws IOException {
-        if ( attrs == null ) {
-            attrs = buildAttrs( path.getFileSystem(), path.getRefTree(), path.getPath() );
+        if (attrs == null) {
+            attrs = buildAttrs(path.getFileSystem(),
+                               path.getRefTree(),
+                               path.getPath());
         }
         return attrs;
     }
 
     @Override
     public Class<? extends BasicFileAttributeView>[] viewTypes() {
-        return new Class[]{ VersionAttributeView.class, JGitVersionAttributeView.class };
+        return new Class[]{VersionAttributeView.class, JGitVersionAttributeView.class};
     }
 
-    private VersionAttributes buildAttrs( final JGitFileSystem fs,
-                                          final String branchName,
-                                          final String path ) {
-        final PathInfo pathInfo = fs.getGit().getPathInfo( branchName, path );
+    private VersionAttributes buildAttrs(final JGitFileSystem fs,
+                                         final String branchName,
+                                         final String path) {
+        final PathInfo pathInfo = fs.getGit().getPathInfo(branchName,
+                                                          path);
 
-        if ( pathInfo == null || pathInfo.getPathType().equals( PathType.NOT_FOUND ) ) {
-            throw new NoSuchFileException( path );
+        if (pathInfo == null || pathInfo.getPathType().equals(PathType.NOT_FOUND)) {
+            throw new NoSuchFileException(path);
         }
 
-        final Ref refId = fs.getGit().getRef( branchName );
+        final Ref refId = fs.getGit().getRef(branchName);
         final List<VersionRecord> records = new ArrayList<>();
 
-        if ( refId != null ) {
+        if (refId != null) {
             try {
-                for ( final RevCommit commit : fs.getGit().listCommits( refId, pathInfo.getPath() ) ) {
-                    records.add( new VersionRecord() {
+                for (final RevCommit commit : fs.getGit().listCommits(refId,
+                                                                      pathInfo.getPath())) {
+                    records.add(new VersionRecord() {
                         @Override
                         public String id() {
                             return commit.name();
@@ -102,16 +106,17 @@ public class JGitVersionAttributeView extends VersionAttributeView<JGitPathImpl>
 
                         @Override
                         public String uri() {
-                            return fs.getPath( commit.name(), path ).toUri().toString();
+                            return fs.getPath(commit.name(),
+                                              path).toUri().toString();
                         }
-                    } );
+                    });
                 }
-            } catch ( Exception e ) {
-                throw new RuntimeException( e );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
 
-        Collections.reverse( records );
+        Collections.reverse(records);
 
         return new VersionAttributes() {
             @Override
@@ -121,8 +126,8 @@ public class JGitVersionAttributeView extends VersionAttributeView<JGitPathImpl>
 
             @Override
             public FileTime lastModifiedTime() {
-                if ( records.size() > 0 ) {
-                    return new FileTimeImpl( records.get( records.size() - 1 ).date().getTime() );
+                if (records.size() > 0) {
+                    return new FileTimeImpl(records.get(records.size() - 1).date().getTime());
                 }
                 return null;
             }
@@ -134,20 +139,20 @@ public class JGitVersionAttributeView extends VersionAttributeView<JGitPathImpl>
 
             @Override
             public FileTime creationTime() {
-                if ( records.size() > 0 ) {
-                    return new FileTimeImpl( records.get( 0 ).date().getTime() );
+                if (records.size() > 0) {
+                    return new FileTimeImpl(records.get(0).date().getTime());
                 }
                 return null;
             }
 
             @Override
             public boolean isRegularFile() {
-                return pathInfo.getPathType().equals( PathType.FILE );
+                return pathInfo.getPathType().equals(PathType.FILE);
             }
 
             @Override
             public boolean isDirectory() {
-                return pathInfo.getPathType().equals( PathType.DIRECTORY );
+                return pathInfo.getPathType().equals(PathType.DIRECTORY);
             }
 
             @Override
@@ -171,5 +176,4 @@ public class JGitVersionAttributeView extends VersionAttributeView<JGitPathImpl>
             }
         };
     }
-
 }

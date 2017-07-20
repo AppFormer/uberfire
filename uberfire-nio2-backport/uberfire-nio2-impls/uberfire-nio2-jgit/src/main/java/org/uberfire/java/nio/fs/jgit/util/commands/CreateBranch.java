@@ -26,9 +26,9 @@ public class CreateBranch {
     private final GitImpl git;
     private final String source;
 
-    public CreateBranch( final GitImpl git,
-                         final String source,
-                         final String target ) {
+    public CreateBranch(final GitImpl git,
+                        final String source,
+                        final String target) {
         this.git = git;
         this.source = source;
         this.target = target;
@@ -38,10 +38,10 @@ public class CreateBranch {
 
     public void execute() {
         try {
-            git.refUpdate( target, git.resolveRevCommit( git.resolveObjectIds( source ).get( 0 ) ) );
-        } catch ( final Exception e ) {
-            throw new RuntimeException( e );
+            git.refUpdate(target,
+                          git.resolveRevCommit(git.resolveObjectIds(source).get(0)));
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
         }
     }
-
 }

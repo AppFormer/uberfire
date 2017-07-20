@@ -36,180 +36,365 @@ import org.uberfire.java.nio.fs.jgit.util.commands.ListDiffs;
 import org.uberfire.java.nio.fs.jgit.util.commands.Merge;
 import org.uberfire.java.nio.fs.jgit.util.exceptions.GitException;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class JGitMergeTest extends AbstractTestInfra {
 
-    private static Logger logger = LoggerFactory.getLogger( JGitMergeTest.class );
+    private static Logger logger = LoggerFactory.getLogger(JGitMergeTest.class);
     public static final String SOURCE_GIT = "source/source";
 
     @Test
     public void testMergeSuccessful() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
 
-        final File gitSource = new File( parentFolder, SOURCE_GIT + ".git" );
-        final Git origin = new CreateRepository( gitSource ).execute().get();
+        final File gitSource = new File(parentFolder,
+                                        SOURCE_GIT + ".git");
+        final Git origin = new CreateRepository(gitSource).execute().get();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.txt", tempFile( "temp1" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.txt",
+                           tempFile("temp1"));
+                   }}).execute();
 
-        new CreateBranch( (GitImpl) origin, "master", "develop" ).execute();
+        new CreateBranch((GitImpl) origin,
+                         "master",
+                         "develop").execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-1", null, null, false, new HashMap<String, File>() {{
-            put( "file2.txt", tempFile( "temp2" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file2.txt",
+                           tempFile("temp2"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-2", null, null, false, new HashMap<String, File>() {{
-            put( "file3.txt", tempFile( "temp3" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-2",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file3.txt",
+                           tempFile("temp3"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-3", null, null, false, new HashMap<String, File>() {{
-            put( "file4.txt", tempFile( "temp4" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-3",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file4.txt",
+                           tempFile("temp4"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-4", null, null, false, new HashMap<String, File>() {{
-            put( "file5.txt", tempFile( "temp5" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-4",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file5.txt",
+                           tempFile("temp5"));
+                   }}).execute();
 
-        new Merge( origin, "develop", "master" ).execute();
+        new Merge(origin,
+                  "develop",
+                  "master").execute();
 
-        final List<DiffEntry> result = new ListDiffs( origin,
-                                                      new GetTreeFromRef( origin, "master" ).execute(),
-                                                      new GetTreeFromRef( origin, "develop" ).execute() ).execute();
+        final List<DiffEntry> result = new ListDiffs(origin,
+                                                     new GetTreeFromRef(origin,
+                                                                        "master").execute(),
+                                                     new GetTreeFromRef(origin,
+                                                                        "develop").execute()).execute();
 
-        assertThat( result.size() ).isEqualTo( 0 );
+        assertThat(result.size()).isEqualTo(0);
     }
 
     @Test
     public void testMergeConflict() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
 
-        final File gitSource = new File( parentFolder, SOURCE_GIT + ".git" );
-        final Git origin = new CreateRepository( gitSource ).execute().get();
+        final File gitSource = new File(parentFolder,
+                                        SOURCE_GIT + ".git");
+        final Git origin = new CreateRepository(gitSource).execute().get();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.txt", tempFile( "temp1" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.txt",
+                           tempFile("temp1"));
+                   }}).execute();
 
-        new CreateBranch( (GitImpl) origin, "master", "develop" ).execute();
+        new CreateBranch((GitImpl) origin,
+                         "master",
+                         "develop").execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.txt", tempFile( "temp1" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.txt",
+                           tempFile("temp1"));
+                   }}).execute();
 
-        new Merge( origin, "develop", "master" ).execute();
+        new Merge(origin,
+                  "develop",
+                  "master").execute();
 
-        final List<DiffEntry> result = new ListDiffs( origin,
-                                                      new GetTreeFromRef( origin, "master" ).execute(),
-                                                      new GetTreeFromRef( origin, "develop" ).execute() ).execute();
+        final List<DiffEntry> result = new ListDiffs(origin,
+                                                     new GetTreeFromRef(origin,
+                                                                        "master").execute(),
+                                                     new GetTreeFromRef(origin,
+                                                                        "develop").execute()).execute();
 
-        assertThat( result.size() ).isEqualTo( 0 );
+        assertThat(result.size()).isEqualTo(0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testParametersNotNull() throws IOException, GitAPIException {
 
-        new Merge( null, "develop", "master" ).execute();
-
+        new Merge(null,
+                  "develop",
+                  "master").execute();
     }
 
     @Test(expected = GitException.class)
     public void testTryToMergeNonexistentBranch() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
 
-        final File gitSource = new File( parentFolder, SOURCE_GIT + ".git" );
-        final Git origin = new CreateRepository( gitSource ).execute().get();
+        final File gitSource = new File(parentFolder,
+                                        SOURCE_GIT + ".git");
+        final Git origin = new CreateRepository(gitSource).execute().get();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.txt", tempFile( "temp1" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.txt",
+                           tempFile("temp1"));
+                   }}).execute();
 
-        new CreateBranch( (GitImpl) origin, "master", "develop" ).execute();
+        new CreateBranch((GitImpl) origin,
+                         "master",
+                         "develop").execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-1", null, null, false, new HashMap<String, File>() {{
-            put( "file2.txt", tempFile( "temp2" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file2.txt",
+                           tempFile("temp2"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-2", null, null, false, new HashMap<String, File>() {{
-            put( "file3.txt", tempFile( "temp3" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-2",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file3.txt",
+                           tempFile("temp3"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-3", null, null, false, new HashMap<String, File>() {{
-            put( "file4.txt", tempFile( "temp4" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-3",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file4.txt",
+                           tempFile("temp4"));
+                   }}).execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-4", null, null, false, new HashMap<String, File>() {{
-            put( "file5.txt", tempFile( "temp5" ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-4",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file5.txt",
+                           tempFile("temp5"));
+                   }}).execute();
 
-        new Merge( origin, "develop", "nonexistent" ).execute();
-
+        new Merge(origin,
+                  "develop",
+                  "nonexistent").execute();
     }
 
     @Test(expected = GitException.class)
     public void testMergeBinaryInformationButHasConflicts() throws IOException, GitAPIException {
 
-        final byte[] contentA = this.loadImage( "images/drools.png" );
-        final byte[] contentB = this.loadImage( "images/jbpm.png" );
-        final byte[] contentC = this.loadImage( "images/opta.png" );
+        final byte[] contentA = this.loadImage("images/drools.png");
+        final byte[] contentB = this.loadImage("images/jbpm.png");
+        final byte[] contentC = this.loadImage("images/opta.png");
 
         final File parentFolder = createTempDirectory();
 
-        final File gitSource = new File( parentFolder, SOURCE_GIT + ".git" );
-        final Git origin = new CreateRepository( gitSource ).execute().get();
+        final File gitSource = new File(parentFolder,
+                                        SOURCE_GIT + ".git");
+        final Git origin = new CreateRepository(gitSource).execute().get();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.jpg", tempFile( contentA ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.jpg",
+                           tempFile(contentA));
+                   }}).execute();
 
-        new CreateBranch( (GitImpl) origin, "master", "develop" ).execute();
+        new CreateBranch((GitImpl) origin,
+                         "master",
+                         "develop").execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.jpg", tempFile( contentB ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.jpg",
+                           tempFile(contentB));
+                   }}).execute();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.jpg", tempFile( contentC ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.jpg",
+                           tempFile(contentC));
+                   }}).execute();
 
-        new Merge( origin, "develop", "master" ).execute();
+        new Merge(origin,
+                  "develop",
+                  "master").execute();
 
-        final List<DiffEntry> result = new ListDiffs( origin,
-                                                      new GetTreeFromRef( origin, "master" ).execute(),
-                                                      new GetTreeFromRef( origin, "develop" ).execute() ).execute();
+        final List<DiffEntry> result = new ListDiffs(origin,
+                                                     new GetTreeFromRef(origin,
+                                                                        "master").execute(),
+                                                     new GetTreeFromRef(origin,
+                                                                        "develop").execute()).execute();
 
-        assertThat( result.size() ).isEqualTo( 0 );
+        assertThat(result.size()).isEqualTo(0);
     }
 
     @Test
     public void testMergeBinaryInformationSuccessful() throws IOException, GitAPIException {
 
-        final byte[] contentA = this.loadImage( "images/drools.png" );
-        final byte[] contentB = this.loadImage( "images/jbpm.png" );
+        final byte[] contentA = this.loadImage("images/drools.png");
+        final byte[] contentB = this.loadImage("images/jbpm.png");
 
         final File parentFolder = createTempDirectory();
 
-        final File gitSource = new File( parentFolder, SOURCE_GIT + ".git" );
-        final Git origin = new CreateRepository( gitSource ).execute().get();
+        final File gitSource = new File(parentFolder,
+                                        SOURCE_GIT + ".git");
+        final Git origin = new CreateRepository(gitSource).execute().get();
 
-        new Commit( origin, "master", "name", "name@example.com", "master-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.jpg", tempFile( contentA ) );
-        }} ).execute();
+        new Commit(origin,
+                   "master",
+                   "name",
+                   "name@example.com",
+                   "master-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.jpg",
+                           tempFile(contentA));
+                   }}).execute();
 
-        new CreateBranch( (GitImpl) origin, "master", "develop" ).execute();
+        new CreateBranch((GitImpl) origin,
+                         "master",
+                         "develop").execute();
 
-        new Commit( origin, "develop", "name", "name@example.com", "develop-1", null, null, false, new HashMap<String, File>() {{
-            put( "file1.jpg", tempFile( contentB ) );
-        }} ).execute();
+        new Commit(origin,
+                   "develop",
+                   "name",
+                   "name@example.com",
+                   "develop-1",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("file1.jpg",
+                           tempFile(contentB));
+                   }}).execute();
 
-        new Merge( origin, "develop", "master" ).execute();
+        new Merge(origin,
+                  "develop",
+                  "master").execute();
 
-        final List<DiffEntry> result = new ListDiffs( origin,
-                                                      new GetTreeFromRef( origin, "master" ).execute(),
-                                                      new GetTreeFromRef( origin, "develop" ).execute() ).execute();
+        final List<DiffEntry> result = new ListDiffs(origin,
+                                                     new GetTreeFromRef(origin,
+                                                                        "master").execute(),
+                                                     new GetTreeFromRef(origin,
+                                                                        "develop").execute()).execute();
 
-        assertThat( result.size() ).isEqualTo( 0 );
+        assertThat(result.size()).isEqualTo(0);
     }
-
 }

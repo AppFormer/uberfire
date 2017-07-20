@@ -32,19 +32,20 @@ public class Fetch {
     private final Pair<String, String> remote;
     private final Collection<RefSpec> refSpecs;
 
-    public Fetch( final GitImpl git,
-                  final CredentialsProvider credentialsProvider,
-                  final Collection<RefSpec> refSpecs ) {
+    public Fetch(final GitImpl git,
+                 final CredentialsProvider credentialsProvider,
+                 final Collection<RefSpec> refSpecs) {
         this.git = git;
         this.credentialsProvider = credentialsProvider;
         this.refSpecs = refSpecs;
-        this.remote = Pair.newPair( "origin", null );
+        this.remote = Pair.newPair("origin",
+                                   null);
     }
 
-    public Fetch( final GitImpl git,
-                  final CredentialsProvider credentialsProvider,
-                  final Pair<String, String> remote,
-                  final Collection<RefSpec> refSpecs ) {
+    public Fetch(final GitImpl git,
+                 final CredentialsProvider credentialsProvider,
+                 final Pair<String, String> remote,
+                 final Collection<RefSpec> refSpecs) {
         this.git = git;
         this.credentialsProvider = credentialsProvider;
         this.remote = remote;
@@ -53,17 +54,18 @@ public class Fetch {
 
     public void execute() throws InvalidRemoteException {
         try {
-            final List<RefSpec> specs = git.updateRemoteConfig( remote, refSpecs );
+            final List<RefSpec> specs = git.updateRemoteConfig(remote,
+                                                               refSpecs);
 
             git._fetch()
-                    .setCredentialsProvider( credentialsProvider )
-                    .setRemote( remote.getK1() )
-                    .setRefSpecs( specs )
+                    .setCredentialsProvider(credentialsProvider)
+                    .setRemote(remote.getK1())
+                    .setRefSpecs(specs)
                     .call();
-        } catch ( final InvalidRemoteException e ) {
+        } catch (final InvalidRemoteException e) {
             throw e;
-        } catch ( final Exception ex ) {
-            throw new RuntimeException( ex );
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

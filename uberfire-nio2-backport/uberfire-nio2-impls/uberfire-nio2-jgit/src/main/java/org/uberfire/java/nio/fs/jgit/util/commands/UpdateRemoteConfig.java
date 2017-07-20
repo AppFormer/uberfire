@@ -38,9 +38,9 @@ public class UpdateRemoteConfig {
     private final Pair<String, String> remote;
     private final Collection<RefSpec> refSpecs;
 
-    public UpdateRemoteConfig( final Git git,
-                               final Pair<String, String> remote,
-                               final Collection<RefSpec> refSpecs ) {
+    public UpdateRemoteConfig(final Git git,
+                              final Pair<String, String> remote,
+                              final Collection<RefSpec> refSpecs) {
         this.git = git;
         this.remote = remote;
         this.refSpecs = refSpecs;
@@ -48,21 +48,24 @@ public class UpdateRemoteConfig {
 
     public List<RefSpec> execute() throws IOException, URISyntaxException {
         final List<RefSpec> specs = new ArrayList<>();
-        if ( refSpecs == null || refSpecs.isEmpty() ) {
-            specs.add( new RefSpec( "+refs/heads/*:refs/remotes/" + remote.getK1() + "/*" ) );
-            specs.add( new RefSpec( "+refs/tags/*:refs/tags/*" ) );
-            specs.add( new RefSpec( "+refs/notes/*:refs/notes/*" ) );
+        if (refSpecs == null || refSpecs.isEmpty()) {
+            specs.add(new RefSpec("+refs/heads/*:refs/remotes/" + remote.getK1() + "/*"));
+            specs.add(new RefSpec("+refs/tags/*:refs/tags/*"));
+            specs.add(new RefSpec("+refs/notes/*:refs/notes/*"));
         } else {
-            specs.addAll( refSpecs );
+            specs.addAll(refSpecs);
         }
 
         final StoredConfig config = git.getRepository().getConfig();
-        final String url = config.getString( "remote", remote.getK1(), "url" );
-        if ( url == null ) {
-            final RemoteConfig remoteConfig = new RemoteConfig( git.getRepository().getConfig(), remote.getK1() );
-            remoteConfig.addURI( new URIish( remote.getK2() ) );
-            specs.forEach( remoteConfig::addFetchRefSpec );
-            remoteConfig.update( git.getRepository().getConfig() );
+        final String url = config.getString("remote",
+                                            remote.getK1(),
+                                            "url");
+        if (url == null) {
+            final RemoteConfig remoteConfig = new RemoteConfig(git.getRepository().getConfig(),
+                                                               remote.getK1());
+            remoteConfig.addURI(new URIish(remote.getK2()));
+            specs.forEach(remoteConfig::addFetchRefSpec);
+            remoteConfig.update(git.getRepository().getConfig());
             git.getRepository().getConfig().save();
         }
         return specs;

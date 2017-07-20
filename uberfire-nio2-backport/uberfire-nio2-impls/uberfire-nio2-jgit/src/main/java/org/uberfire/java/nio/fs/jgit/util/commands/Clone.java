@@ -29,8 +29,10 @@ import org.eclipse.jgit.transport.RefSpec;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.java.nio.fs.jgit.util.Git;
 
-import static java.util.Collections.*;
-import static org.uberfire.commons.validation.PortablePreconditions.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
 
 public class Clone {
 
@@ -40,49 +42,58 @@ public class Clone {
     private final boolean isMirror;
     private final KetchLeaderCache leaders;
 
-    public Clone( final File directory,
-                  final String origin,
-                  final boolean isMirror,
-                  final CredentialsProvider credentialsProvider,
-                  final KetchLeaderCache leaders ) {
-        this.repoDir = checkNotNull( "directory", directory );
-        this.origin = checkNotEmpty( "origin", origin );
+    public Clone(final File directory,
+                 final String origin,
+                 final boolean isMirror,
+                 final CredentialsProvider credentialsProvider,
+                 final KetchLeaderCache leaders) {
+        this.repoDir = checkNotNull("directory",
+                                    directory);
+        this.origin = checkNotEmpty("origin",
+                                    origin);
         this.isMirror = isMirror;
         this.credentialsProvider = credentialsProvider;
         this.leaders = leaders;
     }
 
     public Optional<Git> execute() throws InvalidRemoteException {
-        final Git git = Git.createRepository( repoDir, null );
+        final Git git = Git.createRepository(repoDir,
+                                             null);
 
-        if ( git != null ) {
+        if (git != null) {
             final Collection<RefSpec> refSpecList;
-            if ( isMirror ) {
-                refSpecList = singletonList( new RefSpec( "+refs/*:refs/*" ) );
+            if (isMirror) {
+                refSpecList = singletonList(new RefSpec("+refs/*:refs/*"));
             } else {
                 refSpecList = emptyList();
             }
-            final Pair<String, String> remote = Pair.newPair( "origin", origin );
-            git.fetch( credentialsProvider, remote, refSpecList );
+            final Pair<String, String> remote = Pair.newPair("origin",
+                                                             origin);
+            git.fetch(credentialsProvider,
+                      remote,
+                      refSpecList);
 
             final StoredConfig config = git.getRepository().getConfig();
-            config.setBoolean( "remote", "origin", "mirror", true );
+            config.setBoolean("remote",
+                              "origin",
+                              "mirror",
+                              true);
             try {
                 config.save();
-            } catch ( IOException e ) {
-                throw new RuntimeException( e );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
 
-            git.syncRemote( remote );
+            git.syncRemote(remote);
 
-            if (git.isKetchEnabled()){
+            if (git.isKetchEnabled()) {
                 git.convertRefTree();
-                git.updateLeaders( leaders );
+                git.updateLeaders(leaders);
             }
 
             git.setHeadAsInitialized();
 
-            return Optional.of( git );
+            return Optional.of(git);
         }
 
         return Optional.empty();

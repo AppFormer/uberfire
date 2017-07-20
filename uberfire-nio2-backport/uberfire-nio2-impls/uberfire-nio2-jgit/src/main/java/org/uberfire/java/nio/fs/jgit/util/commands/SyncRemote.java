@@ -33,55 +33,54 @@ public class SyncRemote {
     private final GitImpl git;
     private final Pair<String, String> remote;
 
-    public SyncRemote( final GitImpl git,
-                       final Pair<String, String> remote ) {
+    public SyncRemote(final GitImpl git,
+                      final Pair<String, String> remote) {
         this.git = git;
         this.remote = remote;
     }
 
     public Optional execute() throws InvalidRemoteException {
         try {
-            final List<Ref> branches = git._branchList().setListMode( ListBranchCommand.ListMode.ALL ).call();
+            final List<Ref> branches = git._branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
             final Set<String> remoteBranches = new HashSet<>();
             final Set<String> localBranches = new HashSet<>();
 
-            for ( final Ref branch : branches ) {
-                final String branchName = branch.getName().substring( branch.getName().lastIndexOf( "/" ) + 1 );
-                if ( branch.getName().startsWith( "refs/remotes/" + remote.getK1() ) ) {
-                    remoteBranches.add( branchName );
+            for (final Ref branch : branches) {
+                final String branchName = branch.getName().substring(branch.getName().lastIndexOf("/") + 1);
+                if (branch.getName().startsWith("refs/remotes/" + remote.getK1())) {
+                    remoteBranches.add(branchName);
                 } else {
-                    localBranches.add( branchName );
+                    localBranches.add(branchName);
                 }
             }
 
-            for ( final String localBranch : localBranches ) {
-                if ( remoteBranches.contains( localBranch ) ) {
+            for (final String localBranch : localBranches) {
+                if (remoteBranches.contains(localBranch)) {
                     git._branchCreate()
-                            .setName( localBranch )
-                            .setUpstreamMode( CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM )
-                            .setStartPoint( remote.getK1() + "/" + localBranch )
-                            .setForce( true )
+                            .setName(localBranch)
+                            .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                            .setStartPoint(remote.getK1() + "/" + localBranch)
+                            .setForce(true)
                             .call();
                 }
             }
 
-            remoteBranches.removeAll( localBranches );
+            remoteBranches.removeAll(localBranches);
 
-            for ( final String branch : remoteBranches ) {
+            for (final String branch : remoteBranches) {
                 git._branchCreate()
-                        .setName( branch )
-                        .setUpstreamMode( CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM )
-                        .setStartPoint( remote.getK1() + "/" + branch )
-                        .setForce( true )
+                        .setName(branch)
+                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                        .setStartPoint(remote.getK1() + "/" + branch)
+                        .setForce(true)
                         .call();
             }
             return null;
-        } catch ( final InvalidRemoteException e ) {
+        } catch (final InvalidRemoteException e) {
             throw e;
-        } catch ( final Exception ex ) {
-            throw new RuntimeException( ex );
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
         }
-
     }
 }

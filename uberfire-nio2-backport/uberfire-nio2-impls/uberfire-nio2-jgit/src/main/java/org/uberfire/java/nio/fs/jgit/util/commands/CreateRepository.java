@@ -33,18 +33,22 @@ public class CreateRepository {
     private final File hookDir;
     private final KetchLeaderCache leaders;
 
-    public CreateRepository( final File repoDir ) {
-        this( repoDir, null, null );
+    public CreateRepository(final File repoDir) {
+        this(repoDir,
+             null,
+             null);
     }
 
-    public CreateRepository( final File repoDir,
-                             final File hookDir ) {
-        this( repoDir, hookDir, null );
+    public CreateRepository(final File repoDir,
+                            final File hookDir) {
+        this(repoDir,
+             hookDir,
+             null);
     }
 
-    public CreateRepository( final File repoDir,
-                             final File hookDir,
-                             final KetchLeaderCache leaders ) {
+    public CreateRepository(final File repoDir,
+                            final File hookDir,
+                            final KetchLeaderCache leaders) {
         this.repoDir = repoDir;
         this.hookDir = hookDir;
         this.leaders = leaders;
@@ -52,40 +56,50 @@ public class CreateRepository {
 
     public Optional<Git> execute() {
         try {
-            final org.eclipse.jgit.api.Git _git = org.eclipse.jgit.api.Git.init().setBare( true ).setDirectory( repoDir ).call();
+            final org.eclipse.jgit.api.Git _git = org.eclipse.jgit.api.Git.init().setBare(true).setDirectory(repoDir).call();
 
-            if ( leaders != null ) {
-                new WriteConfiguration( _git.getRepository(), cfg -> {
-                    cfg.setInt( "core", null, "repositoryformatversion", 1 );
-                    cfg.setString( "extensions", null, "refsStorage", "reftree" );
-                } ).execute();
+            if (leaders != null) {
+                new WriteConfiguration(_git.getRepository(),
+                                       cfg -> {
+                                           cfg.setInt("core",
+                                                      null,
+                                                      "repositoryformatversion",
+                                                      1);
+                                           cfg.setString("extensions",
+                                                         null,
+                                                         "refsStorage",
+                                                         "reftree");
+                                       }).execute();
             }
 
             final Repository repo = new FileRepositoryBuilder()
-                    .setGitDir( repoDir )
+                    .setGitDir(repoDir)
                     .build();
 
-            final org.eclipse.jgit.api.Git git = new org.eclipse.jgit.api.Git( repo );
+            final org.eclipse.jgit.api.Git git = new org.eclipse.jgit.api.Git(repo);
 
-            if ( hookDir != null ) {
-                final File repoHookDir = new File( repoDir, "hooks" );
+            if (hookDir != null) {
+                final File repoHookDir = new File(repoDir,
+                                                  "hooks");
 
                 try {
-                    FileUtils.copyDirectory( hookDir, repoHookDir );
-                } catch ( final Exception ex ) {
-                    throw new RuntimeException( ex );
+                    FileUtils.copyDirectory(hookDir,
+                                            repoHookDir);
+                } catch (final Exception ex) {
+                    throw new RuntimeException(ex);
                 }
 
-                for ( final File file : repoHookDir.listFiles() ) {
-                    if ( file != null && file.isFile() ) {
-                        file.setExecutable( true );
+                for (final File file : repoHookDir.listFiles()) {
+                    if (file != null && file.isFile()) {
+                        file.setExecutable(true);
                     }
                 }
             }
 
-            return Optional.of( new GitImpl( git, leaders ) );
-        } catch ( final Exception ex ) {
-            throw new IOException( ex );
+            return Optional.of(new GitImpl(git,
+                                           leaders));
+        } catch (final Exception ex) {
+            throw new IOException(ex);
         }
     }
 }

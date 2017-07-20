@@ -32,75 +32,89 @@ import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.fs.jgit.util.commands.Clone;
 import org.uberfire.java.nio.fs.jgit.util.commands.ListRefs;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
 public class JGitMirrorTest extends AbstractTestInfra {
 
     public static final String TARGET_GIT = "test/target.git";
     public static final String ORIGIN = "https://github.com/uberfire/uberfire-website";
-    private static Logger logger = LoggerFactory.getLogger( JGitMirrorTest.class );
+    private static Logger logger = LoggerFactory.getLogger(JGitMirrorTest.class);
 
     @Test
     public void testToHTTPMirrorSuccess() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
-        final File directory = new File( parentFolder, TARGET_GIT );
-        new Clone( directory, ORIGIN, false, CredentialsProvider.getDefault(), null ).execute();
+        final File directory = new File(parentFolder,
+                                        TARGET_GIT);
+        new Clone(directory,
+                  ORIGIN,
+                  false,
+                  CredentialsProvider.getDefault(),
+                  null).execute();
 
-        final Git cloned = Git.open( directory );
+        final Git cloned = Git.open(directory);
 
-        assertThat( cloned ).isNotNull();
+        assertThat(cloned).isNotNull();
 
-        assertThat(  new ListRefs( cloned.getRepository() ).execute()  ).is( new Condition<List<Ref>>() {
+        assertThat(new ListRefs(cloned.getRepository()).execute()).is(new Condition<List<Ref>>() {
             @Override
-            public boolean matches( final List<Ref> refs ) {
+            public boolean matches(final List<Ref> refs) {
                 return refs.size() > 0;
             }
-        } );
+        });
 
-        assertThat(  new ListRefs( cloned.getRepository() ).execute() .get( 0 ).getName() ).isEqualTo( "refs/heads/master" );
+        assertThat(new ListRefs(cloned.getRepository()).execute().get(0).getName()).isEqualTo("refs/heads/master");
 
-        URIish remoteUri = cloned.remoteList().call().get( 0 ).getURIs().get( 0 );
+        URIish remoteUri = cloned.remoteList().call().get(0).getURIs().get(0);
         String remoteUrl = remoteUri.getScheme() + "://" + remoteUri.getHost() + remoteUri.getPath();
-        assertThat( remoteUrl ).isEqualTo( ORIGIN );
-
+        assertThat(remoteUrl).isEqualTo(ORIGIN);
     }
 
     @Test
     public void testEmptyCredentials() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
-        final File directory = new File( parentFolder, TARGET_GIT );
-        new Clone( directory, ORIGIN, false, null, null ).execute();
+        final File directory = new File(parentFolder,
+                                        TARGET_GIT);
+        new Clone(directory,
+                  ORIGIN,
+                  false,
+                  null,
+                  null).execute();
 
-        final Git cloned = Git.open( directory );
+        final Git cloned = Git.open(directory);
 
-        assertThat( cloned ).isNotNull();
+        assertThat(cloned).isNotNull();
 
-        assertThat(  new ListRefs( cloned.getRepository() ).execute()  ).is( new Condition<List<Ref>>() {
+        assertThat(new ListRefs(cloned.getRepository()).execute()).is(new Condition<List<Ref>>() {
             @Override
-            public boolean matches( final List<Ref> refs ) {
+            public boolean matches(final List<Ref> refs) {
                 return refs.size() > 0;
             }
-        } );
+        });
 
-        assertThat(  new ListRefs( cloned.getRepository() ).execute() .get( 0 ).getName() ).isEqualTo( "refs/heads/master" );
+        assertThat(new ListRefs(cloned.getRepository()).execute().get(0).getName()).isEqualTo("refs/heads/master");
 
-        URIish remoteUri = cloned.remoteList().call().get( 0 ).getURIs().get( 0 );
+        URIish remoteUri = cloned.remoteList().call().get(0).getURIs().get(0);
         String remoteUrl = remoteUri.getScheme() + "://" + remoteUri.getHost() + remoteUri.getPath();
-        assertThat( remoteUrl ).isEqualTo( ORIGIN );
+        assertThat(remoteUrl).isEqualTo(ORIGIN);
     }
 
     @Test
     public void testBadUrl() throws IOException, GitAPIException {
         final File parentFolder = createTempDirectory();
-        final File directory = new File( parentFolder, TARGET_GIT );
+        final File directory = new File(parentFolder,
+                                        TARGET_GIT);
         try {
-            new Clone( directory, ORIGIN + "sssss", false, CredentialsProvider.getDefault(), null ).execute();
-            fail( "If got here the test is wrong because the ORIGIN does no exist" );
-        } catch ( RuntimeException ex ) {
-            assertThat( ex ).isNotNull();
-            logger.info( ex.getMessage(), ex );
+            new Clone(directory,
+                      ORIGIN + "sssss",
+                      false,
+                      CredentialsProvider.getDefault(),
+                      null).execute();
+            fail("If got here the test is wrong because the ORIGIN does no exist");
+        } catch (RuntimeException ex) {
+            assertThat(ex).isNotNull();
+            logger.info(ex.getMessage(),
+                        ex);
         }
-
     }
-
 }

@@ -31,7 +31,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.uberfire.java.nio.fs.jgit.util.GitImpl;
 import org.uberfire.java.nio.fs.jgit.util.exceptions.GitException;
 
-import static java.util.stream.StreamSupport.*;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * Implements the Git Squash command. It needs the repository were he is going to make the squash,
@@ -46,10 +46,10 @@ public class Squash {
     private String squashedCommitMessage;
     private String startCommitString;
 
-    public Squash( final GitImpl git,
-                   final String branch,
-                   final String startCommitString,
-                   final String squashedCommitMessage ) {
+    public Squash(final GitImpl git,
+                  final String branch,
+                  final String startCommitString,
+                  final String squashedCommitMessage) {
         this.git = git;
         this.squashedCommitMessage = squashedCommitMessage;
         this.branch = branch;
@@ -59,26 +59,30 @@ public class Squash {
     public void execute() {
         final Repository repo = this.git.getRepository();
 
-        final RevCommit latestCommit = git.getLastCommit( branch );
-        final RevCommit startCommit = checkIfCommitIsPresentAtBranch( this.git, this.branch, this.startCommitString );
+        final RevCommit latestCommit = git.getLastCommit(branch);
+        final RevCommit startCommit = checkIfCommitIsPresentAtBranch(this.git,
+                                                                     this.branch,
+                                                                     this.startCommitString);
 
         RevCommit parent = startCommit;
-        if ( startCommit.getParentCount() > 0 ) {
-            parent = startCommit.getParent( 0 );
+        if (startCommit.getParentCount() > 0) {
+            parent = startCommit.getParent(0);
         }
 
         final CommitBuilder commitBuilder = new CommitBuilder();
-        commitBuilder.setParentId( parent );
-        commitBuilder.setTreeId( latestCommit.getTree().getId() );
-        commitBuilder.setMessage( squashedCommitMessage );
-        commitBuilder.setAuthor( startCommit.getAuthorIdent() );
-        commitBuilder.setCommitter( startCommit.getAuthorIdent() );
+        commitBuilder.setParentId(parent);
+        commitBuilder.setTreeId(latestCommit.getTree().getId());
+        commitBuilder.setMessage(squashedCommitMessage);
+        commitBuilder.setAuthor(startCommit.getAuthorIdent());
+        commitBuilder.setCommitter(startCommit.getAuthorIdent());
 
-        try ( final ObjectInserter odi = repo.newObjectInserter() ) {
-            final RevCommit squashedCommit = git.resolveRevCommit( odi.insert( commitBuilder ) );
-            git.refUpdate( branch, squashedCommit );
-        } catch ( ConcurrentRefUpdateException | IOException e ) {
-            throw new GitException( "Error on executing squash.", e );
+        try (final ObjectInserter odi = repo.newObjectInserter()) {
+            final RevCommit squashedCommit = git.resolveRevCommit(odi.insert(commitBuilder));
+            git.refUpdate(branch,
+                          squashedCommit);
+        } catch (ConcurrentRefUpdateException | IOException e) {
+            throw new GitException("Error on executing squash.",
+                                   e);
         }
     }
 
@@ -89,20 +93,21 @@ public class Squash {
      * @param startCommitString The commit it needs to find
      * @throws {@link GitException} when it cannot find the commit in that branch
      */
-    private RevCommit checkIfCommitIsPresentAtBranch( final GitImpl git,
-                                                      final String branch,
-                                                      final String startCommitString ) {
+    private RevCommit checkIfCommitIsPresentAtBranch(final GitImpl git,
+                                                     final String branch,
+                                                     final String startCommitString) {
 
         try {
-            final ObjectId id = git.getRef( branch ).getObjectId();
-            final Spliterator<RevCommit> log = git._log().add( id ).call().spliterator();
-            return stream( log, false )
-                    .filter( ( elem ) -> elem.getName().equals( startCommitString ) )
-                    .findFirst().orElseThrow( () -> new GitException( "Commit is not present at branch " + branch ) );
-        } catch ( GitAPIException | MissingObjectException | IncorrectObjectTypeException e ) {
-            throw new GitException( "A problem occurred when trying to get commit list", e );
+            final ObjectId id = git.getRef(branch).getObjectId();
+            final Spliterator<RevCommit> log = git._log().add(id).call().spliterator();
+            return stream(log,
+                          false)
+                    .filter((elem) -> elem.getName().equals(startCommitString))
+                    .findFirst().orElseThrow(() -> new GitException("Commit is not present at branch " + branch));
+        } catch (GitAPIException | MissingObjectException | IncorrectObjectTypeException e) {
+            throw new GitException("A problem occurred when trying to get commit list",
+                                   e);
         }
     }
-
 }
 

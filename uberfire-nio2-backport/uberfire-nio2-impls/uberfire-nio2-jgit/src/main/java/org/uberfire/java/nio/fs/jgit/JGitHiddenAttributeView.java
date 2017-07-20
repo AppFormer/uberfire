@@ -33,27 +33,29 @@ public class JGitHiddenAttributeView extends HiddenAttributeView<JGitPathImpl> {
 
     private HiddenAttributes attrs = null;
 
-    public JGitHiddenAttributeView( final JGitPathImpl path ) {
-        super( path );
+    public JGitHiddenAttributeView(final JGitPathImpl path) {
+        super(path);
     }
 
     @Override
     public HiddenAttributes readAttributes() throws IOException {
-        if ( attrs == null ) {
-            attrs = buildAttrs( path.getFileSystem(), path.getRefTree(), path.getPath() );
+        if (attrs == null) {
+            attrs = buildAttrs(path.getFileSystem(),
+                               path.getRefTree(),
+                               path.getPath());
         }
         return attrs;
     }
 
     @Override
     public Class<? extends BasicFileAttributeView>[] viewTypes() {
-        return new Class[]{ HiddenAttributeView.class, JGitVersionAttributeView.class };
+        return new Class[]{HiddenAttributeView.class, JGitVersionAttributeView.class};
     }
 
-    private HiddenAttributes buildAttrs( final JGitFileSystem fileSystem,
-                                         final String refTree,
-                                         final String path ) {
-        return new HiddenAttributesImpl( new JGitBasicAttributeView( this.path ).readAttributes(), HiddenBranchRefFilter.isHidden( refTree ) );
+    private HiddenAttributes buildAttrs(final JGitFileSystem fileSystem,
+                                        final String refTree,
+                                        final String path) {
+        return new HiddenAttributesImpl(new JGitBasicAttributeView(this.path).readAttributes(),
+                                        HiddenBranchRefFilter.isHidden(refTree));
     }
-
 }

@@ -22,22 +22,24 @@ import org.eclipse.jgit.transport.ReceivePack;
  */
 public class KetchCustomReceivePack extends ReceivePack {
 
-    public KetchCustomReceivePack( final Repository into ) {
-        super( into );
+    public KetchCustomReceivePack(final Repository into) {
+        super(into);
     }
 
     @Override
-    public void setAdvertisedRefs( final Map<String, Ref> allRefs,
-                                   final Set<ObjectId> additionalHaves ) {
-        super.setAdvertisedRefs( allRefs, additionalHaves );
+    public void setAdvertisedRefs(final Map<String, Ref> allRefs,
+                                  final Set<ObjectId> additionalHaves) {
+        super.setAdvertisedRefs(allRefs,
+                                additionalHaves);
         final Map<String, Ref> refs = getAdvertisedRefs();
-        if ( getRepository().getRefDatabase() instanceof RefTreeDatabase ) {
-            final RefDatabase bootstrap = ( (RefTreeDatabase) getRepository().getRefDatabase() ).getBootstrap();
+        if (getRepository().getRefDatabase() instanceof RefTreeDatabase) {
+            final RefDatabase bootstrap = ((RefTreeDatabase) getRepository().getRefDatabase()).getBootstrap();
             try {
-                for ( Map.Entry<String, Ref> entry : bootstrap.getRefs( "" ).entrySet() ) {
-                    refs.put( entry.getKey(), entry.getValue() );
+                for (Map.Entry<String, Ref> entry : bootstrap.getRefs("").entrySet()) {
+                    refs.put(entry.getKey(),
+                             entry.getValue());
                 }
-            } catch ( final IOException e ) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
@@ -45,25 +47,29 @@ public class KetchCustomReceivePack extends ReceivePack {
 
     @Override
     protected void executeCommands() {
-        if ( getRepository().getRefDatabase() instanceof RefTreeDatabase ) {
-            List<ReceiveCommand> toApply = filterCommands( ReceiveCommand.Result.NOT_ATTEMPTED );
-            if ( toApply.isEmpty() ) {
+        if (getRepository().getRefDatabase() instanceof RefTreeDatabase) {
+            List<ReceiveCommand> toApply = filterCommands(ReceiveCommand.Result.NOT_ATTEMPTED);
+            if (toApply.isEmpty()) {
                 return;
             }
-            final BatchRefUpdate batch = ( (RefTreeDatabase) getRepository().getRefDatabase() ).getBootstrap().newBatchUpdate();
-            batch.setAllowNonFastForwards( true );
-            batch.setAtomic( false );
-            batch.setRefLogIdent( getRefLogIdent() );
-            batch.setRefLogMessage( "push", true ); //$NON-NLS-1$
-            batch.addCommand( toApply );
+            final BatchRefUpdate batch = ((RefTreeDatabase) getRepository().getRefDatabase()).getBootstrap().newBatchUpdate();
+            batch.setAllowNonFastForwards(true);
+            batch.setAtomic(false);
+            batch.setRefLogIdent(getRefLogIdent());
+            batch.setRefLogMessage("push",
+                                   true); //$NON-NLS-1$
+            batch.addCommand(toApply);
             try {
-                batch.setPushCertificate( getPushCertificate() );
-                batch.execute( getRevWalk(), NullProgressMonitor.INSTANCE );
-            } catch ( IOException err ) {
-                for ( ReceiveCommand cmd : toApply ) {
-                    if ( cmd.getResult() == ReceiveCommand.Result.NOT_ATTEMPTED ) {
-                        cmd.setResult( ReceiveCommand.Result.REJECTED_OTHER_REASON, MessageFormat.format(
-                                JGitText.get().lockError, err.getMessage() ) );
+                batch.setPushCertificate(getPushCertificate());
+                batch.execute(getRevWalk(),
+                              NullProgressMonitor.INSTANCE);
+            } catch (IOException err) {
+                for (ReceiveCommand cmd : toApply) {
+                    if (cmd.getResult() == ReceiveCommand.Result.NOT_ATTEMPTED) {
+                        cmd.setResult(ReceiveCommand.Result.REJECTED_OTHER_REASON,
+                                      MessageFormat.format(
+                                              JGitText.get().lockError,
+                                              err.getMessage()));
                     }
                 }
             }
