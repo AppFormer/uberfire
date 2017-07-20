@@ -85,13 +85,10 @@ import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.commons.async.DescriptiveThreadFactory;
-import org.uberfire.commons.async.DisposableExecutor;
-import org.uberfire.commons.cluster.ClusterService;
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.commons.config.ConfigProperties.ConfigProperty;
 import org.uberfire.commons.data.Pair;
 import org.uberfire.commons.lifecycle.Disposable;
-import org.uberfire.commons.message.MessageType;
 import org.uberfire.java.nio.EncodingUtil;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.AbstractPath;
@@ -159,14 +156,20 @@ import org.uberfire.java.nio.security.FileSystemAuthenticator;
 import org.uberfire.java.nio.security.FileSystemAuthorizer;
 import org.uberfire.java.nio.security.SecuredFileSystemProvider;
 
-import static java.nio.file.StandardCopyOption.*;
-import static java.util.Collections.*;
-import static org.eclipse.jgit.lib.Constants.*;
-import static org.uberfire.commons.data.Pair.*;
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.*;
-import static org.uberfire.java.nio.file.StandardOpenOption.*;
-import static org.uberfire.java.nio.fs.jgit.util.model.PathType.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Collections.emptyList;
+import static org.eclipse.jgit.lib.Constants.DEFAULT_REMOTE_NAME;
+import static org.eclipse.jgit.lib.Constants.DOT_GIT_EXT;
+import static org.uberfire.commons.data.Pair.newPair;
+import static org.uberfire.commons.validation.PortablePreconditions.checkCondition;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotEmpty;
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.buildDotFile;
+import static org.uberfire.java.nio.base.dotfiles.DotFileUtils.dot;
+import static org.uberfire.java.nio.file.StandardOpenOption.READ;
+import static org.uberfire.java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static org.uberfire.java.nio.fs.jgit.util.model.PathType.DIRECTORY;
+import static org.uberfire.java.nio.fs.jgit.util.model.PathType.NOT_FOUND;
 
 public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                                                Disposable {
@@ -232,7 +235,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
     private final Map<String, JGitFileSystem> fileSystems = new ConcurrentHashMap<>();
     private final Set<JGitFileSystem> closedFileSystems = new HashSet<>();
     private final Map<Repository, JGitFileSystem> repoIndex = new ConcurrentHashMap<>();
-    private final Map<Repository, ClusterService> clusterMap = new ConcurrentHashMap<>();
 
     private final Map<String, String> fullHostNames = new HashMap<String, String>();
 
@@ -250,14 +252,14 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
     final KetchSystem system = new KetchSystem();
     final KetchLeaderCache leaders = new KetchLeaderCache( system );
 
-    boolean enableKetch = true;
+    boolean enableKetch = false;
 
     private void loadConfig( final ConfigProperties config ) {
         LOG.debug( "Configuring from properties:" );
 
         final String currentDirectory = System.getProperty( "user.dir" );
 
-        final ConfigProperty enableKetchProp = config.get( "org.uberfire.nio.git.ketch", "true" );
+        final ConfigProperty enableKetchProp = config.get( "org.uberfire.nio.git.ketch", "false" );
 
         final ConfigProperty hookDirProp = config.get( "org.uberfire.nio.git.hooks", null );
         final ConfigProperty bareReposDirProp = config.get( GIT_NIO_DIR, currentDirectory );
@@ -364,7 +366,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         fileSystems.remove( fileSystem.id() );
 
         repoIndex.remove( fileSystem.getGit().getRepository() );
-        clusterMap.remove( fileSystem.getGit().getRepository() );
     }
 
     public Set<JGitFileSystem> getOpenFileSystems() {
@@ -573,16 +574,11 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
     private void buildAndStartSSH() {
         final ReceivePackFactory receivePackFactory = (ReceivePackFactory<BaseGitCommand>) ( req, db ) -> new ReceivePack( db ) {{
-            final ClusterService clusterService = clusterMap.get( db );
             final JGitFileSystem fs = repoIndex.get( db );
             final Map<String, RevCommit> oldTreeRefs = new HashMap<>();
 
             setPreReceiveHook( ( rp, commands2 ) -> {
                 fs.lock();
-                if ( clusterService != null ) {
-                    clusterService.lock();
-                }
-
                 for ( final ReceiveCommand command : commands2 ) {
                     final RevCommit lastCommit = fs.getGit().getLastCommit( command.getRefName() );
                     oldTreeRefs.put( command.getRefName(), lastCommit );
@@ -606,30 +602,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                     }
                 }
 
-                if ( clusterService != null ) {
-                    //TODO {porcelli} hack, that should be addressed in future
-                    clusterService.broadcast( DEFAULT_IO_SERVICE_NAME,
-                                              new MessageType() {
-
-                                                  @Override
-                                                  public String toString() {
-                                                      return "SYNC_FS";
-                                                  }
-
-                                                  @Override
-                                                  public int hashCode() {
-                                                      return "SYNC_FS".hashCode();
-                                                  }
-                                              },
-                                              new HashMap<String, String>() {{
-                                                  put( "fs_scheme", "git" );
-                                                  put( "fs_id", fs.id() );
-                                                  put( "fs_uri", fs.toString() );
-                                              }}
-                    );
-
-                    clusterService.unlock();
-                }
+                //broadcast changes
             } );
         }};
 
@@ -785,11 +758,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             }
         }
 
-        git.enableKetch();
-
-        final Object _clusterService = env.get( "clusterService" );
-        if ( _clusterService != null && _clusterService instanceof ClusterService ) {
-            clusterMap.put( git.getRepository(), (ClusterService) _clusterService );
+        if (enableKetch){
+            git.enableKetch();
         }
 
         if ( daemonEnabled && daemonService != null && !daemonService.isRunning() ) {

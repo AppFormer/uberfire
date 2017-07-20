@@ -40,6 +40,7 @@ import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.internal.ketch.KetchLeader;
 import org.eclipse.jgit.internal.ketch.KetchLeaderCache;
+import org.eclipse.jgit.internal.storage.reftree.RefTreeDatabase;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -73,9 +74,10 @@ import org.uberfire.java.nio.fs.jgit.util.commands.ListPathContent;
 import org.uberfire.java.nio.fs.jgit.util.commands.ListRefs;
 import org.uberfire.java.nio.fs.jgit.util.commands.Merge;
 import org.uberfire.java.nio.fs.jgit.util.commands.Push;
-import org.uberfire.java.nio.fs.jgit.util.commands.RefUpdateCommand;
+import org.uberfire.java.nio.fs.jgit.util.commands.RefTreeUpdateCommand;
 import org.uberfire.java.nio.fs.jgit.util.commands.ResolveObjectIds;
 import org.uberfire.java.nio.fs.jgit.util.commands.ResolveRevCommit;
+import org.uberfire.java.nio.fs.jgit.util.commands.SimpleRefUpdateCommand;
 import org.uberfire.java.nio.fs.jgit.util.commands.Squash;
 import org.uberfire.java.nio.fs.jgit.util.commands.SyncRemote;
 import org.uberfire.java.nio.fs.jgit.util.commands.UpdateRemoteConfig;
@@ -363,7 +365,11 @@ public class GitImpl implements Git {
     public void refUpdate( final String branch,
                            final RevCommit commit )
             throws IOException, ConcurrentRefUpdateException {
-        new RefUpdateCommand( this, branch, commit ).execute();
+        if (getRepository().getRefDatabase() instanceof RefTreeDatabase){
+            new RefTreeUpdateCommand(this, branch, commit ).execute();
+        } else {
+            new SimpleRefUpdateCommand(this, branch, commit ).execute();
+        }
     }
 
     @Override

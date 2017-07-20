@@ -56,15 +56,15 @@ import static org.eclipse.jgit.lib.Constants.*;
 import static org.eclipse.jgit.lib.Ref.Storage.*;
 import static org.eclipse.jgit.transport.ReceiveCommand.Result.*;
 
-public class RefUpdateCommand {
+public class RefTreeUpdateCommand {
 
     private final Git git;
     private final String name;
     private final RevCommit commit;
 
-    public RefUpdateCommand( final Git git,
-                             final String branchName,
-                             final RevCommit commit ) {
+    public RefTreeUpdateCommand(final Git git,
+                                final String branchName,
+                                final RevCommit commit ) {
         this.git = git;
         this.name = branchName;
         this.commit = commit;
@@ -191,7 +191,7 @@ public class RefUpdateCommand {
         }
     }
 
-    interface Function {
+    interface BiFunction {
 
         boolean apply( final ObjectReader reader,
                        final RefTree refTree ) throws IOException;
@@ -199,54 +199,52 @@ public class RefUpdateCommand {
 
     private void commit( final Repository repo,
                          final RevCommit original,
-                         final Function fun ) throws IOException {
+                         final BiFunction fun ) throws IOException {
         try ( final ObjectReader reader = repo.newObjectReader();
               final ObjectInserter inserter = repo.newObjectInserter();
               final RevWalk rw = new RevWalk( reader ) ) {
 
-            if ( repo.getRefDatabase() instanceof RefTreeDatabase ) {
-                final RefTreeDatabase refdb = (RefTreeDatabase) repo.getRefDatabase();
-                final RefDatabase bootstrap = refdb.getBootstrap();
-                final RefUpdate refUpdate = bootstrap.newUpdate( refdb.getTxnCommitted(), false );
+            final RefTreeDatabase refdb = (RefTreeDatabase) repo.getRefDatabase();
+            final RefDatabase bootstrap = refdb.getBootstrap();
+            final RefUpdate refUpdate = bootstrap.newUpdate( refdb.getTxnCommitted(), false );
 
-                final CommitBuilder cb = new CommitBuilder();
-                final Ref ref = bootstrap.exactRef( refdb.getTxnCommitted() );
-                final RefTree tree;
-                if ( ref != null && ref.getObjectId() != null ) {
-                    tree = RefTree.read( reader, rw.parseTree( ref.getObjectId() ) );
-                    cb.setParentId( ref.getObjectId() );
-                    refUpdate.setExpectedOldObjectId( ref.getObjectId() );
-                } else {
-                    tree = RefTree.newEmptyTree();
-                    refUpdate.setExpectedOldObjectId( ObjectId.zeroId() );
-                }
+            final CommitBuilder cb = new CommitBuilder();
+            final Ref ref = bootstrap.exactRef( refdb.getTxnCommitted() );
+            final RefTree tree;
+            if ( ref != null && ref.getObjectId() != null ) {
+                tree = RefTree.read( reader, rw.parseTree( ref.getObjectId() ) );
+                cb.setParentId( ref.getObjectId() );
+                refUpdate.setExpectedOldObjectId( ref.getObjectId() );
+            } else {
+                tree = RefTree.newEmptyTree();
+                refUpdate.setExpectedOldObjectId( ObjectId.zeroId() );
+            }
 
-                if ( fun.apply( reader, tree ) ) {
-                    final Ref ref2 = bootstrap.exactRef( refdb.getTxnCommitted() );
-                    if ( ref2 == null || ref2.getObjectId().equals( ref != null ? ref.getObjectId() : null ) ) {
-                        cb.setTreeId( tree.writeTree( inserter ) );
-                        if ( original != null ) {
-                            cb.setAuthor( original.getAuthorIdent() );
-                            cb.setCommitter( original.getAuthorIdent() );
-                        } else {
-                            final PersonIdent personIdent = new PersonIdent( "user", "user@example.com" );
-                            cb.setAuthor( personIdent );
-                            cb.setCommitter( personIdent );
-                        }
-                        refUpdate.setNewObjectId( inserter.insert( cb ) );
-                        inserter.flush();
-                        final RefUpdate.Result result = refUpdate.update( rw );
-                        switch ( result ) {
-                            case NEW:
-                            case FAST_FORWARD:
-                                break;
-                            default:
-                                throw new RuntimeException( repo.getDirectory() + " -> " + result.toString() + " : " + refUpdate.getName() );
-                        }
-                        final File commited = new File( repo.getDirectory(), refdb.getTxnCommitted() );
-                        final File accepted = new File( repo.getDirectory(), refdb.getTxnNamespace() + "accepted" );
-                        Files.copy( commited.toPath(), accepted.toPath(), StandardCopyOption.REPLACE_EXISTING );
+            if ( fun.apply( reader, tree ) ) {
+                final Ref ref2 = bootstrap.exactRef( refdb.getTxnCommitted() );
+                if ( ref2 == null || ref2.getObjectId().equals( ref != null ? ref.getObjectId() : null ) ) {
+                    cb.setTreeId( tree.writeTree( inserter ) );
+                    if ( original != null ) {
+                        cb.setAuthor( original.getAuthorIdent() );
+                        cb.setCommitter( original.getAuthorIdent() );
+                    } else {
+                        final PersonIdent personIdent = new PersonIdent( "user", "user@example.com" );
+                        cb.setAuthor( personIdent );
+                        cb.setCommitter( personIdent );
                     }
+                    refUpdate.setNewObjectId( inserter.insert( cb ) );
+                    inserter.flush();
+                    final RefUpdate.Result result = refUpdate.update( rw );
+                    switch ( result ) {
+                        case NEW:
+                        case FAST_FORWARD:
+                            break;
+                        default:
+                            throw new RuntimeException( repo.getDirectory() + " -> " + result.toString() + " : " + refUpdate.getName() );
+                    }
+                    final File commited = new File( repo.getDirectory(), refdb.getTxnCommitted() );
+                    final File accepted = new File( repo.getDirectory(), refdb.getTxnNamespace() + "accepted" );
+                    Files.copy( commited.toPath(), accepted.toPath(), StandardCopyOption.REPLACE_EXISTING );
                 }
             }
         }

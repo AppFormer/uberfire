@@ -75,9 +75,10 @@ public class Clone {
 
             git.syncRemote( remote );
 
-            git.convertRefTree();
-
-            git.updateLeaders( leaders );
+            if (git.isKetchEnabled()){
+                git.convertRefTree();
+                git.updateLeaders( leaders );
+            }
 
             git.setHeadAsInitialized();
 
