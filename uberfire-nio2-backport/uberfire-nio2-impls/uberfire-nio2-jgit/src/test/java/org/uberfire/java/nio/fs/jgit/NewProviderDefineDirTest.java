@@ -28,9 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider.GIT_NIO_DIR;
-import static org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider.GIT_NIO_DIR_NAME;
-import static org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider.REPOSITORIES_CONTAINER_DIR;
+import static org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration.*;
 
 @RunWith(Parameterized.class)
 public class NewProviderDefineDirTest extends AbstractTestInfra {

@@ -42,7 +42,7 @@ public class JGitFileSystemProviderSSHBadConfigTest extends AbstractTestInfra {
 
     @Test
     public void testCheckDefaultSSHIdleWithInvalidArg() throws IOException {
-        assertEquals(JGitFileSystemProvider.SSH_IDLE_TIMEOUT,
+        assertEquals(JGitFileSystemProviderConfiguration.SSH_IDLE_TIMEOUT,
                      provider.getGitSSHService().getProperties().get(SshServer.IDLE_TIMEOUT));
     }
 }

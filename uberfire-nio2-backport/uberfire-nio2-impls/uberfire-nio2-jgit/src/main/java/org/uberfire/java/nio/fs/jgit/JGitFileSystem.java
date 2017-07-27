@@ -89,13 +89,15 @@ public class JGitFileSystem implements FileSystem,
     private CommitInfo batchCommitInfo = null;
     private Map<Path, Boolean> hadCommitOnBatchState = new ConcurrentHashMap<Path, Boolean>();
 
+    private Map<String, NotificationModel> oldHeadsOfPendingDiffs = new ConcurrentHashMap<>();
+
     private final Lock lock = new Lock();
 
-    JGitFileSystem(final JGitFileSystemProvider provider,
-                   final Map<String, String> fullHostNames,
-                   final Git git,
-                   final String name,
-                   final CredentialsProvider credential) {
+    public JGitFileSystem(final JGitFileSystemProvider provider,
+                          final Map<String, String> fullHostNames,
+                          final Git git,
+                          final String name,
+                          final CredentialsProvider credential) {
         this.provider = checkNotNull("provider",
                                      provider);
         this.git = checkNotNull("git",
@@ -589,5 +591,23 @@ public class JGitFileSystem implements FileSystem,
             isLocked.set(false);
             notifyAll();
         }
+    }
+
+    public void addOldHeadsOfPendingDiffs(String branchName,
+                                          NotificationModel notificationModel) {
+        oldHeadsOfPendingDiffs.put(branchName,
+                                   notificationModel);
+    }
+
+    public Map<String, NotificationModel> getOldHeadsOfPendingDiffs() {
+        return oldHeadsOfPendingDiffs;
+    }
+
+    public boolean hasOldHeadsOfPendingDiffs() {
+        return !oldHeadsOfPendingDiffs.isEmpty();
+    }
+
+    public void clearOldHeadsOfPendingDiffs() {
+        oldHeadsOfPendingDiffs = new ConcurrentHashMap<>();
     }
 }
