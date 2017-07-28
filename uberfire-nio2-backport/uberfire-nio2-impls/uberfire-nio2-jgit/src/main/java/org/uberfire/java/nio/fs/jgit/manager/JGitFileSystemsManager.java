@@ -47,7 +47,7 @@ public class JGitFileSystemsManager {
     ) {
         this.jGitFileSystemProvider = jGitFileSystemProvider;
         this.config = config;
-        fsCache = new JGitFileSystemsCache();
+        fsCache = new JGitFileSystemsCache(config);
     }
 
     public void newFileSystem(Supplier<Map<String, String>> fullHostNames,

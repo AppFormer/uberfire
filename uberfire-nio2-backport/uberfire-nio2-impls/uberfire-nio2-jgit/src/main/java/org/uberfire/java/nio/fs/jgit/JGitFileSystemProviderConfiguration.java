@@ -46,6 +46,7 @@ public class JGitFileSystemProviderConfiguration {
     public static final String SSH_ALGORITHM = "DSA";
     public static final String SSH_CERT_PASSPHRASE = "";
     public static final String DEFAULT_COMMIT_LIMIT_TO_GC = "20";
+    public static final String JGIT_FILE_SYSTEM_INSTANCES_CACHE = "20";
     public static final String GIT_ENV_KEY_MIGRATE_FROM = "migrate-from";
 
     private int commitLimit;
@@ -72,6 +73,7 @@ public class JGitFileSystemProviderConfiguration {
     private String httpProxyPassword;
     private String httpsProxyUser;
     private String httpsProxyPassword;
+    private int jgitFileSystemsInstancesCache;
 
     public void load(ConfigProperties systemConfig) {
         LOG.debug("Configuring from properties:");
@@ -123,6 +125,9 @@ public class JGitFileSystemProviderConfiguration {
         final ConfigProperties.ConfigProperty httpsProxyPasswordProp = systemConfig.get("https.proxyPassword",
                                                                                         null);
 
+        final ConfigProperties.ConfigProperty jgitFileSystemsInstancesCacheProp = systemConfig.get("org.uberfire.nio.jgit.cache.instances",
+                                                                                                   JGIT_FILE_SYSTEM_INSTANCES_CACHE);
+
         httpProxyUser = httpProxyUserProp.getValue();
         httpProxyPassword = httpProxyPasswordProp.getValue();
         httpsProxyUser = httpsProxyUserProp.getValue();
@@ -146,6 +151,8 @@ public class JGitFileSystemProviderConfiguration {
         gitReposParentDir = new File(bareReposDirProp.getValue(),
                                      reposDirNameProp.getValue());
         commitLimit = commitLimitProp.getIntValue();
+
+        jgitFileSystemsInstancesCache = jgitFileSystemsInstancesCacheProp.getIntValue();
 
         daemonEnabled = enabledProp.getBooleanValue();
         if (daemonEnabled) {
@@ -258,5 +265,9 @@ public class JGitFileSystemProviderConfiguration {
 
     public String getHttpsProxyPassword() {
         return httpsProxyPassword;
+    }
+
+    public int getJgitFileSystemsInstancesCache() {
+        return jgitFileSystemsInstancesCache;
     }
 }
