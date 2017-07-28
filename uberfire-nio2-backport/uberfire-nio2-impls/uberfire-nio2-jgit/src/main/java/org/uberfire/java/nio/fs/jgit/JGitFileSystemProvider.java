@@ -390,10 +390,13 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                         final String name = repo.getK1() + repo.getK2().substring(0,
                                                                                   repo.getK2().indexOf(DOT_GIT_EXT));
 
-                        manager.newFileSystem(fullHostNames,
-                                              Git.createRepository(repoDir),
-                                              name,
-                                              buildCredential(null));
+                        String child = repo.getK1() + repo.getK2();
+
+                        manager.newFileSystem(() -> fullHostNames,
+                                              () -> Git.createRepository(new File(config.getGitReposParentDir(),
+                                                                                  child)),
+                                              () -> name,
+                                              () -> buildCredential(null));
                     } else {
                         LOG.debug("Not registering " + repoDir + " as a GIT filesystem because it is not a directory");
                     }
@@ -581,49 +584,15 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             throw new FileSystemAlreadyExistsException("No filesystem for uri (" + uri + ") found.");
         }
 
-        final String outPath = (String) env.get(GIT_ENV_KEY_DEST_PATH);
-        final File repoDest;
+        final Git git = createNewGitRepo(env,
+                                         fsName);
 
-        if (outPath != null) {
-            repoDest = new File(outPath,
-                                fsName + DOT_GIT_EXT);
-        } else {
-            repoDest = new File(config.getGitReposParentDir(),
-                                fsName + DOT_GIT_EXT);
-        }
+        manager.newFileSystem(() -> fullHostNames,
+                              () -> git,
+                              () -> fsName,
+                              () -> buildCredential(env));
 
-        final Git git;
-        final CredentialsProvider credential = buildCredential(env);
-
-        if (env.containsKey(GIT_ENV_KEY_DEFAULT_REMOTE_NAME)) {
-            final String origin = env.get(GIT_ENV_KEY_DEFAULT_REMOTE_NAME).toString();
-            try {
-                if (this.isForkOrigin(origin)) {
-                    git = Git.fork(this.getGitRepoContainerDir(),
-                                   origin,
-                                   fsName,
-                                   credential,
-                                   config.isEnableKetch() ? leaders : null);
-                } else {
-                    git = Git.clone(repoDest,
-                                    origin,
-                                    true,
-                                    credential,
-                                    config.isEnableKetch() ? leaders : null);
-                }
-            } catch (InvalidRemoteException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            git = Git.createRepository(repoDest,
-                                       config.getHookDir(),
-                                       config.isEnableKetch() ? leaders : null);
-        }
-
-        JGitFileSystem fs = manager.newFileSystem(fullHostNames,
-                                                  git,
-                                                  fsName,
-                                                  credential);
+        JGitFileSystem fs = manager.get(fsName);
 
         boolean init = false;
 
@@ -658,6 +627,50 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         }
 
         return fs;
+    }
+
+    private Git createNewGitRepo(Map<String, ?> env,
+                                 String fsName) {
+        final Git git;
+
+        CredentialsProvider credential = buildCredential(env);
+
+        final String outPath = (String) env.get(GIT_ENV_KEY_DEST_PATH);
+        final File repoDest;
+
+        if (outPath != null) {
+            repoDest = new File(outPath,
+                                fsName + DOT_GIT_EXT);
+        } else {
+            repoDest = new File(config.getGitReposParentDir(),
+                                fsName + DOT_GIT_EXT);
+        }
+
+        if (env.containsKey(GIT_ENV_KEY_DEFAULT_REMOTE_NAME)) {
+            final String origin = env.get(GIT_ENV_KEY_DEFAULT_REMOTE_NAME).toString();
+            try {
+                if (this.isForkOrigin(origin)) {
+                    git = Git.fork(this.getGitRepoContainerDir(),
+                                   origin,
+                                   fsName,
+                                   credential,
+                                   config.isEnableKetch() ? leaders : null);
+                } else {
+                    git = Git.clone(repoDest,
+                                    origin,
+                                    true,
+                                    credential,
+                                    config.isEnableKetch() ? leaders : null);
+                }
+            } catch (InvalidRemoteException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            git = Git.createRepository(repoDest,
+                                       config.getHookDir(),
+                                       config.isEnableKetch() ? leaders : null);
+        }
+        return git;
     }
 
     private void migrateIfNeeded(final Map<String, ?> env,

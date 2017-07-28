@@ -15,17 +15,14 @@
  */
 package org.uberfire.java.nio.fs.jgit.manager;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration;
@@ -35,80 +32,94 @@ import static org.eclipse.jgit.lib.Constants.DOT_GIT_EXT;
 
 public class JGitFileSystemsManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JGitFileSystemsManager.class);
-
-    private final Map<String, JGitFileSystem> fileSystems = new ConcurrentHashMap<>();
-
     private final Set<String> closedFileSystems = new HashSet<>();
 
+    private final Set<String> fileSystems = new HashSet<>();
+
     private JGitFileSystemProvider jGitFileSystemProvider;
+
+    private final JGitFileSystemsCache fsCache;
 
     private JGitFileSystemProviderConfiguration config;
 
     public JGitFileSystemsManager(JGitFileSystemProvider jGitFileSystemProvider,
-                                  JGitFileSystemProviderConfiguration config) {
+                                  JGitFileSystemProviderConfiguration config
+    ) {
         this.jGitFileSystemProvider = jGitFileSystemProvider;
         this.config = config;
+        fsCache = new JGitFileSystemsCache();
     }
 
-    public JGitFileSystem newFileSystem(Map<String, String> fullHostNames,
-                                        Git git,
-                                        String fsName,
-                                        CredentialsProvider credential) {
+    public void newFileSystem(Supplier<Map<String, String>> fullHostNames,
+                              Supplier<Git> git,
+                              Supplier<String> fsName,
+                              Supplier<CredentialsProvider> credential) {
+
+        Supplier<JGitFileSystem> fsSupplier = createFileSystemSupplier(fullHostNames,
+                                                                       git,
+                                                                       fsName,
+                                                                       credential);
+        String realFSKey = resolveRealFsKey(fsName.get());
+
+        fsCache.addSupplier(realFSKey,
+                            fsSupplier);
+        fileSystems.add(realFSKey);
+    }
+
+    private Supplier<JGitFileSystem> createFileSystemSupplier(Supplier<Map<String, String>> fullHostNames,
+                                                              Supplier<Git> git,
+                                                              Supplier<String> fsName,
+                                                              Supplier<CredentialsProvider> credential) {
+        String realFSKey = resolveRealFsKey(fsName.get());
+
+        return () -> newFileSystem(fullHostNames.get(),
+                                   git.get(),
+                                   realFSKey,
+                                   credential.get());
+    }
+
+    private JGitFileSystem newFileSystem(Map<String, String> fullHostNames,
+                                         Git git,
+                                         String fsName,
+                                         CredentialsProvider credential) {
         final JGitFileSystem fs = new JGitFileSystem(jGitFileSystemProvider,
                                                      fullHostNames,
                                                      git,
                                                      fsName,
                                                      credential);
 
-        String key = resolveFsKey(fsName);
-
-        fileSystems.put(key,
-                        fs);
-        LOG.debug("Running GIT GC on '" + fsName + "'");
         fs.getGit().gc();
-        LOG.debug("Registering existing GIT filesystem '" + fsName + "' at " + git.getRepository().getDirectory());
+
 
         return fs;
     }
 
-    public String resolveFsKey(String fsName) {
-        String gitPath = config.getGitReposParentDir().getAbsolutePath();
-        String fsKey = gitPath + fsName;
-        return fsKey;
-    }
-
     public void remove(String fsName) {
-        String key = resolveFsKey(fsName);
-        fileSystems.remove(key);
-        closedFileSystems.remove(key);
+        String realFSKey = resolveRealFsKey(fsName);
+        fsCache.remove(realFSKey);
+        fileSystems.remove(realFSKey);
+        closedFileSystems.remove(realFSKey);
     }
 
-    public Collection<JGitFileSystem> getFileSystems() {
-        return fileSystems.values();
-    }
-
-    public JGitFileSystem get(String name) {
-        String key = resolveFsKey(name);
-        return fileSystems.get(key);
+    public JGitFileSystem get(String fsName) {
+        String realFSKey = resolveRealFsKey(fsName);
+        return fsCache.get(realFSKey);
     }
 
     public void clear() {
+        fsCache.clear();
         fileSystems.clear();
+        closedFileSystems.clear();
     }
 
-    public boolean containsKey(String name) {
-        String key = resolveFsKey(name);
-        return fileSystems.containsKey(key);
+    public boolean containsKey(String fsName) {
+        String realFSKey = resolveRealFsKey(fsName);
+        return fileSystems.contains(realFSKey);
     }
 
     public void addClosedFileSystems(JGitFileSystem fileSystem) {
-        String key = resolveFsKey(fileSystem.getName());
-        closedFileSystems.add(key);
-    }
-
-    public Collection<JGitFileSystem> getClosedFS() {
-        return closedFileSystems.stream().map(fs -> fileSystems.get(fs)).collect(Collectors.toList());
+        String realFSKey = resolveRealFsKey(fileSystem.getName());
+        closedFileSystems.add(realFSKey);
     }
 
     public boolean allTheFSAreClosed() {
@@ -117,20 +128,26 @@ public class JGitFileSystemsManager {
 
     public JGitFileSystem get(Repository db) {
         String key = extractFSNameFromRepo(db);
-        return fileSystems.get(key);
+        return fsCache.get(key);
     }
 
     private String extractFSNameFromRepo(Repository db) {
         String fsName = db.getDirectory().getName().substring(0,
                                                               db.getDirectory().getName().indexOf(DOT_GIT_EXT));
-        return resolveFsKey(fsName);
+        return resolveRealFsKey(fsName);
     }
 
     public Set<JGitFileSystem> getOpenFileSystems() {
-        Collection<JGitFileSystem> open = fileSystems.values();
-        return open.stream().filter(fs -> {
-            String fsKey = resolveFsKey(fs.getName());
-            return !closedFileSystems.contains(fsKey);
-        }).collect(Collectors.toSet());
+        return fileSystems.stream().filter(fsName -> !closedFileSystems.contains(fsName))
+                .map(fsName -> get(fsName)).collect(Collectors.toSet());
+    }
+
+    public String resolveRealFsKey(String fsName) {
+//        if(fsName.contains("/")){
+//            return fsName;
+//        }
+//        String gitPath = config.getGitReposParentDir().getAbsolutePath();
+//        String fsKey = gitPath + fsName;
+        return fsName;
     }
 }
