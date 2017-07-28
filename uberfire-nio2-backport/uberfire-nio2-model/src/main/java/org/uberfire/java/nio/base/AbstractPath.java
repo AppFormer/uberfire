@@ -141,6 +141,7 @@ public abstract class AbstractPath<FS extends FileSystem>
 
     @Override
     public FS getFileSystem() {
+        //proxy
         return fs;
     }
 

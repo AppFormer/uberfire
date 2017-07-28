@@ -379,6 +379,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
      * this method.
      */
     public final void rescanForExistingRepositories() {
+        //morrer?
         manager.clear();
         final List<Pair<String, String>> repos = getRepositories(config.getGitReposParentDir());
         if (repos != null) {
@@ -584,6 +585,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             throw new FileSystemAlreadyExistsException("No filesystem for uri (" + uri + ") found.");
         }
 
+        //passar pra um suplier
         final Git git = createNewGitRepo(env,
                                          fsName);
 
