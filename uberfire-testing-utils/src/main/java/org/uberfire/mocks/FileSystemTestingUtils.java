@@ -60,6 +60,7 @@ public class FileSystemTestingUtils {
     private void setupJGitRepository() {
         System.setProperty("org.uberfire.nio.git.dir",
                            path.getAbsolutePath());
+        System.out.println("Path "+ path.getAbsolutePath());
         final URI newRepo = URI.create("git://amend-repo-test");
 
         fileSystem = ioService.newFileSystem(newRepo,
