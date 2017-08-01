@@ -23,13 +23,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.inject.Qualifier;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -45,9 +39,7 @@ import org.uberfire.annotations.processors.facades.BackendModule;
 import org.uberfire.annotations.processors.facades.ClientAPIModule;
 
 import static java.util.Collections.singletonList;
-import static org.uberfire.annotations.processors.facades.ClientAPIModule.OWNING_PERSPECTIVE;
-import static org.uberfire.annotations.processors.facades.ClientAPIModule.workbenchEditor;
-import static org.uberfire.annotations.processors.facades.ClientAPIModule.workbenchScreen;
+import static org.uberfire.annotations.processors.facades.ClientAPIModule.*;
 
 /**
  * Utilities for code generation
@@ -555,6 +547,27 @@ public class GeneratorUtils {
                                                 "value");
         }
         return null;
+    }
+
+    public static String getProfile(final TypeElement classElement,
+                                    final PackageElement packageElement,
+                                    final ProcessingEnvironment processingEnvironment) {
+        AnnotationMirror profileAnnotation = getAnnotation(processingEnvironment.getElementUtils(),
+                                                           classElement,
+                                                           APIModule.profile);
+        if (profileAnnotation == null) {
+            profileAnnotation = getAnnotation(processingEnvironment.getElementUtils(),
+                                              packageElement,
+                                              APIModule.profile);
+        }
+
+        if (profileAnnotation != null) {
+            return extractAnnotationStringValue(processingEnvironment.getElementUtils(),
+                                                profileAnnotation,
+                                                "value");
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1153,6 +1166,15 @@ public class GeneratorUtils {
             if (annotationName.contentEquals(getQualifiedName(annotation))) {
                 return annotation;
             }
+
+            //Check for annotations within annotations
+            final DeclaredType annotationType = annotation.getAnnotationType();
+            for (AnnotationMirror annotationMirror : elementUtils.getAllAnnotationMirrors(annotationType.asElement())) {
+                if (annotationName.contentEquals(getQualifiedName(annotationMirror))) {
+                    return annotationMirror;
+                }
+            }
+
         }
         return null;
     }

@@ -43,12 +43,19 @@ import org.uberfire.client.mvp.IsSplashScreen;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
+<#if profile??>
+import org.jboss.errai.ioc.client.api.EnabledByProperty;
+
+</#if>
 @ApplicationScoped
 @Generated("org.uberfire.annotations.processors.WorkbenchSplashScreenProcessor")
 @Named("${identifier}")
 @IsSplashScreen
 <#if beanActivatorClass??>
 @ActivatedBy(${beanActivatorClass}.class)
+</#if>
+<#if profile??>
+@EnabledByProperty(value="org.uberfire.profile.active", matchValue="${profile}", defaultValue="${profile}")
 </#if>
 <#list qualifiers as qualifier>
 ${qualifier}

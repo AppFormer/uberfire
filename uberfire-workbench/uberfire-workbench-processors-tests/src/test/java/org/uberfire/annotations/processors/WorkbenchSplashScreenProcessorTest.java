@@ -204,4 +204,22 @@ public class WorkbenchSplashScreenProcessorTest extends AbstractProcessorTest {
         assertEquals(result.getExpectedCode(),
                      result.getActualCode());
     }
+
+    @Test
+    public void testProfileInTheActivity() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/WorkbenchSplashScreenTest11";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/WorkbenchSplashScreenTest11.expected";
+
+        result.setExpectedCode(getExpectedSourceCode(pathExpectedResult));
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile(
+                getProcessorUnderTest(),
+                pathCompilationUnit);
+
+        assertSuccessfulCompilation(diagnostics);
+        assertNotNull(result.getActualCode());
+        assertNotNull(result.getExpectedCode());
+        assertEquals(result.getExpectedCode(),
+                     result.getActualCode());
+    }
 }
