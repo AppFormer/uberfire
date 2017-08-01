@@ -75,7 +75,11 @@ public class FileSystemTestingUtils {
         JGitFileSystemProvider gitFsProvider = (JGitFileSystemProvider) FileSystemProviders.resolveProvider(URI.create("git://whatever"));
         gitFsProvider.shutdown();
         FileUtils.deleteQuietly(gitFsProvider.getGitRepoContainerDir());
-        gitFsProvider.rescanForExistingRepositories();
+    }
+
+    public void shutDownProvider(){
+        JGitFileSystemProvider gitFsProvider = (JGitFileSystemProvider) FileSystemProviders.resolveProvider(URI.create("git://whatever"));
+        gitFsProvider.shutdown();
     }
 
     public FileSystem getFileSystem() {

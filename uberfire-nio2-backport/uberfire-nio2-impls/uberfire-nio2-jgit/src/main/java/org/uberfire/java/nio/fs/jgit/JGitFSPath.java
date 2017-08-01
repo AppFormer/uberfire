@@ -41,6 +41,7 @@ public class JGitFSPath implements FSPath {
 
     @Override
     public FileSystem getFileSystem() {
+        System.out.println("");
         return fs;
     }
 

@@ -142,6 +142,7 @@ public abstract class AbstractPath<FS extends FileSystem>
     @Override
     public FS getFileSystem() {
         //proxy
+        System.out.println("");
         return fs;
     }
 
@@ -419,6 +420,7 @@ public abstract class AbstractPath<FS extends FileSystem>
     public boolean startsWith(final String other) throws InvalidPathException {
         checkNotNull("other",
                      other);
+        //get file system
         return startsWith(getFileSystem().getPath(other));
     }
 

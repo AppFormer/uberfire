@@ -58,6 +58,7 @@ public class SocialFile {
 
     public void write(List<SocialActivitiesEvent> events) throws IOException {
         try {
+            //get file system
             ioService.startBatch(path.getFileSystem());
 
             SeekableByteChannel sbc = ioService.newByteChannel(path);

@@ -77,6 +77,7 @@ public class WorkbenchServicesImpl implements WorkbenchServices {
         final Path splashFilterPath = userServices.buildPath("splash",
                                                              splashFilter.getName() + ".filter");
         try {
+            //get file system
             ioService.startBatch(splashFilterPath.getFileSystem());
             ioService.write(splashFilterPath,
                             xml);
@@ -145,6 +146,7 @@ public class WorkbenchServicesImpl implements WorkbenchServices {
         final Path perspectivesPath = userServices.buildPath("perspectives");
         if (ioService.exists(perspectivesPath)) {
             try {
+                //get file system
                 ioService.startBatch(perspectivesPath.getFileSystem());
                 ioService.delete(perspectivesPath,
                                  StandardDeleteOption.NON_EMPTY_DIRECTORIES);

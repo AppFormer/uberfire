@@ -32,6 +32,7 @@ public class FileSystemResourceAdaptor implements RuntimeContentResource {
         if (fileSystem == null) {
             this.fileSystem = null;
         } else {
+            //get file system
             this.fileSystem = fileSystem.getRootDirectories().iterator().next().getFileSystem();
         }
     }

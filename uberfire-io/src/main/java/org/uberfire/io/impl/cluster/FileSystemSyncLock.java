@@ -35,6 +35,7 @@ public class FileSystemSyncLock<V> extends LockExecuteNotifyAsyncReleaseTemplate
 
     public FileSystemSyncLock(final String serviceId,
                               final FileSystem _fileSystem) {
+        //get file system
         final FileSystem fileSystem = _fileSystem.getRootDirectories().iterator().next().getFileSystem();
         this.serviceId = serviceId;
         this.scheme = fileSystem.getRootDirectories().iterator().next().toUri().getScheme();

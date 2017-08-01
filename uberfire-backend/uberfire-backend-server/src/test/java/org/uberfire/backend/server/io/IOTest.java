@@ -29,10 +29,13 @@ public class IOTest {
     }
 
     @Test
-    public void bla() {
+    public void bla() throws IOException {
         Path init = fsUtils.getIoService().get(URI.create("git://amend-repo-test/init2.file"));
         fsUtils.getIoService().write(init,
-                                     "setupFS!");
+                                     "yay!");
         System.out.println("");
+
+        String s = fsUtils.getIoService().readAllString(init);
+        System.out.println(s);
     }
 }

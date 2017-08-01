@@ -41,6 +41,7 @@ public class JGitBasicAttributeView extends AbstractBasicFileAttributeView<JGitP
     @Override
     public BasicFileAttributes readAttributes() throws IOException {
         if (attrs == null) {
+            //get file system
             attrs = buildAttrs(path.getFileSystem(),
                                path.getRefTree(),
                                path.getPath());
