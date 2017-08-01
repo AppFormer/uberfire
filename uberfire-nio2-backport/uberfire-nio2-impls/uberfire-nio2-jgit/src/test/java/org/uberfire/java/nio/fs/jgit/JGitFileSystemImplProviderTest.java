@@ -79,7 +79,7 @@ import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrow
 import static org.mockito.Mockito.*;
 import static org.uberfire.java.nio.file.StandardDeleteOption.NON_EMPTY_DIRECTORIES;
 
-public class JGitFileSystemProviderTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderTest extends AbstractTestInfra {
 
     private int gitDaemonPort;
 
@@ -198,7 +198,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-name");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -288,7 +288,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-repo");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -411,7 +411,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-name");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -1690,7 +1690,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final URI newRepo = URI.create("git://squash-repo");
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
-                                                                          EMPTY_ENV);
+                                                                                  EMPTY_ENV);
 
         final Path generalPath = provider.getPath(URI.create("git://master@squash-repo/"));
         final Path path = provider.getPath(URI.create("git://master@squash-repo/myfile1.txt"));
@@ -1733,7 +1733,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final URI newRepo = URI.create("git://squash-repo");
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
-                                                                          EMPTY_ENV);
+                                                                                  EMPTY_ENV);
 
         final Path generalPath = provider.getPath(URI.create("git://master@squash-repo/"));
         final Path path = provider.getPath(URI.create("git://develop@squash-repo/myfile1.txt"));
@@ -1780,7 +1780,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         doThrow(new RuntimeException()).
                 when(provider).
-                notifyDiffs(any(JGitFileSystem.class),
+                notifyDiffs(any(JGitFileSystemImpl.class),
                             any(String.class),
                             any(String.class),
                             any(String.class),

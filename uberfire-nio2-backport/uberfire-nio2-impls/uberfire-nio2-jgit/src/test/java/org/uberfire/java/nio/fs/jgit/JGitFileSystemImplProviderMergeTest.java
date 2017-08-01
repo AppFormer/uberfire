@@ -33,7 +33,7 @@ import org.uberfire.java.nio.fs.jgit.util.exceptions.GitException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class JGitFileSystemProviderMergeTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderMergeTest extends AbstractTestInfra {
 
     @Test
     public void testMergeSuccessful() throws IOException, GitAPIException {
@@ -74,7 +74,7 @@ public class JGitFileSystemProviderMergeTest extends AbstractTestInfra {
                       master,
                       new MergeCopyOption());
 
-        final Git gitRepo = ((JGitFileSystem) master.getFileSystem()).getGit();
+        final Git gitRepo = ((JGitFileSystemImpl) master.getFileSystem()).getGit();
 
         final List<DiffEntry> result = new ListDiffs(gitRepo,
                                                      new GetTreeFromRef(gitRepo,
@@ -178,7 +178,7 @@ public class JGitFileSystemProviderMergeTest extends AbstractTestInfra {
                       master,
                       new MergeCopyOption());
 
-        final Git gitRepo = ((JGitFileSystem) master.getFileSystem()).getGit();
+        final Git gitRepo = ((JGitFileSystemImpl) master.getFileSystem()).getGit();
         final List<DiffEntry> result = new ListDiffs(gitRepo,
                                                      new GetTreeFromRef(gitRepo,
                                                                         "master").execute(),

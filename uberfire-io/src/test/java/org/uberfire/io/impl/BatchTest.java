@@ -40,6 +40,7 @@ import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemImpl;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 
 import static org.junit.Assert.*;
@@ -71,7 +72,7 @@ public class BatchTest {
 
         fs1 = ioService.newFileSystem(newRepo,
                                       new HashMap<String, Object>());
-        fs1Batch = (JGitFileSystem) fs1;
+        fs1Batch = (JGitFileSystemImpl) fs1;
         Path init = ioService.get(URI.create("git://amend-repo-test/init.file"));
         ioService.write(init,
                         "setupFS!");
@@ -83,7 +84,7 @@ public class BatchTest {
                                           put("init",
                                               "true");
                                       }});
-        fs2Batch = (JGitFileSystem) fs2;
+        fs2Batch = (JGitFileSystemImpl) fs2;
         init = ioService.get(URI.create("git://check-amend-repo-test/init.file"));
         ioService.write(init,
                         "setupFS!");
@@ -94,7 +95,7 @@ public class BatchTest {
                                           put("init",
                                               "true");
                                       }});
-        fs3Batch = (JGitFileSystem) fs3;
+        fs3Batch = (JGitFileSystemImpl) fs3;
         init = ioService.get(URI.create("git://check-amend-repo-test-2/init.file"));
         ioService.write(init,
                         "setupFS!");

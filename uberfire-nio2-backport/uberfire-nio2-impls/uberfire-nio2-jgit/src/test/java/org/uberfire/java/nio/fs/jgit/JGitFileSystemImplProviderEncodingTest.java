@@ -29,7 +29,7 @@ import org.uberfire.java.nio.fs.jgit.util.commands.Commit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class JGitFileSystemProviderEncodingTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderEncodingTest extends AbstractTestInfra {
 
     private int gitDaemonPort;
 
@@ -50,7 +50,7 @@ public class JGitFileSystemProviderEncodingTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://encoding-origin-name");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",

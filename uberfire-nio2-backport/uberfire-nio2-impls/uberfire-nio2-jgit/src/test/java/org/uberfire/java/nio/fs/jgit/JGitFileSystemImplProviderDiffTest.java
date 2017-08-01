@@ -37,9 +37,9 @@ import org.uberfire.java.nio.fs.jgit.util.commands.CreateRepository;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class JGitFileSystemProviderDiffTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderDiffTest extends AbstractTestInfra {
 
-    private Logger logger = LoggerFactory.getLogger(JGitFileSystemProviderDiffTest.class);
+    private Logger logger = LoggerFactory.getLogger(JGitFileSystemImplProviderDiffTest.class);
 
     @Test
     public void testDiffsBetweenBranches() throws IOException {

@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class JGitFileSystemProviderSSHBadConfigTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderSSHBadConfigTest extends AbstractTestInfra {
 
     @Override
     public Map<String, String> getGitPreferences() {

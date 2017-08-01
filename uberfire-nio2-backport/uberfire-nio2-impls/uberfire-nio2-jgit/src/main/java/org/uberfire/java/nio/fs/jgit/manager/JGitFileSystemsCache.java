@@ -3,13 +3,24 @@ package org.uberfire.java.nio.fs.jgit.manager;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import org.uberfire.commons.validation.PortablePreconditions;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemProxy;
 
+/**
+ *
+ * Todo Tomorrow eder
+ *
+ * arrumar testes, implementar lock e estudar watch service como vai funcionar?
+ *
+ *
+ *
+ */
 public class JGitFileSystemsCache {
 
     private Map<String, Supplier<JGitFileSystem>> fileSystemsSuppliers = new ConcurrentHashMap<>();
@@ -28,22 +39,17 @@ public class JGitFileSystemsCache {
     }
 
     public void addSupplier(String fsKey,
-                            Supplier<JGitFileSystem> fsSupplier) {
+                            Supplier<JGitFileSystem> createFSSupplier) {
         PortablePreconditions.checkNotNull("fsKey",
                                            fsKey);
         PortablePreconditions.checkNotNull("fsSupplier",
-                                           fsSupplier);
+                                           createFSSupplier);
+
+        Supplier<JGitFileSystem> cachedSupplier = createCachedSupplier(fsKey,
+                                                                       createFSSupplier);
 
         fileSystemsSuppliers.put(fsKey,
-                                 fsSupplier);
-        setEntry(fsKey,
-                 fsSupplier.get());
-    }
-
-    private void setEntry(String fsKey,
-                          JGitFileSystem fs) {
-        fileSystemsCache.put(fsKey,
-                             fs);
+                                 cachedSupplier);
     }
 
     public void remove(String fsName) {
@@ -52,16 +58,21 @@ public class JGitFileSystemsCache {
 
     public JGitFileSystem get(String fsName) {
 
-        if (fileSystemsCache.get(fsName) != null) {
-            return fileSystemsCache.get(fsName);
-        }
+//        if (fileSystemsCache.get(fsName) != null) {
+//            return new JGitFileSystemProxy(fileSystemsSuppliers.get(fsName));
+//        }
         if (fileSystemsSuppliers.get(fsName) != null) {
-            JGitFileSystem jGitFileSystem = fileSystemsSuppliers.get(fsName).get();
-            setEntry(fsName,
-                     jGitFileSystem);
-            return jGitFileSystem;
+
+            return new JGitFileSystemProxy(fileSystemsSuppliers.get(fsName));
         }
+        //if there is no cache, regenerate
         return null;
+    }
+
+    Supplier<JGitFileSystem> createCachedSupplier(String fsName,
+                                                  Supplier<JGitFileSystem> jGitFileSystemSupplier) {
+
+        return LazyFileSystemsSupplier.of(jGitFileSystemSupplier);
     }
 
     public void clear() {
@@ -71,5 +82,25 @@ public class JGitFileSystemsCache {
 
     public boolean containsKey(String fsName) {
         return fileSystemsSuppliers.containsKey(fsName);
+    }
+
+    public JGitFileSystemsCacheInfo getCacheInfo() {
+        return new JGitFileSystemsCacheInfo();
+    }
+
+    public class JGitFileSystemsCacheInfo {
+
+        public int fileSystemsCacheSize() {
+            return fileSystemsCache.size();
+        }
+
+        public Set<String> fileSystemsCacheKeys() {
+            return fileSystemsCache.keySet();
+        }
+
+        @Override
+        public String toString() {
+            return "JGitFileSystemsCacheInfo{fileSystemsCacheSize[" + fileSystemsCacheSize() + "], fileSystemsCacheKeys[" + fileSystemsCacheKeys() + "]}";
+        }
     }
 }

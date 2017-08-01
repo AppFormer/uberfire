@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.uberfire.java.nio.file.api.FileSystemProviders;
+import org.uberfire.java.nio.file.spi.FileSystemProvider;
 
 import static org.uberfire.commons.validation.Preconditions.checkNotNull;
 
@@ -77,6 +78,7 @@ public final class Paths {
         checkNotNull("uri",
                      uri);
 
-        return FileSystemProviders.resolveProvider(uri).getPath(uri);
+        FileSystemProvider fileSystemProvider = FileSystemProviders.resolveProvider(uri);
+        return fileSystemProvider.getPath(uri);
     }
 }

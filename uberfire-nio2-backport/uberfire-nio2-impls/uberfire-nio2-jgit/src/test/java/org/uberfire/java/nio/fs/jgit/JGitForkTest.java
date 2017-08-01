@@ -198,7 +198,7 @@ public class JGitForkTest extends AbstractTestInfra {
         String forkPath = "git://" + TARGET;
         final URI forkUri = URI.create(forkPath);
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(forkUri,
-                                                                          forkEnv);
+                                                                                  forkEnv);
 
         assertThat(((GitImpl) fs.getGit())._remoteList().call().get(0).getURIs().get(0).toString())
                 .isEqualTo(new File(provider.getGitRepoContainerDir(),

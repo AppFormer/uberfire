@@ -597,22 +597,22 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
         String fsName = extractRepoName(uri);
 
-//        migrateIfNeeded(env,
-//                        fsName);
-
         if (manager.containsKey(fsName)) {
             //change this url
-            throw new FileSystemAlreadyExistsException("No filesystem for uri (" + uri + ") found.");
+            throw new FileSystemAlreadyExistsException("There is already a FS for " + uri + ".");
         }
 
-        //passar pra um suplier
-        final Git git = createNewGitRepo(env,
-                                         fsName);
+        String envUsername = extractEnvProperty(GIT_ENV_KEY_USER_NAME,
+                                                env);
+        String envPassword = extractEnvProperty(GIT_ENV_KEY_PASSWORD,
+                                                env);
 
         manager.newFileSystem(() -> fullHostNames,
-                              () -> git,
+                              () -> createNewGitRepo(env,
+                                                     fsName),
                               () -> fsName,
-                              () -> buildCredential(env));
+                              () -> buildCredential(envUsername,
+                                                    envPassword));
 
         JGitFileSystem fs = manager.get(fsName);
 
@@ -641,7 +641,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         }
 
         if (config.isEnableKetch()) {
-            git.enableKetch();
+            createNewGitRepo(env,
+                             fsName).enableKetch();
         }
 
         if (config.isDaemonEnabled() && daemonService != null && !daemonService.isRunning()) {
@@ -651,11 +652,25 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         return fs;
     }
 
+    private String extractEnvProperty(String key,
+                                      Map<String, ?> env) {
+        if (env == null || env.get(key) == null) {
+            return null;
+        }
+        return env.get(key).toString();
+    }
+
     private Git createNewGitRepo(Map<String, ?> env,
                                  String fsName) {
         final Git git;
 
-        CredentialsProvider credential = buildCredential(env);
+        String envUsername = extractEnvProperty(GIT_ENV_KEY_USER_NAME,
+                                                env);
+        String envPassword = extractEnvProperty(GIT_ENV_KEY_PASSWORD,
+                                                env);
+
+        CredentialsProvider credential = buildCredential(envUsername,
+                                                         envPassword);
 
         final String outPath = (String) env.get(GIT_ENV_KEY_DEST_PATH);
         final File repoDest;
@@ -1235,7 +1250,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
     }
 
     private boolean deleteRepo(final FileSystem fileSystem) {
-        final File gitDir = ((JGitFileSystem) fileSystem).getGit().getRepository().getDirectory();
+        final File gitDir = ((JGitFileSystemImpl) fileSystem).getGit().getRepository().getDirectory();
         fileSystem.close();
         fileSystem.dispose();
 
@@ -2053,7 +2068,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         }
 
         if (attribute.equals(FileSystemState.FILE_SYSTEM_STATE_ATTR)) {
-            JGitFileSystem fileSystem = (JGitFileSystem) path.getFileSystem();
+            JGitFileSystemImpl fileSystem = (JGitFileSystemImpl) path.getFileSystem();
             try {
                 fileSystem.lock();
 
@@ -2290,16 +2305,15 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         return path;
     }
 
-    private CredentialsProvider buildCredential(final Map<String, ?> env) {
-        if (env != null) {
-            if (env.containsKey(GIT_ENV_KEY_USER_NAME)) {
-                if (env.containsKey(GIT_ENV_KEY_PASSWORD)) {
-                    return new UsernamePasswordCredentialsProvider(env.get(GIT_ENV_KEY_USER_NAME).toString(),
-                                                                   env.get(GIT_ENV_KEY_PASSWORD).toString());
-                }
-                return new UsernamePasswordCredentialsProvider(env.get(GIT_ENV_KEY_USER_NAME).toString(),
-                                                               "");
+    private CredentialsProvider buildCredential(String username,
+                                                String password) {
+        if (username != null) {
+            if (password != null) {
+                return new UsernamePasswordCredentialsProvider(username,
+                                                               password);
             }
+            return new UsernamePasswordCredentialsProvider(username,
+                                                           "");
         }
         return CredentialsProvider.getDefault();
     }
@@ -2614,5 +2628,9 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
     public void setDetectedFS(final FS detectedFS) {
         this.detectedFS = detectedFS;
+    }
+
+    public JGitFileSystemsManager getManager() {
+        return manager;
     }
 }

@@ -691,6 +691,7 @@ public abstract class AbstractPath<FS extends FileSystem>
         if (usesWindowsFormat) {
             return '\\';
         }
+        //ederign
         return fs.getSeparator().toCharArray()[0];
     }
 
