@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.fs.jgit.util.commands.Commit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -44,6 +45,7 @@ public class JGitFileSystemImplProviderEncodingTest extends AbstractTestInfra {
                      String.valueOf(gitDaemonPort));
         return gitPrefs;
     }
+
 
     @Test
     public void test() throws IOException {
@@ -107,7 +109,10 @@ public class JGitFileSystemImplProviderEncodingTest extends AbstractTestInfra {
 
         provider.getPath(fs.getPath("file+name.txt").toUri());
 
-        assertThat(provider.getPath(fs.getPath("file+name.txt").toUri())).isEqualTo(fs.getPath("file+name.txt"));
+        URI uri = fs.getPath("file+name.txt").toUri();
+        Path path = provider.getPath(uri);
+        Path path1 = fs.getPath("file+name.txt");
+        assertThat(path).isEqualTo(path1);
 
         assertThat(provider.getPath(fs.getPath("file name.txt").toUri())).isEqualTo(fs.getPath("file name.txt"));
 

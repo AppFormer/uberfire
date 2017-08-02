@@ -235,4 +235,15 @@ public class JGitFileSystemProxy implements JGitFileSystem {
     public JGitFileSystem getRealJGitFileSystem() {
         return cachedSupplier.get();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        //equals de string para ver se os parametros sao iguais
+        return cachedSupplier.get().equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return cachedSupplier.get().hashCode();
+    }
 }

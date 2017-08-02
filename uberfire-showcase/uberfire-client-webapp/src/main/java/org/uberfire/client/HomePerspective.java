@@ -19,6 +19,7 @@ package org.uberfire.client;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.dom.Div;
+import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.ui.client.local.api.IsElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
@@ -34,6 +35,10 @@ public class HomePerspective implements IsElement {
     @DataField
     @WorkbenchPanel(parts = "MoodScreen?uber=fire&uber1=fire1")
     Div moodScreen;
+
+
+    @Inject
+    User user;
 
     @Inject
     @DataField

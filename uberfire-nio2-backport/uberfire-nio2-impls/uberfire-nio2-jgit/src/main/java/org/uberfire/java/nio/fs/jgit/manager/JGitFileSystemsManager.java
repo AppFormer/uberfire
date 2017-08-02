@@ -71,7 +71,6 @@ public class JGitFileSystemsManager {
                                                               Supplier<String> fsName,
                                                               Supplier<CredentialsProvider> credential) {
 
-
         String realFSKey = resolveRealFsKey(fsName.get());
 
         return () -> newFileSystem(fullHostNames.get(),
@@ -91,7 +90,6 @@ public class JGitFileSystemsManager {
                                                          credential);
 
         fs.getGit().gc();
-        System.out.println(" fileSystem created " + fsName + " "  + fs.hashCode());
 
         return fs;
     }

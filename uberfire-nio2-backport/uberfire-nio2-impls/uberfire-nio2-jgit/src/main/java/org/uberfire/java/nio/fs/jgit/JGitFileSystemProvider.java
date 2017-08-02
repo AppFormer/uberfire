@@ -194,10 +194,9 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
     final KetchLeaderCache leaders = new KetchLeaderCache(system);
 
-    final JGitFileSystemProviderConfiguration config = new JGitFileSystemProviderConfiguration();
+    JGitFileSystemProviderConfiguration config;
 
-    final JGitFileSystemsManager manager = new JGitFileSystemsManager(this,
-                                                                      config);
+    JGitFileSystemsManager manager;
 
     /**
      * Creates a JGit filesystem provider which takes its configuration from system properties. In a normal production
@@ -229,9 +228,12 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                                   ExecutorService executorService) {
         this.executorService = executorService;
 
-        this.manager.clear();
+        config = new JGitFileSystemProviderConfiguration();
 
         loadConfig(gitPrefs);
+
+        manager = new JGitFileSystemsManager(this,
+                                             config);
 
         setupGitDefaultCredentials();
 
@@ -551,6 +553,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         }
         shutdownSSH();
         forceStopDaemon();
+        manager.clear();
     }
 
     /**
@@ -597,10 +600,11 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
         String fsName = extractRepoName(uri);
 
-        if (manager.containsKey(fsName)) {
-            //change this url
-            throw new FileSystemAlreadyExistsException("There is already a FS for " + uri + ".");
-        }
+        //voltar isto
+//        if (manager.containsKey(fsName)) {
+//            change this url
+//            throw new FileSystemAlreadyExistsException("There is already a FS for " + uri + ".");
+//        }
 
         String envUsername = extractEnvProperty(GIT_ENV_KEY_USER_NAME,
                                                 env);
@@ -622,6 +626,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             init = true;
         }
 
+
+        //se o cara ta vazio, vamos precisar inicializar
         if (!env.containsKey(GIT_ENV_KEY_DEFAULT_REMOTE_NAME) && init) {
             try {
                 final URI initURI = URI.create(getScheme() + "://master@" + fsName + "/readme.md");
@@ -2068,7 +2074,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         }
 
         if (attribute.equals(FileSystemState.FILE_SYSTEM_STATE_ATTR)) {
-            JGitFileSystemImpl fileSystem = (JGitFileSystemImpl) path.getFileSystem();
+            JGitFileSystem fileSystem = (JGitFileSystem) path.getFileSystem();
             try {
                 fileSystem.lock();
 

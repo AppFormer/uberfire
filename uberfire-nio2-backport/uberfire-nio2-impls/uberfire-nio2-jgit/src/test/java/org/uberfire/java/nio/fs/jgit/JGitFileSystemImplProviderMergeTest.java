@@ -74,7 +74,7 @@ public class JGitFileSystemImplProviderMergeTest extends AbstractTestInfra {
                       master,
                       new MergeCopyOption());
 
-        final Git gitRepo = ((JGitFileSystemImpl) master.getFileSystem()).getGit();
+        final Git gitRepo = ((JGitFileSystem) master.getFileSystem()).getGit();
 
         final List<DiffEntry> result = new ListDiffs(gitRepo,
                                                      new GetTreeFromRef(gitRepo,
@@ -178,7 +178,7 @@ public class JGitFileSystemImplProviderMergeTest extends AbstractTestInfra {
                       master,
                       new MergeCopyOption());
 
-        final Git gitRepo = ((JGitFileSystemImpl) master.getFileSystem()).getGit();
+        final Git gitRepo = ((JGitFileSystem) master.getFileSystem()).getGit();
         final List<DiffEntry> result = new ListDiffs(gitRepo,
                                                      new GetTreeFromRef(gitRepo,
                                                                         "master").execute(),

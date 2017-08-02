@@ -12,30 +12,21 @@ import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProxy;
 
-/**
- *
- * Todo Tomorrow eder
- *
- * arrumar testes, implementar lock e estudar watch service como vai funcionar?
- *
- *
- *
- */
 public class JGitFileSystemsCache {
 
     private Map<String, Supplier<JGitFileSystem>> fileSystemsSuppliers = new ConcurrentHashMap<>();
 
-    private Map<String, JGitFileSystem> fileSystemsCache;
+    private Map<String, Supplier<JGitFileSystem>> memoizedSuppliers;
 
     public JGitFileSystemsCache(JGitFileSystemProviderConfiguration config) {
-        fileSystemsCache = new LinkedHashMap<String, JGitFileSystem>(config.getJgitFileSystemsInstancesCache() + 1,
-                                                                     0.75f,
-                                                                     true) {
+        memoizedSuppliers = new LinkedHashMap<String, Supplier<JGitFileSystem>>(config.getJgitFileSystemsInstancesCache() + 1,
+                                                                                0.75f,
+                                                                                true) {
             public boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > config.getJgitFileSystemsInstancesCache();
             }
         };
-        fileSystemsCache = (Map) Collections.synchronizedMap(fileSystemsCache);
+        memoizedSuppliers = (Map) Collections.synchronizedMap(memoizedSuppliers);
     }
 
     public void addSupplier(String fsKey,
@@ -45,38 +36,42 @@ public class JGitFileSystemsCache {
         PortablePreconditions.checkNotNull("fsSupplier",
                                            createFSSupplier);
 
-        Supplier<JGitFileSystem> cachedSupplier = createCachedSupplier(fsKey,
-                                                                       createFSSupplier);
+        fileSystemsSuppliers.putIfAbsent(fsKey,
+                                         createFSSupplier);
 
-        fileSystemsSuppliers.put(fsKey,
-                                 cachedSupplier);
+        createMemoizedSupplier(fsKey,
+                               createFSSupplier);
     }
 
     public void remove(String fsName) {
         fileSystemsSuppliers.remove(fsName);
+        memoizedSuppliers.remove(fsName);
     }
 
     public JGitFileSystem get(String fsName) {
 
-//        if (fileSystemsCache.get(fsName) != null) {
-//            return new JGitFileSystemProxy(fileSystemsSuppliers.get(fsName));
-//        }
-        if (fileSystemsSuppliers.get(fsName) != null) {
-
-            return new JGitFileSystemProxy(fileSystemsSuppliers.get(fsName));
+        if (memoizedSuppliers.get(fsName) != null) {
+            return new JGitFileSystemProxy(memoizedSuppliers.get(fsName));
+        }
+        else if (fileSystemsSuppliers.get(fsName) != null) {
+            createMemoizedSupplier(fsName,
+                                   fileSystemsSuppliers.get(fsName));
+            return new JGitFileSystemProxy(memoizedSuppliers.get(fsName));
         }
         //if there is no cache, regenerate
         return null;
     }
 
-    Supplier<JGitFileSystem> createCachedSupplier(String fsName,
-                                                  Supplier<JGitFileSystem> jGitFileSystemSupplier) {
-
-        return LazyFileSystemsSupplier.of(jGitFileSystemSupplier);
+    Supplier<JGitFileSystem> createMemoizedSupplier(String fsKey,
+                                                    Supplier<JGitFileSystem> createFSSupplier) {
+        Supplier<JGitFileSystem> memoizedFSSupplier = MemoizedFileSystemsSupplier.of(createFSSupplier);
+        memoizedSuppliers.putIfAbsent(fsKey,
+                                      memoizedFSSupplier);
+        return memoizedFSSupplier;
     }
 
     public void clear() {
-        this.fileSystemsCache.clear();
+        memoizedSuppliers.clear();
         fileSystemsSuppliers.clear();
     }
 
@@ -91,11 +86,11 @@ public class JGitFileSystemsCache {
     public class JGitFileSystemsCacheInfo {
 
         public int fileSystemsCacheSize() {
-            return fileSystemsCache.size();
+            return memoizedSuppliers.size();
         }
 
         public Set<String> fileSystemsCacheKeys() {
-            return fileSystemsCache.keySet();
+            return memoizedSuppliers.keySet();
         }
 
         @Override

@@ -154,6 +154,10 @@ public class JGitFileSystemProviderConfiguration {
 
         jgitFileSystemsInstancesCache = jgitFileSystemsInstancesCacheProp.getIntValue();
 
+        if (jgitFileSystemsInstancesCache < 1) {
+            jgitFileSystemsInstancesCache = Integer.valueOf(JGIT_FILE_SYSTEM_INSTANCES_CACHE);
+        }
+
         daemonEnabled = enabledProp.getBooleanValue();
         if (daemonEnabled) {
             daemonPort = portProp.getIntValue();

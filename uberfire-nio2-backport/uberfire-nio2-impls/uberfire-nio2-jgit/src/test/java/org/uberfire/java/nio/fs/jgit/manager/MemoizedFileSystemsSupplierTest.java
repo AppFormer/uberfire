@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class LazyFileSystemsSupplierTest {
+public class MemoizedFileSystemsSupplierTest {
 
     public static int instanceCount = 0;
 
@@ -28,7 +28,7 @@ public class LazyFileSystemsSupplierTest {
     }
 
     Supplier<DummyObject> getLazySupplier() {
-        return LazyFileSystemsSupplier.of(getSupplier());
+        return MemoizedFileSystemsSupplier.of(getSupplier());
     }
 
     Supplier<DummyObject> getSupplier() {

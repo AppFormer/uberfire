@@ -38,13 +38,10 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.IOException;
-import org.uberfire.java.nio.base.FileSystemId;
 import org.uberfire.java.nio.base.FileSystemState;
-import org.uberfire.java.nio.base.FileSystemStateAware;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.file.ClosedWatchServiceException;
 import org.uberfire.java.nio.file.FileStore;
-import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.InterruptedException;
 import org.uberfire.java.nio.file.InvalidPathException;
 import org.uberfire.java.nio.file.Path;
@@ -391,7 +388,11 @@ public class JGitFileSystemImpl implements JGitFileSystem {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
-            return false;
+            if (o != null && o instanceof JGitFileSystemProxy) {
+                o = ((JGitFileSystemProxy) o).getRealJGitFileSystem();
+            } else {
+                return false;
+            }
         }
 
         JGitFileSystemImpl that = (JGitFileSystemImpl) o;
@@ -399,6 +400,7 @@ public class JGitFileSystemImpl implements JGitFileSystem {
         if (fileStore != null ? !fileStore.equals(that.fileStore) : that.fileStore != null) {
             return false;
         }
+
         if (!git.equals(that.git)) {
             return false;
         }
@@ -481,7 +483,6 @@ public class JGitFileSystemImpl implements JGitFileSystem {
     public boolean isOnBatch() {
         return state.equals(FileSystemState.BATCH);
     }
-
 
     @Override
     public void setState(String state) {

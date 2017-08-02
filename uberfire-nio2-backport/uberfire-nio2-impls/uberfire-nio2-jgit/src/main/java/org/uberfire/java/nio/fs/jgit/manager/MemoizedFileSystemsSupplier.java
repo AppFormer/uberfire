@@ -4,26 +4,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-public class LazyFileSystemsSupplier<T> implements Supplier<T> {
+public class MemoizedFileSystemsSupplier<T> implements Supplier<T> {
 
     final Supplier<T> delegate;
     ConcurrentMap<Class<?>, T> map = new ConcurrentHashMap<>(1);
 
-    private LazyFileSystemsSupplier(Supplier<T> delegate) {
+    private MemoizedFileSystemsSupplier(Supplier<T> delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public T get() {
 
-        T t = this.map.computeIfAbsent(LazyFileSystemsSupplier.class,
+        T t = this.map.computeIfAbsent(MemoizedFileSystemsSupplier.class,
                                        k -> this.delegate.get());
-        System.out.println("Lazy Supplier executed with return object: " + t.hashCode());
         return t;
     }
 
     public static <T> Supplier<T> of(Supplier<T> provider) {
-        return new LazyFileSystemsSupplier<>(provider);
+        return new MemoizedFileSystemsSupplier<>(provider);
     }
-
 }

@@ -44,7 +44,9 @@ public class FileSystemTestingUtils {
         ioService = new IOServiceDotFileImpl();
 
         createTempDirectory();
-        setupJGitRepository(initRepo);
+        setupJGitRepository("git://amend-repo-test",
+                            initRepo
+        );
     }
 
     private void createTempDirectory()
@@ -62,17 +64,18 @@ public class FileSystemTestingUtils {
         this.path = temp;
     }
 
-    private void setupJGitRepository(boolean initRepo) {
+    public void setupJGitRepository(String repoPath,
+                                    boolean initRepo) {
         System.setProperty("org.uberfire.nio.git.dir",
                            path.getAbsolutePath());
         System.out.println("Path " + path.getAbsolutePath());
-        final URI newRepo = URI.create("git://amend-repo-test");
+        final URI newRepo = URI.create(repoPath);
 
         fileSystem = ioService.newFileSystem(newRepo,
                                              new HashMap<String, Object>());
         if (initRepo) {
 
-            Path init = ioService.get(URI.create("git://amend-repo-test/init.file"));
+            Path init = ioService.get(URI.create(repoPath + "/init.file"));
             ioService.write(init,
                             "setupFS!");
         }
