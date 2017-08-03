@@ -59,11 +59,10 @@ public class JGitFileSystemsManager {
                                                                        git,
                                                                        fsName,
                                                                        credential);
-        String realFSKey = resolveRealFsKey(fsName.get());
 
-        fsCache.addSupplier(realFSKey,
+        fsCache.addSupplier(fsName.get(),
                             fsSupplier);
-        fileSystems.add(realFSKey);
+        fileSystems.add(fsName.get());
     }
 
     private Supplier<JGitFileSystem> createFileSystemSupplier(Supplier<Map<String, String>> fullHostNames,
@@ -71,11 +70,9 @@ public class JGitFileSystemsManager {
                                                               Supplier<String> fsName,
                                                               Supplier<CredentialsProvider> credential) {
 
-        String realFSKey = resolveRealFsKey(fsName.get());
-
         return () -> newFileSystem(fullHostNames.get(),
                                    git.get(),
-                                   realFSKey,
+                                   fsName.get(),
                                    credential.get());
     }
 
@@ -95,15 +92,14 @@ public class JGitFileSystemsManager {
     }
 
     public void remove(String fsName) {
-        String realFSKey = resolveRealFsKey(fsName);
+        String realFSKey = fsName;
         fsCache.remove(realFSKey);
         fileSystems.remove(realFSKey);
         closedFileSystems.remove(realFSKey);
     }
 
     public JGitFileSystem get(String fsName) {
-        //return supplier
-        String realFSKey = resolveRealFsKey(fsName);
+        String realFSKey = fsName;
         return fsCache.get(realFSKey);
     }
 
@@ -114,12 +110,12 @@ public class JGitFileSystemsManager {
     }
 
     public boolean containsKey(String fsName) {
-        String realFSKey = resolveRealFsKey(fsName);
+        String realFSKey = fsName;
         return fileSystems.contains(realFSKey);
     }
 
     public void addClosedFileSystems(JGitFileSystem fileSystem) {
-        String realFSKey = resolveRealFsKey(fileSystem.getName());
+        String realFSKey = fileSystem.getName();
         closedFileSystems.add(realFSKey);
     }
 
@@ -135,22 +131,12 @@ public class JGitFileSystemsManager {
     private String extractFSNameFromRepo(Repository db) {
         String fsName = db.getDirectory().getName().substring(0,
                                                               db.getDirectory().getName().indexOf(DOT_GIT_EXT));
-        return resolveRealFsKey(fsName);
+        return fsName;
     }
 
     public Set<JGitFileSystem> getOpenFileSystems() {
         return fileSystems.stream().filter(fsName -> !closedFileSystems.contains(fsName))
                 .map(fsName -> get(fsName)).collect(Collectors.toSet());
-    }
-
-    public String resolveRealFsKey(String fsName) {
-        //TODO
-//        if(fsName.contains("/")){
-//            return fsName;
-//        }
-//        String gitPath = config.getGitReposParentDir().getAbsolutePath();
-//        String fsKey = gitPath + fsName;
-        return fsName;
     }
 
     public JGitFileSystemsCache getFsCache() {

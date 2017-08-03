@@ -397,17 +397,7 @@ public class JGitFileSystemImpl implements JGitFileSystem {
 
         JGitFileSystemImpl that = (JGitFileSystemImpl) o;
 
-        if (fileStore != null ? !fileStore.equals(that.fileStore) : that.fileStore != null) {
-            return false;
-        }
-
-        if (!git.equals(that.git)) {
-            return false;
-        }
         if (!name.equals(that.name)) {
-            return false;
-        }
-        if (!provider.equals(that.provider)) {
             return false;
         }
 
@@ -421,10 +411,7 @@ public class JGitFileSystemImpl implements JGitFileSystem {
 
     @Override
     public int hashCode() {
-        int result = provider.hashCode();
-        result = 31 * result + git.hashCode();
-        result = 31 * result + (fileStore != null ? fileStore.hashCode() : 0);
-        result = 31 * result + name.hashCode();
+        int result = name.hashCode();
         return result;
     }
 

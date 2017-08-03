@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.uberfire.io.IOService;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
 import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.FileSystemAlreadyExistsException;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
@@ -71,8 +72,14 @@ public class FileSystemTestingUtils {
         System.out.println("Path " + path.getAbsolutePath());
         final URI newRepo = URI.create(repoPath);
 
-        fileSystem = ioService.newFileSystem(newRepo,
-                                             new HashMap<String, Object>());
+        try{
+
+            fileSystem = ioService.newFileSystem(newRepo,
+                                                 new HashMap<String, Object>());
+        }
+        catch (FileSystemAlreadyExistsException e){
+
+        }
         if (initRepo) {
 
             Path init = ioService.get(URI.create(repoPath + "/init.file"));

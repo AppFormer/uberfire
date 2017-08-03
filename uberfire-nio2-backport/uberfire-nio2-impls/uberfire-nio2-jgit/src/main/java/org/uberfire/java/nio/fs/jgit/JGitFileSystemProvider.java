@@ -600,11 +600,9 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
 
         String fsName = extractRepoName(uri);
 
-        //voltar isto
-//        if (manager.containsKey(fsName)) {
-//            change this url
-//            throw new FileSystemAlreadyExistsException("There is already a FS for " + uri + ".");
-//        }
+        if (manager.containsKey(fsName)) {
+            throw new FileSystemAlreadyExistsException("There is already a FS for " + uri + ".");
+        }
 
         String envUsername = extractEnvProperty(GIT_ENV_KEY_USER_NAME,
                                                 env);
@@ -625,7 +623,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         if (env.containsKey(GIT_ENV_KEY_INIT) && Boolean.valueOf(env.get(GIT_ENV_KEY_INIT).toString())) {
             init = true;
         }
-
 
         //se o cara ta vazio, vamos precisar inicializar
         if (!env.containsKey(GIT_ENV_KEY_DEFAULT_REMOTE_NAME) && init) {

@@ -96,8 +96,11 @@ public class JGitFileSystemLazyCacheTest {
         FileSystem fileSystem1Instance2 = secondWriteFS1.getFileSystem();
 
         //not equals because we have to regenerate, but still represent the same FS
-        assertNotEquals(fileSystem1Instance1,
-                        fileSystem1Instance2);
+        assertTrue(System.identityHashCode(fileSystem1Instance1) != System.identityHashCode(fileSystem1Instance2));
+        assertTrue(fileSystem1Instance1.hashCode() == fileSystem1Instance2.hashCode());
+        assertEquals(fileSystem1Instance1,
+                     fileSystem1Instance2);
+
         System.out.println(fileSystem1Instance1.equals(fileSystem1Instance2));
 
         //let's remove fs1 again from cache
@@ -120,13 +123,12 @@ public class JGitFileSystemLazyCacheTest {
     @Test
     public void branchingTest() throws IOException {
 
-
-
         FileSystem fileSystem = fsUtils.setupJGitRepository("git://dora-repo",
                                                             true);
         fsUtils.getProvider().forceAsDefault();
 
-        Path branchPath = fileSystem.getPath("branch", "dir");
+        Path branchPath = fileSystem.getPath("branch",
+                                             "dir");
 
         Path pathOnBranch = branchPath.resolve("test.file");
 
@@ -136,7 +138,7 @@ public class JGitFileSystemLazyCacheTest {
 
         String actual = fsUtils.getIoService().readAllString(branchPath.resolve("test.file"));
 
-        assertEquals(expected, actual);
-
+        assertEquals(expected,
+                     actual);
     }
 }
