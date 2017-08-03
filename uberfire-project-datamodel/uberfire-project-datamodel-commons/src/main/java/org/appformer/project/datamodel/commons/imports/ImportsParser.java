@@ -29,30 +29,27 @@ public final class ImportsParser {
     private ImportsParser() {
     }
 
-    public static Imports parseImports( final String content ) {
+    public static Imports parseImports(final String content) {
         Imports imports = new Imports();
 
-        if ( content == null || content.trim().equals( "" ) ) {
+        if (content == null || content.trim().equals("")) {
             return imports;
         } else {
-            final String[] lines = content.split( "\\n" );
+            final String[] lines = content.split("\\n");
 
-            for ( int i = 0; i < lines.length; i++ ) {
-                String line = lines[ i ].trim();
-                if ( !( line.equals( "" ) || line.startsWith( "#" ) ) ) {
-                    if ( line.startsWith( KEYWORD ) ) {
-                        line = line.substring( KEYWORD.length() ).trim();
-                        if ( line.endsWith( ";" ) ) {
-                            line = line.substring( 0, line.length() - 1 );
-                        }
-                        imports.addImport( new Import( line ) );
+            for (String line1 : lines) {
+                String line = line1.trim();
+                if (line.startsWith(KEYWORD)) {
+                    line = line.substring(KEYWORD.length()).trim();
+                    if (line.endsWith(";")) {
+                        line = line.substring(0,
+                                              line.length() - 1);
                     }
+                    imports.addImport(new Import(line));
                 }
             }
 
             return imports;
         }
-
     }
-
 }

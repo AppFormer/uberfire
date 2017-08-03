@@ -26,30 +26,27 @@ public final class PackageNameParser {
     private PackageNameParser() {
     }
 
-    public static String parsePackageName( final String content ) {
+    public static String parsePackageName(final String content) {
         String packageName = "";
 
-        if ( content == null || content.trim().equals( "" ) ) {
+        if (content == null || content.trim().equals("")) {
             return packageName;
         } else {
-            final String[] lines = content.split( "\\n" );
+            final String[] lines = content.split("\\n");
 
-            for ( int i = 0; i < lines.length; i++ ) {
-                String line = lines[ i ].trim();
-                if ( !( line.equals( "" ) || line.startsWith( "#" ) ) ) {
-                    if ( line.startsWith( KEYWORD ) ) {
-                        line = line.substring( KEYWORD.length() ).trim();
-                        if ( line.endsWith( ";" ) ) {
-                            line = line.substring( 0, line.length() - 1 );
-                        }
-                        return line;
+            for (String line1 : lines) {
+                String line = line1.trim();
+                if (line.startsWith(KEYWORD)) {
+                    line = line.substring(KEYWORD.length()).trim();
+                    if (line.endsWith(";")) {
+                        line = line.substring(0,
+                                              line.length() - 1);
                     }
+                    return line;
                 }
             }
 
             return packageName;
         }
-
     }
-
 }
