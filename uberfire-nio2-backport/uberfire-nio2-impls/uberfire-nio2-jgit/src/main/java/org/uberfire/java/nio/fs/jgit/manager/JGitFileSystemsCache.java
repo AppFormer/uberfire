@@ -50,13 +50,13 @@ public class JGitFileSystemsCache {
 
     public JGitFileSystem get(String fsName) {
 
-        if (memoizedSuppliers.get(fsName) != null) {
-            return new JGitFileSystemProxy(memoizedSuppliers.get(fsName));
-        }
-        else if (fileSystemsSuppliers.get(fsName) != null) {
-            createMemoizedSupplier(fsName,
-                                   fileSystemsSuppliers.get(fsName));
-            return new JGitFileSystemProxy(memoizedSuppliers.get(fsName));
+        Supplier<JGitFileSystem> memoizedSupplier = memoizedSuppliers.get(fsName);
+        if (memoizedSupplier != null) {
+            return new JGitFileSystemProxy(memoizedSupplier);
+        } else if (fileSystemsSuppliers.get(fsName) != null) {
+            Supplier<JGitFileSystem> newMemoizedSupplier = createMemoizedSupplier(fsName,
+                                                                                  fileSystemsSuppliers.get(fsName));
+            return new JGitFileSystemProxy(newMemoizedSupplier);
         }
         //if there is no cache, regenerate
         return null;

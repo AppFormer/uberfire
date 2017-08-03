@@ -64,8 +64,8 @@ public class FileSystemTestingUtils {
         this.path = temp;
     }
 
-    public void setupJGitRepository(String repoPath,
-                                    boolean initRepo) {
+    public FileSystem setupJGitRepository(String repoPath,
+                                          boolean initRepo) {
         System.setProperty("org.uberfire.nio.git.dir",
                            path.getAbsolutePath());
         System.out.println("Path " + path.getAbsolutePath());
@@ -79,6 +79,12 @@ public class FileSystemTestingUtils {
             ioService.write(init,
                             "setupFS!");
         }
+        return fileSystem;
+    }
+
+    public void setProviderAsDefault() {
+        JGitFileSystemProvider gitFsProvider = (JGitFileSystemProvider) FileSystemProviders.resolveProvider(URI.create("git://whatever"));
+        gitFsProvider.forceAsDefault();
     }
 
     public void cleanup() {
@@ -99,6 +105,10 @@ public class FileSystemTestingUtils {
 
     public IOService getIoService() {
         return ioService;
+    }
+
+    public JGitFileSystemProvider getProvider() {
+        return (JGitFileSystemProvider) FileSystemProviders.resolveProvider(URI.create("git://whatever"));
     }
 
     public JGitFileSystemsCache.JGitFileSystemsCacheInfo getFSCacheInfo() {
