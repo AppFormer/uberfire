@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,9 +43,11 @@ import org.junit.Test;
 import org.uberfire.java.nio.base.FileSystemState;
 import org.uberfire.java.nio.base.NotImplementedException;
 import org.uberfire.java.nio.base.attributes.HiddenAttributeView;
+import org.uberfire.java.nio.base.dotfiles.DotFileOption;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.base.options.SquashOption;
 import org.uberfire.java.nio.base.version.VersionRecord;
+import org.uberfire.java.nio.channels.SeekableByteChannel;
 import org.uberfire.java.nio.file.DirectoryNotEmptyException;
 import org.uberfire.java.nio.file.DirectoryStream;
 import org.uberfire.java.nio.file.FileAlreadyExistsException;
@@ -54,13 +57,16 @@ import org.uberfire.java.nio.file.FileSystemAlreadyExistsException;
 import org.uberfire.java.nio.file.FileSystemNotFoundException;
 import org.uberfire.java.nio.file.NoSuchFileException;
 import org.uberfire.java.nio.file.NotDirectoryException;
+import org.uberfire.java.nio.file.OpenOption;
 import org.uberfire.java.nio.file.Path;
+import org.uberfire.java.nio.file.StandardOpenOption;
 import org.uberfire.java.nio.file.StandardWatchEventKind;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchKey;
 import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributeView;
 import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
+import org.uberfire.java.nio.file.attribute.FileAttribute;
 import org.uberfire.java.nio.file.attribute.FileTime;
 import org.uberfire.java.nio.fs.jgit.util.Git;
 import org.uberfire.java.nio.fs.jgit.util.GitImpl;
@@ -832,6 +838,105 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         inStream.close();
 
         assertThat(content).isNotNull().isEqualTo("my cool content");
+    }
+
+    @Test
+    public void testNewByteChannelWithDotFileOptionBatchNotEnabled() throws IOException, GitAPIException {
+        testNewByteChannelWithDotFileOptionBatch(false);
+    }
+
+    @Test
+    public void testNewByteChannelWithDotFileOptionBatchEnabled() throws IOException, GitAPIException {
+        testNewByteChannelWithDotFileOptionBatch(true);
+    }
+
+    private void testNewByteChannelWithDotFileOptionBatch(final boolean enableBatch) throws IOException, GitAPIException {
+        final File parentFolder = createTempDirectory();
+        final File gitFolder = new File(parentFolder,
+                                        "mytest.git");
+
+        final Git origin = new CreateRepository(gitFolder).execute().get();
+
+        new Commit(origin,
+                   "master",
+                   "user",
+                   "user@example.com",
+                   "commit message",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("path/to/some/file/myfile.txt",
+                           tempFile("original content"));
+                   }}).execute();
+        new Commit(origin,
+                   "master",
+                   "user",
+                   "user@example.com",
+                   "commit message",
+                   null,
+                   null,
+                   false,
+                   new HashMap<String, File>() {{
+                       put("path/to/some/file/.myfile.txt",
+                           tempFile("original dot content"));
+                   }}).execute();
+
+        final URI newRepo = URI.create("git://newbytechannelwithdotfileoption-test-repo");
+
+        final Map<String, Object> env = new HashMap<String, Object>() {{
+            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+                origin.getRepository().getDirectory().toString());
+        }};
+
+        final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
+                                                                          env);
+
+        assertThat(fs).isNotNull();
+
+        List<RevCommit> commits = getCommitsFromBranch((GitImpl) fs.getGit(),
+                                                       "master");
+        assertThat(commits.size()).isEqualTo(2);
+
+        final Path path = provider.getPath(URI.create("git://master@newbytechannelwithdotfileoption-test-repo/path/to/some/file/myfile.txt"));
+
+        if (enableBatch) {
+            provider.setAttribute(path,
+                                  FileSystemState.FILE_SYSTEM_STATE_ATTR,
+                                  FileSystemState.BATCH);
+        }
+
+        SeekableByteChannel byteChannel = provider.newByteChannel(path,
+                                                                  new HashSet<OpenOption>() {{
+                                                                      add(new DotFileOption());
+                                                                      add(StandardOpenOption.TRUNCATE_EXISTING);
+                                                                  }},
+                                                                  new FileAttribute<String>() {
+                                                                      @Override
+                                                                      public String name() {
+                                                                          return "key";
+                                                                      }
+
+                                                                      @Override
+                                                                      public String value() {
+                                                                          return "value";
+                                                                      }
+                                                                  }
+        );
+
+        byteChannel.write(ByteBuffer.wrap("test content".getBytes()));
+        byteChannel.close();
+
+        if (enableBatch) {
+            provider.setAttribute(path,
+                                  FileSystemState.FILE_SYSTEM_STATE_ATTR,
+                                  FileSystemState.NORMAL);
+        }
+
+        commits = getCommitsFromBranch((GitImpl) fs.getGit(),
+                                       "master");
+
+        assertThat(commits.size()).isEqualTo(3);
     }
 
     @Test(expected = FileSystemNotFoundException.class)
