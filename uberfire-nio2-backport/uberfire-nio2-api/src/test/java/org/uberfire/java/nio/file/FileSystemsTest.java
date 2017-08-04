@@ -28,8 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.fs.file.BaseSimpleFileSystem;
-import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
-import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemImpl;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration;
 import org.uberfire.java.nio.fs.jgit.JGitPathImpl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -39,7 +39,7 @@ public class FileSystemsTest {
     @Before
     @After
     public void cleanup() throws IOException {
-        FileUtils.deleteDirectory(new File(JGitFileSystemProvider.REPOSITORIES_CONTAINER_DIR));
+        FileUtils.deleteDirectory(new File(JGitFileSystemProviderConfiguration.REPOSITORIES_CONTAINER_DIR));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class FileSystemsTest {
 
         assertThat(fs).isNotNull();
 
-        final FileSystem newFS = FileSystems.newFileSystem(JGitPathImpl.create((JGitFileSystem) fs,
+        final FileSystem newFS = FileSystems.newFileSystem(JGitPathImpl.create((JGitFileSystemImpl) fs,
                                                                                "new_test",
                                                                                "my-other-test",
                                                                                false),

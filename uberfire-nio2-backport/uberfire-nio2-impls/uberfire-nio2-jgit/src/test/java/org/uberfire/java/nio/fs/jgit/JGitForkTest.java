@@ -182,7 +182,7 @@ public class JGitForkTest extends AbstractTestInfra {
         String TARGET = "testforkB/target";
 
         final Map<String, ?> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_INIT,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_INIT,
                 "true");
         }};
 
@@ -192,13 +192,13 @@ public class JGitForkTest extends AbstractTestInfra {
                                env);
 
         final Map<String, ?> forkEnv = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 SOURCE);
         }};
         String forkPath = "git://" + TARGET;
         final URI forkUri = URI.create(forkPath);
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(forkUri,
-                                                                          forkEnv);
+                                                                                  forkEnv);
 
         assertThat(((GitImpl) fs.getGit())._remoteList().call().get(0).getURIs().get(0).toString())
                 .isEqualTo(new File(provider.getGitRepoContainerDir(),
@@ -212,7 +212,7 @@ public class JGitForkTest extends AbstractTestInfra {
         String TARGET = "testforkB/target";
 
         final Map<String, ?> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_INIT,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_INIT,
                 "true");
         }};
 
@@ -222,7 +222,7 @@ public class JGitForkTest extends AbstractTestInfra {
                                env);
 
         final Map<String, ?> forkEnv = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 SOURCE);
         }};
 

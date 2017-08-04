@@ -28,14 +28,14 @@ import org.uberfire.java.nio.file.Path;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
-public class JGitFileSystemProviderGCTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderGCTest extends AbstractTestInfra {
 
     @Test
     public void testGC() throws IOException {
         final URI newRepo = URI.create("git://gc-repo-name");
 
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
-                                                                          EMPTY_ENV);
+                                                                                  EMPTY_ENV);
 
         assertThat(fs).isNotNull();
 
