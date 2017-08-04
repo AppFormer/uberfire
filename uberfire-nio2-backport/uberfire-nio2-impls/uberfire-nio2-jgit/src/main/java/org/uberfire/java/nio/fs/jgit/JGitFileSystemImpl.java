@@ -16,6 +16,15 @@
 
 package org.uberfire.java.nio.fs.jgit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import java.net.URI;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -41,6 +50,7 @@ import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.base.FileSystemState;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.file.ClosedWatchServiceException;
+import org.uberfire.java.nio.file.FileAlreadyExistsException;
 import org.uberfire.java.nio.file.FileStore;
 import org.uberfire.java.nio.file.InterruptedException;
 import org.uberfire.java.nio.file.InvalidPathException;
@@ -86,7 +96,7 @@ public class JGitFileSystemImpl implements JGitFileSystem {
 
     private Map<String, NotificationModel> oldHeadsOfPendingDiffs = new ConcurrentHashMap<>();
 
-    private final Lock lock = new Lock();
+    private Lock lock;
 
     public JGitFileSystemImpl(final JGitFileSystemProvider provider,
                               final Map<String, String> fullHostNames,
@@ -99,6 +109,9 @@ public class JGitFileSystemImpl implements JGitFileSystem {
                                 git);
         this.name = checkNotEmpty("name",
                                   name);
+
+        java.nio.file.Path lockPath = getLockPath();
+        this.lock = new Lock(lockPath);
         this.credential = checkNotNull("credential",
                                        credential);
         this.fileStore = new JGitFileStore(this.git.getRepository());
@@ -116,6 +129,21 @@ public class JGitFileSystemImpl implements JGitFileSystem {
         } else {
             toStringContent = "git://" + name;
         }
+    }
+
+    private java.nio.file.Path getLockPath() {
+        URI uri = git.getRepository().getDirectory().toURI();
+        java.nio.file.Path lockFile = null;
+        try {
+            java.nio.file.Path repo = Paths.get(uri);
+            lockFile = repo.resolve("db.lock");
+            Files.createFile(lockFile);
+        } catch (FileAlreadyExistsException ignored) {
+        } catch (Exception e) {
+            LOGGER.error("Error building lock infra [" + toString() + "]",
+                         e);
+        }
+        return lockFile;
     }
 
     @Override
@@ -586,15 +614,43 @@ public class JGitFileSystemImpl implements JGitFileSystem {
     private static class Lock {
 
         private final AtomicBoolean isLocked = new AtomicBoolean(false);
+        private java.nio.file.Path uri;
+        private FileLock lock;
+        private FileChannel fileChannel;
+
+        public Lock(java.nio.file.Path uri) {
+            this.uri = uri;
+        }
 
         public synchronized void lock() throws java.lang.InterruptedException {
             while (!isLocked.compareAndSet(false,
                                            true)) {
                 wait();
             }
+
+            try {
+                File file = uri.toFile();
+                RandomAccessFile raf = new RandomAccessFile(file, "rw");
+                fileChannel = raf.getChannel();
+                lock = fileChannel.lock();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public synchronized void unlock() {
+            try {
+                if (lock != null && lock.isValid()) {
+                    lock.release();
+                }
+                fileChannel.close();
+                fileChannel = null;
+                lock = null;
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
             isLocked.set(false);
             notifyAll();
         }
