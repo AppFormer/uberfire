@@ -24,7 +24,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -600,7 +599,6 @@ public class JGitFileSystemImpl implements JGitFileSystem {
     @Override
     public void lock() {
         try {
-            //Lock vai ter que gravar num arquivo
             lock.lock();
         } catch (final java.lang.InterruptedException ignored) {
         }
@@ -630,7 +628,8 @@ public class JGitFileSystemImpl implements JGitFileSystem {
 
             try {
                 File file = uri.toFile();
-                RandomAccessFile raf = new RandomAccessFile(file, "rw");
+                RandomAccessFile raf = new RandomAccessFile(file,
+                                                            "rw");
                 fileChannel = raf.getChannel();
                 lock = fileChannel.lock();
             } catch (FileNotFoundException e) {
@@ -645,7 +644,9 @@ public class JGitFileSystemImpl implements JGitFileSystem {
                 if (lock != null && lock.isValid()) {
                     lock.release();
                 }
-                fileChannel.close();
+                if (fileChannel != null) {
+                    fileChannel.close();
+                }
                 fileChannel = null;
                 lock = null;
             } catch (java.io.IOException e) {

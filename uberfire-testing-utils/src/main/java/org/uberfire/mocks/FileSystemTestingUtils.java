@@ -69,7 +69,6 @@ public class FileSystemTestingUtils {
                                           boolean initRepo) {
         System.setProperty("org.uberfire.nio.git.dir",
                            path.getAbsolutePath());
-        System.out.println("Path " + path.getAbsolutePath());
         final URI newRepo = URI.create(repoPath);
 
         try{
