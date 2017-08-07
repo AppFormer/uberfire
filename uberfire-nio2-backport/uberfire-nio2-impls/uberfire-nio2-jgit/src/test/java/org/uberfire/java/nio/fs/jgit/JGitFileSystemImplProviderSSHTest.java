@@ -35,7 +35,7 @@ import org.uberfire.java.nio.security.FileSystemUser;
 
 import static org.junit.Assert.*;
 
-public class JGitFileSystemProviderSSHTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderSSHTest extends AbstractTestInfra {
 
     private int gitSSHPort;
 
@@ -87,7 +87,7 @@ public class JGitFileSystemProviderSSHTest extends AbstractTestInfra {
         //Setup origin
         final URI originRepo = URI.create("git://repo");
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         //Write a file to origin that we won't amend in the clone
         new Commit(origin.getGit(),
@@ -106,7 +106,7 @@ public class JGitFileSystemProviderSSHTest extends AbstractTestInfra {
         //Setup clone
         JGitFileSystem clone;
         clone = (JGitFileSystem) provider.newFileSystem(URI.create("git://repo-clone"),
-                                                        new HashMap<String, Object>() {{
+                                                            new HashMap<String, Object>() {{
                                                             put("init",
                                                                 "true");
                                                             put("origin",

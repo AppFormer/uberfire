@@ -296,11 +296,11 @@ public class JGitUtilTest extends AbstractTestInfra {
                            tempFile("call?"));
                    }}).execute();
 
-        JGitFileSystem jGitFileSystem = mock(JGitFileSystem.class);
-        when(jGitFileSystem.getGit()).thenReturn(git);
+        JGitFileSystemImpl jGitFileSystemImpl = mock(JGitFileSystemImpl.class);
+        when(jGitFileSystemImpl.getGit()).thenReturn(git);
 
         final JGitPathImpl path = mock(JGitPathImpl.class);
-        when(path.getFileSystem()).thenReturn(jGitFileSystem);
+        when(path.getFileSystem()).thenReturn(jGitFileSystemImpl);
         when(path.getRefTree()).thenReturn("master");
         when(path.getPath()).thenReturn("path/to/file2.txt");
 

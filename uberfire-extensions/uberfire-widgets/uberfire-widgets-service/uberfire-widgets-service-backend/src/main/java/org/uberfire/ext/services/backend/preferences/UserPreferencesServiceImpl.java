@@ -64,6 +64,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
     private void saveUserPreferences(final UserPreference preferences,
                                      final Path path) {
         try {
+            //get file system
             ioServiceConfig.startBatch(path.getFileSystem());
             ioServiceConfig.write(path,
                                   xs.toXML(preferences));

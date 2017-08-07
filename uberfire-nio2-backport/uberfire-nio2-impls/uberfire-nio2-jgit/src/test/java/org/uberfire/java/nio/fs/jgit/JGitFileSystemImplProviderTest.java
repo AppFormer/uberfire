@@ -79,7 +79,7 @@ import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrow
 import static org.mockito.Mockito.*;
 import static org.uberfire.java.nio.file.StandardDeleteOption.NON_EMPTY_DIRECTORIES;
 
-public class JGitFileSystemProviderTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderTest extends AbstractTestInfra {
 
     private int gitDaemonPort;
 
@@ -198,7 +198,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-name");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -216,7 +216,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://my-repo-name");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 "git://localhost:" + gitDaemonPort + "/my-simple-test-origin-name");
         }};
 
@@ -288,7 +288,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-repo");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -306,7 +306,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://my-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 "git://localhost:" + gitDaemonPort + "/my-simple-test-origin-repo");
         }};
 
@@ -335,7 +335,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo2 = URI.create("git://my-repo2");
 
         final Map<String, Object> env2 = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 "git://localhost:" + gitDaemonPort + "/my-simple-test-origin-repo");
         }};
 
@@ -411,7 +411,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI originRepo = URI.create("git://my-simple-test-origin-name");
 
         final JGitFileSystem origin = (JGitFileSystem) provider.newFileSystem(originRepo,
-                                                                              Collections.emptyMap());
+                                                                                      Collections.emptyMap());
 
         new Commit(origin.getGit(),
                    "master",
@@ -429,7 +429,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://my-repo-name");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 "git://localhost:" + gitDaemonPort + "/my-simple-test-origin-name");
         }};
 
@@ -553,7 +553,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://inputstream-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -599,7 +599,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://xinputstream-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -645,7 +645,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://xxinputstream-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -684,7 +684,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://inputstream-not-exists-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -734,7 +734,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://outstream-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -801,7 +801,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
         final URI newRepo = URI.create("git://outstreamwithop-test-repo");
 
         final Map<String, Object> env = new HashMap<String, Object>() {{
-            put(JGitFileSystemProvider.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
+            put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_DEFAULT_REMOTE_NAME,
                 origin.getRepository().getDirectory().toString());
         }};
 
@@ -1610,7 +1610,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final FileSystem fs = provider.newFileSystem(newRepo,
                                                      new HashMap<String, Object>() {{
-                                                         put(JGitFileSystemProvider.GIT_ENV_KEY_INIT,
+                                                         put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_INIT,
                                                              "true");
                                                      }});
 
@@ -1655,7 +1655,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final FileSystem fs = provider.newFileSystem(newRepo,
                                                      new HashMap<String, Object>() {{
-                                                         put(JGitFileSystemProvider.GIT_ENV_KEY_INIT,
+                                                         put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_INIT,
                                                              "true");
                                                      }});
 
@@ -1690,7 +1690,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final URI newRepo = URI.create("git://squash-repo");
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
-                                                                          EMPTY_ENV);
+                                                                                  EMPTY_ENV);
 
         final Path generalPath = provider.getPath(URI.create("git://master@squash-repo/"));
         final Path path = provider.getPath(URI.create("git://master@squash-repo/myfile1.txt"));
@@ -1733,7 +1733,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final URI newRepo = URI.create("git://squash-repo");
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(newRepo,
-                                                                          EMPTY_ENV);
+                                                                                  EMPTY_ENV);
 
         final Path generalPath = provider.getPath(URI.create("git://master@squash-repo/"));
         final Path path = provider.getPath(URI.create("git://develop@squash-repo/myfile1.txt"));
@@ -1772,7 +1772,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         final FileSystem fs = provider.newFileSystem(newRepo,
                                                      new HashMap<String, Object>() {{
-                                                         put(JGitFileSystemProvider.GIT_ENV_KEY_INIT,
+                                                         put(JGitFileSystemProviderConfiguration.GIT_ENV_KEY_INIT,
                                                              "true");
                                                      }});
 
@@ -1780,7 +1780,7 @@ public class JGitFileSystemProviderTest extends AbstractTestInfra {
 
         doThrow(new RuntimeException()).
                 when(provider).
-                notifyDiffs(any(JGitFileSystem.class),
+                notifyDiffs(any(JGitFileSystemImpl.class),
                             any(String.class),
                             any(String.class),
                             any(String.class),

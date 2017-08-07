@@ -77,7 +77,10 @@ public final class Files {
 
     // internal shortcut
     private static FileSystemProvider providerOf(final Path path) {
-        return path.getFileSystem().provider();
+        //proxy
+        //get file system
+        FileSystem fileSystem = path.getFileSystem();
+        return fileSystem.provider();
     }
 
     //contents

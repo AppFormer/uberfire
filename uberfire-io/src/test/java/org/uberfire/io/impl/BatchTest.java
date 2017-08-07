@@ -40,6 +40,7 @@ import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
 import org.uberfire.java.nio.file.api.FileSystemProviders;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemImpl;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 
 import static org.junit.Assert.*;

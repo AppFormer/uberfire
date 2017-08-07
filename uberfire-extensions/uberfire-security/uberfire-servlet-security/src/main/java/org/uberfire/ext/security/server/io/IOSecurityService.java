@@ -831,6 +831,7 @@ public class IOSecurityService implements IOService {
     }
 
     private Resource toResource(final Path path) {
+        //get file system
         return new FileSystemResourceAdaptor(path.getFileSystem());
     }
 

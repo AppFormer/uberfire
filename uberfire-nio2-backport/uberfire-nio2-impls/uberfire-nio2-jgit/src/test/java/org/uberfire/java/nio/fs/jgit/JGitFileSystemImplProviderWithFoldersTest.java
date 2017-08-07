@@ -34,7 +34,7 @@ import org.uberfire.java.nio.fs.jgit.util.GitImpl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class JGitFileSystemProviderWithFoldersTest extends AbstractTestInfra {
+public class JGitFileSystemImplProviderWithFoldersTest extends AbstractTestInfra {
 
     @Test
     public void testNewFileSystemWithSubfolder() {
@@ -60,7 +60,7 @@ public class JGitFileSystemProviderWithFoldersTest extends AbstractTestInfra {
         String oldPath = "git://test/old";
         final URI oldUri = URI.create(oldPath);
         final JGitFileSystem fs = (JGitFileSystem) provider.newFileSystem(oldUri,
-                                                                          env);
+                                                                                  env);
 
         final Path path = provider.getPath(URI.create("git://master@test/old/some/path/myfile.txt"));
         provider.setAttribute(path,
