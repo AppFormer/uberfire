@@ -102,9 +102,6 @@ public class JGitFileSystemLazyCacheTest {
                      fileSystem1Instance2);
 
 
-        //also
-        assertFalse(fileSystem1Instance1.isOpen());
-        assertTrue(fileSystem1Instance2.isOpen());
 
         //let's remove fs1 again from cache
         fsUtils.setupJGitRepository(defaultRepo + "5",

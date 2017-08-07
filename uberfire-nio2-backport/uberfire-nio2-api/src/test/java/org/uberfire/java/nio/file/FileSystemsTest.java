@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.uberfire.java.nio.fs.file.BaseSimpleFileSystem;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystem;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemImpl;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProviderConfiguration;
 import org.uberfire.java.nio.fs.jgit.JGitPathImpl;
@@ -67,7 +68,7 @@ public class FileSystemsTest {
 
         assertThat(fs).isNotNull();
 
-        final FileSystem newFS = FileSystems.newFileSystem(JGitPathImpl.create((JGitFileSystemImpl) fs,
+        final FileSystem newFS = FileSystems.newFileSystem(JGitPathImpl.create((JGitFileSystem) fs,
                                                                                "new_test",
                                                                                "my-other-test",
                                                                                false),

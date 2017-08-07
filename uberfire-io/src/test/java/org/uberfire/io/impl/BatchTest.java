@@ -72,7 +72,7 @@ public class BatchTest {
 
         fs1 = ioService.newFileSystem(newRepo,
                                       new HashMap<String, Object>());
-        fs1Batch = (JGitFileSystemImpl) fs1;
+        fs1Batch = (JGitFileSystem) fs1;
         Path init = ioService.get(URI.create("git://amend-repo-test/init.file"));
         ioService.write(init,
                         "setupFS!");
@@ -84,7 +84,7 @@ public class BatchTest {
                                           put("init",
                                               "true");
                                       }});
-        fs2Batch = (JGitFileSystemImpl) fs2;
+        fs2Batch = (JGitFileSystem) fs2;
         init = ioService.get(URI.create("git://check-amend-repo-test/init.file"));
         ioService.write(init,
                         "setupFS!");
@@ -95,7 +95,7 @@ public class BatchTest {
                                           put("init",
                                               "true");
                                       }});
-        fs3Batch = (JGitFileSystemImpl) fs3;
+        fs3Batch = (JGitFileSystem) fs3;
         init = ioService.get(URI.create("git://check-amend-repo-test-2/init.file"));
         ioService.write(init,
                         "setupFS!");
