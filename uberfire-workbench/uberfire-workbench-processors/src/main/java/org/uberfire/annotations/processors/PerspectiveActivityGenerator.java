@@ -67,6 +67,10 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
         final String beanActivatorClass = GeneratorUtils.getBeanActivatorClassName(classElement,
                                                                                    processingEnvironment);
 
+        final String profile = GeneratorUtils.getProfile(classElement,
+                                                         packageElement,
+                                                         processingEnvironment);
+
         final ExecutableElement onStartupMethod = GeneratorUtils.getOnStartupMethodForNonEditors(classElement,
                                                                                                  processingEnvironment);
 
@@ -127,6 +131,8 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
             messager.printMessage(Kind.NOTE,
                                   "Qualifiers: " + String.join(", ",
                                                                qualifiers));
+            messager.printMessage(Kind.NOTE,
+                                  "Profile: " + profile);
         }
 
         Map<String, Object> root = new HashMap<String, Object>();
@@ -192,6 +198,8 @@ public class PerspectiveActivityGenerator extends AbstractGenerator {
                  isDynamic);
         root.put("qualifiers",
                  qualifiers);
+        root.put("profile",
+                 profile);
 
         //Generate code
         final StringWriter sw = new StringWriter();

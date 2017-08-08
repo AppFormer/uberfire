@@ -465,6 +465,60 @@ public class PerspectiveProcessorTest extends AbstractProcessorTest {
                      result.getActualCode());
     }
 
+    @Test
+    public void testProfileInTheActivity() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest26";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/PerspectiveTest26.expected";
+
+        result.setExpectedCode(getExpectedSourceCode(pathExpectedResult));
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile(
+                getProcessorUnderTest(),
+                pathCompilationUnit);
+
+        assertSuccessfulCompilation(diagnostics);
+        assertNotNull(result.getActualCode());
+        assertNotNull(result.getExpectedCode());
+        assertEquals(result.getExpectedCode(),
+                     result.getActualCode());
+    }
+
+    @Test
+    public void testProfilePackageInTheActivity() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/packagelevel/PerspectiveTest27";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/PerspectiveTest27.expected";
+
+        result.setExpectedCode(getExpectedSourceCode(pathExpectedResult));
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile(
+                getProcessorUnderTest(),
+                pathCompilationUnit);
+
+        assertSuccessfulCompilation(diagnostics);
+        assertNotNull(result.getActualCode());
+        assertNotNull(result.getExpectedCode());
+        assertEquals(result.getExpectedCode(),
+                     result.getActualCode());
+    }
+
+    @Test
+    public void testProfileAnnotationExtensionInTheActivity() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/PerspectiveTest28";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/PerspectiveTest28.expected";
+
+        result.setExpectedCode(getExpectedSourceCode(pathExpectedResult));
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile(
+                getProcessorUnderTest(),
+                pathCompilationUnit);
+
+        assertSuccessfulCompilation(diagnostics);
+        assertNotNull(result.getActualCode());
+        assertNotNull(result.getExpectedCode());
+        assertEquals(result.getExpectedCode(),
+                     result.getActualCode());
+    }
+
     private void printDiagnostics(List<Diagnostic<? extends JavaFileObject>> diagnostics) {
         for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
             System.out.println(diagnostic);

@@ -1,2 +1,3 @@
+org.uberfire.backend.server.cdi.profile.ProfileExtension
 org.uberfire.backend.server.cdi.SystemConfigProducer
 org.uberfire.backend.server.cdi.workspace.WorkspaceScopedExtension

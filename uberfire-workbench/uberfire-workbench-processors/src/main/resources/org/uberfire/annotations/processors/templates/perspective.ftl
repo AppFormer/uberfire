@@ -68,6 +68,10 @@ import jsinterop.annotations.JsType;
 import org.jboss.errai.ioc.client.api.Shared;
 
 </#if>
+<#if profile??>
+import org.jboss.errai.ioc.client.api.EnabledByProperty;
+
+</#if>
 @Dependent
 @Generated("org.uberfire.annotations.processors.WorkbenchPerspectiveProcessor")
 @Named("${identifier}")
@@ -76,6 +80,9 @@ import org.jboss.errai.ioc.client.api.Shared;
 </#if>
 <#if isDynamic>
 @JsType
+</#if>
+<#if profile??>
+@EnabledByProperty(value="org.uberfire.profile.active", matchValue="${profile}", defaultValue="${profile}")
 </#if>
 <#list qualifiers as qualifier>
 ${qualifier}

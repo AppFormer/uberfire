@@ -92,6 +92,10 @@ public class ScreenActivityGenerator extends AbstractGenerator {
         final String beanActivatorClass = GeneratorUtils.getBeanActivatorClassName(classElement,
                                                                                    processingEnvironment);
 
+        final String profile = GeneratorUtils.getProfile(classElement,
+                                                         packageElement,
+                                                         processingEnvironment);
+
         final ExecutableElement onStartupMethod = GeneratorUtils.getOnStartupMethodForNonEditors(classElement,
                                                                                                  processingEnvironment);
 
@@ -216,6 +220,8 @@ public class ScreenActivityGenerator extends AbstractGenerator {
             messager.printMessage(Kind.NOTE,
                                   "Qualifiers: " + String.join(", ",
                                                                qualifiers));
+            messager.printMessage(Kind.NOTE,
+                                  "Profile: " + profile);
         }
 
         //Validate getWidgetMethodName and isWidget
@@ -300,6 +306,8 @@ public class ScreenActivityGenerator extends AbstractGenerator {
                  isDynamic);
         root.put("qualifiers",
                  qualifiers);
+        root.put("profile",
+                 profile);
 
         //Generate code
         final StringWriter sw = new StringWriter();

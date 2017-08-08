@@ -41,6 +41,8 @@ import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.jboss.errai.security.shared.api.Role;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.service.AuthenticationService;
+import org.slf4j.Logger;
+import org.uberfire.backend.profile.ProfileManager;
 import org.uberfire.client.menu.CustomSplashHelp;
 import org.uberfire.client.menu.WorkbenchViewModeSwitcherMenuBuilder;
 import org.uberfire.client.mvp.ActivityManager;
@@ -112,6 +114,10 @@ public class ShowcaseEntryPoint {
     private ErrorPopupView errorPopupView;
     @Inject
     private PatternFlyEntryPoint pflyEntryPoint;
+    @Inject
+    private Caller<ProfileManager> profileManager;
+    @Inject
+    private Logger logger;
 
     public static List<MenuItem> getScreens() {
         final List<MenuItem> screens = new ArrayList<>();
@@ -152,8 +158,10 @@ public class ShowcaseEntryPoint {
         PatternFlyBootstrapper.ensureMomentIsAvailable();
         PatternFlyBootstrapper.ensureBootstrapDateRangePickerIsAvailable();
         hideLoadingPopup();
-        GWT.log("PatternFly version: " + pflyEntryPoint.getPatternFlyVersion());
-        GWT.log("Loaded MomentJS using locale: " + pflyEntryPoint.getMomentLocale());
+        logger.info("PatternFly version: {}", pflyEntryPoint.getPatternFlyVersion());
+        logger.info("Loaded MomentJS using locale: {}", pflyEntryPoint.getMomentLocale());
+        profileManager.call(enabled -> logger.info("Is test profile active: {}",
+                                                   enabled)).isProfileEnabled("test");
     }
 
     private void setupMenu(@Observes final ApplicationReadyEvent event) {

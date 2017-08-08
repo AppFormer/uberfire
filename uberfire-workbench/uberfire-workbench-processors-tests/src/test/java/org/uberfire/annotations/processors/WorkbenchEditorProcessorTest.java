@@ -544,4 +544,22 @@ public class WorkbenchEditorProcessorTest extends AbstractProcessorTest {
         assertEquals(result.getExpectedCode(),
                      result.getActualCode());
     }
+
+    @Test
+    public void testProfileInTheActivity() throws FileNotFoundException {
+        final String pathCompilationUnit = "org/uberfire/annotations/processors/WorkbenchEditorTest30";
+        final String pathExpectedResult = "org/uberfire/annotations/processors/expected/WorkbenchEditorTest30.expected";
+
+        result.setExpectedCode(getExpectedSourceCode(pathExpectedResult));
+
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = compile(
+                getProcessorUnderTest(),
+                pathCompilationUnit);
+
+        assertSuccessfulCompilation(diagnostics);
+        assertNotNull(result.getActualCode());
+        assertNotNull(result.getExpectedCode());
+        assertEquals(result.getExpectedCode(),
+                     result.getActualCode());
+    }
 }

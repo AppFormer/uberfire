@@ -45,11 +45,18 @@ import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.ioc.client.api.ActivatedBy;
 
 </#if>
+<#if profile??>
+import org.jboss.errai.ioc.client.api.EnabledByProperty;
+
+</#if>
 @Dependent
 @Generated("org.uberfire.annotations.processors.WorkbenchPopupProcessor")
 @Named("${identifier}")
 <#if beanActivatorClass??>
 @ActivatedBy(${beanActivatorClass}.class)
+</#if>
+<#if profile??>
+@EnabledByProperty(value="org.uberfire.profile.active", matchValue="${profile}", defaultValue="${profile}")
 </#if>
 <#list qualifiers as qualifier>
 ${qualifier}
