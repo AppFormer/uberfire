@@ -1,21 +1,22 @@
+#!/bin/bash -e
 # clone the repository and the release-branch
 
-if [ "$TARGET" == "productized" ]; then   
-   git clone git@github.com:jboss-integration/uberfire.git --branch $RELEASE_BRANCH
+if [ "$target" == "productized" ]; then
+   git clone git@github.com:jboss-integration/uberfire.git --branch $releaseBranch
 else 
-   git clone git@github.com:uberfire/uberfire.git --branch $RELEASE_BRANCH
+   git clone git@github.com:uberfire/uberfire.git --branch $releaseBranch
 fi
 
-commitMSG="Tagging $TAG"
+commitMsg="Tagging $tag"
 
 # pushes the TAG to jboss-integration or droolsjbpm [IMPORTANT: "push -n" (--dryrun) should be replaced by "push" when script is ready]
 if [ "$TARGET" == "productized" ]; then
    cd $WORKSPACE/uberfire
-   git tag -a $TAG -m "$commitMSG"
+   git tag -a $tag -m "$commitMsg"
    git remote add upstream git@github.com:jboss-integration/uberfire.git
-   git push upstream $TAG
+   git push upstream $tag
 else
    cd $WORKSPACE/uberfire
-   git tag -a $TAG -m "$commitMSG"
-   git push origin $TAG
+   git tag -a $tag -m "$commitMsg"
+   git push origin $tag
 fi
