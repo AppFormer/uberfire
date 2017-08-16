@@ -47,13 +47,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- EJB for AsyncExecutorService -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.ejb</groupId>
-      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
 
@@ -65,13 +58,13 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>org.uberfire.commons</Bundle-SymbolicName>
+            <Export-Package>
+              org.uberfire.commons.*
+            </Export-Package>
             <Import-Package>
-              !org.uberfire.commons,
               *
             </Import-Package>
-            <Export-Package>
-              org.uberfire.commons
-            </Export-Package>
+            <_removeheaders>Private-Package</_removeheaders>
           </instructions>
         </configuration>
       </plugin>
