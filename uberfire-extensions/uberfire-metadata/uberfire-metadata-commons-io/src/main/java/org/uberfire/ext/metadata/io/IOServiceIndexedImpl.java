@@ -66,7 +66,7 @@ public class IOServiceIndexedImpl extends IOServiceDotFileImpl {
     private final BatchIndex batchIndex;
 
     private final Class<? extends FileAttributeView>[] views;
-    private final List<FileSystem> watchedList = new ArrayList<FileSystem>();
+    private final List<String> watchedList = new ArrayList<>();
     private final List<WatchService> watchServices = new ArrayList<WatchService>();
 
     private final Observer observer;
@@ -254,11 +254,11 @@ public class IOServiceIndexedImpl extends IOServiceDotFileImpl {
     }
 
     protected void setupWatchService(final FileSystem fs) {
-        if (watchedList.contains(fs)) {
+        if (watchedList.contains(fs.getName())) {
             return;
         }
         final WatchService ws = fs.newWatchService();
-        watchedList.add(fs);
+        watchedList.add(fs.getName());
         watchServices.add(ws);
 
         final ExecutorService defaultInstance = this.executorService;

@@ -18,9 +18,6 @@ package org.uberfire.java.nio.fs.jgit.util.commands;
 
 import org.uberfire.java.nio.fs.jgit.util.GitImpl;
 
-/**
- * TODO: update me
- */
 public class CreateBranch {
 
     private final GitImpl git;

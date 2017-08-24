@@ -170,7 +170,7 @@ public class PluginMediaServlet
                 }
 
                 try {
-                    ioService.startBatch();
+                    ioService.startBatch(path.getFileSystem());
                     writeFile(ioService,
                               path,
                               fileItem);

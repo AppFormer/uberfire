@@ -19,17 +19,55 @@ package org.uberfire.io.lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.LockableFileSystem;
 
 public class BatchLockControl {
 
     private ReentrantLock lock = new ReentrantLock(true);
+    private FileSystem fileSystemOnBatch;
 
-    public void lock(final FileSystem... fileSystems) {
+    public void lock(final FileSystem fs) {
         lock.lock();
+        makeSureThatIsOnlyOneFSOnCurrentBatch(fs);
+        if (!isAlreadyOnBatch(fs)) {
+            if (isLockable(fs)) {
+                fileSystemOnBatch = fs;
+                ((LockableFileSystem) fs).lock();
+            } else {
+                throw new BatchRuntimeException("Not a LockableFileSystem : "
+                                                        + fileSystemOnBatch.toString());
+            }
+        }
+    }
+
+    private void makeSureThatIsOnlyOneFSOnCurrentBatch(FileSystem fs) {
+        if (fileSystemOnBatch != null && !fileSystemOnBatch.equals(fs)) {
+            lock.unlock();
+            throw new BatchRuntimeException("We already have a batch process running on another FS : "
+                                                    + fileSystemOnBatch.toString());
+        }
+    }
+
+    private boolean isAlreadyOnBatch(FileSystem fileSystem) {
+        return fileSystemOnBatch != null && fileSystemOnBatch.equals(fileSystem);
     }
 
     public void unlock() {
-        lock.unlock();
+        if (lock.isLocked()) {
+            if (shouldUnlockLockedFileSystems()) {
+                ((LockableFileSystem) fileSystemOnBatch).unlock();
+                fileSystemOnBatch = null;
+            }
+            lock.unlock();
+        }
+    }
+
+    private boolean shouldUnlockLockedFileSystems() {
+        return lock.getHoldCount() == 1 && fileSystemOnBatch != null && isLockable(fileSystemOnBatch);
+    }
+
+    private boolean isLockable(FileSystem fileSystem) {
+        return fileSystem instanceof LockableFileSystem;
     }
 
     public boolean isLocked() {
@@ -38,5 +76,16 @@ public class BatchLockControl {
 
     public int getHoldCount() {
         return lock.getHoldCount();
+    }
+
+    public FileSystem getFileSystemOnBatch() {
+        return fileSystemOnBatch;
+    }
+
+    public class BatchRuntimeException extends RuntimeException {
+
+        public BatchRuntimeException(String message) {
+            super(message);
+        }
     }
 }
