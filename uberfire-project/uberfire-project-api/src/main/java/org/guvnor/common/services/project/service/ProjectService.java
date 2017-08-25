@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.guvnor.common.services.project.service;
 
-import org.guvnor.common.services.project.model.Project;
+import java.util.Collection;
+
+import org.guvnor.common.services.project.model.Module;
+import org.guvnor.common.services.project.model.POM;
+import org.guvnor.common.services.project.model.WorkspaceProject;
+import org.guvnor.structure.organizationalunit.OrganizationalUnit;
+import org.guvnor.structure.repositories.Branch;
+import org.guvnor.structure.repositories.Repository;
 import org.jboss.errai.bus.server.annotations.Remote;
+import org.uberfire.backend.vfs.Path;
 
 @Remote
-public interface ProjectService<T extends Project>
-        extends ProjectResourceResolver<T>,
-                ProjectServiceCore<T> {
+public interface ProjectService {
 
+    Collection<WorkspaceProject> getAllProjects();
+
+    Collection<WorkspaceProject> getAllProjects(final OrganizationalUnit organizationalUnit);
+
+    WorkspaceProject newProject(final OrganizationalUnit organizationalUnit,
+                                final POM pom);
+
+    WorkspaceProject newProject(final OrganizationalUnit organizationalUnit,
+                                final POM pom,
+                                final DeploymentMode mode);
+
+    WorkspaceProject resolveProject(final Repository repository);
+
+    WorkspaceProject resolveProject(final Branch branch);
+
+    WorkspaceProject resolveProject(final Module module);
+
+    WorkspaceProject resolveProject(final Path module);
+
+    WorkspaceProject resolveProject(final String name);
+
+    WorkspaceProject resolveProjectByRepositoryAlias(final String repositoryAlias);
 }

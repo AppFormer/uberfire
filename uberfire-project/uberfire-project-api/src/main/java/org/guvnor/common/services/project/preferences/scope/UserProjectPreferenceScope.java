@@ -20,7 +20,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.guvnor.common.services.project.context.ProjectContext;
-import org.guvnor.common.services.project.model.Project;
+import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.shared.preferences.GuvnorPreferenceScopes;
 import org.uberfire.preferences.shared.PreferenceScope;
 import org.uberfire.preferences.shared.PreferenceScopeFactory;
@@ -33,7 +33,7 @@ public class UserProjectPreferenceScope implements PreferenceScopeBean {
 
     private ProjectContext projectContext;
 
-    private Project project;
+    private WorkspaceProject workspaceProject;
 
     @Inject
     public UserProjectPreferenceScope(final PreferenceScopeFactory scopeFactory,
@@ -42,27 +42,27 @@ public class UserProjectPreferenceScope implements PreferenceScopeBean {
         this.projectContext = projectContext;
     }
 
-    public UserProjectPreferenceScope forProject(final Project project) {
-        this.project = project;
+    public UserProjectPreferenceScope forProject(final WorkspaceProject workspaceProject) {
+        this.workspaceProject = workspaceProject;
         return this;
     }
 
     @Override
     public PreferenceScope resolve() {
-        if (project != null) {
-            return createProjectScope(project);
+        if (workspaceProject != null) {
+            return createProjectScope(workspaceProject);
         }
 
-        if (projectContext.getActiveProject() != null) {
-            return createProjectScope(projectContext.getActiveProject());
+        if (projectContext.getActiveWorkspaceProject() != null) {
+            return createProjectScope(projectContext.getActiveWorkspaceProject());
         }
 
         throw new RuntimeException("A project must be selected or be active to use this scope.");
     }
 
-    private PreferenceScope createProjectScope(final Project project) {
+    private PreferenceScope createProjectScope(final WorkspaceProject workspaceProject) {
         final PreferenceScope projectScope = scopeFactory.createScope(GuvnorPreferenceScopes.PROJECT,
-                                                                      project.getEncodedIdentifier());
+                                                                      workspaceProject.getEncodedIdentifier());
         final PreferenceScope userProjectScope = scopeFactory.createScope(GuvnorPreferenceScopes.USER,
                                                                           projectScope);
 

@@ -24,6 +24,6 @@ public interface ProjectWizard {
 
     void initialise(final POM pom);
 
-    void start(final Callback<Project> callback,
+    void start(final Callback<WorkspaceProject> callback,
                final boolean openEditor);
 }
