@@ -141,6 +141,13 @@ public class BaseGridData implements GridData {
     }
 
     @Override
+    public void reindexColumns() {
+        for (int index = 0; index < columns.size(); index++) {
+            columns.get(index).setIndex(index);
+        }
+    }
+
+    @Override
     public List<GridRow> getRows() {
         return Collections.unmodifiableList(rows);
     }
