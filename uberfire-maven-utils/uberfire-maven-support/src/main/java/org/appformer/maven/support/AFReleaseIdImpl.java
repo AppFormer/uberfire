@@ -131,7 +131,7 @@ public class AFReleaseIdImpl implements AFReleaseId,
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof AFReleaseIdImpl)) {
             return false;
         }
 
