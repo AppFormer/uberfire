@@ -44,7 +44,7 @@ import static org.jboss.errai.common.client.dom.DOMUtil.removeAllChildren;
 /**
  * The view component of the templated panel system. This view supports an arbitrary number of child panel views, each
  * identified by a {@link NamedPosition}.
- * <p>
+ * <p/>
  * This view does not support having parts added to it directly, so it also does not support drag-and-drop of parts.
  * @see TemplatedWorkbenchPanelPresenter
  * @see WorkbenchPanel
@@ -178,6 +178,11 @@ public class TemplatedWorkbenchPanelView implements WorkbenchPanelView<Templated
                                                      elementId);
             }
         }
+    }
+
+    @Override
+    public void disableMaximization() {
+        layoutSelection.get().disableMaximization();
     }
 
     @Override

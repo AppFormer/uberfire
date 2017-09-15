@@ -121,12 +121,17 @@ public abstract class AbstractWorkbenchPanelView<P extends WorkbenchPanelPresent
     }
 
     @Override
+    public void disableMaximization() {
+        layoutSelection.get().disableMaximization();
+    }
+
+    @Override
     public void maximize() {
-        layoutSelection.get().maximize(this);
+        layoutSelection.get().maximize(asWidget());
     }
 
     @Override
     public void unmaximize() {
-        layoutSelection.get().unmaximize(this);
+        layoutSelection.get().unmaximize(asWidget());
     }
 }

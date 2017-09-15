@@ -113,6 +113,15 @@ public class WorkbenchLayoutImplTest {
     }
 
     @Test
+    public void testMaximizeWithMaximizationDisabled() {
+        workbenchLayout.disableMaximization();
+        workbenchLayout.maximize(widget);
+
+        verify(widget,
+               never()).addStyleName(WorkbenchLayoutImpl.UF_MAXIMIZED_PANEL);
+    }
+
+    @Test
     public void testExpandAnimation() {
         final WorkbenchLayoutImpl.ExpandAnimation expandAnimation = new WorkbenchLayoutImpl.ExpandAnimation(widget,
                                                                                                             Maps.<Widget, WorkbenchLayoutImpl.OriginalStyleInfo>newHashMap(),
@@ -133,6 +142,19 @@ public class WorkbenchLayoutImplTest {
 
         verify(((RequiresResize) widget),
                never()).onResize();
+    }
+
+    @Test
+    public void testUnMaximizeWithMaximizationDisabled() {
+        workbenchLayout.disableMaximization();
+
+        workbenchLayout.maximize(widget);
+        workbenchLayout.unmaximize(widget);
+
+        verify(widget,
+               never()).addStyleName(WorkbenchLayoutImpl.UF_MAXIMIZED_PANEL);
+        verify(widget,
+               never()).removeStyleName(WorkbenchLayoutImpl.UF_MAXIMIZED_PANEL);
     }
 
     @Test

@@ -28,6 +28,8 @@ import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PartDefinition;
+import org.uberfire.workbench.model.PerspectiveDefinition;
+import org.uberfire.workbench.model.PerspectiveDefinitionOption;
 
 import static org.uberfire.workbench.model.ContextDisplayMode.SHOW;
 
@@ -48,14 +50,18 @@ public abstract class AbstractMultiPartWorkbenchPanelPresenter<P extends Abstrac
     }
 
     private void buildPerspectiveContext() {
-        final ContextDefinition contextDefinition = perspectiveManager.getLivePerspectiveDefinition().getContextDefinition();
-        final ContextDisplayMode contextDisplayMode = perspectiveManager.getLivePerspectiveDefinition().getContextDisplayMode();
+        final PerspectiveDefinition livePerspectiveDefinition = perspectiveManager.getLivePerspectiveDefinition();
+        final ContextDefinition contextDefinition = livePerspectiveDefinition.getContextDefinition();
+        final ContextDisplayMode contextDisplayMode = livePerspectiveDefinition.getContextDisplayMode();
         if (contextDefinition != null && contextDisplayMode == SHOW) {
             final ContextActivity activity = activityManager.getActivity(ContextActivity.class,
                                                                          contextDefinition.getPlace());
             if (activity != null) {
                 perspectiveContext = activity;
             }
+        }
+        if (livePerspectiveDefinition.hasOption(PerspectiveDefinitionOption.MAXIMIZATION_DISABLED)) {
+            disableMaximization();
         }
     }
 

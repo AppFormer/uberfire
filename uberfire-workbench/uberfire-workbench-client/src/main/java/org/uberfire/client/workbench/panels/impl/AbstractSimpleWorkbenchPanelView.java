@@ -145,6 +145,11 @@ public abstract class AbstractSimpleWorkbenchPanelView<P extends WorkbenchPanelP
     }
 
     @Override
+    public void disableMaximization() {
+        listBar.getMaximizeButton().setVisible(false);
+    }
+
+    @Override
     public void setElementId(String elementId) {
         super.setElementId(elementId);
         listBar.getMaximizeButton().getView().asWidget().ensureDebugId(elementId + "-maximizeButton");

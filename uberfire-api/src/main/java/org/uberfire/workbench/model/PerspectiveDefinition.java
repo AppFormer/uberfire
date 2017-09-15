@@ -23,7 +23,7 @@ import jsinterop.annotations.JsType;
  * multiple Parts, one of which can be visible at a time. Panels can also contain child panels which are all visible at
  * the same time are are physically located within the bounds of the parent panel. Each Part is associated with one
  * PlaceRequest.
- * <p>
+ * <p/>
  * Implementations of this interface must be marked with Errai's {@code @Portable} annotation.
  */
 @JsType
@@ -55,4 +55,10 @@ public interface PerspectiveDefinition {
     ContextDisplayMode getContextDisplayMode();
 
     void setContextDisplayMode(final ContextDisplayMode contextDisplayMode);
+
+    PerspectiveDefinitionOption[] getOptions();
+
+    void setOptions(PerspectiveDefinitionOption... options);
+
+    boolean hasOption(PerspectiveDefinitionOption fullscreenDisabled);
 }

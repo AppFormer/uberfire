@@ -80,6 +80,11 @@ public class MultiListWorkbenchPanelView
     }
 
     @Override
+    public void disableMaximization() {
+        listBar.getMaximizeButton().setVisible(false);
+    }
+
+    @Override
     public Collection<PartDefinition> getParts() {
         return listBar.getParts();
     }

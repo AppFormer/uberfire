@@ -26,6 +26,7 @@ import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.CompassPosition;
 import org.uberfire.workbench.model.ContextDefinition;
+import org.uberfire.workbench.model.PerspectiveDefinitionOption;
 import org.uberfire.workbench.model.impl.ContextDefinitionImpl;
 import org.uberfire.workbench.model.impl.PanelDefinitionImpl;
 import org.uberfire.workbench.model.impl.PartDefinitionImpl;
@@ -228,5 +229,25 @@ public abstract class AbstractMultiPartWorkbenchPanelPresenterTest extends Abstr
                      presenter.getDefinition().getChild(CompassPosition.NORTH));
         verify(childPanelPresenter,
                never()).setParent(null);
+    }
+
+    @Test
+    public void maximizationShouldBeDisabledWhenPerspectiveDefinitionHasTheOptionToDisableIt() {
+        AbstractMultiPartWorkbenchPanelPresenter<?> presenter = getPresenterToTest();
+
+        panelManagerPerspectiveDefinition.setOptions(PerspectiveDefinitionOption.MAXIMIZATION_DISABLED);
+        presenter.setDefinition(panelPresenterPanelDefinition);
+
+        verify(view).disableMaximization();
+    }
+
+    @Test
+    public void maximizationShouldNotBeDisabledWhenPerspectiveDefinitionDoesNotHaveTheOptionToDisableIt() {
+        AbstractMultiPartWorkbenchPanelPresenter<?> presenter = getPresenterToTest();
+
+        presenter.setDefinition(panelPresenterPanelDefinition);
+
+        verify(view,
+               never()).disableMaximization();
     }
 }
