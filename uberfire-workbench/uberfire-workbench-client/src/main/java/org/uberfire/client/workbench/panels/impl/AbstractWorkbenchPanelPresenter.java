@@ -34,7 +34,7 @@ import static org.uberfire.debug.Debug.objectId;
 
 /**
  * Basic implementation of common functionality in a panel presenter.
- * <p>
+ * <p/>
  * At the least, concrete subclasses have to implement {@link #asPresenterType()} to return {@code this}. Subclasses may
  * override other methods as necessary to customize behaviour for use with specialized layouts and view implementations.
  */
@@ -208,6 +208,11 @@ public abstract class AbstractWorkbenchPanelPresenter<P extends AbstractWorkbenc
     @Override
     public void unmaximize() {
         view.unmaximize();
+    }
+
+    @Override
+    public void disableMaximization() {
+        view.disableMaximization();
     }
 
     @Override

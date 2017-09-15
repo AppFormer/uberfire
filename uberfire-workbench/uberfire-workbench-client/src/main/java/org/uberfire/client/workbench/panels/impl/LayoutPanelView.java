@@ -143,6 +143,11 @@ public class LayoutPanelView implements WorkbenchPanelView<LayoutPanelPresenter>
     }
 
     @Override
+    public void disableMaximization() {
+        layoutSelection.get().disableMaximization();
+    }
+
+    @Override
     public void maximize() {
         layoutSelection.get().maximize(asWidget());
     }

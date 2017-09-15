@@ -109,6 +109,8 @@ public class WorkbenchLayoutImpl implements WorkbenchLayout {
      */
     private WorkbenchPickupDragController dragController;
 
+    private boolean maximizationDisabled = false;
+
     public WorkbenchLayoutImpl() {
 
     }
@@ -240,6 +242,10 @@ public class WorkbenchLayoutImpl implements WorkbenchLayout {
 
     @Override
     public void maximize(final Widget w) {
+        if (maximizationDisabled) {
+            return;
+        }
+
         if (maximizedWidgetOriginalStyles.get(w) != null) {
             return;
         }
@@ -254,11 +260,19 @@ public class WorkbenchLayoutImpl implements WorkbenchLayout {
 
     @Override
     public void unmaximize(Widget w) {
+        if (maximizationDisabled) {
+            return;
+        }
 
         w.removeStyleName(UF_MAXIMIZED_PANEL);
 
         new CollapseAnimation(w,
                               maximizedWidgetOriginalStyles).run();
+    }
+
+    @Override
+    public void disableMaximization() {
+        this.maximizationDisabled = true;
     }
 
     @Override

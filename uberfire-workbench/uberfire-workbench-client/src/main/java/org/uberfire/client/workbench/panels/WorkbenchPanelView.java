@@ -32,13 +32,13 @@ import org.uberfire.workbench.model.Position;
 /**
  * Manages the Widget and DOM interaction of a panel. Part of the UberFire MVC system for panels. For a full explanation
  * of what a panel is in UberFire, see the class-level documentation for {@link WorkbenchPanelPresenter}.
- * <p>
+ * <p/>
  * <h2>View Lifecycle</h2>
- * <p>
+ * <p/>
  * UberFire Panel Views are Dependent-scoped beans managed by the Errai IOC container. Views are always created by
  * injection into their presenter, which ties their bean lifecycle to that of the presenter: they are created when the
  * presenter is created, and they are destroyed when the presenter is destroyed.
- * <p>
+ * <p/>
  * This is the lifecycle of a WorkbenchPanelView:
  * <ol>
  * <li>The view's constructor is invoked by Errai IOC. At this point, it is not yet safe to access injected
@@ -138,7 +138,7 @@ public interface WorkbenchPanelView<P extends WorkbenchPanelPresenter> extends U
      * simple panel types that do not support child panels, this will typically be the same widget returned by
      * {@link #asWidget()}. For fancier panels, this will typically be some child panel within the view's
      * internal structure.
-     * <p>
+     * <p/>
      * If the return value is null, parts will not be droppable on this view.
      */
     Widget getPartDropRegion();
@@ -152,6 +152,11 @@ public interface WorkbenchPanelView<P extends WorkbenchPanelPresenter> extends U
      * Restores this view to its original unmaximized size and position using {@link WorkbenchLayout#unmaximize(Widget)}.
      */
     void unmaximize();
+
+    /**
+     * Disables the maximize button on child screens.
+     */
+    void disableMaximization();
 
     /**
      * Returns the parts currently held by the view.

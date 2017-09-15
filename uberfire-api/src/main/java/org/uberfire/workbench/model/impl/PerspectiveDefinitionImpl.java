@@ -20,6 +20,7 @@ import org.uberfire.workbench.model.ContextDefinition;
 import org.uberfire.workbench.model.ContextDisplayMode;
 import org.uberfire.workbench.model.PanelDefinition;
 import org.uberfire.workbench.model.PerspectiveDefinition;
+import org.uberfire.workbench.model.PerspectiveDefinitionOption;
 
 import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
 import static org.uberfire.workbench.model.ContextDisplayMode.SHOW;
@@ -36,6 +37,7 @@ public class PerspectiveDefinitionImpl
     private String name;
     private ContextDefinition contextDefinition;
     private ContextDisplayMode contextDisplayMode = SHOW;
+    private PerspectiveDefinitionOption[] options;
 
     public PerspectiveDefinitionImpl() {
         this("org.uberfire.client.workbench.panels.impl.MultiTabWorkbenchPanelPresenter");
@@ -82,6 +84,29 @@ public class PerspectiveDefinitionImpl
     @Override
     public void setContextDisplayMode(final ContextDisplayMode contextDisplayMode) {
         this.contextDisplayMode = contextDisplayMode;
+    }
+
+    @Override
+    public PerspectiveDefinitionOption[] getOptions() {
+        return options;
+    }
+
+    @Override
+    public void setOptions(PerspectiveDefinitionOption... options) {
+        this.options = options;
+    }
+
+    @Override
+    public boolean hasOption(final PerspectiveDefinitionOption option) {
+        if (options != null) {
+            for (PerspectiveDefinitionOption existentOption : options) {
+                if (existentOption.equals(option)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

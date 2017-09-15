@@ -39,7 +39,7 @@ import static org.uberfire.plugin.PluginUtil.ensureIterable;
 /**
  * Corresponding view to {@link SplitLayoutPanelPresenter}. Only supports panels, not parts.
  * Enforces lifecycle callbacks on center parts.
- * <p>
+ * <p/>
  * Since this panel cannot hold parts, it also does not support drag-and-drop of parts.
  */
 @Dependent
@@ -166,6 +166,11 @@ public class SplitLayoutPanelView implements WorkbenchPanelView<SplitLayoutPanel
             asWidget().getElement().setAttribute("id",
                                                  elementId);
         }
+    }
+
+    @Override
+    public void disableMaximization() {
+        layoutSelection.get().disableMaximization();
     }
 
     @Override

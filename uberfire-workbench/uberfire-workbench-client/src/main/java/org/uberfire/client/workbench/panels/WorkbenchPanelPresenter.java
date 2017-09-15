@@ -59,12 +59,12 @@ public interface WorkbenchPanelPresenter {
     /**
      * Adds the given part to this panel's content area, updating this panel's definition and the part's definition to
      * reflect the new part ownership.
-     * <p>
+     * <p/>
      * Panels each implement their own policy and user interface for part management. Some panels do not support parts
      * at all; others allow only a single part; still others can hold multiple parts at a time. Either way, panels that
      * do display parts typically display them one at a time. Those that support multiple parts include UI widgets
      * (eg. tabs or a dropdown list) that let the user select which one to display.
-     * <p>
+     * <p/>
      * After the panel's border decorations, part switcher UI, title bar, and subpanel space has been accounted for, the
      * part's view typically occupies all remaining space within its parent panel.
      * @param part the part to add. Must not be null, and must not currently belong to any panel.
@@ -94,7 +94,7 @@ public interface WorkbenchPanelPresenter {
      * Adds the given panel as a subpanel of this one in the given position. Panels typically only allow one child panel
      * in each position, and may throw an exception or make alternative arrangements (for example, forward the request
      * to a child panel) when you try to add a child panel to an already-occupied slot.
-     * <p>
+     * <p/>
      * Subpanels are typically always visible, and take up space within the bounds of their parent panel.
      * @param child the panel to add. The presenter, its view, and its definition must not belong to any parent. As a side
      * effect of this call (if the call is successful), the given presenter, its view, and its definition
@@ -139,6 +139,8 @@ public interface WorkbenchPanelPresenter {
      * Restores this panel's view to its original unmaximized size and position.
      */
     public void unmaximize();
+
+    void disableMaximization();
 
     /**
      * Returns the view that was given to this panel when it was first created.
