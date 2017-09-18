@@ -225,6 +225,7 @@ public abstract class AbstractIOWatchService implements IOWatchService,
         if (executor == null) {
             IOWatchServiceExecutor _executor = null;
             try {
+                //why? ederign
                 _executor = InitialContext.doLookup("java:module/IOWatchServiceExecutorImpl");
             } catch (final Exception ignored) {
             }
