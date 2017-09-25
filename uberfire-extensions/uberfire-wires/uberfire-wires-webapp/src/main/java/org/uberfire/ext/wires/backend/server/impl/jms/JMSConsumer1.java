@@ -1,4 +1,4 @@
-package org.uberfire.ext.wires.backend.server.impl;
+package org.uberfire.ext.wires.backend.server.impl.jms;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,18 +16,18 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 @TransactionManagement(TransactionManagementType.BEAN)
-@MessageDriven(name = "JMSConsumer3", activationConfig = {
+@MessageDriven(name = "JMSConsumer1", activationConfig = {
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "topic/APPFORMER.CLUSTER.MESSAGE"),
         @ActivationConfigProperty(propertyName = "destinationJndiName", propertyValue = "topic/APPFORMER.CLUSTER.MESSAGE"),
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")})
-public class JMSConsumer3 implements MessageListener {
+public class JMSConsumer1 implements MessageListener {
 
-    private final static Logger LOGGER = Logger.getLogger(JMSConsumer3.class.toString());
+    private final static Logger LOGGER = Logger.getLogger(JMSConsumer1.class.toString());
 
     @Override
     public void onMessage(Message msg) {
-        String msgText = "\n   "+new Date().toString()+" JMSConsumer3  ";
+        String msgText = "\n   "+ new Date().toString() + " JMSConsumer1  ";
         if (msg instanceof TextMessage) {
             try {
                 msgText += ((TextMessage) msg).getText();
@@ -41,7 +41,9 @@ public class JMSConsumer3 implements MessageListener {
         String filePath = "/tmp/file.txt";
 
         try {
-            Files.write(Paths.get(filePath), msgText.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(filePath),
+                        msgText.getBytes(),
+                        StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("Problem occurs when deleting the directory : " + filePath);
             e.printStackTrace();

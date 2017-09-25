@@ -52,6 +52,7 @@ public class JGitFileSystemsEventsManager {
 
         watchService.publishEvents(watchable,
                                    elist);
+        //ederign publish cluster messages
     }
 
     public void close(String name) {

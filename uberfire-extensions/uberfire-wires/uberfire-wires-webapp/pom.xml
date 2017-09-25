@@ -44,6 +44,19 @@
       <!--<scope>provided</scope>-->
     <!--</dependency>-->
 
+
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-server</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-client</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+
     <!-- JMS -->
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>

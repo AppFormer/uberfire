@@ -31,6 +31,7 @@ import org.jboss.errai.security.shared.service.AuthenticationService;
 import org.uberfire.backend.server.IOWatchServiceNonDotImpl;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
 import org.uberfire.commons.concurrent.Unmanaged;
+import org.uberfire.ext.wires.backend.server.impl.jms.JMSBridge;
 import org.uberfire.ext.wires.shared.social.ShowcaseSocialUserEvent;
 import org.uberfire.io.IOService;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
@@ -50,7 +51,7 @@ public class ApplicationScopedProducer {
     private ExecutorService executorService;
 
     @Inject
-    JMSProducer jmsProducer;
+    JMSBridge jmsProducer;
 
     @Inject
     private JMSContext context;

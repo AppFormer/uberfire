@@ -1,4 +1,4 @@
-package org.uberfire.ext.wires.backend.server.impl;
+package org.uberfire.ext.wires.backend.server.impl.jms;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
