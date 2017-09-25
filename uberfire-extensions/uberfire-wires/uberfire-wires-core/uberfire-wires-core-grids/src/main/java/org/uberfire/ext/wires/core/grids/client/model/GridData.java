@@ -79,6 +79,11 @@ public interface GridData {
                        final List<GridColumn<?>> columns);
 
     /**
+     * Re-index columns
+     */
+    void reindexColumns();
+
+    /**
      * Returns the rows associated with the grid.
      * @return
      */
@@ -121,7 +126,7 @@ public interface GridData {
                    final GridRow row);
 
     /**
-     * Moves rowss to a new index within the grid
+     * Moves rows to a new index within the grid
      * @param index
      * @param rows
      */
