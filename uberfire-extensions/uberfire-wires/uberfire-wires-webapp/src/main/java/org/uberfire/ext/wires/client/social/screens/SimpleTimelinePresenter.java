@@ -59,6 +59,7 @@ public class SimpleTimelinePresenter {
 
     public void fireEvent() {
         event.fire(new ShowcaseSocialUserEvent(loggedUser.getIdentifier()));
+
         updateTimeline();
     }
 

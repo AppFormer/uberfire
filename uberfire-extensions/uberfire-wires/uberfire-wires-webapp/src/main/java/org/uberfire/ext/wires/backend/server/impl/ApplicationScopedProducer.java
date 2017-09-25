@@ -18,7 +18,6 @@ package org.uberfire.ext.wires.backend.server.impl;
 
 import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
@@ -26,7 +25,6 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.jms.JMSContext;
-import javax.jms.Topic;
 
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.service.AuthenticationService;
@@ -51,15 +49,11 @@ public class ApplicationScopedProducer {
 
     private ExecutorService executorService;
 
-//    @Resource(mappedName = "topic/TopicHelloWorld")
-//    private Topic topic;
-
-//    @Resource(mappedName = "java:/topic/HELLOWORLDMDBTopic")
-//    private Topic topic;
+    @Inject
+    JMSProducer jmsProducer;
 
     @Inject
     private JMSContext context;
-
 
     public ApplicationScopedProducer() {
     }
@@ -87,12 +81,8 @@ public class ApplicationScopedProducer {
     }
 
     public void onEvent(@Observes ShowcaseSocialUserEvent event) {
-
-        System.out.println("..");
-//        context.
-//        context.createProducer().send(topic, " Boa Noite Apucarana ");
+        jmsProducer.sendMessage(event.toString());
     }
-
 
     @Produces
     @Named("ioStrategy")
