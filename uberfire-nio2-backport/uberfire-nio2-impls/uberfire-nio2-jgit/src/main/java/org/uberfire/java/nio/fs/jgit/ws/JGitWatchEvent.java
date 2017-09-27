@@ -15,39 +15,42 @@
  */
 package org.uberfire.java.nio.fs.jgit.ws;
 
+import java.net.URI;
+
 import org.eclipse.jgit.diff.DiffEntry;
 import org.uberfire.java.nio.base.WatchContext;
 import org.uberfire.java.nio.file.Path;
+import org.uberfire.java.nio.file.Paths;
 import org.uberfire.java.nio.file.StandardWatchEventKind;
 import org.uberfire.java.nio.file.WatchEvent;
 
 public class JGitWatchEvent implements WatchEvent {
 
+    private final URI oldPath;
+    private final URI newPath;
     private final String sessionId;
     private final String userName;
     private final String message;
-    private final DiffEntry diffEntry;
-    private final Path oldPath;
-    private final Path newPath;
+    private final String changeType;
 
     public JGitWatchEvent(String sessionId,
                           String userName,
                           String message,
-                          DiffEntry diffEntry,
+                          String changeType,
                           Path oldPath,
                           Path newPath) {
 
         this.sessionId = sessionId;
         this.userName = userName;
         this.message = message;
-        this.diffEntry = diffEntry;
-        this.oldPath = oldPath;
-        this.newPath = newPath;
+        this.changeType = changeType;
+        this.oldPath = oldPath != null ? oldPath.toUri() : null;
+        this.newPath = newPath != null ? newPath.toUri() : null;
     }
 
     @Override
     public WatchEvent.Kind kind() {
-        DiffEntry.ChangeType changeType = diffEntry.getChangeType();
+        DiffEntry.ChangeType changeType = DiffEntry.ChangeType.valueOf(this.changeType);
         switch (changeType) {
             case ADD:
             case COPY:
@@ -74,12 +77,12 @@ public class JGitWatchEvent implements WatchEvent {
 
             @Override
             public Path getPath() {
-                return newPath;
+                return newPath != null ? Paths.get(newPath) : null;
             }
 
             @Override
             public Path getOldPath() {
-                return oldPath;
+                return oldPath != null ? Paths.get(oldPath) : null;
             }
 
             @Override
@@ -102,12 +105,12 @@ public class JGitWatchEvent implements WatchEvent {
     @Override
     public String toString() {
         return "WatchEvent{" +
-                "newPath=" + newPath +
-                ", oldPath=" + oldPath +
+                "newPath=" + null +
+                ", oldPath=" + null +
                 ", sessionId='" + sessionId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", message='" + message + '\'' +
-                ", changeType=" + diffEntry.getChangeType() +
+                ", changeType=" + changeType +
                 '}';
     }
 }

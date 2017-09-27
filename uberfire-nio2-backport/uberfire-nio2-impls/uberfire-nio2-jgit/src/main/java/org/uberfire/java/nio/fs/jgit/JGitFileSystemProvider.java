@@ -2428,8 +2428,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             WatchEvent e = new JGitWatchEvent(sessionId,
                                               userName,
                                               message,
-                                              diffEntry,
-                                              oldPath,
+                                              diffEntry.getChangeType().name(),
+                                              fs.getRootDirectories().iterator().next(),
                                               newPath);
             events.add(e);
         }

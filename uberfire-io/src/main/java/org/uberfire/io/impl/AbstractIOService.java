@@ -88,6 +88,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable,
         this.id = DEFAULT_SERVICE_NAME;
         ioWatchService = null;
         PriorityDisposableRegistry.register(this);
+
     }
 
     public AbstractIOService(final String id) {
@@ -251,6 +252,7 @@ public abstract class AbstractIOService implements IOServiceIdentifiable,
             ioWatchService.addWatchService(fs,
                                            fs.newWatchService());
         }
+
 
         fileSystems.add(new FileSystemMetadata(fs));
 

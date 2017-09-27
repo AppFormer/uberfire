@@ -47,11 +47,11 @@ public class JMSBridge {
             jmsBridge = new JMSBridgeImpl(new JNDIConnectionFactoryFactory(sourceJndiParams,
                                                                            "ConnectionFactory"),
                                           new JNDIConnectionFactoryFactory(targetJndiParams,
-                                                                                                                            "ConnectionFactory"),
+                                                                           "ConnectionFactory"),
                                           new JNDIDestinationFactory(sourceJndiParams,
                                                                      "source/topic"),
                                           new JNDIDestinationFactory(targetJndiParams,
-                                                                                                                      "target/queue"),
+                                                                     "target/queue"),
                                           "admin",
                                           "admin",
                                           "admin",
@@ -74,8 +74,10 @@ public class JMSBridge {
             sourceTopic = (Topic) sourceContext.lookup("source/topic");
 
             // Step 4. Create a connection, a session and a message producer for the *source* topic
-            sourceConnection = sourceConnectionFactory.createConnection("admin", "admin");
-            sourceSession = sourceConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            sourceConnection = sourceConnectionFactory.createConnection("admin",
+                                                                        "admin");
+            sourceSession = sourceConnection.createSession(false,
+                                                           Session.AUTO_ACKNOWLEDGE);
             sourceProducer = sourceSession.createProducer(sourceTopic);
 
             MessageConsumer consumer = sourceSession.createConsumer(sourceTopic);
@@ -84,7 +86,7 @@ public class JMSBridge {
 
                 @Override
                 public void onMessage(Message message) {
-                    System.out.println("1234");
+                    System.out.println("Listener");
                     try {
                         System.out.println(((TextMessage) message).getText());
                     } catch (JMSException e) {
@@ -93,14 +95,13 @@ public class JMSBridge {
                 }
             });
             sourceConnection.start();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @PreDestroy
-    public void bla1(){
+    public void bla1() {
         // Step 6. Close the *source* connection
         try {
             sourceConnection.close();
@@ -113,14 +114,7 @@ public class JMSBridge {
 
         TextMessage message = null;
         try {
-            MessageConsumer consumer = sourceSession.createConsumer(sourceTopic);
-            consumer.setMessageListener(new MessageListener() {
 
-                @Override
-                public void onMessage(Message message) {
-                    System.out.println("12345");
-                }
-            });
             message = sourceSession.createTextMessage("this is a text message sent at " + System.currentTimeMillis() + msg);
             sourceProducer.send(message);
         } catch (JMSException e) {

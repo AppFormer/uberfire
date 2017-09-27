@@ -25,12 +25,24 @@ import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
+import org.uberfire.java.nio.fs.jgit.ws.jms.JGitEventsBroadcaster;
 
 public class JGitFileSystemsEventsManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JGitFileSystemsEventsManager.class);
 
     private final Map<String, JGitFileSystemWatchServices> fsWatchServices = new ConcurrentHashMap<>();
+
+    private JGitEventsBroadcaster jGitEventsBroadcaster;
+
+    public JGitFileSystemsEventsManager() {
+
+        final String appFormerCluster = System.getProperty("appformer-cluster",
+                                                           null);
+//        if (appFormerCluster != null) {
+            jGitEventsBroadcaster = new JGitEventsBroadcaster();
+//        }
+    }
 
     public WatchService newWatchService(String fsName)
             throws UnsupportedOperationException, IOException {
@@ -53,6 +65,10 @@ public class JGitFileSystemsEventsManager {
         watchService.publishEvents(watchable,
                                    elist);
         //ederign publish cluster messages
+
+        if (jGitEventsBroadcaster != null) {
+            jGitEventsBroadcaster.sendMessageFIXMENAME(elist);
+        }
     }
 
     public void close(String name) {
