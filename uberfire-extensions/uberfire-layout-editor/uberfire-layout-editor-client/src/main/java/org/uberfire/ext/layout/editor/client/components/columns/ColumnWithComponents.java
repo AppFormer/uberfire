@@ -218,6 +218,10 @@ public class ColumnWithComponents implements Column {
         setColumnWidth(newSize);
     }
 
+    public ParameterizedCommand<Column> getRemoveColumnCommand() {
+        return removeColumnCommand;
+    }
+
     @Override
     public LayoutComponent getLayoutComponent() {
         return null;
