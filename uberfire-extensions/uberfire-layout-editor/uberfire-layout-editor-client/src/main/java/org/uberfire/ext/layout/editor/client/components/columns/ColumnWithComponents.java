@@ -107,6 +107,7 @@ public class ColumnWithComponents implements Column {
         row.init(createDropCommand(),
                  createRowRemoveCommand(),
                  createComponentRemoveCommand(),
+                 this,
                  currentLayoutTemplateSupplier,
                  Row.ROW_DEFAULT_HEIGHT);
     }
@@ -216,6 +217,10 @@ public class ColumnWithComponents implements Column {
     public void incrementWidth() {
         final int newSize = this.columnWidth + 1;
         setColumnWidth(newSize);
+    }
+
+    public ParameterizedCommand<Column> getRemoveColumnCommand() {
+        return removeColumnCommand;
     }
 
     @Override

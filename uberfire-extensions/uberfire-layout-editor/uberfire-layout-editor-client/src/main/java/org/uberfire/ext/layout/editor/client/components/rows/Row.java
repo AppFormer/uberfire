@@ -245,6 +245,7 @@ public class Row {
     public void addColumns(ComponentColumn... _columns) {
         for (ComponentColumn column : _columns) {
             column.setParentId(id);
+            column.setId(idGenerator.createColumnID(id));
             column.setDropCommand(dropCommand());
             columns.add(column);
         }
@@ -297,6 +298,9 @@ public class Row {
     }
 
     ParameterizedCommand<Column> removeColumnCommand() {
+        if(parentColumnWithComponents != null) {
+            return parentColumnWithComponents.getRemoveColumnCommand();
+        }
         return (targetCol) -> {
             removeColumn(targetCol);
         };
@@ -962,6 +966,10 @@ public class Row {
         this.canResizeUp = canResizeUp;
         this.canResizeDown = canResizeDown;
         view.setupResize();
+    }
+
+    public ColumnWithComponents getParentColumnWithComponents() {
+        return parentColumnWithComponents;
     }
 
     public interface View extends UberElement<Row> {
