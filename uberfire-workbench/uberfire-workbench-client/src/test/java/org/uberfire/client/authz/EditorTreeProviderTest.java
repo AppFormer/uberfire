@@ -17,6 +17,7 @@ package org.uberfire.client.authz;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.jboss.errai.ioc.client.container.SyncBeanDef;
 import org.junit.Before;
@@ -37,6 +38,7 @@ import org.uberfire.security.impl.authz.DefaultPermissionManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -106,10 +108,8 @@ public class EditorTreeProviderTest {
         options.setResourceIds(Collections.singletonList(EDITOR1_ID));
         provider.loadChildren(root,
                               options,
-                              children -> {
-                                  assertEquals(children.size(),
-                                               1);
-                              });
+                              children -> assertEquals(children.size(),
+                                                       1));
     }
 
     @Test
@@ -134,8 +134,22 @@ public class EditorTreeProviderTest {
         options.setNodeNamePattern("name");
         provider.loadChildren(root,
                               options,
-                              children -> assertEquals(children.size(),
-                                                       2));
+                              children -> {
+                                  assertEquals(children.size(),
+                                               2);
+                                  assertContains(EDITOR1_NAME,
+                                                 children);
+                                  assertContains(EDITOR2_NAME,
+                                                 children);
+                              });
+    }
+
+    private void assertContains(final String editorName,
+                                final List<PermissionNode> children) {
+        assertTrue(children.stream()
+                           .filter(p -> p.getNodeName().equals(editorName))
+                           .findFirst()
+                           .isPresent());
     }
 
     @Test
@@ -151,6 +165,8 @@ public class EditorTreeProviderTest {
                               children -> {
                                   assertEquals(children.size(),
                                                1);
+                                  assertEquals(EDITOR1_NAME,
+                                               children.get(0).getNodeName());
                               });
     }
 
@@ -167,6 +183,8 @@ public class EditorTreeProviderTest {
                               children -> {
                                   assertEquals(children.size(),
                                                1);
+                                  assertEquals(EDITOR2_NAME,
+                                               children.get(0).getNodeName());
                               });
     }
 
