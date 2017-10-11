@@ -13,8 +13,8 @@ commitMsg="Tagging $tag"
 if [ "$TARGET" == "productized" ]; then
    cd $WORKSPACE/uberfire
    git tag -a $tag -m "$commitMsg"
-   git remote add upstream git@github.com:jboss-integration/uberfire.git
-   git push upstream $tag
+   git remote add gerrit ssh://jb-ip-tooling-jenkins@code.engineering.redhat.com/droolsjbpm-uberfire
+   git push gerrit $tag
 else
    cd $WORKSPACE/uberfire
    git tag -a $tag -m "$commitMsg"
