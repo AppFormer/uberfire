@@ -217,7 +217,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
     private final Map<String, JGitFileSystem> fileSystems = new ConcurrentHashMap<String, JGitFileSystem>();
     private final Set<JGitFileSystem> closedFileSystems = new HashSet<JGitFileSystem>();
     private final Map<Repository, JGitFileSystem> repoIndex = new ConcurrentHashMap<Repository, JGitFileSystem>();
-    private final Map<Repository, ClusterService> clusterMap = new ConcurrentHashMap<Repository, ClusterService>();
+    private ClusterService clusterService;
 
     private final Map<String, String> fullHostNames = new HashMap<String, String>();
 
@@ -316,7 +316,11 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                                                           httpsProxyPassword ) );
     }
 
-    public void onCloseFileSystem( final JGitFileSystem fileSystem ) {
+    public void setupClusterService(final ClusterService clusterService) {
+        this.clusterService = clusterService;
+    }
+
+    public void onCloseFileSystem(final JGitFileSystem fileSystem ) {
         closedFileSystems.add( fileSystem );
 
         synchronized ( oldHeadsOfPendingDiffsLock ) {
@@ -334,7 +338,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         fileSystems.remove( fileSystem.id() );
 
         repoIndex.remove( fileSystem.gitRepo().getRepository() );
-        clusterMap.remove( fileSystem.gitRepo().getRepository() );
     }
 
     public Set<JGitFileSystem> getOpenFileSystems() {
@@ -519,7 +522,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                                        final Repository db ) throws ServiceNotEnabledException, ServiceNotAuthorizedException {
 
                 return new ReceivePack( db ) {{
-                    final ClusterService clusterService = clusterMap.get( db );
                     final JGitFileSystem fs = repoIndex.get( db );
                     final Map<String, RevCommit> oldTreeRefs = new HashMap<String, RevCommit>();
 
@@ -544,44 +546,51 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                         public void onPostReceive( final ReceivePack rp,
                                                    final Collection<ReceiveCommand> commands ) {
                             fs.unlock();
-                            final String userName = req.getUser().getName();
-                            for ( Map.Entry<String, RevCommit> oldTreeRef : oldTreeRefs.entrySet() ) {
-                                final List<RevCommit> commits = JGitUtil.getCommits( fs, oldTreeRef.getKey(), oldTreeRef.getValue(), JGitUtil.getLastCommit( fs.gitRepo(), oldTreeRef.getKey() ) );
-                                for ( final RevCommit revCommit : commits ) {
-                                    final RevTree parent = revCommit.getParentCount() > 0 ? revCommit.getParent( 0 ).getTree() : null;
-                                    notifyDiffs( fs,
-                                                 oldTreeRef.getKey(),
-                                                 "<ssh>",
-                                                 userName,
-                                                 revCommit.getFullMessage(),
-                                                 parent,
-                                                 revCommit.getTree() );
+                            try {
+                                final String userName = req.getUser().getName();
+                                for ( Map.Entry<String, RevCommit> oldTreeRef : oldTreeRefs.entrySet() ) {
+                                    final List<RevCommit> commits = JGitUtil.getCommits( fs, oldTreeRef.getKey(), oldTreeRef.getValue(), JGitUtil.getLastCommit( fs.gitRepo(), oldTreeRef.getKey() ) );
+                                    for ( final RevCommit revCommit : commits ) {
+                                        final RevTree parent = revCommit.getParentCount() > 0 ? revCommit.getParent( 0 ).getTree() : null;
+                                        notifyDiffs( fs,
+                                                     oldTreeRef.getKey(),
+                                                     "<ssh>",
+                                                     userName,
+                                                     revCommit.getFullMessage(),
+                                                     parent,
+                                                     revCommit.getTree() );
+                                    }
                                 }
-                            }
 
-                            if ( clusterService != null ) {
-                                //TODO {porcelli} hack, that should be addressed in future
-                                clusterService.broadcast( DEFAULT_IO_SERVICE_NAME,
-                                                          new MessageType() {
+                                if ( clusterService != null ) {
+                                    //TODO {porcelli} hack, that should be addressed in future
+                                    clusterService.broadcast( DEFAULT_IO_SERVICE_NAME,
+                                                              new MessageType() {
 
-                                                              @Override
-                                                              public String toString() {
-                                                                  return "SYNC_FS";
-                                                              }
+                                                                  @Override
+                                                                  public String toString() {
+                                                                      return "SYNC_FS";
+                                                                  }
 
-                                                              @Override
-                                                              public int hashCode() {
-                                                                  return "SYNC_FS".hashCode();
-                                                              }
-                                                          },
-                                                          new HashMap<String, String>() {{
-                                                              put( "fs_scheme", "git" );
-                                                              put( "fs_id", fs.id() );
-                                                              put( "fs_uri", fs.toString() );
-                                                          }}
-                                );
+                                                                  @Override
+                                                                  public int hashCode() {
+                                                                      return "SYNC_FS".hashCode();
+                                                                  }
+                                                              },
+                                                              new HashMap<String, String>() {{
+                                                                  put( "fs_scheme", "git" );
+                                                                  put( "fs_id", fs.id() );
+                                                                  put( "fs_uri", fs.toString() );
+                                                              }}
+                                    );
 
-                                clusterService.unlock();
+                                }
+                            } catch (final Exception ex){
+                                LOG.error("SSH Error", ex);
+                            } finally {
+                                if (clusterService != null){
+                                    clusterService.unlock();
+                                }
                             }
                         }
                     } );
@@ -742,11 +751,6 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             if ( !bare ) {
                 //todo: checkout
             }
-        }
-
-        final Object _clusterService = env.get( "clusterService" );
-        if ( _clusterService != null && _clusterService instanceof ClusterService ) {
-            clusterMap.put( git.getRepository(), (ClusterService) _clusterService );
         }
 
         if ( daemonEnabled && daemonService != null && !daemonService.isRunning() ) {

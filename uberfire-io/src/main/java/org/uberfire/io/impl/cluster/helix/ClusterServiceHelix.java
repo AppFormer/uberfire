@@ -16,6 +16,7 @@
 
 package org.uberfire.io.impl.cluster.helix;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,9 @@ import org.uberfire.commons.message.AsyncCallback;
 import org.uberfire.commons.message.MessageHandlerResolver;
 import org.uberfire.commons.message.MessageType;
 import org.uberfire.io.impl.cluster.ClusterMessageType;
+import org.uberfire.java.nio.file.api.FileSystemProviders;
+import org.uberfire.java.nio.file.spi.FileSystemProvider;
+import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 
 import static java.util.Arrays.*;
 import static java.util.UUID.*;
@@ -70,6 +74,10 @@ public class ClusterServiceHelix implements ClusterService {
         this.participantManager = getZkHelixManager( clusterName, zkAddress, instanceName );
         PriorityDisposableRegistry.register( this );
         start();
+        final FileSystemProvider provider = FileSystemProviders.resolveProvider(URI.create("git://test"));
+        if (provider != null && provider instanceof JGitFileSystemProvider){
+            ((JGitFileSystemProvider) provider).setupClusterService(this);
+        }
     }
 
     HelixManager getZkHelixManager( String clusterName,
