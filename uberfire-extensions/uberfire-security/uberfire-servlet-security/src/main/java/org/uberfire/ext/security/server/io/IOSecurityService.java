@@ -44,6 +44,7 @@ import org.uberfire.java.nio.file.DirectoryStream;
 import org.uberfire.java.nio.file.FileAlreadyExistsException;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.FileSystemAlreadyExistsException;
+import org.uberfire.java.nio.file.FileSystemMetadata;
 import org.uberfire.java.nio.file.FileSystemNotFoundException;
 import org.uberfire.java.nio.file.NoSuchFileException;
 import org.uberfire.java.nio.file.NotDirectoryException;
@@ -97,19 +98,6 @@ public class IOSecurityService implements IOService {
     }
 
     @Override
-    public void startBatch(FileSystem[] fss,
-                           Option... options) {
-        for (FileSystem fs : fss) {
-            if (!authManager.authorize(toResource(fs),
-                                       getUser())) {
-                throw new SecurityException();
-            }
-        }
-        service.startBatch(fss,
-                           options);
-    }
-
-    @Override
     public void startBatch(FileSystem fs,
                            Option... options) {
         if (!authManager.authorize(toResource(fs),
@@ -118,17 +106,6 @@ public class IOSecurityService implements IOService {
         }
         service.startBatch(fs,
                            options);
-    }
-
-    @Override
-    public void startBatch(FileSystem... fss) {
-        for (FileSystem fs : fss) {
-            if (!authManager.authorize(toResource(fs),
-                                       getUser())) {
-                throw new SecurityException();
-            }
-        }
-        service.startBatch(fss);
     }
 
     @Override
@@ -174,10 +151,10 @@ public class IOSecurityService implements IOService {
     }
 
     @Override
-    public Iterable<FileSystem> getFileSystems() {
-        final Iterable<FileSystem> _result = service.getFileSystems();
-        final Set<FileSystem> result = new HashSet<FileSystem>();
-        for (final FileSystem fs : _result) {
+    public Iterable<FileSystemMetadata> getFileSystemsMetadata() {
+        final Iterable<FileSystemMetadata> _result = service.getFileSystemsMetadata();
+        final Set<FileSystemMetadata> result = new HashSet<>();
+        for (final FileSystemMetadata fs : _result) {
             if (authManager.authorize(toResource(fs),
                                       getUser())) {
                 result.add(fs);
@@ -191,7 +168,7 @@ public class IOSecurityService implements IOService {
     public FileSystem getFileSystem(URI uri) throws IllegalArgumentException, FileSystemNotFoundException, ProviderNotFoundException, SecurityException {
         try {
             final FileSystem result = service.getFileSystem(uri);
-            if (!authManager.authorize(toResource(result),
+            if (!authManager.authorize(toResource(new FileSystemMetadata(result)),
                                        getUser())) {
                 throw new SecurityException();
             }
@@ -827,11 +804,15 @@ public class IOSecurityService implements IOService {
     }
 
     private Resource toResource(final FileSystem fs) {
+        return new FileSystemResourceAdaptor(new FileSystemMetadata(fs));
+    }
+
+    private Resource toResource(final FileSystemMetadata fs) {
         return new FileSystemResourceAdaptor(fs);
     }
 
     private Resource toResource(final Path path) {
-        return new FileSystemResourceAdaptor(path.getFileSystem());
+        return new FileSystemResourceAdaptor(new FileSystemMetadata(path.getFileSystem()));
     }
 
     private User getUser() {

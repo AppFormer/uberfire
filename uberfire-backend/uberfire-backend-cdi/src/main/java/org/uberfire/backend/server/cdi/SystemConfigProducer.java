@@ -65,6 +65,7 @@ import org.uberfire.java.nio.file.FileStore;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.FileSystemAlreadyExistsException;
 import org.uberfire.java.nio.file.InvalidPathException;
+import org.uberfire.java.nio.file.LockableFileSystem;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.PathMatcher;
 import org.uberfire.java.nio.file.PatternSyntaxException;
@@ -242,6 +243,7 @@ public class SystemConfigProducer implements Extension {
             public Set<Type> getTypes() {
                 return new HashSet<Type>() {{
                     add(FileSystem.class);
+                    add(LockableFileSystem.class);
                     add(Object.class);
                 }};
             }
@@ -570,6 +572,11 @@ public class SystemConfigProducer implements Extension {
         @Override
         public WatchService newWatchService() throws UnsupportedOperationException, IOException {
             return null;
+        }
+
+        @Override
+        public String getName() {
+            return "DummyFileSystem";
         }
 
         @Override

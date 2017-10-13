@@ -38,6 +38,7 @@ import org.uberfire.java.nio.file.FileSystem;
 
 @ApplicationScoped
 @Startup(StartupType.BOOTSTRAP)
+//ederign cluster stgartup
 public class ConfigIOServiceProducer {
 
     private static ConfigIOServiceProducer instance;

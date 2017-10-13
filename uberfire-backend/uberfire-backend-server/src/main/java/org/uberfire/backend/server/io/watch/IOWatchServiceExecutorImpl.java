@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ejb.AccessTimeout;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
@@ -57,6 +58,7 @@ import static org.uberfire.backend.server.util.Paths.convert;
 @Singleton
 @Startup
 @TransactionAttribute(NOT_SUPPORTED)
+@AccessTimeout(value = 30, unit = java.util.concurrent.TimeUnit.SECONDS)
 public class IOWatchServiceExecutorImpl implements IOWatchServiceExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IOWatchServiceExecutorImpl.class);

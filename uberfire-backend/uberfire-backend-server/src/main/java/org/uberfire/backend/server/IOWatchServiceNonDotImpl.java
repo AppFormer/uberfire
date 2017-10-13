@@ -22,6 +22,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.uberfire.backend.server.io.watch.AbstractIOWatchService;
+import org.uberfire.backend.server.util.Paths;
 import org.uberfire.commons.concurrent.Unmanaged;
 import org.uberfire.java.nio.base.WatchContext;
 import org.uberfire.java.nio.file.StandardWatchEventKind;

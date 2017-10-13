@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messaging-deployment xmlns="urn:jboss:messaging-activemq-deployment:1.0">
+  <server name="default">
+    <jms-destinations>
+
+      <jms-topic name="APPFORMER.CLUSTER.MESSAGE">
+        <entry name="topic/APPFORMER.CLUSTER.MESSAGE"/>
+        <entry name="java:jboss/exported/jms/topic/APPFORMER.CLUSTER.MESSAGE"/>
+      </jms-topic>
+
+      <jms-queue name="KIE.SERVER.REQUEST">
+        <entry name="queue/KIE.SERVER.REQUEST"/>
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.REQUEST"/>
+      </jms-queue>
+
+
+    </jms-destinations>
+  </server>
+</messaging-deployment>

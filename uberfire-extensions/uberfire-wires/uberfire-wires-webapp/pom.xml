@@ -38,6 +38,38 @@
 
   <dependencies>
 
+    <!--<dependency>-->
+      <!--<groupId>org.jboss.spec.javax.security.jacc</groupId>-->
+      <!--<artifactId>jboss-jacc-api_1.5_spec</artifactId>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+
+
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-server</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-client</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+
+    <!-- JMS -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JEE -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.ejb</groupId>
+      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-widgets-service-backend</artifactId>

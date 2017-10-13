@@ -20,15 +20,19 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.jms.JMSContext;
 
 import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.service.AuthenticationService;
 import org.uberfire.backend.server.IOWatchServiceNonDotImpl;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
 import org.uberfire.commons.concurrent.Unmanaged;
+import org.uberfire.ext.wires.backend.server.impl.jms.JMSBridge;
+import org.uberfire.ext.wires.shared.social.ShowcaseSocialUserEvent;
 import org.uberfire.io.IOService;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
 import org.uberfire.io.impl.cluster.IOServiceClusterImpl;
@@ -45,6 +49,12 @@ public class ApplicationScopedProducer {
     private IOService ioService;
 
     private ExecutorService executorService;
+
+    @Inject
+    JMSBridge jmsProducer;
+
+    @Inject
+    private JMSContext context;
 
     public ApplicationScopedProducer() {
     }
@@ -69,6 +79,10 @@ public class ApplicationScopedProducer {
                                                  clusterServiceFactory,
                                                  executorService);
         }
+    }
+
+    public void onEvent(@Observes ShowcaseSocialUserEvent event) {
+        jmsProducer.sendMessage(event.toString());
     }
 
     @Produces
