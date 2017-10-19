@@ -10,7 +10,7 @@ fi
 commitMsg="Tagging $tag"
 
 # pushes the TAG to jboss-integration or droolsjbpm [IMPORTANT: "push -n" (--dryrun) should be replaced by "push" when script is ready]
-if [ "$TARGET" == "productized" ]; then
+if [ "$target" == "productized" ]; then
    cd $WORKSPACE/uberfire
    git tag -a $tag -m "$commitMsg"
    git remote add gerrit ssh://jb-ip-tooling-jenkins@code.engineering.redhat.com/droolsjbpm-uberfire
