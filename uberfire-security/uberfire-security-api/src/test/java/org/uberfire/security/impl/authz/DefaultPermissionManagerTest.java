@@ -17,6 +17,7 @@
 package org.uberfire.security.impl.authz;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.jboss.errai.security.shared.api.Group;
 import org.jboss.errai.security.shared.api.GroupImpl;
@@ -239,7 +240,7 @@ public class DefaultPermissionManagerTest {
                               final Group group,
                               final Role... roles) {
 
-        return new UserImpl(name, Arrays.asList(roles), Arrays.asList(group));
+        return new UserImpl(name, Arrays.asList(roles), Collections.singletonList(group));
     }
 
     private DefaultPermissionCollection makeDeniedPermissionCollection() {
