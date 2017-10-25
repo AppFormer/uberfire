@@ -37,7 +37,7 @@ In order to build and contribute to our documentation, follow this steps
 - View the built docs in uberfire-docs/docs/_book/index.html and uberfire-docs/uberfire-docs.pdf
 - Submit a pull request to get your changes accepted
 
-##License
+## License
 
 Uberfire Framework is released under Apache 2 License.
 
