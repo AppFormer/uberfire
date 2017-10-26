@@ -26,11 +26,17 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.guvnor.common.services.backend.cache.BuilderCache;
+import org.guvnor.common.services.backend.cache.ClassLoaderCache;
+import org.guvnor.common.services.backend.cache.DependenciesCache;
+import org.guvnor.common.services.backend.cache.GitCache;
+import org.guvnor.common.services.backend.cache.KieModuleMetaDataCache;
 import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.rpc.SessionInfo;
 import org.uberfire.workbench.events.ResourceAddedEvent;
@@ -66,12 +72,31 @@ public class ResourceChangeObserver {
     private Instance<ResourceChangeObservableFile> observableFiles;
 
     @Inject
+    private ClassLoaderCache classLoaderCache;
+
+    @Inject
+    private KieModuleMetaDataCache kieModuleMetaDataCache;
+
+    @Inject
+    private GitCache gitCache;
+
+    @Inject
+    private DependenciesCache dependenciesCache;
+
+    @Inject
+    private BuilderCache builderCache;
+
+    @Inject
     private ObservablePOMFile observablePomFile;
 
     public void processResourceAdd(@Observes final ResourceAddedEvent resourceAddedEvent) {
         processResourceChange(resourceAddedEvent.getSessionInfo(),
                               resourceAddedEvent.getPath(),
                               ResourceChangeType.ADD);
+        org.uberfire.java.nio.file.Path nioPath = Paths.convert(resourceAddedEvent.getPath());
+        classLoaderCache.removeTargetMapClassloader(nioPath);
+        classLoaderCache.removeEventTypes(nioPath);
+        classLoaderCache.removeDependenciesClassloader(nioPath);
         incrementalBuilder.addResource(resourceAddedEvent.getPath());
     }
 
@@ -79,6 +104,8 @@ public class ResourceChangeObserver {
         processResourceChange(resourceDeletedEvent.getSessionInfo(),
                               resourceDeletedEvent.getPath(),
                               ResourceChangeType.DELETE);
+
+        cleanAllCaches(resourceDeletedEvent.getPath());
         incrementalBuilder.deleteResource(resourceDeletedEvent.getPath());
     }
 
@@ -86,6 +113,21 @@ public class ResourceChangeObserver {
         processResourceChange(resourceUpdatedEvent.getSessionInfo(),
                               resourceUpdatedEvent.getPath(),
                               ResourceChangeType.UPDATE);
+        //If the pom is changed a rescan of the project is needed
+        org.uberfire.java.nio.file.Path nioPath = Paths.convert(resourceUpdatedEvent.getPath());
+        if (resourceUpdatedEvent.getPath().getFileName().endsWith("pom.xml")) {
+            classLoaderCache.removeDependenciesClassloader(nioPath);
+            classLoaderCache.removeProjectDeps(nioPath);
+            classLoaderCache.removeTargetMapClassloader(nioPath);
+            classLoaderCache.removeDependenciesClassloader(nioPath);
+            builderCache.cleanInternalCache(nioPath.toUri().toString());
+        } else if (resourceUpdatedEvent.getPath().getFileName().endsWith(".java")) {
+            classLoaderCache.removeTargetMapClassloader(nioPath);
+            classLoaderCache.removeEventTypes(nioPath);
+            classLoaderCache.removeDependenciesClassloader(nioPath);
+        } else {
+            cleanAllCaches(resourceUpdatedEvent.getPath());
+        }
         incrementalBuilder.updateResource(resourceUpdatedEvent.getPath());
     }
 
@@ -93,6 +135,7 @@ public class ResourceChangeObserver {
         processResourceChange(resourceCopiedEvent.getSessionInfo(),
                               resourceCopiedEvent.getPath(),
                               ResourceChangeType.COPY);
+        cleanAllCaches(resourceCopiedEvent.getPath());
         incrementalBuilder.addResource(resourceCopiedEvent.getPath()); //¿?
     }
 
@@ -100,8 +143,21 @@ public class ResourceChangeObserver {
         processResourceChange(resourceRenamedEvent.getSessionInfo(),
                               resourceRenamedEvent.getPath(),
                               ResourceChangeType.RENAME);
+
         incrementalBuilder.deleteResource(resourceRenamedEvent.getPath());
+        cleanAllCaches(resourceRenamedEvent.getPath());
         incrementalBuilder.addResource(resourceRenamedEvent.getDestinationPath());
+    }
+
+    private void cleanAllCaches(Path path) {
+        org.uberfire.java.nio.file.Path nioPath = Paths.convert(path);
+        classLoaderCache.removeTargetMapClassloader(nioPath);
+        classLoaderCache.removeDependenciesClassloader(nioPath);
+        classLoaderCache.removeDeclaredTypes(nioPath);
+        classLoaderCache.removeEventTypes(nioPath);
+        classLoaderCache.removeProjectDeps(nioPath);
+        classLoaderCache.removeDeclaredTypes(nioPath);
+        classLoaderCache.removeDeclaredTypes(nioPath);
     }
 
     public void processBatchChanges(@Observes final ResourceBatchChangesEvent resourceBatchChangesEvent) {
@@ -112,6 +168,8 @@ public class ResourceChangeObserver {
         } else {
             processBatchResourceChanges(resourceBatchChangesEvent.getSessionInfo(),
                                         batchChanges);
+            //@TODO how to know the rootpath ?
+            //cleanAllCaches(resourceBatchChangesEvent.getPath());
             incrementalBuilder.batchResourceChanges(resourceBatchChangesEvent.getBatch());
         }
     }
