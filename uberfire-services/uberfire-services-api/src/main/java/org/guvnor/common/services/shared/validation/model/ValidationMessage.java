@@ -16,12 +16,16 @@
 
 package org.guvnor.common.services.shared.validation.model;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 import org.guvnor.common.services.shared.message.Level;
 import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.backend.vfs.Path;
 
 @Portable
-public class ValidationMessage {
+public class ValidationMessage implements Serializable,
+                                          Comparable {
 
     private long id;
     private Level level;
@@ -175,5 +179,11 @@ public class ValidationMessage {
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = ~~result;
         return result;
+    }
+
+    @Override
+    public int compareTo(Object other) {
+        return Comparator.comparing((ValidationMessage p) -> p.getText())
+                .thenComparing(p -> p.getPath().toURI().toString()).compare(this, (ValidationMessage) other);
     }
 }

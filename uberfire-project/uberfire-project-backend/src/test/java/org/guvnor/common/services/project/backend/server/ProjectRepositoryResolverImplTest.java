@@ -21,13 +21,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+
 import javax.enterprise.inject.Instance;
 
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
 import org.appformer.maven.integration.embedder.MavenSettings;
+import org.guvnor.common.services.project.backend.server.utils.ConfigurationStaticStrategy;
+import org.guvnor.common.services.project.backend.server.utils.POMContentHandler;
+import org.guvnor.common.services.project.backend.server.utils.configuration.ConfigurationStrategy;
 import org.guvnor.common.services.project.model.GAV;
 import org.guvnor.common.services.project.model.MavenRepositoryMetadata;
 import org.guvnor.common.services.project.model.MavenRepositorySource;
@@ -48,14 +54,24 @@ import static org.guvnor.common.services.project.backend.server.MavenLocalReposi
 import static org.guvnor.common.services.project.backend.server.RepositoryResolverTestUtils.deployArtifact;
 import static org.guvnor.common.services.project.backend.server.RepositoryResolverTestUtils.generateSettingsXml;
 import static org.guvnor.common.services.project.backend.server.RepositoryResolverTestUtils.installArtifact;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 // *** NOTE ***
 // The transient Maven Repository used by these tests is only cleared after all the tests have ran.
 // Therefore each test should use a unique GAV to avoid potential conflicts between tests.
 public class ProjectRepositoryResolverImplTest {
+
+    private static final List<ConfigurationStrategy> strategies = new ArrayList<ConfigurationStrategy>() {{
+        add(new ConfigurationStaticStrategy());
+    }};
 
     @Mock
     private IOService ioService;
@@ -73,6 +89,8 @@ public class ProjectRepositoryResolverImplTest {
 
     private static java.nio.file.Path m2Folder = null;
     private static java.nio.file.Path settingsXmlPath = null;
+
+    private POMContentHandler pomContentHandler;
 
     @BeforeClass
     public static void setupSystemProperties() {
@@ -98,9 +116,10 @@ public class ProjectRepositoryResolverImplTest {
 
     @Before
     public void setup() {
+        pomContentHandler = new POMContentHandler(strategies);
         service = new ProjectRepositoryResolverImpl(ioService,
                                                     gavPreferencesProvider,
-                                                    scopeResolutionStrategies);
+                                                    scopeResolutionStrategies, pomContentHandler);
         doReturn(gavPreferences).when(gavPreferencesProvider).get();
     }
 
@@ -1256,9 +1275,10 @@ public class ProjectRepositoryResolverImplTest {
             doReturn(true).when(gavPreferences).isConflictingGAVCheckDisabled();
 
             //Re-instantiate service to pick-up System Property
+            final POMContentHandler handler = new POMContentHandler(strategies);
             service = new ProjectRepositoryResolverImpl(ioService,
                                                         gavPreferencesProvider,
-                                                        scopeResolutionStrategies);
+                                                        scopeResolutionStrategies, handler);
 
             final InputStream pomStream = new ByteArrayInputStream(pomXml.getBytes(StandardCharsets.UTF_8));
             final MavenProject mavenProject = MavenProjectLoader.parseMavenPom(pomStream);
@@ -1307,9 +1327,10 @@ public class ProjectRepositoryResolverImplTest {
             doReturn(true).when(gavPreferences).isConflictingGAVCheckDisabled();
 
             //Re-instantiate service to pick-up System Property
+            final POMContentHandler handler = new POMContentHandler(strategies);
             service = new ProjectRepositoryResolverImpl(ioService,
                                                         gavPreferencesProvider,
-                                                        scopeResolutionStrategies);
+                                                        scopeResolutionStrategies, handler);
 
             final InputStream pomStream = new ByteArrayInputStream(pomXml.getBytes(StandardCharsets.UTF_8));
             final MavenProject mavenProject = MavenProjectLoader.parseMavenPom(pomStream);
@@ -1353,9 +1374,10 @@ public class ProjectRepositoryResolverImplTest {
             doReturn(true).when(gavPreferences).isConflictingGAVCheckDisabled();
 
             //Re-instantiate service to pick-up System Property
+            final POMContentHandler handler = new POMContentHandler(strategies);
             service = new ProjectRepositoryResolverImpl(ioService,
                                                         gavPreferencesProvider,
-                                                        scopeResolutionStrategies);
+                                                        scopeResolutionStrategies, handler);
 
             final InputStream pomStream = new ByteArrayInputStream(pomXml.getBytes(StandardCharsets.UTF_8));
             final MavenProject mavenProject = MavenProjectLoader.parseMavenPom(pomStream);

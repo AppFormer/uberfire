@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -82,7 +83,7 @@ public class ProjectRepositoryResolverImpl
 
     private IOService ioService;
 
-    private POMContentHandler pomContentHandler = new POMContentHandler();
+    private POMContentHandler pomContentHandler;
 
     private Instance<GAVPreferences> gavPreferencesProvider;
 
@@ -94,10 +95,12 @@ public class ProjectRepositoryResolverImpl
     @Inject
     public ProjectRepositoryResolverImpl(final @Named("ioStrategy") IOService ioService,
                                          final Instance<GAVPreferences> gavPreferencesProvider,
-                                         @Customizable final WorkbenchPreferenceScopeResolutionStrategies scopeResolutionStrategies) {
+                                         @Customizable final WorkbenchPreferenceScopeResolutionStrategies scopeResolutionStrategies,
+                                         final POMContentHandler pomContentHandler) {
         this.ioService = ioService;
         this.gavPreferencesProvider = gavPreferencesProvider;
         this.scopeResolutionStrategies = scopeResolutionStrategies;
+        this.pomContentHandler = pomContentHandler;
     }
 
     @Override

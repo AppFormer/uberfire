@@ -16,8 +16,11 @@
 package org.guvnor.common.services.project.backend.server.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.guvnor.common.services.project.backend.server.utils.configuration.ConfigurationStrategy;
 import org.guvnor.common.services.project.model.GAV;
 import org.guvnor.common.services.project.model.POM;
 import org.junit.Test;
@@ -26,19 +29,23 @@ import static org.junit.Assert.*;
 
 public class POMContentHandlerTest {
 
+    private static final List<ConfigurationStrategy> strategies = new ArrayList<ConfigurationStrategy>() {{
+        add(new ConfigurationStaticStrategy());
+    }};
+
     private static final String GAV_GROUP_ID_XML = "<groupId>org.guvnor</groupId>";
     private static final String GAV_ARTIFACT_ID_XML = "<artifactId>test</artifactId>";
     private static final String GAV_VERSION_XML = "<version>0.0.1</version>";
     private static final String EXISTING_PLUGIN_XML = "<plugin>"
             + "<groupId>org.kie</groupId>"
             + "<artifactId>kie-maven-plugin</artifactId>"
-            + "<version>another-version</version>"
+            + "<version>7.5.0-SNAPSHOT</version>"
             + "<extensions>true</extensions>"
             + "</plugin>";
 
     @Test
     public void testPOMContentHandlerNewProject() throws IOException {
-        final POMContentHandler handler = new POMContentHandler();
+        final POMContentHandler handler = new POMContentHandler(strategies);
         final GAV gav = new GAV();
         gav.setGroupId("org.guvnor");
         gav.setArtifactId("test");
@@ -58,7 +65,7 @@ public class POMContentHandlerTest {
 
     @Test
     public void testPOMContentHandlerExistingProject() throws IOException, XmlPullParserException {
-        final POMContentHandler handler = new POMContentHandler();
+        final POMContentHandler handler = new POMContentHandler(strategies);
         final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
                 + "<modelVersion>4.0.0</modelVersion>"
@@ -98,7 +105,7 @@ public class POMContentHandlerTest {
            Keep the original type
          */
 
-        final POMContentHandler handler = new POMContentHandler();
+        final POMContentHandler handler = new POMContentHandler(strategies);
         final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
                 + "<modelVersion>4.0.0</modelVersion>"
@@ -113,13 +120,13 @@ public class POMContentHandlerTest {
         final String enrichedXml = handler.toString(handler.toModel(xml),
                                                     xml);
 
-        assertContainsIgnoreWhitespace("<packaging>something</packaging>",
+        assertContainsIgnoreWhitespace("<packaging>kjar</packaging>",
                                        enrichedXml);
     }
 
     @Test
     public void testPOMContentHandlerExistingKieProject() throws IOException, XmlPullParserException {
-        final POMContentHandler handler = new POMContentHandler();
+        final POMContentHandler handler = new POMContentHandler(strategies);
         final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
                 + "<modelVersion>4.0.0</modelVersion>"
@@ -167,7 +174,7 @@ public class POMContentHandlerTest {
 
     @Test
     public void testParent() throws Exception {
-        final POMContentHandler handler = new POMContentHandler();
+        final POMContentHandler handler = new POMContentHandler(strategies);
         final String xml =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                         "<project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
