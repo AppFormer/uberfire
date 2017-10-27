@@ -183,7 +183,7 @@ public class ValidationMessage implements Serializable,
 
     @Override
     public int compareTo(Object other) {
-        return Comparator.comparing((ValidationMessage p) -> p.getText())
-                .thenComparing(p -> p.getPath().toURI().toString()).compare(this, (ValidationMessage) other);
+        return Comparator.comparing((ValidationMessage p) -> p.getText()).compare(this, (ValidationMessage) other);
+
     }
 }

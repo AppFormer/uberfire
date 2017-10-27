@@ -33,6 +33,10 @@ public class BuildMessage implements Serializable, Comparable {
     private int column;
     private String text;
 
+    public BuildMessage() {
+
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -138,8 +142,7 @@ public class BuildMessage implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object other) {
-        return Comparator.comparing((BuildMessage p)->p.getText())
-                .thenComparing(p->p.getPath().toURI().toString()).compare(this,(BuildMessage)other);
+        return Comparator.comparing((BuildMessage p)->p.getText()).compare(this, (BuildMessage) other);
     }
 
 
