@@ -38,6 +38,7 @@ import static org.mockito.Mockito.*;
 public class GitRepositoryFactoryHelperTest {
 
     private IOService ioService;
+    private IOService notIndexed;
     private GitRepositoryFactoryHelper helper;
     private FileSystem fileSystem;
     private ArrayList<Path> rootDirectories;
@@ -45,7 +46,8 @@ public class GitRepositoryFactoryHelperTest {
     @Before
     public void setUp() throws Exception {
         ioService = mock(IOService.class);
-        helper = new GitRepositoryFactoryHelper(ioService);
+        notIndexed = mock(IOService.class);
+        helper = new GitRepositoryFactoryHelper(ioService, notIndexed);
 
         fileSystem = mock(FileSystem.class);
         when(
@@ -54,6 +56,11 @@ public class GitRepositoryFactoryHelperTest {
         ).thenReturn(
                 fileSystem
         );
+
+        when(
+                notIndexed.newFileSystem(any(URI.class),
+                                        anyMap())
+        ).thenThrow(new RuntimeException());
 
         rootDirectories = new ArrayList<Path>();
         when(fileSystem.getRootDirectories()).thenReturn(rootDirectories);

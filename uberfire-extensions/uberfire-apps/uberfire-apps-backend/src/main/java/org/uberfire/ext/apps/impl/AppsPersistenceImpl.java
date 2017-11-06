@@ -30,11 +30,8 @@ import javax.inject.Named;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.uberfire.ext.apps.api.AppsPersistenceAPI;
 import org.uberfire.ext.apps.api.Directory;
-import org.uberfire.ext.layout.editor.api.LayoutServices;
+import org.uberfire.ext.layout.editor.api.PerspectiveServices;
 import org.uberfire.ext.layout.editor.api.editor.LayoutTemplate;
-import org.uberfire.ext.plugin.model.LayoutEditorModel;
-import org.uberfire.ext.plugin.model.PluginType;
-import org.uberfire.ext.plugin.service.PluginServices;
 import org.uberfire.ext.plugin.type.TagsConverterUtil;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.DirectoryStream;
@@ -50,9 +47,7 @@ public class AppsPersistenceImpl implements AppsPersistenceAPI {
 
     public static final String HOME_DIR = ".app_dir/home";
     @Inject
-    PluginServices pluginServices;
-    @Inject
-    LayoutServices layoutServices;
+    PerspectiveServices perspectiveServices;
     @Inject
     @Named("ioStrategy")
     private IOService ioService;
@@ -63,7 +58,7 @@ public class AppsPersistenceImpl implements AppsPersistenceAPI {
     @PostConstruct
     public void setup() {
         try {
-            fileSystem = ioService.newFileSystem(URI.create("default://plugins"),
+            fileSystem = ioService.newFileSystem(URI.create("default://system_ou/plugins"),
                                                  new HashMap<String, Object>() {{
                                                      put("init",
                                                          Boolean.TRUE);
@@ -71,7 +66,7 @@ public class AppsPersistenceImpl implements AppsPersistenceAPI {
                                                          Boolean.TRUE);
                                                  }});
         } catch (final FileSystemAlreadyExistsException e) {
-            fileSystem = ioService.getFileSystem(URI.create("default://plugins"));
+            fileSystem = ioService.getFileSystem(URI.create("default://system_ou/plugins"));
         }
         this.root = fileSystem.getRootDirectories().iterator().next();
     }
@@ -87,21 +82,18 @@ public class AppsPersistenceImpl implements AppsPersistenceAPI {
     }
 
     private Map<String, List<String>> generateTagMap() {
-        Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
-        final Collection<LayoutEditorModel> layoutEditorModels = pluginServices.listLayoutEditor(PluginType.PERSPECTIVE_LAYOUT);
-        for (LayoutEditorModel layoutEditorModel : layoutEditorModels) {
-            LayoutTemplate layoutTemplate = layoutServices.convertLayoutFromString(layoutEditorModel.getLayoutEditorModel());
-            if (layoutTemplate != null) {
-                List<String> tags = TagsConverterUtil.extractTags(layoutTemplate.getLayoutProperties());
-                for (String tag : tags) {
-                    List<String> perspectives = tagsMap.get(tag.toUpperCase());
-                    if (perspectives == null) {
-                        perspectives = new ArrayList<String>();
-                    }
-                    perspectives.add(layoutTemplate.getName());
-                    tagsMap.put(tag.toUpperCase(),
-                                perspectives);
+        Map<String, List<String>> tagsMap = new HashMap<>();
+        final Collection<LayoutTemplate> layoutTemplates = perspectiveServices.listLayoutTemplates();
+        for (LayoutTemplate layoutTemplate : layoutTemplates) {
+            List<String> tags = TagsConverterUtil.extractTags(layoutTemplate.getLayoutProperties());
+            for (String tag : tags) {
+                List<String> perspectives = tagsMap.get(tag.toUpperCase());
+                if (perspectives == null) {
+                    perspectives = new ArrayList<>();
                 }
+                perspectives.add(layoutTemplate.getName());
+                tagsMap.put(tag.toUpperCase(),
+                            perspectives);
             }
         }
 

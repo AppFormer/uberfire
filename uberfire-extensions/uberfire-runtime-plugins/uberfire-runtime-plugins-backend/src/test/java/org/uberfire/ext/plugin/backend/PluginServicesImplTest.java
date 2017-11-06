@@ -33,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.ext.editor.commons.backend.validation.DefaultFileNameValidator;
@@ -44,10 +45,13 @@ import org.uberfire.ext.plugin.event.PluginSaved;
 import org.uberfire.ext.plugin.exception.PluginAlreadyExists;
 import org.uberfire.ext.plugin.model.CodeType;
 import org.uberfire.ext.plugin.model.Framework;
+import org.uberfire.ext.plugin.model.LayoutEditorModel;
+import org.uberfire.ext.plugin.model.Plugin;
 import org.uberfire.ext.plugin.model.PluginSimpleContent;
 import org.uberfire.ext.plugin.model.PluginType;
 import org.uberfire.ext.plugin.model.RuntimePlugin;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
+import org.uberfire.java.nio.file.FileAlreadyExistsException;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.mocks.FileSystemTestingUtils;
 import org.uberfire.rpc.SessionInfo;
@@ -193,16 +197,45 @@ public class PluginServicesImplTest {
                             "newEmptyScreen"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testCopyPluginToAnotherDirectory() {
         Path pluginPath = createPlugin("emptyScreen",
-                                       PluginType.SCREEN,
-                                       null);
+                PluginType.SCREEN,
+                null);
+
+        Plugin targetPlugin = buildPlugin("newEmptyScreen",
+                PluginType.SCREEN,
+                null);
+
+        Path targetDir = Paths.convert(Paths.convert(targetPlugin.getPath()).getParent());
+        Path resultPath = pluginServices.copy(pluginPath,
+                "newEmptyScreen",
+                targetDir,
+                "");
+
+        assertEquals(Paths.convert(resultPath), Paths.convert(targetPlugin.getPath()));
+        verify(pluginAddedEvent,
+                times(1)).fire(any(PluginAdded.class));
+
+        Collection<RuntimePlugin> runtimePlugins = pluginServices.listRuntimePlugins();
+        assertEquals(2,
+                runtimePlugins.size());
+        assertTrue(contains(runtimePlugins,
+                "emptyScreen"));
+        assertTrue(contains(runtimePlugins,
+                "newEmptyScreen"));
+    }
+
+    @Test(expected = FileAlreadyExistsException.class)
+    public void testCopyPluginAlreadyExists() {
+        Path pluginPath = createPlugin("emptyScreen",
+                PluginType.SCREEN,
+                null);
 
         pluginServices.copy(pluginPath,
-                            "newEmptyScreen",
-                            pluginPath,
-                            "");
+                "emptyScreen",
+                pluginPath,
+                "");
     }
 
     @Test
@@ -238,6 +271,18 @@ public class PluginServicesImplTest {
         Collection<RuntimePlugin> runtimePlugins = pluginServices.listRuntimePlugins();
         assertEquals(0,
                      runtimePlugins.size());
+    }
+
+    @Test
+    public void testLoadEmptyLayout() {
+        Path pluginPath = createPlugin("emptyLayout",
+                PluginType.PERSPECTIVE_LAYOUT,
+                null);
+
+        LayoutEditorModel layoutEditorModel = pluginServices.getLayoutEditor(pluginPath, PluginType.PERSPECTIVE_LAYOUT);
+        assertEquals(layoutEditorModel.getName(), "emptyLayout");
+        assertEquals(layoutEditorModel.getPath(), pluginPath);
+        assertTrue(layoutEditorModel.isEmptyLayout());
     }
 
     private Path createPlugin(String name,
