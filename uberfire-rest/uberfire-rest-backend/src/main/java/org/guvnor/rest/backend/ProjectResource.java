@@ -634,14 +634,14 @@ public class ProjectResource {
 
     private org.guvnor.structure.organizationalunit.OrganizationalUnit checkOrganizationalUnitExistence(String orgUnitName) {
         if (orgUnitName == null || orgUnitName.isEmpty()) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(orgUnitName).build());
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Missing organizationalUnitName").build());
         }
 
         org.guvnor.structure.organizationalunit.OrganizationalUnit origOrgUnit
                 = organizationalUnitService.getOrganizationalUnit(orgUnitName);
 
         if (origOrgUnit == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(orgUnitName).build());
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).type(MediaType.TEXT_PLAIN_TYPE).entity(orgUnitName).build());
         }
         return origOrgUnit;
     }
