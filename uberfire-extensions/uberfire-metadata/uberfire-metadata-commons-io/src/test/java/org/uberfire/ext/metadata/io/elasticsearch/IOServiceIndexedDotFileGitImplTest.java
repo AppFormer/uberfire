@@ -46,20 +46,22 @@ public class IOServiceIndexedDotFileGitImplTest extends BaseIndexTest {
 
     @Test
     public void testIndexedDotFile() throws IOException, InterruptedException {
-        setupCountDown(2);
+        setupCountDown(1);
         final Path path = getBasePath(getSimpleName()).resolve("dotFile.txt");
         //Write the "real path" with no attributes and hence no "dot file"
         ioService().write(path,
                           "ooooo!",
                           Collections.<OpenOption>emptySet());
 
+        waitForCountDown(10000);
+        setupCountDown(1);
         //Write an unmodified "real path" with attributes. This leads to only the "dot path" being indexed.
         ioService().write(path,
                           "ooooo!",
                           Collections.<OpenOption>emptySet(),
                           getFileAttributes());
 
-        waitForCountDown(30000);
+        waitForCountDown(10000);
 
         final MetaObject mo = config.getMetaModelStore().getMetaObject(Path.class.getName());
 

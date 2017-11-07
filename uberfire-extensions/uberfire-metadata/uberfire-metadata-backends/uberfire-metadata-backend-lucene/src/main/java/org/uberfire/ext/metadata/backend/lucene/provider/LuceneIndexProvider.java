@@ -63,7 +63,7 @@ public class LuceneIndexProvider implements IndexProvider {
     }
 
     @Override
-    public boolean freshIndex(final KCluster cluster) {
+    public boolean isFreshIndex(final KCluster cluster) {
         final Index index = indexManager.get(cluster);
         return index == null || index.freshIndex();
     }

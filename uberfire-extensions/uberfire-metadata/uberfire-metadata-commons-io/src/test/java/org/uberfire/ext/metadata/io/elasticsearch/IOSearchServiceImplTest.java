@@ -58,7 +58,7 @@ public class IOSearchServiceImplTest extends BaseIndexTest {
 
         final Path root = path1.getRoot();
 
-        waitForCountDown(20000);
+        waitForCountDown(10000);
 
         {
             final List<Path> result = searchIndex.fullTextSearch("g",

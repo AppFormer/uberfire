@@ -16,7 +16,12 @@
 
 package org.uberfire.ext.metadata.analyzer;
 
-public interface ElasticSearchAnalyzerWrapper {
+public enum ElasticSearchAnalyzer {
+    SIMPLE,
+    STANDARD;
 
-    String getFieldAnalyzer(String fieldName);
+    @Override
+    public String toString() {
+        return this.name().toLowerCase();
+    }
 }

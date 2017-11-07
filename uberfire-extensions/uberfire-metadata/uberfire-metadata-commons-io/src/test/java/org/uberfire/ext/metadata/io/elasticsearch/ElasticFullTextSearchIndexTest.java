@@ -81,7 +81,7 @@ public class ElasticFullTextSearchIndexTest extends BaseIndexTest {
         ioService().write(path1,
                           "Some cheese");
 
-        waitForCountDown(20000);
+        waitForCountDown(10000);
 
         List<String> indices = Arrays.asList(toKCluster(path1.getFileSystem()).getClusterId());
         IndexProvider provider = this.config.getIndexProvider();
@@ -115,7 +115,7 @@ public class ElasticFullTextSearchIndexTest extends BaseIndexTest {
         ioService().write(path2,
                           "Some cheese");
 
-        waitForCountDown(20000);
+        waitForCountDown(10000);
 
         {
             WildcardQuery query = new WildcardQuery(new Term(FULL_TEXT_FIELD,

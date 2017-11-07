@@ -132,16 +132,6 @@
         <updatePolicy>daily</updatePolicy>
       </snapshots>
     </repository>
-    <repository>
-      <id>elastic</id>
-      <url>https://artifacts.elastic.co/maven</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -974,17 +964,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.elasticsearch.client</groupId>
-        <artifactId>x-pack-transport</artifactId>
-        <version>${version.elasticsearch.client}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>commons-logging</artifactId>
-            <groupId>commons-logging</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty</artifactId>
         <version>${version.io.netty.old}</version>
@@ -1044,11 +1023,6 @@
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron</artifactId>
         <version>${version.org.wildfly.security}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-internal</artifactId>
-        <version>${version.org.kie}</version>
       </dependency>
       <!-- Apache ActiveMQ/Artemis -->
       <dependency>

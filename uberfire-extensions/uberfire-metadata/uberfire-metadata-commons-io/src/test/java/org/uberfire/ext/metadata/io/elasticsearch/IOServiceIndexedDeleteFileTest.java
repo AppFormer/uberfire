@@ -64,7 +64,7 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
                               }
                           });
 
-        waitForCountDown(20000);
+        waitForCountDown(10000);
 
         List<String> indices = Arrays.asList(toKCluster(path.getFileSystem()).getClusterId());
         IndexProvider provider = this.config.getIndexProvider();
@@ -82,7 +82,7 @@ public class IOServiceIndexedDeleteFileTest extends BaseIndexTest {
         //Delete and re-check the index
         ioService().delete(path);
 
-        waitForCountDown(20000);
+        waitForCountDown(10000);
 
         hits = provider.findHitsByQuery(indices,
                                         new TermQuery(new Term("delete",

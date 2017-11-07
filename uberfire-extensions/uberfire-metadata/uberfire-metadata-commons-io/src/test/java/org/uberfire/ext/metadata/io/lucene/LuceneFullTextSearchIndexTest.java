@@ -74,12 +74,12 @@ public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
 
     @Test
     public void testFullTextIndexedFile() throws IOException, InterruptedException {
-        setupCountDown(2);
+        setupCountDown(1);
         final Path path1 = getBasePath(this.getClass().getSimpleName()).resolve("mydrlfile1.drl");
         ioService().write(path1,
                           "Some cheese");
 
-        waitForCountDown(5000);
+        waitForCountDown(10000);
 
         final String index = toKCluster(path1.getFileSystem()).getClusterId();
 
@@ -107,13 +107,13 @@ public class LuceneFullTextSearchIndexTest extends BaseIndexTest {
                          hits);
         }
 
-        setupCountDown(2);
+        setupCountDown(1);
 
         final Path path2 = getBasePath(this.getClass().getSimpleName()).resolve("a.drl");
         ioService().write(path2,
                           "Some cheese");
 
-        waitForCountDown(5000);
+        waitForCountDown(10000);
 
         {
             WildcardQuery query = new WildcardQuery(new Term(FULL_TEXT_FIELD,

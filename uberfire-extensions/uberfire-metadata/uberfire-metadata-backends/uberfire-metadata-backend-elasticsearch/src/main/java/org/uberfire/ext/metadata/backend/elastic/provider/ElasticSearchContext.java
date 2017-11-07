@@ -17,7 +17,6 @@
 package org.uberfire.ext.metadata.backend.elastic.provider;
 
 import java.net.InetAddress;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.ext.metadata.backend.elastic.exceptions.MetadataException;
@@ -37,14 +36,11 @@ public class ElasticSearchContext {
 
     private static final String PORT = "org.appformer.ext.metadata.elastic.port";
     private static final String HOST = "org.appformer.ext.metadata.elastic.host";
-    private static final String USERNAME = "org.appformer.ext.metadata.elastic.username";
-    private static final String PASSWORD = "org.appformer.ext.metadata.elastic.password";
     private static final String CLUSTER = "org.appformer.ext.metadata.elastic.cluster";
     private static final String RETRIES = "org.appformer.ext.metadata.elastic.retries";
     public static final String ES_CLUSTER_NAME = "cluster.name";
     public static final String ES_TRANSPORT_TYPE = "transport.type";
-    public static final String ES_SECURITY_4 = "security4";
-    public static final String ES_XPACK_SECURITY_USER = "xpack.security.user";
+    public static final String ES_NETTY_4 = "netty4";
 
     private static ElasticSearchContext INSTANCE;
     private final String cluster;
@@ -52,8 +48,6 @@ public class ElasticSearchContext {
     private TransportClient transportClient;
     private String hostname;
     private int port;
-    private String username;
-    private String password;
 
     private Logger logger = LoggerFactory.getLogger(ElasticSearchContext.class);
 
@@ -66,12 +60,6 @@ public class ElasticSearchContext {
                 put(PORT,
                     System.getProperty(PORT,
                                        "9300"));
-                put(USERNAME,
-                    System.getProperty(USERNAME,
-                                       "elastic"));
-                put(PASSWORD,
-                    System.getProperty(PASSWORD,
-                                       "changeme"));
                 put(CLUSTER,
                     System.getProperty(CLUSTER,
                                        "kie-cluster"));
@@ -96,18 +84,12 @@ public class ElasticSearchContext {
                                                    properties.get(PORT)));
         this.hostname = checkNotEmpty("host",
                                       properties.get(HOST));
-        this.username = checkNotNull("username",
-                                     properties.get(USERNAME));
-        this.password = checkNotNull("password",
-                                     properties.get(PASSWORD));
         this.cluster = checkNotNull("cluster",
                                     properties.get(CLUSTER));
         this.retries = Integer.parseInt(properties.get(RETRIES));
     }
 
     private TransportClient createTransportClient(String cluster,
-                                                  String username,
-                                                  String password,
                                                   String hostname,
                                                   int port) {
 
@@ -122,13 +104,9 @@ public class ElasticSearchContext {
                         .put(ES_CLUSTER_NAME,
                              cluster)
                         .put(ES_TRANSPORT_TYPE,
-                             ES_SECURITY_4)
-                        .put(ES_XPACK_SECURITY_USER,
-                             MessageFormat.format("{0}:{1}",
-                                                  username,
-                                                  password))
+                             ES_NETTY_4)
                         .build();
-                client = new PreBuiltXPackTransportClient(settings)
+                client = new PreBuiltTransportClient(settings)
                         .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostname),
                                                                             port));
             } catch (Exception e) {
@@ -136,7 +114,7 @@ public class ElasticSearchContext {
                              e);
                 retries++;
                 try {
-                    Thread.sleep(5000l);
+                    Thread.sleep(5000L);
                 } catch (InterruptedException e1) {
                     logger.error("Error trying to create Transport Client, retrying",
                                  e1);
@@ -154,8 +132,6 @@ public class ElasticSearchContext {
     public Client getTransportClient() {
         if (this.transportClient == null) {
             this.transportClient = this.createTransportClient(cluster,
-                                                              username,
-                                                              password,
                                                               hostname,
                                                               port);
         }

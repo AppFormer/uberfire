@@ -94,7 +94,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
     }
 
     @Override
-    public boolean freshIndex(KCluster cluster) {
+    public boolean isFreshIndex(KCluster cluster) {
         return this.getIndexSize(cluster.getClusterId()) == 0;
     }
 
@@ -150,7 +150,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
     @Override
     public boolean exists(String index,
                           String id) {
-        return this.findHitsByQuery(Arrays.asList(index),
+        return this.findHitsByQuery(Collections.singletonList(index),
                                     new TermQuery(new Term(MetaObject.META_OBJECT_ID,
                                                            id))) > 0;
     }
@@ -164,7 +164,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
     public void delete(String index,
                        String id) {
 
-        Optional<SearchResponse> found = findByQueryRaw(Arrays.asList(index),
+        Optional<SearchResponse> found = findByQueryRaw(Collections.singletonList(index),
                                                         new TermQuery(new Term(MetaObject.META_OBJECT_ID,
                                                                                id)),
                                                         null,
@@ -186,7 +186,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
     @Override
     public List<KObject> findById(String index,
                                   String id) throws IOException {
-        return this.findByQuery(Arrays.asList(index),
+        return this.findByQuery(Collections.singletonList(index),
                                 new TermQuery(new Term(MetaObject.META_OBJECT_ID,
                                                        id)),
                                 1);
@@ -219,7 +219,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
 
     @Override
     public long getIndexSize(String index) {
-        return this.findHitsByQuery(Arrays.asList(index),
+        return this.findHitsByQuery(Collections.singletonList(index),
                                     new MatchAllDocsQuery());
     }
 
@@ -242,15 +242,12 @@ public class ElasticSearchIndexProvider implements IndexProvider {
                                                                 query,
                                                                 sort,
                                                                 limit);
-        if (response.isPresent()) {
-            return hitsToKObjects(response);
-        } else {
-            return Collections.emptyList();
-        }
+
+        return response.map(this::hitsToKObjects).orElse(Collections.emptyList());
     }
 
-    private List<KObject> hitsToKObjects(Optional<SearchResponse> response) {
-        return Arrays.stream(response.get().getHits().getHits())
+    private List<KObject> hitsToKObjects(SearchResponse response) {
+        return Arrays.stream(response.getHits().getHits())
                 .map(searchHit -> fieldFactory.fromDocument(searchHit.getSource()))
                 .collect(Collectors.toList());
     }
@@ -293,7 +290,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
         List<String> splittedTokens = Arrays.asList(queryString.split(" "));
         return splittedTokens.stream().map(query -> {
             if (query.chars().filter(ch -> ch == ':').count() >= 0) {
-                int separationChar = query.indexOf(":") + 1;
+                int separationChar = query.indexOf(':') + 1;
                 return query.substring(0,
                                        separationChar) + escape(query.substring(separationChar));
             } else {
@@ -327,11 +324,8 @@ public class ElasticSearchIndexProvider implements IndexProvider {
                                                                 query,
                                                                 null,
                                                                 0);
-        if (response.isPresent()) {
-            return response.get().getHits().getTotalHits();
-        } else {
-            return 0;
-        }
+
+        return response.map(res -> res.getHits().getTotalHits()).orElse(0L);
     }
 
     @Override
@@ -398,7 +392,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
         checkNotNull("metaProperties",
                      metaProperties);
         Map<String, Object> properties = new HashMap<>();
-        metaProperties.stream().forEach(metaProperty -> {
+        metaProperties.forEach(metaProperty -> {
             ElasticMetaProperty elasticProperty = (ElasticMetaProperty) metaProperty;
             Map<String, String> configuration = new HashMap<>();
             configuration.put("type",
@@ -429,7 +423,7 @@ public class ElasticSearchIndexProvider implements IndexProvider {
         }
     }
 
-    private String createElasticType(MetaProperty metaProperty) {
+    protected String createElasticType(MetaProperty metaProperty) {
         Class<?> type = metaProperty.getTypes().iterator().next();
         if (type == String.class && metaProperty.isSearchable()) {
             return ES_TEXT_TYPE;

@@ -52,15 +52,11 @@ public class IOServiceIndexedSortingTest extends BaseIndexTest {
     @Test
     public void testSortedFiles() throws IOException, InterruptedException {
 
-        setupCountDown(4);
-
         //Write files in reverse order so natural Lucene order would be c, b, a
         final Path base = writeFile("cFile1.txt");
         writeFile("CFile2.txt");
         writeFile("bFile.txt");
         writeFile("aFile.txt");
-
-        waitForCountDown(20000);
 
         List<String> indices = Arrays.asList(toKCluster(base.getFileSystem()).getClusterId());
         IndexProvider provider = this.config.getIndexProvider();
@@ -103,10 +99,12 @@ public class IOServiceIndexedSortingTest extends BaseIndexTest {
     }
 
     private Path writeFile(final String fileName) {
+        setupCountDown(1);
         final Path path = getBasePath(getSimpleName()).resolve(fileName);
         ioService().write(path,
                           "content",
                           Collections.<OpenOption>emptySet());
+        waitForCountDown(10000);
         return path;
     }
 }

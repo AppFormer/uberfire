@@ -27,7 +27,7 @@ import org.uberfire.ext.metadata.model.KObject;
 
 public interface IndexProvider extends Disposable {
 
-    boolean freshIndex(final KCluster cluster);
+    boolean isFreshIndex(final KCluster cluster);
 
     void index(KObject object);
 

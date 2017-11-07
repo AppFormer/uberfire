@@ -93,6 +93,8 @@ public class ComplexFieldsTest extends BaseIndexTest {
                                   }
                               });
         }
+        waitForCountDown(5000);
+        setupCountDown(1);
         {
             final Path file = ioService().get("git://elastic_complex_fields_test/path/to/files.txt");
             ioService().write(file,
@@ -110,7 +112,7 @@ public class ComplexFieldsTest extends BaseIndexTest {
                                   }
                               });
         }
-        waitForCountDown(20000);
+        waitForCountDown(5000);
         List<KObject> result = config.getIndexProvider().findByQuery(Arrays.asList("elastic_complex_fields_test"),
                                                                      new WildcardQuery(new Term("file",
                                                                                                 "default://master@files/kie")),

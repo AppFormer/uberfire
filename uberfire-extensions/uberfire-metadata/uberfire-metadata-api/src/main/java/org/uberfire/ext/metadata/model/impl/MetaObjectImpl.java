@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.uberfire.ext.metadata.model.schema.MetaObject;
 import org.uberfire.ext.metadata.model.schema.MetaProperty;
@@ -12,17 +13,26 @@ import org.uberfire.ext.metadata.model.schema.MetaType;
 public class MetaObjectImpl implements MetaObject {
 
     private final MetaType metaType;
-    private final Set<MetaProperty> properties;
+    private final ConcurrentHashMap<String, MetaProperty> properties;
 
     public MetaObjectImpl(MetaType metaType,
                           Set<MetaProperty> properties) {
         this.metaType = metaType;
 
         if (properties == null) {
-            this.properties = new HashSet<>();
+            this.properties = new ConcurrentHashMap<>();
         } else {
-            this.properties = properties;
+            this.properties = toHashMap(properties);
         }
+    }
+
+    private ConcurrentHashMap<String, MetaProperty> toHashMap(Set<MetaProperty> properties) {
+        ConcurrentHashMap<String, MetaProperty> map = new ConcurrentHashMap<>();
+        if (properties != null) {
+            properties.forEach(metaProperty -> map.put(metaProperty.getName(),
+                                                       metaProperty));
+        }
+        return map;
     }
 
     @Override
@@ -32,20 +42,17 @@ public class MetaObjectImpl implements MetaObject {
 
     @Override
     public Collection<MetaProperty> getProperties() {
-        return this.properties;
+        return this.properties.values();
     }
 
     @Override
     public Optional<MetaProperty> getProperty(String name) {
-        return this.getProperties()
-                .stream()
-                .filter(metaProperty -> metaProperty.getName()
-                        .equals(name))
-                .findFirst();
+        return Optional.ofNullable(this.properties.get(name));
     }
 
     @Override
     public void addProperty(MetaProperty metaProperty) {
-        this.properties.add(metaProperty);
+        this.properties.put(metaProperty.getName(),
+                            metaProperty);
     }
 }

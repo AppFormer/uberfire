@@ -59,7 +59,7 @@ public class IOServiceIndexedDotFileGitInternalImplTest extends BaseIndexTest {
                           Collections.<OpenOption>emptySet(),
                           getFileAttributes());
 
-        waitForCountDown(30000);
+        waitForCountDown(10000);
 
         List<String> indices = Arrays.asList(toKCluster(path1.getFileSystem()).getClusterId());
         IndexProvider provider = this.config.getIndexProvider();

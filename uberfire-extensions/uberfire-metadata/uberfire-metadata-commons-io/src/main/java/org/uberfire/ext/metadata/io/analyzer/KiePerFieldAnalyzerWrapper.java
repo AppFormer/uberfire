@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.uberfire.ext.metadata.analyzer.ElasticSearchAnalyzer;
 import org.uberfire.ext.metadata.analyzer.ElasticSearchAnalyzerWrapper;
 import org.uberfire.ext.metadata.backend.lucene.analyzer.FilenameAnalyzer;
 
@@ -55,9 +56,9 @@ public class KiePerFieldAnalyzerWrapper extends DelegatingAnalyzerWrapper implem
         Analyzer analyzer = this.getWrappedAnalyzer(fieldName);
         Class<?> analyzerClass = analyzer.getClass();
         if (analyzerClass.equals(FilenameAnalyzer.class)) {
-            return ANALYZER_SIMPLE;
+            return ElasticSearchAnalyzer.SIMPLE.toString();
         } else {
-            return ANALYZER_STANDARD;
+            return ElasticSearchAnalyzer.STANDARD.toString();
         }
     }
 }

@@ -58,7 +58,7 @@ public class MetadataIndexEngine implements MetaIndexEngine {
 
     @Override
     public boolean freshIndex(KCluster cluster) {
-        boolean isFreshIndex = this.provider.freshIndex(cluster) && !batchMode.containsKey(cluster);
+        boolean isFreshIndex = this.provider.isFreshIndex(cluster) && !batchMode.containsKey(cluster);
         if (logger.isDebugEnabled()) {
             logger.debug("Is fresh index? " + isFreshIndex);
         }

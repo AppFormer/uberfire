@@ -77,7 +77,7 @@ public class ElasticSearchIndexTest extends BaseIndexTest {
             }
         };
 
-        waitForCountDown(5000);
+        waitForCountDown(10000);
 
         final Map<String, Object> attributes = new HashMap<String, Object>() {{
             put("filename",

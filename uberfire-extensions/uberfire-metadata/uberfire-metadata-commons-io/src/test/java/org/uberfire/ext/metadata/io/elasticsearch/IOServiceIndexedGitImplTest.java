@@ -93,7 +93,7 @@ public class IOServiceIndexedGitImplTest extends BaseIndexTest {
                               }
                           });
 
-        waitForCountDown(5000);
+        waitForCountDown(10000);
 
         Thread.sleep(2000l);
 

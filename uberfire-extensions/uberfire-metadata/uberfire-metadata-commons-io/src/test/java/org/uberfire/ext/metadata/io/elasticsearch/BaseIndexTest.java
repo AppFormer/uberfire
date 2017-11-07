@@ -38,6 +38,7 @@ import org.uberfire.ext.metadata.backend.elastic.provider.ElasticSearchContext;
 import org.uberfire.ext.metadata.io.IOServiceIndexedImpl;
 import org.uberfire.ext.metadata.io.IndexersFactory;
 import org.uberfire.ext.metadata.io.MetadataConfigBuilder;
+import org.uberfire.ext.metadata.io.elasticsearch.suite.ElasticSearchTestSuite;
 import org.uberfire.io.IOService;
 import org.uberfire.io.attribute.DublinCoreView;
 import org.uberfire.java.nio.base.version.VersionAttributeView;
@@ -51,41 +52,30 @@ public abstract class BaseIndexTest {
 
     protected static final Map<String, Path> basePaths = new HashMap<String, Path>();
     protected static final List<File> tempFiles = new ArrayList<File>();
+    private static boolean localTest = false;
     protected boolean created = false;
     protected MetadataConfig config;
     protected IOService ioService = null;
     private int seed = new Random(10L).nextInt();
 
-    private static String image = "docker.elastic.co/elasticsearch/elasticsearch:5.6.1";
-
-    @ClassRule
-    public static DockerRule elasticsearchRule = DockerRule.builder()
-            .imageName(image)
-            .name("kie-elasticsearch")
-            .env("cluster.name",
-                 "kie-cluster")
-            .env("discovery.type",
-                 "single-node")
-            .env("http.host",
-                 "0.0.0.0")
-            .env("transport.host",
-                 "0.0.0.0")
-            .env("transport.tcp.port",
-                 "9300")
-            .mountFrom(new File("src/test/resources/elasticsearch.yml").getAbsolutePath())
-            .to("/usr/share/elasticsearch/config/elasticsearch.yml")
-            .stopOptions(StopOption.KILL,
-                         StopOption.REMOVE)
-            .waitForTimeout(60)
-            .expose("9200",
-                    "9200")
-            .expose("9300",
-                    "9300")
-            .waitFor(WaitFor.logMessage("started"))
-            .build();
+    @BeforeClass
+    public static void beforeClass() throws Throwable {
+        cleanup();
+        String id = ElasticSearchTestSuite.elasticsearchRule.getContainerId();
+        if (id == null) {
+            ElasticSearchTestSuite.elasticsearchRule.before();
+            localTest = true;
+        }
+    }
 
     @AfterClass
-    @BeforeClass
+    public static void afterClass() {
+        if (localTest) {
+            ElasticSearchTestSuite.elasticsearchRule.after();
+        }
+        cleanup();
+    }
+
     public static void cleanup() {
         for (final File tempFile : tempFiles) {
             FileUtils.deleteQuietly(tempFile);
@@ -155,7 +145,7 @@ public abstract class BaseIndexTest {
     }
 
     @After
-    public void tierDown() {
+    public void tearDown() {
         this.ioService.dispose();
         ElasticSearchContext.getInstance().destroy();
     }

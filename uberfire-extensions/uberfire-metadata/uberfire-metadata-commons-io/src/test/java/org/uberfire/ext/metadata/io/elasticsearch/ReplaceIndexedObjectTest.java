@@ -61,7 +61,7 @@ public class ReplaceIndexedObjectTest extends BaseIndexTest {
                                   }
                               });
 
-            waitForCountDown(20000);
+            waitForCountDown(10000);
             setupCountDown(2);
             ioService().write(file,
                               "some content here",
@@ -77,7 +77,7 @@ public class ReplaceIndexedObjectTest extends BaseIndexTest {
                                       return "default://master@file/kies";
                                   }
                               });
-            waitForCountDown(20000);
+            waitForCountDown(10000);
         }
 
         List<KObject> result = config.getIndexProvider().findByQuery(Arrays.asList(getSimpleName()),
