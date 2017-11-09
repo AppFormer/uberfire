@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import com.google.common.base.Joiner;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.DefaultPlaceRequest;
@@ -63,7 +64,7 @@ public final class MenuBuilderImpl
     final Stack<MenuFactory.CustomMenuBuilder> context = new Stack<MenuFactory.CustomMenuBuilder>();
     int order = 0;
 
-    private static class CurrentContext implements MenuFactory.CustomMenuBuilder {
+    static class CurrentContext implements MenuFactory.CustomMenuBuilder {
 
         MenuItem menu = null;
 
@@ -73,6 +74,7 @@ public final class MenuBuilderImpl
         Set<String> roles = new HashSet<String>();
         MenuPosition position = MenuPosition.LEFT;
         String contributionPoint = null;
+        String namespace = null;
         Command command = null;
         PlaceRequest placeRequest = null;
         List<MenuItem> menuItems = new ArrayList<MenuItem>();
@@ -141,11 +143,10 @@ public final class MenuBuilderImpl
 
                     @Override
                     public String getSignatureId() {
-                        if ( contributionPoint != null ) {
-                            return getClass().getName() + "#" + contributionPoint + "#" + caption;
 
-                        }
-                        return getClass().getName() + "#" + caption;
+                        final String[] signatureParts = { getClass().getName(), contributionPoint, namespace, caption };
+
+                        return Joiner.on( '#' ).skipNulls().join( signatureParts );
                     }
 
                     @Override
@@ -223,11 +224,10 @@ public final class MenuBuilderImpl
 
                     @Override
                     public String getSignatureId() {
-                        if ( contributionPoint != null ) {
-                            return getClass().getName() + "#" + contributionPoint + "#" + caption;
 
-                        }
-                        return getClass().getName() + "#" + caption;
+                        final String[] signatureParts = { getClass().getName(), contributionPoint, namespace, caption };
+
+                        return Joiner.on( '#' ).skipNulls().join( signatureParts );
                     }
 
                     @Override
@@ -300,11 +300,10 @@ public final class MenuBuilderImpl
 
                     @Override
                     public String getSignatureId() {
-                        if ( contributionPoint != null ) {
-                            return getClass().getName() + "#" + contributionPoint + "#" + caption;
 
-                        }
-                        return getClass().getName() + "#" + caption;
+                        final String[] signatureParts = { getClass().getName(), contributionPoint, namespace, caption };
+
+                        return Joiner.on( '#' ).skipNulls().join( signatureParts );
                     }
 
                     @Override
@@ -372,11 +371,10 @@ public final class MenuBuilderImpl
 
                 @Override
                 public String getSignatureId() {
-                    if ( contributionPoint != null ) {
-                        return getClass().getName() + "#" + contributionPoint + "#" + caption;
 
-                    }
-                    return getClass().getName() + "#" + caption;
+                    final String[] signatureParts = { getClass().getName(), contributionPoint, namespace, caption };
+
+                    return Joiner.on( '#' ).skipNulls().join( signatureParts );
                 }
 
                 @Override
@@ -541,6 +539,12 @@ public final class MenuBuilderImpl
             ( (CurrentContext) context.peek() ).roles.add( role );
         }
 
+        return this;
+    }
+
+    @Override
+    public MenuBuilderImpl withNamespace(final String namespace) {
+        ( (CurrentContext) context.peek() ).namespace = checkNotEmpty( "namespace", namespace );
         return this;
     }
 
