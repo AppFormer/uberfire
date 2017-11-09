@@ -127,6 +127,8 @@ public final class MenuFactory {
         T withRoles( final String... roles );
 
         T withRoles( final Collection<String> roles );
+
+        T withNamespace( final String namespace );
     }
 
     public interface CustomMenuBuilder {
