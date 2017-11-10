@@ -17,6 +17,7 @@
 package org.uberfire.java.nio.base;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.regex.Matcher;
 
 import org.uberfire.java.nio.file.FileSystem;
@@ -27,7 +28,8 @@ import static org.kie.soup.commons.validation.Preconditions.checkNotNull;
 
 public class GeneralPathImpl
         extends AbstractPath<FileSystem>
-        implements SegmentedPath {
+        implements SegmentedPath,
+                   Serializable {
 
     private GeneralPathImpl(final FileSystem fs,
                             final File file) {
