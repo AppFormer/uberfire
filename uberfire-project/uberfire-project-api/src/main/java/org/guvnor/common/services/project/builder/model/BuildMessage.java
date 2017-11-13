@@ -24,7 +24,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 import org.uberfire.backend.vfs.Path;
 
 @Portable
-public class BuildMessage implements Serializable, Comparable {
+public class BuildMessage implements Serializable, Comparable<BuildMessage> {
 
     private long id;
     private Level level;
@@ -141,9 +141,11 @@ public class BuildMessage implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object other) {
-        return Comparator.comparing((BuildMessage p)->p.getText()).compare(this, (BuildMessage) other);
+    public int compareTo(BuildMessage other) {
+        return Comparator.comparing(BuildMessage::getText).compare(this, other);
     }
+
+
 
 
 }

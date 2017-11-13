@@ -154,9 +154,9 @@ public class POMContentHandler {
     protected Plugin getNewCompilerPlugin(Map<ConfigurationKey, String> conf) {
 
         Plugin newCompilerPlugin = new Plugin();
-        newCompilerPlugin.setGroupId(conf.get(ConfigurationKey.ALTERNATIVE_COMPILER_PLUGINS));
-        newCompilerPlugin.setArtifactId(conf.get(ConfigurationKey.ALTERNATIVE_COMPILER_PLUGIN));
-        newCompilerPlugin.setVersion(conf.get(ConfigurationKey.ALTERNATIVE_COMPILER_PLUGIN_VERSION));
+        newCompilerPlugin.setGroupId(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGI_GROUP));
+        newCompilerPlugin.setArtifactId(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGIN_ARTIFACT));
+        newCompilerPlugin.setVersion(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGIN_VERSION));
 
         PluginExecution execution = new PluginExecution();
         execution.setId(COMPILE);
@@ -186,7 +186,7 @@ public class POMContentHandler {
 
     protected Plugin getDisableMavenCompiler(Map<ConfigurationKey, String> conf) {
         Plugin plugin = new Plugin();
-        plugin.setArtifactId(conf.get(ConfigurationKey.MAVEN_COMPILER_PLUGIN));
+        plugin.setArtifactId(conf.get(ConfigurationKey.MAVEN_COMPILER_PLUGIN_ARTIFACT));
 
         Xpp3Dom skipMain = new Xpp3Dom(MAVEN_SKIP_MAIN);
         skipMain.setValue(TRUE);

@@ -25,7 +25,7 @@ import org.uberfire.backend.vfs.Path;
 
 @Portable
 public class ValidationMessage implements Serializable,
-                                          Comparable {
+                                          Comparable<ValidationMessage> {
 
     private long id;
     private Level level;
@@ -182,8 +182,7 @@ public class ValidationMessage implements Serializable,
     }
 
     @Override
-    public int compareTo(Object other) {
-        return Comparator.comparing((ValidationMessage p) -> p.getText()).compare(this, (ValidationMessage) other);
-
+    public int compareTo(ValidationMessage other) {
+        return Comparator.comparing(ValidationMessage::getText).compare(this, other);
     }
 }
