@@ -154,7 +154,7 @@ public class POMContentHandler {
     protected Plugin getNewCompilerPlugin(Map<ConfigurationKey, String> conf) {
 
         Plugin newCompilerPlugin = new Plugin();
-        newCompilerPlugin.setGroupId(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGI_GROUP));
+        newCompilerPlugin.setGroupId(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGIN_GROUP));
         newCompilerPlugin.setArtifactId(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGIN_ARTIFACT));
         newCompilerPlugin.setVersion(conf.get(ConfigurationKey.TAKARI_COMPILER_PLUGIN_VERSION));
 
