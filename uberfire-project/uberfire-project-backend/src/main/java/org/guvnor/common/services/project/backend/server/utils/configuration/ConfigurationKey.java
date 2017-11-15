@@ -18,6 +18,10 @@ package org.guvnor.common.services.project.backend.server.utils.configuration;
 
 public enum ConfigurationKey {
 
+    COMPILER,
+    SOURCE_VERSION,
+    TARGET_VERSION,
+
     MAVEN_COMPILER_PLUGIN_GROUP,
     MAVEN_COMPILER_PLUGIN_ARTIFACT,
     MAVEN_COMPILER_PLUGIN_VERSION,
