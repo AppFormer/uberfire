@@ -118,22 +118,19 @@ public class POMContentHandler {
         String kieVersion = conf.get(ConfigurationKey.KIE_VERSION);
         if (pom.getDependencies().isEmpty()) {
             List<Dependency> dependencies = new ArrayList<>();
-            dependencies.add(getDependency(conf, "org.kie", "kie-api", kieVersion, "provided"));
-            dependencies.add(getDependency(conf, "org.optaplanner", "optaplanner-core", kieVersion, "provided"));
-            dependencies.add(getDependency(conf, "org.optaplanner", "org.optaplanner", kieVersion, "provided"));
-            dependencies.add(getDependency(conf, "junit", "junit", "4.12", "test"));
+            dependencies.add(getDependency("org.kie", "kie-api", kieVersion, "provided"));
+            dependencies.add(getDependency("org.optaplanner", "optaplanner-core", kieVersion, "provided"));
+            dependencies.add(getDependency("junit", "junit", "4.12", "test"));
             model.setDependencies(dependencies);
         } else {
             pom.getDependencies().add(getGuvDependency(conf, "org.kie", "kie-api", kieVersion, "provided"));
-            pom.getDependencies().add(getGuvDependency(conf, "org.kie", "kie-api", kieVersion, "provided"));
             pom.getDependencies().add(getGuvDependency(conf, "org.optaplanner", "optaplanner-core", kieVersion, "provided"));
-            pom.getDependencies().add(getGuvDependency(conf, "org.optaplanner", "org.optaplanner", kieVersion, "provided"));
             pom.getDependencies().add(getGuvDependency(conf, "junit", "junit", "4.12", "test"));
             new DependencyUpdater(model.getDependencies()).updateDependencies(pom.getDependencies());
         }
     }
 
-    private Dependency getDependency(Map<ConfigurationKey, String> conf, String groupID, String artifactID, String version, String scope) {
+    private Dependency getDependency(String groupID, String artifactID, String version, String scope) {
         Dependency dep = new Dependency();
         dep.setGroupId(groupID);
         dep.setArtifactId(artifactID);
