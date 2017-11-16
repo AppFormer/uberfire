@@ -318,8 +318,8 @@ public class GridWidgetDnDMouseMoveHandlerTest {
                                             });
     }
 
-    public void doFindMovableGridWhenOverDragHandle(final boolean isPinned,
-                                                    final Command assertion) {
+    private void doFindMovableGridWhenOverDragHandle(final boolean isPinned,
+                                                     final Command assertion) {
         state.setOperation(GridWidgetHandlersOperation.NONE);
         when(gridWidget.isVisible()).thenReturn(true);
         when(gridWidget.onDragHandle(any(INodeXYEvent.class))).thenReturn(true);
