@@ -20,11 +20,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
@@ -46,6 +45,7 @@ import org.guvnor.common.services.project.backend.server.utils.configuration.Con
 import org.guvnor.common.services.project.model.GAV;
 import org.guvnor.common.services.project.model.POM;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 @ApplicationScoped
@@ -71,7 +71,7 @@ public class POMContentHandler {
     @Inject
     public POMContentHandler(final Instance<ConfigurationStrategy> configuration) {
         this(stream(configuration.spliterator(), false)
-                     .collect(Collectors.toList()));
+                     .collect(toList()));
     }
 
     public POMContentHandler(Collection<ConfigurationStrategy> configurations) {
@@ -157,7 +157,7 @@ public class POMContentHandler {
 
         PluginExecution execution = new PluginExecution();
         execution.setId(COMPILE);
-        execution.setGoals(Arrays.asList(COMPILE));
+        execution.setGoals(Collections.singletonList(COMPILE));
         execution.setPhase(COMPILE);
 
         Xpp3Dom compilerId = new Xpp3Dom(COMPILER_ID);
@@ -166,7 +166,7 @@ public class POMContentHandler {
         configuration.addChild(compilerId);
 
         execution.setConfiguration(configuration);
-        newCompilerPlugin.setExecutions(Arrays.asList(execution));
+        newCompilerPlugin.setExecutions(Collections.singletonList(execution));
 
         return newCompilerPlugin;
     }
@@ -199,28 +199,22 @@ public class POMContentHandler {
         PluginExecution exec = new PluginExecution();
         exec.setId(MAVEN_DEFAULT_COMPILE);
         exec.setPhase(MAVEN_PHASE_NONE);
-        List<PluginExecution> executions = new ArrayList<>();
-        executions.add(exec);
-        plugin.setExecutions(executions);
+        plugin.setExecutions(Collections.singletonList(exec));
         return plugin;
     }
 
-    private ArrayList<Repository> getRepositories(final POM pom) {
-        ArrayList<Repository> result = new ArrayList<Repository>();
-        for (org.guvnor.common.services.project.model.Repository repository : pom.getRepositories()) {
-            result.add(fromClientModelToPom(repository));
-        }
-        return result;
+    private List<Repository> getRepositories(final POM pom) {
+        return pom.getRepositories().stream()
+                .map(this::fromClientModelToPom)
+                .collect(toList());
     }
 
-    private ArrayList<String> getModules(final POM pom) {
-        ArrayList<String> result = new ArrayList<String>();
+    private List<String> getModules(final POM pom) {
         if (pom.getModules() != null) {
-            for (String module : pom.getModules()) {
-                result.add(module);
-            }
+            return new ArrayList<>(pom.getModules());
+        } else {
+            return Collections.emptyList();
         }
-        return result;
     }
 
     private Parent getParent(final POM pom) {
@@ -253,7 +247,6 @@ public class POMContentHandler {
         to.setId(from.getId());
         to.setName(from.getName());
         to.setUrl(from.getUrl());
-
         return to;
     }
 
