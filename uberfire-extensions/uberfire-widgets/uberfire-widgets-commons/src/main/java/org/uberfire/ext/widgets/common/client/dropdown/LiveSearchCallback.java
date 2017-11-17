@@ -16,9 +16,7 @@
 
 package org.uberfire.ext.widgets.common.client.dropdown;
 
-import java.util.List;
-
 public interface LiveSearchCallback {
 
-    void afterSearch(List<String> itemList);
+    void afterSearch(LiveSearchResults results);
 }

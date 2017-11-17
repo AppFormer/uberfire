@@ -28,7 +28,5 @@ import com.google.gwt.user.client.ui.IsWidget;
  * Presenter.
  * @param <T> The Presenter type
  */
-public interface UberView<T> extends IsWidget {
-
-    void init(T presenter);
+public interface UberView<T> extends IsWidget, HasPresenter<T> {
 }

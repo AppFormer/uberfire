@@ -22,10 +22,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.uberfire.commons.cluster.ClusterJMSService;
+import org.uberfire.commons.cluster.ClusterParameters;
+import org.uberfire.commons.cluster.ClusterService;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
-import org.uberfire.java.nio.fs.jgit.ws.cluster.ClusterParameters;
 import org.uberfire.java.nio.fs.jgit.ws.cluster.JGitEventsBroadcast;
 
 import static org.junit.Assert.*;
@@ -56,9 +58,10 @@ public class JGitFileSystemsEventsManagerTest {
     @Test
     public void doNotSetupClusterTest() {
         JGitFileSystemsEventsManager another = new JGitFileSystemsEventsManager() {
+
             @Override
-            ClusterParameters loadClusterParameters() {
-                return mock(ClusterParameters.class);
+            ClusterService createClusterJMSService() {
+                return mock(ClusterJMSService.class);
             }
         };
         assertNull(another.getjGitEventsBroadcast());

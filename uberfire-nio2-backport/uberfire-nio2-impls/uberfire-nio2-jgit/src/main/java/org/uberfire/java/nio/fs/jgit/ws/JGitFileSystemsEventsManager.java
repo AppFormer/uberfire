@@ -21,11 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uberfire.commons.cluster.ClusterJMSService;
+import org.uberfire.commons.cluster.ClusterService;
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.WatchEvent;
 import org.uberfire.java.nio.file.WatchService;
-import org.uberfire.java.nio.fs.jgit.ws.cluster.ClusterParameters;
 import org.uberfire.java.nio.fs.jgit.ws.cluster.JGitEventsBroadcast;
 
 public class JGitFileSystemsEventsManager {
@@ -34,24 +35,24 @@ public class JGitFileSystemsEventsManager {
 
     private final Map<String, JGitFileSystemWatchServices> fsWatchServices = new ConcurrentHashMap<>();
 
-    private final ClusterParameters clusterParameters;
+    private final ClusterService clusterService;
 
     JGitEventsBroadcast jGitEventsBroadcast;
 
     public JGitFileSystemsEventsManager() {
-        clusterParameters = loadClusterParameters();
+        clusterService = createClusterJMSService();
 
-        if (clusterParameters.isAppFormerClustered()) {
+        if (clusterService.isAppFormerClustered()) {
             setupJGitEventsBroadcast();
         }
     }
 
-    ClusterParameters loadClusterParameters() {
-        return new ClusterParameters();
+    ClusterService createClusterJMSService() {
+        return new ClusterJMSService();
     }
 
     void setupJGitEventsBroadcast() {
-        jGitEventsBroadcast = new JGitEventsBroadcast(clusterParameters,
+        jGitEventsBroadcast = new JGitEventsBroadcast(clusterService,
                                                       w -> publishEvents(w.getFsName(),
                                                                          w.getWatchable(),
                                                                          w.getEvents(),
