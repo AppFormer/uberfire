@@ -35,9 +35,9 @@ public class POM {
 
     private Build build;
 
-    private List<Dependency> dependencies = new ArrayList<Dependency>();
-    private List<Repository> repositories = new ArrayList<Repository>();
-    private List<String> modules = new ArrayList<String>();
+    private List<Dependency> dependencies = new ArrayList<>();
+    private List<Repository> repositories = new ArrayList<>();
+    private List<String> modules = new ArrayList<>();
 
     public POM() {
         this.gav = new GAV();
@@ -53,7 +53,6 @@ public class POM {
     public POM(final String name,
                final String description,
                final GAV gav) {
-        super();
         this.name = name;
         this.description = description;
         this.gav = gav;
@@ -63,10 +62,7 @@ public class POM {
                final String description,
                final GAV gav,
                final boolean multiModule) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.gav = gav;
+        this(name, description, gav);
         if (multiModule) {
             packaging = "pom";
         }
