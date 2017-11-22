@@ -30,6 +30,8 @@ import static org.kie.soup.commons.validation.Preconditions.checkNotNull;
 
 public abstract class BaseSimpleFileStore implements FileStore {
 
+    BaseSimpleFileStore(){}
+
     BaseSimpleFileStore(final Path path) {
     }
 

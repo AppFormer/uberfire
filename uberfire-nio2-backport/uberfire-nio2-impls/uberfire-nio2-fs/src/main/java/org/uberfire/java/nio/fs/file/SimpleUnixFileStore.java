@@ -17,15 +17,18 @@
 package org.uberfire.java.nio.fs.file;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.uberfire.java.nio.IOException;
 import org.uberfire.java.nio.file.Path;
 
-public class SimpleUnixFileStore extends BaseSimpleFileStore {
+public class SimpleUnixFileStore extends BaseSimpleFileStore implements Serializable{
 
     SimpleUnixFileStore(final Path path) {
         super(path);
     }
+
+    SimpleUnixFileStore(){}
 
     @Override
     public String name() {

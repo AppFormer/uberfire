@@ -17,6 +17,7 @@
 package org.uberfire.java.nio.fs.file;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +39,8 @@ import static org.kie.soup.commons.validation.Preconditions.checkNotEmpty;
 import static org.kie.soup.commons.validation.Preconditions.checkNotNull;
 
 public abstract class BaseSimpleFileSystem implements FileSystem,
-                                                      FileSystemId {
+                                                      FileSystemId,
+                                                      Serializable {
 
     private final FileSystemProvider provider;
     private final String defaultDirectory;

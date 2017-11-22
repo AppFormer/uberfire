@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
@@ -70,7 +71,8 @@ import static org.kie.soup.commons.validation.Preconditions.checkNotNull;
 import static org.uberfire.java.nio.file.StandardOpenOption.READ;
 import static org.uberfire.java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
-public class SimpleFileSystemProvider implements FileSystemProvider {
+public class SimpleFileSystemProvider implements FileSystemProvider,
+                                                 Serializable {
 
     private static final String USER_DIR = "user.dir";
     private final BaseSimpleFileSystem fileSystem;

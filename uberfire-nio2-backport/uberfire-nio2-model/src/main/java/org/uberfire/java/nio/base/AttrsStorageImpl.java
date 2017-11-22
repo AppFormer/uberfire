@@ -16,6 +16,7 @@
 
 package org.uberfire.java.nio.base;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,8 @@ import org.uberfire.java.nio.file.attribute.BasicFileAttributeView;
 
 import static java.util.Collections.unmodifiableMap;
 
-public class AttrsStorageImpl implements AttrsStorage {
+public class AttrsStorageImpl implements AttrsStorage,
+                                         Serializable {
 
     final Properties content = new Properties();
     final Map<String, AttributeView> viewsNameIndex = new HashMap<String, AttributeView>();

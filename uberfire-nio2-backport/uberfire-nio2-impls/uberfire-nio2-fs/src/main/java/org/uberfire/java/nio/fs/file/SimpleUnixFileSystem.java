@@ -16,6 +16,7 @@
 
 package org.uberfire.java.nio.fs.file;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -23,7 +24,7 @@ import org.uberfire.java.nio.file.FileStore;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.spi.FileSystemProvider;
 
-public class SimpleUnixFileSystem extends BaseSimpleFileSystem {
+public class SimpleUnixFileSystem extends BaseSimpleFileSystem implements Serializable {
 
     final FileStore fileStore = new SimpleUnixFileStore(null);
 

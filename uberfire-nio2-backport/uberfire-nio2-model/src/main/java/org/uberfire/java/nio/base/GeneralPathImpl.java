@@ -17,6 +17,9 @@
 package org.uberfire.java.nio.base;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 
@@ -30,6 +33,8 @@ public class GeneralPathImpl
         extends AbstractPath<FileSystem>
         implements SegmentedPath,
                    Serializable {
+
+    public GeneralPathImpl(){}
 
     private GeneralPathImpl(final FileSystem fs,
                             final File file) {
@@ -193,5 +198,13 @@ public class GeneralPathImpl
     @Override
     public String getSegmentId() {
         return "/";
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 }

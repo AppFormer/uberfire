@@ -16,12 +16,14 @@
 
 package org.uberfire.commons.data;
 
+import java.io.Serializable;
+
 /**
  * This is a simple class to store a pair of objects.
  * @param <K1>
  * @param <K2>
  */
-public class Pair<K1, K2> {
+public class Pair<K1, K2> implements Serializable{
 
     private final PairEqualsMode equalsMode;
     /**

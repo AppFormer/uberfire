@@ -17,6 +17,9 @@
 package org.uberfire.java.nio.base;
 
 import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +49,8 @@ import static org.kie.soup.commons.validation.Preconditions.checkInstanceOf;
 
 public abstract class AbstractPath<FS extends FileSystem>
         implements Path,
-                   AttrHolder {
+                   AttrHolder,
+                   Serializable {
 
     public static final Pattern WINDOWS_DRIVER = Pattern.compile("^/?[A-Z|a-z]+(:).*");
     public static final String DEFAULT_WINDOWS_DRIVER = "C:";
@@ -64,6 +68,15 @@ public abstract class AbstractPath<FS extends FileSystem>
     protected final AttrsStorage attrsStorage = new AttrsStorageImpl();
     protected String toStringFormat;
     protected File file = null;
+
+    protected AbstractPath(){
+        this(null,
+             null,
+             "",
+             false,
+             false,
+             true);
+    }
 
     protected AbstractPath(final FS fs,
                            final File file) {
@@ -803,5 +816,13 @@ public abstract class AbstractPath<FS extends FileSystem>
             this.isRoot = isRoot;
             this.path = path;
         }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws java.io.IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 }
