@@ -25,7 +25,7 @@ import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.DeploymentMode;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
@@ -46,9 +46,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectServiceImplNewWorkspaceProjectTest {
+public class ProjectServiceImplNewWorkspaceWorkspaceProjectTest {
 
-    ProjectService projectService;
+    WorkspaceProjectService workspaceProjectService;
 
     @Mock
     RepositoryService repositoryService;
@@ -96,12 +96,12 @@ public class ProjectServiceImplNewWorkspaceProjectTest {
 
         doReturn(moduleService).when(moduleServices).get();
 
-        projectService = new ProjectServiceImpl(mock(OrganizationalUnitService.class),
-                                                repositoryService,
-                                                newProjectEvent,
-                                                moduleServices,
-                                                mock(User.class),
-                                                mock(AuthorizationManager.class));
+        workspaceProjectService = new WorkspaceProjectServiceImpl(mock(OrganizationalUnitService.class),
+                                                                  repositoryService,
+                                                                  newProjectEvent,
+                                                                  moduleServices,
+                                                                  mock(User.class),
+                                                                  mock(AuthorizationManager.class));
     }
 
     @Test
@@ -112,8 +112,8 @@ public class ProjectServiceImplNewWorkspaceProjectTest {
                                                        eq(""),
                                                        eq(DeploymentMode.VALIDATED));
 
-        final WorkspaceProject workspaceProject = projectService.newProject(ou,
-                                                                            pom);
+        final WorkspaceProject workspaceProject = workspaceProjectService.newProject(ou,
+                                                                                     pom);
         assertProject(workspaceProject);
         verify(newProjectEvent).fire(any());
     }
@@ -126,9 +126,9 @@ public class ProjectServiceImplNewWorkspaceProjectTest {
                                                        eq(""),
                                                        eq(DeploymentMode.VALIDATED));
 
-        final WorkspaceProject workspaceProject = projectService.newProject(ou,
-                                                                            pom,
-                                                                            DeploymentMode.VALIDATED);
+        final WorkspaceProject workspaceProject = workspaceProjectService.newProject(ou,
+                                                                                     pom,
+                                                                                     DeploymentMode.VALIDATED);
         assertProject(workspaceProject);
         verify(newProjectEvent).fire(any());
     }
@@ -140,9 +140,9 @@ public class ProjectServiceImplNewWorkspaceProjectTest {
                                                        eq(""),
                                                        eq(DeploymentMode.FORCED));
 
-        final WorkspaceProject workspaceProject = projectService.newProject(ou,
-                                                                            pom,
-                                                                            DeploymentMode.FORCED);
+        final WorkspaceProject workspaceProject = workspaceProjectService.newProject(ou,
+                                                                                     pom,
+                                                                                     DeploymentMode.FORCED);
         assertProject(workspaceProject);
         verify(newProjectEvent).fire(any());
     }

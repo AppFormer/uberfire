@@ -24,7 +24,7 @@ import javax.enterprise.inject.Instance;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.organizationalunit.impl.OrganizationalUnitImpl;
@@ -44,9 +44,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkspaceProjectServiceImplTest {
+public class WorkspaceWorkspaceProjectServiceImplTest {
 
-    ProjectService projectService;
+    WorkspaceProjectService workspaceProjectService;
 
     @Mock
     OrganizationalUnitService organizationalUnitService;
@@ -82,12 +82,12 @@ public class WorkspaceProjectServiceImplTest {
 
         doReturn(moduleService).when(moduleServices).get();
 
-        projectService = new ProjectServiceImpl(organizationalUnitService,
-                                                repositoryService,
-                                                new EventSourceMock<>(),
-                                                moduleServices,
-                                                mock(User.class),
-                                                mock(AuthorizationManager.class));
+        workspaceProjectService = new WorkspaceProjectServiceImpl(organizationalUnitService,
+                                                                  repositoryService,
+                                                                  new EventSourceMock<>(),
+                                                                  moduleServices,
+                                                                  mock(User.class),
+                                                                  mock(AuthorizationManager.class));
     }
 
     private void setUpOUs() {
@@ -131,7 +131,7 @@ public class WorkspaceProjectServiceImplTest {
     @Test
     public void getAllProjects() throws Exception {
 
-        final Collection<WorkspaceProject> allWorkspaceProjects = projectService.getAllProjects();
+        final Collection<WorkspaceProject> allWorkspaceProjects = workspaceProjectService.getAllWorkspaceProjects();
 
         assertEquals(3,
                      allWorkspaceProjects.size());
@@ -139,7 +139,7 @@ public class WorkspaceProjectServiceImplTest {
 
     @Test
     public void getAllProjectsForOU1() throws Exception {
-        final Collection<WorkspaceProject> allWorkspaceProjects = projectService.getAllProjects(ou1);
+        final Collection<WorkspaceProject> allWorkspaceProjects = workspaceProjectService.getAllWorkspaceProjects(ou1);
 
         assertContains(repository1,
                        allWorkspaceProjects);
@@ -152,7 +152,7 @@ public class WorkspaceProjectServiceImplTest {
 
     @Test
     public void getAllProjectsForOU2() throws Exception {
-        final Collection<WorkspaceProject> allWorkspaceProjects = projectService.getAllProjects(ou2);
+        final Collection<WorkspaceProject> allWorkspaceProjects = workspaceProjectService.getAllWorkspaceProjects(ou2);
 
         assertContains(repository3,
                        allWorkspaceProjects);
@@ -173,9 +173,9 @@ public class WorkspaceProjectServiceImplTest {
         ou2.getRepositories().add(repository4);
         allRepositories.add(repository4);
 
-        final Collection<WorkspaceProject> allWorkspaceProjects = projectService.getAllProjects(new OrganizationalUnitImpl("ou2",
-                                                                                                                           "",
-                                                                                                                           ""));
+        final Collection<WorkspaceProject> allWorkspaceProjects = workspaceProjectService.getAllWorkspaceProjects(new OrganizationalUnitImpl("ou2",
+                                                                                                                                             "",
+                                                                                                                                             ""));
 
         assertContains(repository3,
                        allWorkspaceProjects);
@@ -193,7 +193,7 @@ public class WorkspaceProjectServiceImplTest {
 
         doReturn(organizationalUnit).when(organizationalUnitService).getOrganizationalUnit("myOU");
 
-        assertTrue(projectService.getAllProjects(organizationalUnit).isEmpty());
+        assertTrue(workspaceProjectService.getAllWorkspaceProjects(organizationalUnit).isEmpty());
     }
 
     private void assertContains(final Repository repository,

@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 import org.guvnor.common.services.project.client.security.ProjectController;
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.client.resources.i18n.CommonConstants;
 import org.guvnor.structure.repositories.PublicURI;
 import org.guvnor.structure.repositories.RepositoryInfo;
@@ -51,7 +51,7 @@ public class RepositoryEditorPresenter {
 
     private View view;
     private Caller<RepositoryService> repositoryService;
-    private Caller<ProjectService> projectService;
+    private Caller<WorkspaceProjectService> projectService;
     private Caller<RepositoryServiceEditor> repositoryServiceEditor;
     private Event<NotificationEvent> notification;
     private PlaceManager placeManager;
@@ -82,7 +82,7 @@ public class RepositoryEditorPresenter {
     @Inject
     public RepositoryEditorPresenter(final View view,
                                      final Caller<RepositoryService> repositoryService,
-                                     final Caller<ProjectService> projectService,
+                                     final Caller<WorkspaceProjectService> projectService,
                                      final Caller<RepositoryServiceEditor> repositoryServiceEditor,
                                      final Event<NotificationEvent> notification,
                                      final PlaceManager placeManager,

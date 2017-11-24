@@ -19,7 +19,7 @@ package org.guvnor.common.services.project.preferences.scope;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.guvnor.common.services.project.context.ProjectContext;
+import org.guvnor.common.services.project.context.WorkspaceProjectContext;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.shared.preferences.GuvnorPreferenceScopes;
 import org.uberfire.preferences.shared.PreferenceScope;
@@ -31,15 +31,15 @@ public class UserProjectPreferenceScope implements PreferenceScopeBean {
 
     private PreferenceScopeFactory scopeFactory;
 
-    private ProjectContext projectContext;
+    private WorkspaceProjectContext workspaceProjectContext;
 
     private WorkspaceProject workspaceProject;
 
     @Inject
     public UserProjectPreferenceScope(final PreferenceScopeFactory scopeFactory,
-                                      final ProjectContext projectContext) {
+                                      final WorkspaceProjectContext workspaceProjectContext) {
         this.scopeFactory = scopeFactory;
-        this.projectContext = projectContext;
+        this.workspaceProjectContext = workspaceProjectContext;
     }
 
     public UserProjectPreferenceScope forProject(final WorkspaceProject workspaceProject) {
@@ -53,8 +53,8 @@ public class UserProjectPreferenceScope implements PreferenceScopeBean {
             return createProjectScope(workspaceProject);
         }
 
-        if (projectContext.getActiveWorkspaceProject() != null) {
-            return createProjectScope(projectContext.getActiveWorkspaceProject());
+        if (workspaceProjectContext.getActiveWorkspaceProject() != null) {
+            return createProjectScope(workspaceProjectContext.getActiveWorkspaceProject());
         }
 
         throw new RuntimeException("A project must be selected or be active to use this scope.");

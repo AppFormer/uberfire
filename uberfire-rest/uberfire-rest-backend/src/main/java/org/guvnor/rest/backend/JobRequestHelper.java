@@ -35,7 +35,7 @@ import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.GAVAlreadyExistsException;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.common.services.shared.test.TestResultMessage;
 import org.guvnor.common.services.shared.test.TestService;
 import org.guvnor.rest.client.JobResult;
@@ -67,7 +67,7 @@ public class JobRequestHelper {
     private ModuleService<? extends Module> moduleService;
 
     @Inject
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
 
     @Inject
     private BuildService buildService;
@@ -168,8 +168,8 @@ public class JobRequestHelper {
             pom.setName(projectName);
 
             try {
-                projectService.newProject(organizationalUnit,
-                                          pom);
+                workspaceProjectService.newProject(organizationalUnit,
+                                                   pom);
             } catch (GAVAlreadyExistsException gae) {
                 result.setStatus(JobStatus.DUPLICATE_RESOURCE);
                 result.setResult("Project's GAV [" + gae.getGAV().toString() + "] already exists at [" + toString(gae.getRepositories()) + "]");
@@ -200,7 +200,7 @@ public class JobRequestHelper {
         JobResult result = new JobResult();
         result.setJobId(jobId);
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         if (workspaceProject == null) {
             result.setStatus(JobStatus.RESOURCE_NOT_EXIST);
@@ -227,7 +227,7 @@ public class JobRequestHelper {
         JobResult result = new JobResult();
         result.setJobId(jobId);
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         if (workspaceProject == null) {
             result.setStatus(JobStatus.RESOURCE_NOT_EXIST);
@@ -274,8 +274,8 @@ public class JobRequestHelper {
             result.setResult("Organizational Unit [" + organizationalUnitName + "] does not exist");
             return result;
         } else {
-            final WorkspaceProject workspaceProject = projectService.newProject(organizationalUnit,
-                                                                                new POM(new GAV(organizationalUnit.getDefaultGroupId(),
+            final WorkspaceProject workspaceProject = workspaceProjectService.newProject(organizationalUnit,
+                                                                                         new POM(new GAV(organizationalUnit.getDefaultGroupId(),
                                                                                                 projectName,
                                                                                                 "1.0.0")));
             final Module module = workspaceProject.getMainModule();
@@ -325,7 +325,7 @@ public class JobRequestHelper {
         final JobResult result = new JobResult();
         result.setJobId(jobId);
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         if (workspaceProject == null) {
             result.setStatus(JobStatus.RESOURCE_NOT_EXIST);
@@ -377,7 +377,7 @@ public class JobRequestHelper {
         JobResult result = new JobResult();
         result.setJobId(jobId);
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         if (workspaceProject == null) {
             result.setStatus(JobStatus.RESOURCE_NOT_EXIST);

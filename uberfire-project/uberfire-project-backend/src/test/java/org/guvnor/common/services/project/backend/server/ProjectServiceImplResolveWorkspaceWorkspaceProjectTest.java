@@ -23,7 +23,7 @@ import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
@@ -45,9 +45,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectServiceImplResolveWorkspaceProjectTest {
+public class ProjectServiceImplResolveWorkspaceWorkspaceProjectTest {
 
-    ProjectService projectService;
+    WorkspaceProjectService workspaceProjectService;
 
     @Mock
     RepositoryService repositoryService;
@@ -105,17 +105,17 @@ public class ProjectServiceImplResolveWorkspaceProjectTest {
 
         doReturn(moduleService).when(moduleServices).get();
 
-        projectService = new ProjectServiceImpl(organizationalUnitService,
-                                                repositoryService,
-                                                new EventSourceMock<>(),
-                                                moduleServices,
-                                                mock(User.class),
-                                                mock(AuthorizationManager.class));
+        workspaceProjectService = new WorkspaceProjectServiceImpl(organizationalUnitService,
+                                                                  repositoryService,
+                                                                  new EventSourceMock<>(),
+                                                                  moduleServices,
+                                                                  mock(User.class),
+                                                                  mock(AuthorizationManager.class));
     }
 
     @Test
     public void resolveProjectPath() throws Exception {
-        final WorkspaceProject workspaceProject = projectService.resolveProject(path);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(path);
 
         assertEquals(ou,
                      workspaceProject.getOrganizationalUnit());
@@ -130,9 +130,9 @@ public class ProjectServiceImplResolveWorkspaceProjectTest {
     @Test
     public void resolveProjectModule() throws Exception {
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(new Module(path,
-                                                                                           mock(Path.class),
-                                                                                           mock(POM.class)));
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(new Module(path,
+                                                                                                    mock(Path.class),
+                                                                                                    mock(POM.class)));
 
         assertEquals(ou,
                      workspaceProject.getOrganizationalUnit());
@@ -153,7 +153,7 @@ public class ProjectServiceImplResolveWorkspaceProjectTest {
                                           path));
 
         repository.setBranches(branches);
-        final WorkspaceProject workspaceProject = projectService.resolveProject(repository);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(repository);
 
         assertEquals(ou,
                      workspaceProject.getOrganizationalUnit());
@@ -168,7 +168,7 @@ public class ProjectServiceImplResolveWorkspaceProjectTest {
     @Test
     public void resolveProjectBranch() throws Exception {
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(masterBranch);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(masterBranch);
 
         assertEquals(ou,
                      workspaceProject.getOrganizationalUnit());

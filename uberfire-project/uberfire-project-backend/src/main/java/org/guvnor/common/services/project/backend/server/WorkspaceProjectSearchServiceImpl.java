@@ -23,8 +23,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.guvnor.common.services.project.service.ProjectSearchService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectSearchService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.jboss.errai.bus.server.annotations.Service;
 
 /**
@@ -32,13 +32,13 @@ import org.jboss.errai.bus.server.annotations.Service;
  */
 @Service
 @ApplicationScoped
-public class ProjectSearchServiceImpl implements ProjectSearchService {
+public class WorkspaceProjectSearchServiceImpl implements WorkspaceProjectSearchService {
 
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
 
     @Inject
-    public ProjectSearchServiceImpl(final ProjectService projectService) {
-        this.projectService = projectService;
+    public WorkspaceProjectSearchServiceImpl(final WorkspaceProjectService workspaceProjectService) {
+        this.workspaceProjectService = workspaceProjectService;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ProjectSearchServiceImpl implements ProjectSearchService {
                                                      final boolean caseSensitive) {
         final List<WorkspaceProject> result = new ArrayList<>();
 
-        for (final WorkspaceProject workspaceProject : projectService.getAllProjects()) {
+        for (final WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects()) {
 
             final String name = workspaceProject.getName();
             if (caseSensitive ? name.contains(pattern) : name.toLowerCase().contains(pattern.toLowerCase())) {

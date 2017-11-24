@@ -24,9 +24,9 @@ import javax.inject.Named;
 import org.guvnor.common.services.project.events.NewProjectEvent;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.guvnor.common.services.project.project.ProjectMigrationService;
+import org.guvnor.common.services.project.project.WorkspaceProjectMigrationService;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
@@ -39,10 +39,10 @@ import org.uberfire.backend.server.util.Paths;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.Path;
 
-public class ProjectMigrationServiceImpl
-        implements ProjectMigrationService {
+public class WorkspaceProjectMigrationServiceImpl
+        implements WorkspaceProjectMigrationService {
 
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
     private RepositoryService repositoryService;
     private OrganizationalUnitService organizationalUnitService;
     private Event<NewProjectEvent> newProjectEvent;
@@ -50,18 +50,18 @@ public class ProjectMigrationServiceImpl
     private ModuleService<? extends Module> moduleService;
     private IOService ioService;
 
-    public ProjectMigrationServiceImpl() {
+    public WorkspaceProjectMigrationServiceImpl() {
     }
 
     @Inject
-    public ProjectMigrationServiceImpl(final ProjectService projectService,
-                                       final RepositoryService repositoryService,
-                                       final OrganizationalUnitService organizationalUnitService,
-                                       final Event<NewProjectEvent> newProjectEvent,
-                                       final RepositoryCopier repositoryCopier,
-                                       final ModuleService<? extends Module> moduleService,
-                                       final @Named("ioStrategy") IOService ioService) {
-        this.projectService = projectService;
+    public WorkspaceProjectMigrationServiceImpl(final WorkspaceProjectService workspaceProjectService,
+                                                final RepositoryService repositoryService,
+                                                final OrganizationalUnitService organizationalUnitService,
+                                                final Event<NewProjectEvent> newProjectEvent,
+                                                final RepositoryCopier repositoryCopier,
+                                                final ModuleService<? extends Module> moduleService,
+                                                final @Named("ioStrategy") IOService ioService) {
+        this.workspaceProjectService = workspaceProjectService;
         this.repositoryService = repositoryService;
         this.organizationalUnitService = organizationalUnitService;
         this.newProjectEvent = newProjectEvent;
@@ -93,7 +93,7 @@ public class ProjectMigrationServiceImpl
 
         private void fireNewProjectEvents() {
             for (final Repository repository : newRepositories.values()) {
-                final WorkspaceProject newWorkspaceProject = projectService.resolveProject(repository);
+                final WorkspaceProject newWorkspaceProject = workspaceProjectService.resolveProject(repository);
                 newProjectEvent.fire(new NewProjectEvent(newWorkspaceProject));
             }
         }

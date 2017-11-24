@@ -38,24 +38,24 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkspaceProjectContextTest {
+public class WorkspaceWorkspaceProjectContextTest {
 
     @Spy
-    private EventSourceMock<ProjectContextChangeEvent> changeEvent = new EventSourceMock<ProjectContextChangeEvent>();
+    private EventSourceMock<WorkspaceProjectContextChangeEvent> changeEvent = new EventSourceMock<WorkspaceProjectContextChangeEvent>();
 
-    private ProjectContext context;
+    private WorkspaceProjectContext context;
 
     @Before
     public void setUp() throws Exception {
-        context = new ProjectContext(changeEvent);
+        context = new WorkspaceProjectContext(changeEvent);
 
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                context.onProjectContextChanged((ProjectContextChangeEvent) invocationOnMock.getArguments()[0]);
+                context.onProjectContextChanged((WorkspaceProjectContextChangeEvent) invocationOnMock.getArguments()[0]);
                 return null;
             }
-        }).when(changeEvent).fire(any(ProjectContextChangeEvent.class));
+        }).when(changeEvent).fire(any(WorkspaceProjectContextChangeEvent.class));
     }
 
     @Test
@@ -150,16 +150,16 @@ public class WorkspaceProjectContextTest {
         final Package newPackage = new Package();
         final Module newModule = new Module();
 
-        final ProjectContextChangeHandler changeHandler = mock(ProjectContextChangeHandler.class);
+        final WorkspaceProjectContextChangeHandler changeHandler = mock(WorkspaceProjectContextChangeHandler.class);
         context.addChangeHandler(changeHandler);
 
         final WorkspaceProject newWorkspaceProject = new WorkspaceProject(newOrganizationalUnit,
                                                                           mock(Repository.class),
                                                                           newBranch,
                                                                           mock(Module.class));
-        context.onProjectContextChanged(new ProjectContextChangeEvent(newWorkspaceProject,
-                                                                      newModule,
-                                                                      newPackage));
+        context.onProjectContextChanged(new WorkspaceProjectContextChangeEvent(newWorkspaceProject,
+                                                                               newModule,
+                                                                               newPackage));
 
         assertEquals(newOrganizationalUnit,
                      context.getActiveOrganizationalUnit());
@@ -174,10 +174,10 @@ public class WorkspaceProjectContextTest {
 
     @Test
     public void testContextChangeHandlerGetsRemoved() throws Exception {
-        ProjectContextChangeHandler changeHandler = mock(ProjectContextChangeHandler.class);
+        WorkspaceProjectContextChangeHandler changeHandler = mock(WorkspaceProjectContextChangeHandler.class);
         ProjectContextChangeHandle handle = context.addChangeHandler(changeHandler);
 
-        context.onProjectContextChanged(new ProjectContextChangeEvent());
+        context.onProjectContextChanged(new WorkspaceProjectContextChangeEvent());
 
         verify(changeHandler).onChange();
 
@@ -185,7 +185,7 @@ public class WorkspaceProjectContextTest {
 
         reset(changeHandler);
 
-        context.onProjectContextChanged(new ProjectContextChangeEvent());
+        context.onProjectContextChanged(new WorkspaceProjectContextChangeEvent());
 
         verify(changeHandler,
                never()).onChange();

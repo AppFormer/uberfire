@@ -27,11 +27,11 @@ import org.jboss.errai.bus.server.annotations.Remote;
 import org.uberfire.backend.vfs.Path;
 
 @Remote
-public interface ProjectService {
+public interface WorkspaceProjectService {
 
-    Collection<WorkspaceProject> getAllProjects();
+    Collection<WorkspaceProject> getAllWorkspaceProjects();
 
-    Collection<WorkspaceProject> getAllProjects(final OrganizationalUnit organizationalUnit);
+    Collection<WorkspaceProject> getAllWorkspaceProjects(final OrganizationalUnit organizationalUnit);
 
     WorkspaceProject newProject(final OrganizationalUnit organizationalUnit,
                                 final POM pom);

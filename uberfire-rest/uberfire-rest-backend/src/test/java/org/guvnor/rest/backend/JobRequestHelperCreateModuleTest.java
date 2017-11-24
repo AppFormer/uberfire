@@ -25,7 +25,7 @@ import org.guvnor.common.services.project.model.MavenRepositoryMetadata;
 import org.guvnor.common.services.project.model.MavenRepositorySource;
 import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.service.GAVAlreadyExistsException;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.rest.client.JobResult;
 import org.guvnor.rest.client.JobStatus;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
@@ -57,7 +57,7 @@ public class JobRequestHelperCreateModuleTest {
     private RepositoryService repositoryService;
 
     @Mock
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
 
     @Mock
     private OrganizationalUnitService organizationalUnitService;
@@ -128,8 +128,8 @@ public class JobRequestHelperCreateModuleTest {
 
         doThrow(new GAVAlreadyExistsException(new GAV("projectGroupId:projectName:projectVersion"),
                                               repositories))
-                .when(projectService).newProject(any(OrganizationalUnit.class),
-                                                 any(POM.class));
+                .when(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                          any(POM.class));
 
         final JobResult jobResult = jobRequestHelper.createProject("jobId",
                                                                    "myRepository",
@@ -150,8 +150,8 @@ public class JobRequestHelperCreateModuleTest {
     public void testNewProjectWhenFileAlreadyExists() throws Exception {
 
         doThrow(new FileAlreadyExistsException("myProject"))
-                .when(projectService).newProject(any(OrganizationalUnit.class),
-                                                 any(POM.class));
+                .when(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                          any(POM.class));
 
         final JobResult jobResult = jobRequestHelper.createProject("jobId",
                                                                    "myOrganizationalUnit",
@@ -179,8 +179,8 @@ public class JobRequestHelperCreateModuleTest {
                                        "projectDescription");
 
         ArgumentCaptor<POM> pomArgumentCaptor = ArgumentCaptor.forClass(POM.class);
-        verify(projectService).newProject(any(OrganizationalUnit.class),
-                                          pomArgumentCaptor.capture());
+        verify(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                   pomArgumentCaptor.capture());
 
         final POM pom = pomArgumentCaptor.getValue();
         assertEquals("projectGroupId",
@@ -205,8 +205,8 @@ public class JobRequestHelperCreateModuleTest {
                                        "projectDescription");
 
         ArgumentCaptor<POM> pomArgumentCaptor = ArgumentCaptor.forClass(POM.class);
-        verify(projectService).newProject(any(OrganizationalUnit.class),
-                                          pomArgumentCaptor.capture());
+        verify(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                   pomArgumentCaptor.capture());
 
         final POM pom = pomArgumentCaptor.getValue();
         assertEquals("myProject",
@@ -223,8 +223,8 @@ public class JobRequestHelperCreateModuleTest {
                                        "projectDescription");
 
         ArgumentCaptor<POM> pomArgumentCaptor = ArgumentCaptor.forClass(POM.class);
-        verify(projectService).newProject(any(OrganizationalUnit.class),
-                                          pomArgumentCaptor.capture());
+        verify(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                   pomArgumentCaptor.capture());
 
         final POM pom = pomArgumentCaptor.getValue();
         assertEquals("myProject",
@@ -242,8 +242,8 @@ public class JobRequestHelperCreateModuleTest {
                                        "projectDescription");
 
         ArgumentCaptor<POM> pomArgumentCaptor = ArgumentCaptor.forClass(POM.class);
-        verify(projectService).newProject(any(OrganizationalUnit.class),
-                                          pomArgumentCaptor.capture());
+        verify(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                   pomArgumentCaptor.capture());
 
         final POM pom = pomArgumentCaptor.getValue();
         assertEquals("1.0",
@@ -261,8 +261,8 @@ public class JobRequestHelperCreateModuleTest {
                                        "projectDescription");
 
         ArgumentCaptor<POM> pomArgumentCaptor = ArgumentCaptor.forClass(POM.class);
-        verify(projectService).newProject(any(OrganizationalUnit.class),
-                                          pomArgumentCaptor.capture());
+        verify(workspaceProjectService).newProject(any(OrganizationalUnit.class),
+                                                   pomArgumentCaptor.capture());
 
         final POM pom = pomArgumentCaptor.getValue();
         assertEquals("1.0",

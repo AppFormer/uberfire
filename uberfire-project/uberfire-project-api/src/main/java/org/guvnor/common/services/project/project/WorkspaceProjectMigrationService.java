@@ -1,9 +1,8 @@
 /*
- * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -12,18 +11,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+package org.guvnor.common.services.project.project;
 
-package org.guvnor.common.services.project.model;
+import org.guvnor.common.services.project.model.WorkspaceProject;
 
-import org.uberfire.client.callbacks.Callback;
+public interface WorkspaceProjectMigrationService {
 
-public interface ProjectWizard {
-
-    void initialise();
-
-    void initialise(final POM pom);
-
-    void start(final Callback<WorkspaceProject> callback,
-               final boolean openEditor);
+    void migrate(final WorkspaceProject legacyWorkspaceProject);
 }

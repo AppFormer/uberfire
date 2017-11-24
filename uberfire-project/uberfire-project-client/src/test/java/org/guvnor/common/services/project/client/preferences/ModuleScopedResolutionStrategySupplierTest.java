@@ -16,7 +16,7 @@
 
 package org.guvnor.common.services.project.client.preferences;
 
-import org.guvnor.common.services.project.context.ProjectContextChangeEvent;
+import org.guvnor.common.services.project.context.WorkspaceProjectContextChangeEvent;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.shared.preferences.WorkbenchPreferenceScopeResolutionStrategies;
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class ModuleScopedResolutionStrategySupplierTest {
 
     @Test
     public void getWithProjectTest() {
-        ProjectContextChangeEvent event = mock(ProjectContextChangeEvent.class);
+        WorkspaceProjectContextChangeEvent event = mock(WorkspaceProjectContextChangeEvent.class);
         doReturn(module).when(event).getModule();
 
         projectScopedResolutionStrategySupplier.selectedProjectChanged(event);

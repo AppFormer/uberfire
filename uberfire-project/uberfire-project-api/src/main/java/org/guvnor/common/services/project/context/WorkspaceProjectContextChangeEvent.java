@@ -25,42 +25,42 @@ import org.jboss.errai.common.client.api.annotations.Portable;
  * An event raised when the Project Context changes
  */
 @Portable
-public class ProjectContextChangeEvent {
+public class WorkspaceProjectContextChangeEvent {
 
     private final OrganizationalUnit ou;
     private final WorkspaceProject workspaceProject;
     private final Module module;
     private final Package pkg;
 
-    public ProjectContextChangeEvent() {
+    public WorkspaceProjectContextChangeEvent() {
         ou = null;
         workspaceProject = null;
         module = null;
         pkg = null;
     }
 
-    public ProjectContextChangeEvent(final OrganizationalUnit ou) {
+    public WorkspaceProjectContextChangeEvent(final OrganizationalUnit ou) {
         this.ou = ou;
         this.workspaceProject = null;
         this.module = null;
         this.pkg = null;
     }
 
-    public ProjectContextChangeEvent(final WorkspaceProject workspaceProject) {
+    public WorkspaceProjectContextChangeEvent(final WorkspaceProject workspaceProject) {
         this(workspaceProject,
              null);
     }
 
-    public ProjectContextChangeEvent(final WorkspaceProject workspaceProject,
-                                     final Module module) {
+    public WorkspaceProjectContextChangeEvent(final WorkspaceProject workspaceProject,
+                                              final Module module) {
         this(workspaceProject,
              module,
              null);
     }
 
-    public ProjectContextChangeEvent(final WorkspaceProject workspaceProject,
-                                     final Module module,
-                                     final Package pkg) {
+    public WorkspaceProjectContextChangeEvent(final WorkspaceProject workspaceProject,
+                                              final Module module,
+                                              final Package pkg) {
         this.ou = workspaceProject.getOrganizationalUnit();
         this.workspaceProject = workspaceProject;
         this.module = module;

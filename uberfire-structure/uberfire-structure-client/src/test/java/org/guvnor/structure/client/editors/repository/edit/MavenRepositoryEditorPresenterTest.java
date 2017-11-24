@@ -21,7 +21,7 @@ import java.util.List;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.guvnor.common.services.project.client.security.ProjectController;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.repositories.PublicURI;
 import org.guvnor.structure.repositories.Repository;
 import org.guvnor.structure.repositories.RepositoryInfo;
@@ -78,7 +78,7 @@ public class MavenRepositoryEditorPresenterTest {
     public void before() {
         presenter = new RepositoryEditorPresenter(view,
                                                   new CallerMock<RepositoryService>(repositoryService),
-                                                  new CallerMock<ProjectService>(mock(ProjectService.class)),
+                                                  new CallerMock<WorkspaceProjectService>(mock(WorkspaceProjectService.class)),
                                                   new CallerMock<RepositoryServiceEditor>(repositoryServiceEditor),
                                                   notification,
                                                   placeManager,

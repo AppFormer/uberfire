@@ -28,7 +28,7 @@ import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.DeploymentMode;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
@@ -42,8 +42,8 @@ import org.uberfire.security.authz.AuthorizationManager;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
-public class ProjectServiceImpl
-        implements ProjectService {
+public class WorkspaceProjectServiceImpl
+        implements WorkspaceProjectService {
 
     private OrganizationalUnitService organizationalUnitService;
     private RepositoryService repositoryService;
@@ -52,16 +52,16 @@ public class ProjectServiceImpl
     private User user;
     private AuthorizationManager authorizationManager;
 
-    public ProjectServiceImpl() {
+    public WorkspaceProjectServiceImpl() {
     }
 
     @Inject
-    public ProjectServiceImpl(final OrganizationalUnitService organizationalUnitService,
-                              final RepositoryService repositoryService,
-                              final Event<NewProjectEvent> newProjectEvent,
-                              final Instance<ModuleService<? extends Module>> moduleServices,
-                              final User user,
-                              final AuthorizationManager authorizationManager) {
+    public WorkspaceProjectServiceImpl(final OrganizationalUnitService organizationalUnitService,
+                                       final RepositoryService repositoryService,
+                                       final Event<NewProjectEvent> newProjectEvent,
+                                       final Instance<ModuleService<? extends Module>> moduleServices,
+                                       final User user,
+                                       final AuthorizationManager authorizationManager) {
         this.organizationalUnitService = organizationalUnitService;
         this.repositoryService = repositoryService;
         this.newProjectEvent = newProjectEvent;
@@ -71,19 +71,19 @@ public class ProjectServiceImpl
     }
 
     @Override
-    public Collection<WorkspaceProject> getAllProjects() {
+    public Collection<WorkspaceProject> getAllWorkspaceProjects() {
 
         final List<WorkspaceProject> result = new ArrayList<>();
 
         for (final OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
-            result.addAll(getAllProjects(ou));
+            result.addAll(getAllWorkspaceProjects(ou));
         }
 
         return result;
     }
 
     @Override
-    public Collection<WorkspaceProject> getAllProjects(final OrganizationalUnit organizationalUnit) {
+    public Collection<WorkspaceProject> getAllWorkspaceProjects(final OrganizationalUnit organizationalUnit) {
         final List<WorkspaceProject> result = new ArrayList<>();
 
         for (final Repository repository : repositoryService.getRepositories()) {
@@ -173,7 +173,7 @@ public class ProjectServiceImpl
     @Override
     public WorkspaceProject resolveProject(final String name) {
 
-        for (final WorkspaceProject workspaceProject : getAllProjects()) {
+        for (final WorkspaceProject workspaceProject : getAllWorkspaceProjects()) {
             if (workspaceProject.getName().equals(name)) {
                 return workspaceProject;
             }

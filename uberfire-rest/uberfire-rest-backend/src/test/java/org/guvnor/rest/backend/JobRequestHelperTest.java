@@ -23,7 +23,7 @@ import javax.enterprise.event.Event;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.common.services.shared.test.Failure;
 import org.guvnor.common.services.shared.test.TestResultMessage;
 import org.guvnor.common.services.shared.test.TestService;
@@ -63,13 +63,13 @@ public class JobRequestHelperTest {
     @Mock
     private ModuleService<MyModule> moduleService;
     @Mock
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
     @Mock
     private WorkspaceProject workspaceProject;
 
     @Before
     public void setUp() throws Exception {
-        when(projectService.resolveProject("project")).thenReturn(workspaceProject);
+        when(workspaceProjectService.resolveProject("project")).thenReturn(workspaceProject);
         when(repositoryService.getRepository("repositoryAlias")).thenReturn(repository);
     }
 

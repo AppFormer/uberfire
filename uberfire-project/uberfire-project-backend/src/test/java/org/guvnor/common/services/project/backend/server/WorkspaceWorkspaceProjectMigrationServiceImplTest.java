@@ -23,7 +23,7 @@ import org.guvnor.common.services.project.events.NewProjectEvent;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.ModuleService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
@@ -51,9 +51,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkspaceProjectMigrationServiceImplTest {
+public class WorkspaceWorkspaceProjectMigrationServiceImplTest {
 
-    private ProjectMigrationServiceImpl service;
+    private WorkspaceProjectMigrationServiceImpl service;
 
     @Mock
     private ModuleService moduleService;
@@ -86,7 +86,7 @@ public class WorkspaceProjectMigrationServiceImplTest {
     private OrganizationalUnit organizationalUnit;
 
     @Mock
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
 
     @Captor
     private ArgumentCaptor<Path> pathArgumentCaptor;
@@ -100,7 +100,7 @@ public class WorkspaceProjectMigrationServiceImplTest {
     @Before
     public void setUp() throws Exception {
 
-        doReturn(mock(WorkspaceProject.class)).when(projectService).resolveProject(any(Repository.class));
+        doReturn(mock(WorkspaceProject.class)).when(workspaceProjectService).resolveProject(any(Repository.class));
 
         doAnswer(new Answer<org.uberfire.java.nio.file.Path>() {
             @Override
@@ -110,13 +110,13 @@ public class WorkspaceProjectMigrationServiceImplTest {
             }
         }).when(ioService).get(any(URI.class));
 
-        service = new ProjectMigrationServiceImpl(projectService,
-                                                  repositoryService,
-                                                  organizationalUnitService,
-                                                  newProjectEvent,
-                                                  repositoryCopier,
-                                                  moduleService,
-                                                  ioService);
+        service = new WorkspaceProjectMigrationServiceImpl(workspaceProjectService,
+                                                           repositoryService,
+                                                           organizationalUnitService,
+                                                           newProjectEvent,
+                                                           repositoryCopier,
+                                                           moduleService,
+                                                           ioService);
 
         when(repositoryCopier.makeSafeRepositoryName(anyString())).thenAnswer(new Answer<String>() {
             @Override

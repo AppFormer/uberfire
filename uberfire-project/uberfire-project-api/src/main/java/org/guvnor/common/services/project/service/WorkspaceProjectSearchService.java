@@ -26,7 +26,7 @@ import org.jboss.errai.bus.server.annotations.Remote;
  * {@link Module} remote search interface
  */
 @Remote
-public interface ProjectSearchService {
+public interface WorkspaceProjectSearchService {
 
     /**
      * Retrieve a max number of {@link Module} instances given a name pattern.

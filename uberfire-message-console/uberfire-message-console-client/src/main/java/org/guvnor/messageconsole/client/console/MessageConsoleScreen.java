@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.guvnor.common.services.project.builder.model.BuildMessage;
 import org.guvnor.common.services.project.builder.model.BuildResults;
 import org.guvnor.common.services.project.builder.service.BuildService;
-import org.guvnor.common.services.project.context.ProjectContextChangeEvent;
+import org.guvnor.common.services.project.context.WorkspaceProjectContextChangeEvent;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.messageconsole.client.console.resources.MessageConsoleResources;
 import org.guvnor.messageconsole.events.MessageUtils;
@@ -109,7 +109,7 @@ public class MessageConsoleScreen implements RefreshMenuBuilder.SupportsRefresh 
                 .build();
     }
 
-    public void selectedProjectChanged(@Observes final ProjectContextChangeEvent event) {
+    public void selectedProjectChanged(@Observes final WorkspaceProjectContextChangeEvent event) {
         this.module = event.getModule();
         this.menus.getItems().get(0).setEnabled(module != null);
     }

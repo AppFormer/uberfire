@@ -37,43 +37,43 @@ import org.uberfire.backend.vfs.Path;
  * Only the ProjectContextChangeEvent can change this and after each change we need to alert the change handlers.
  */
 @ApplicationScoped
-public class ProjectContext {
+public class WorkspaceProjectContext {
 
     private OrganizationalUnit activeOrganizationalUnit;
     private WorkspaceProject activeWorkspaceProject;
     private Module activeModule;
     private Package activePackage;
 
-    private Map<ProjectContextChangeHandle, ProjectContextChangeHandler> changeHandlers = new HashMap<ProjectContextChangeHandle, ProjectContextChangeHandler>();
+    private Map<ProjectContextChangeHandle, WorkspaceProjectContextChangeHandler> changeHandlers = new HashMap<ProjectContextChangeHandle, WorkspaceProjectContextChangeHandler>();
 
-    private Event<ProjectContextChangeEvent> contextChangeEvent;
+    private Event<WorkspaceProjectContextChangeEvent> contextChangeEvent;
 
-    public ProjectContext() {
+    public WorkspaceProjectContext() {
     }
 
     @Inject
-    public ProjectContext(final Event<ProjectContextChangeEvent> contextChangeEvent) {
+    public WorkspaceProjectContext(final Event<WorkspaceProjectContextChangeEvent> contextChangeEvent) {
         this.contextChangeEvent = contextChangeEvent;
     }
 
     public void onRepositoryRemoved(final @Observes RepositoryRemovedEvent event) {
 
         if (activeWorkspaceProject != null && event.getRepository().getAlias().equals(activeWorkspaceProject.getRepository().getAlias())) {
-            contextChangeEvent.fire(new ProjectContextChangeEvent(activeOrganizationalUnit));
+            contextChangeEvent.fire(new WorkspaceProjectContextChangeEvent(activeOrganizationalUnit));
         }
     }
 
     public void onOrganizationalUnitUpdated(@Observes final UpdatedOrganizationalUnitEvent event) {
-        contextChangeEvent.fire(new ProjectContextChangeEvent(event.getOrganizationalUnit()));
+        contextChangeEvent.fire(new WorkspaceProjectContextChangeEvent(event.getOrganizationalUnit()));
     }
 
-    public void onProjectContextChanged(@Observes final ProjectContextChangeEvent event) {
+    public void onProjectContextChanged(@Observes final WorkspaceProjectContextChangeEvent event) {
         this.setActiveOrganizationalUnit(event.getOrganizationalUnit());
         this.setActiveWorkspaceProject(event.getWorkspaceProject());
         this.setActiveModule(event.getModule());
         this.setActivePackage(event.getPackage());
 
-        for (ProjectContextChangeHandler handler : changeHandlers.values()) {
+        for (WorkspaceProjectContextChangeHandler handler : changeHandlers.values()) {
             handler.onChange();
         }
     }
@@ -114,7 +114,7 @@ public class ProjectContext {
         this.activePackage = activePackage;
     }
 
-    public ProjectContextChangeHandle addChangeHandler(final ProjectContextChangeHandler changeHandler) {
+    public ProjectContextChangeHandle addChangeHandler(final WorkspaceProjectContextChangeHandler changeHandler) {
         ProjectContextChangeHandle handle = new ProjectContextChangeHandle();
         changeHandlers.put(handle,
                            changeHandler);

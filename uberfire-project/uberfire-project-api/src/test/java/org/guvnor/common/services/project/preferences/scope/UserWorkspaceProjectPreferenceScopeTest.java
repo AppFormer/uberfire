@@ -16,7 +16,7 @@
 
 package org.guvnor.common.services.project.preferences.scope;
 
-import org.guvnor.common.services.project.context.ProjectContext;
+import org.guvnor.common.services.project.context.WorkspaceProjectContext;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class UserWorkspaceProjectPreferenceScopeTest {
 
     private PreferenceScopeFactory scopeFactory;
 
-    private ProjectContext projectContext;
+    private WorkspaceProjectContext workspaceProjectContext;
 
     private UserProjectPreferenceScope userProjectScope;
 
@@ -47,10 +47,10 @@ public class UserWorkspaceProjectPreferenceScopeTest {
 
         scopeFactory = new PreferenceScopeFactoryImpl(scopeTypes);
 
-        projectContext = mock(ProjectContext.class);
+        workspaceProjectContext = mock(WorkspaceProjectContext.class);
 
         userProjectScope = new UserProjectPreferenceScope(scopeFactory,
-                                                          projectContext);
+                                                          workspaceProjectContext);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UserWorkspaceProjectPreferenceScopeTest {
     public void userProjectScopeIsResolvedWithActiveProjectCorrectlyTest() {
         final WorkspaceProject workspaceProject = mock(WorkspaceProject.class);
         doReturn("identifier").when(workspaceProject).getEncodedIdentifier();
-        doReturn(workspaceProject).when(projectContext).getActiveWorkspaceProject();
+        doReturn(workspaceProject).when(workspaceProjectContext).getActiveWorkspaceProject();
 
         final PreferenceScope resolvedUserProjectScope = userProjectScope.resolve();
 

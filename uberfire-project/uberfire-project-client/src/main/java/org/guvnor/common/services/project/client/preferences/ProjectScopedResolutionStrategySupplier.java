@@ -21,7 +21,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.guvnor.common.services.project.context.ProjectContextChangeEvent;
+import org.guvnor.common.services.project.context.WorkspaceProjectContextChangeEvent;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.shared.preferences.WorkbenchPreferenceScopeResolutionStrategies;
 import org.uberfire.preferences.shared.impl.PreferenceScopeResolutionStrategyInfo;
@@ -41,7 +41,7 @@ public class ProjectScopedResolutionStrategySupplier implements Supplier<Prefere
         this.scopeResolutionStrategies = scopeResolutionStrategies;
     }
 
-    public void selectedProjectChanged(@Observes final ProjectContextChangeEvent event) {
+    public void selectedProjectChanged(@Observes final WorkspaceProjectContextChangeEvent event) {
         this.module = event.getModule();
     }
 

@@ -21,8 +21,8 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.guvnor.common.services.project.service.ProjectSearchService;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectSearchService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.repositories.Branch;
 import org.guvnor.structure.repositories.Repository;
 import org.junit.Before;
@@ -36,10 +36,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkspaceProjectSearchServiceTest {
+public class WorkspaceWorkspaceProjectSearchServiceTest {
 
     @Mock
-    ProjectService projectService;
+    WorkspaceProjectService workspaceProjectService;
 
     @Mock
     WorkspaceProject itemA;
@@ -47,7 +47,7 @@ public class WorkspaceProjectSearchServiceTest {
     @Mock
     WorkspaceProject itemB;
 
-    private ProjectSearchService searchService;
+    private WorkspaceProjectSearchService searchService;
 
     @Before
     public void setUp() throws Exception {
@@ -58,11 +58,11 @@ public class WorkspaceProjectSearchServiceTest {
 
         when(repository.getDefaultBranch()).thenReturn(Optional.of(new Branch("master",
                                                                               repositoryRoot)));
-        when(projectService.getAllProjects()).thenReturn(new HashSet() {{
+        when(workspaceProjectService.getAllWorkspaceProjects()).thenReturn(new HashSet() {{
             add(itemA);
             add(itemB);
         }});
-        searchService = new ProjectSearchServiceImpl(projectService);
+        searchService = new WorkspaceProjectSearchServiceImpl(workspaceProjectService);
     }
 
     @Test

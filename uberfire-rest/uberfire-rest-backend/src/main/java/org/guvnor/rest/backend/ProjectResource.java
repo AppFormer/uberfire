@@ -40,7 +40,7 @@ import javax.ws.rs.core.Variant;
 
 import org.guvnor.common.services.project.model.GAV;
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.guvnor.common.services.project.service.ProjectService;
+import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.rest.client.AddProjectToOrganizationalUnitRequest;
 import org.guvnor.rest.client.CloneRepositoryRequest;
 import org.guvnor.rest.client.CompileProjectRequest;
@@ -90,7 +90,7 @@ public class ProjectResource {
     @Inject
     private RepositoryService repositoryService;
     @Inject
-    private ProjectService projectService;
+    private WorkspaceProjectService workspaceProjectService;
     @Inject
     private JobRequestScheduler jobRequestObserver;
     @Inject
@@ -217,7 +217,7 @@ public class ProjectResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(organizationalUnitName).build());
         }
 
-        return getProjectResponses(projectService.getAllProjects(organizationalUnit));
+        return getProjectResponses(workspaceProjectService.getAllWorkspaceProjects(organizationalUnit));
     }
 
     private List<ProjectResponse> getProjectResponses(Collection<WorkspaceProject> workspaceProjects) {
@@ -242,7 +242,7 @@ public class ProjectResource {
     public Collection<ProjectResponse> getProjects() {
         logger.info("-----getProjects--- ");
 
-        return getProjectResponses(projectService.getAllProjects());
+        return getProjectResponses(workspaceProjectService.getAllWorkspaceProjects());
     }
 
     @DELETE
@@ -275,7 +275,7 @@ public class ProjectResource {
         logger.debug("-----getProject---, project name: {}",
                      projectName);
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         final ProjectResponse projectResponse = new ProjectResponse();
         final GAV projectGAV = workspaceProject.getMainModule().getPom().getGav();
@@ -396,7 +396,7 @@ public class ProjectResource {
             orgUnit.setDefaultGroupId(ou.getDefaultGroupId());
 
             final List<String> projectNames = new ArrayList<String>();
-            for (final WorkspaceProject workspaceProject : projectService.getAllProjects(ou)) {
+            for (final WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
                 projectNames.add(workspaceProject.getName());
             }
 
@@ -423,7 +423,7 @@ public class ProjectResource {
         orgUnit.setDefaultGroupId(origOrgUnit.getDefaultGroupId());
 
         final List<String> projectNames = new ArrayList<>();
-        for (final WorkspaceProject workspaceProject : projectService.getAllProjects(origOrgUnit)) {
+        for (final WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(origOrgUnit)) {
             projectNames.add(workspaceProject.getName());
         }
 
@@ -593,7 +593,7 @@ public class ProjectResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(projectName).build());
         }
 
-        final WorkspaceProject workspaceProject = projectService.resolveProject(projectName);
+        final WorkspaceProject workspaceProject = workspaceProjectService.resolveProject(projectName);
 
         if (workspaceProject == null) {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(projectName).build());
