@@ -1,4 +1,0 @@
-wires
-=====
-
-wires canvas
