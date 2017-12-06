@@ -16,9 +16,6 @@
 
 package org.uberfire.security.impl.authz;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.security.authz.AuthorizationResult.*;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -28,9 +25,13 @@ import org.uberfire.security.Resource;
 import org.uberfire.security.ResourceManager;
 import org.uberfire.security.authz.AuthorizationManager;
 import org.uberfire.security.authz.AuthorizationResult;
-import org.uberfire.security.authz.ResourceDecisionManager;
 import org.uberfire.security.authz.ProfileDecisionManager;
+import org.uberfire.security.authz.ResourceDecisionManager;
 import org.uberfire.security.authz.VotingStrategy;
+
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_ABSTAIN;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_GRANTED;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
 
@@ -40,8 +41,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     private final ProfileDecisionManager profileDecisionManager;
 
     public DefaultAuthorizationManager(final Collection<ResourceDecisionManager> decisionManagers,
-                                       final ResourceManager resourceManager, final VotingStrategy votingStrategy,
-                                       final ProfileDecisionManager profileDecisionManager ) {
+                                       final ResourceManager resourceManager,
+                                       final VotingStrategy votingStrategy,
+                                       final ProfileDecisionManager profileDecisionManager) {
         this.votingStrategy = checkNotNull("votingStrategy", votingStrategy);
         this.profileDecisionManager = profileDecisionManager;
         this.decisionManagers = checkNotNull("decisionManagers", decisionManagers);
@@ -78,7 +80,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
                     @Override
                     public AuthorizationResult next() {
                         ResourceDecisionManager resourceDecisionManager = decisionManagerIterator.next();
-                        return resourceDecisionManager.decide(resource, user, profileDecisionManager );
+                        return resourceDecisionManager.decide(resource, user, profileDecisionManager);
                     }
 
                     @Override
@@ -96,6 +98,13 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
         }
 
         return false;
+    }
+
+    @Override
+    public void invalidate(User user) {
+        for (ResourceDecisionManager decisionManager : decisionManagers) {
+            decisionManager.invalidate(user);
+        }
     }
 
     @Override

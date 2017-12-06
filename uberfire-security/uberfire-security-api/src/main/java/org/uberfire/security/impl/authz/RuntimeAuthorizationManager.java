@@ -16,9 +16,6 @@
 
 package org.uberfire.security.impl.authz;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.security.authz.AuthorizationResult.*;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 
@@ -29,32 +26,50 @@ import org.uberfire.security.authz.AuthorizationManager;
 import org.uberfire.security.authz.AuthorizationResult;
 import org.uberfire.security.authz.ProfileDecisionManager;
 
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_ABSTAIN;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_GRANTED;
+
 @ApplicationScoped
 @Alternative
 public class RuntimeAuthorizationManager implements AuthorizationManager {
 
-    private final RuntimeResourceManager resourceManager = new RuntimeResourceManager();
-    private final RuntimeResourceDecisionManager decisionManager = new RuntimeResourceDecisionManager( resourceManager );
-    private final ProfileDecisionManager profileDecisionManager = new DefaultProfileDecisionManager();
+    private final RuntimeResourceManager resourceManager;
+    private final RuntimeResourceDecisionManager decisionManager;
+    private final ProfileDecisionManager profileDecisionManager;
 
-    @Override
-    public boolean supports( final Resource resource ) {
-        return resourceManager.supports( resource );
+    public RuntimeAuthorizationManager() {
+        this.resourceManager = new RuntimeResourceManager();
+        this.decisionManager = new RuntimeResourceDecisionManager(resourceManager);
+        this.profileDecisionManager = new DefaultProfileDecisionManager();
+    }
+
+    public RuntimeAuthorizationManager(final RuntimeResourceManager resourceManager,
+                                       final RuntimeResourceDecisionManager decisionManager,
+                                       final ProfileDecisionManager profileDecisionManager) {
+        this.resourceManager = resourceManager;
+        this.decisionManager = decisionManager;
+        this.profileDecisionManager = profileDecisionManager;
     }
 
     @Override
-    public boolean authorize( final Resource resource,
-                              final User user )
+    public boolean supports(final Resource resource) {
+        return resourceManager.supports(resource);
+    }
+
+    @Override
+    public boolean authorize(final Resource resource,
+                             final User user)
             throws UnauthorizedException {
-        if ( !resourceManager.requiresAuthentication( resource ) ) {
+        if (!resourceManager.requiresAuthentication(resource)) {
             return true;
         }
 
-        checkNotNull( "subject", user );
+        checkNotNull("subject", user);
 
-        final AuthorizationResult finalResult = decisionManager.decide( resource, user, profileDecisionManager );
+        final AuthorizationResult finalResult = decisionManager.decide(resource, user, profileDecisionManager);
 
-        if ( finalResult.equals( ACCESS_ABSTAIN ) || finalResult.equals( ACCESS_GRANTED ) ) {
+        if (finalResult.equals(ACCESS_ABSTAIN) || finalResult.equals(ACCESS_GRANTED)) {
             return true;
         }
 
@@ -62,9 +77,13 @@ public class RuntimeAuthorizationManager implements AuthorizationManager {
     }
 
     @Override
-    public String toString() {
-      return "RuntimeAuthorizationManager [resourceManager=" + resourceManager + ", decisionManager=" + decisionManager
-              + ", profileDecisionManager=" + profileDecisionManager + "]";
+    public void invalidate(final User user) {
+        decisionManager.invalidate(user);
     }
 
+    @Override
+    public String toString() {
+        return "RuntimeAuthorizationManager [resourceManager=" + resourceManager + ", decisionManager=" + decisionManager
+                + ", profileDecisionManager=" + profileDecisionManager + "]";
+    }
 }

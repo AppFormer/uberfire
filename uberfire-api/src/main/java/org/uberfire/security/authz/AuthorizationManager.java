@@ -26,4 +26,5 @@ public interface AuthorizationManager {
 
     boolean authorize(final Resource resource, final User user) throws UnauthorizedException;
 
+    void invalidate(final User user);
 }

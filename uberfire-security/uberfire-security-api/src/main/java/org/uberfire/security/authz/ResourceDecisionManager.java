@@ -23,5 +23,7 @@ public interface ResourceDecisionManager {
 
     boolean supports(final Resource resource);
 
-    AuthorizationResult decide(final Resource resource, final User user, final ProfileDecisionManager profileDecisionManager );
+    AuthorizationResult decide(final Resource resource, final User user, final ProfileDecisionManager profileDecisionManager);
+
+    void invalidate(final User user);
 }
