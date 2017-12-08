@@ -16,9 +16,6 @@
 
 package org.uberfire.backend.server.security;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-import static org.uberfire.security.authz.AuthorizationResult.*;
-
 import javax.enterprise.inject.Alternative;
 
 import org.jboss.errai.security.shared.api.identity.User;
@@ -32,31 +29,51 @@ import org.uberfire.security.impl.authz.DefaultProfileDecisionManager;
 import org.uberfire.security.impl.authz.RuntimeResourceDecisionManager;
 import org.uberfire.security.impl.authz.RuntimeResourceManager;
 
+import static org.uberfire.commons.validation.PortablePreconditions.checkNotNull;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_ABSTAIN;
+import static org.uberfire.security.authz.AuthorizationResult.ACCESS_GRANTED;
+
 @Alternative
 public class FileSystemAuthorizationManager implements AuthorizationManager {
 
-    private final RuntimeResourceDecisionManager decisionManager = new RuntimeResourceDecisionManager( new RuntimeResourceManager() );
-    private final ProfileDecisionManager profileDecisionManager = new DefaultProfileDecisionManager();
+    private final RuntimeResourceDecisionManager decisionManager;
+    private final ProfileDecisionManager profileDecisionManager;
 
-    @Override
-    public boolean supports( final Resource resource ) {
-        return resource != null && ( resource instanceof FileSystem || resource instanceof FileSystemResourceAdaptor );
+    public FileSystemAuthorizationManager() {
+        this.decisionManager = new RuntimeResourceDecisionManager(new RuntimeResourceManager());
+        this.profileDecisionManager = new DefaultProfileDecisionManager();
+    }
+
+    public FileSystemAuthorizationManager(final RuntimeResourceDecisionManager decisionManager,
+                                          final ProfileDecisionManager profileDecisionManager) {
+        this.decisionManager = decisionManager;
+        this.profileDecisionManager = profileDecisionManager;
     }
 
     @Override
-    public boolean authorize( final Resource resource,
-                              final User subject ) throws UnauthorizedException {
-        checkNotNull( "subject", subject );
+    public boolean supports(final Resource resource) {
+        return resource != null && (resource instanceof FileSystem || resource instanceof FileSystemResourceAdaptor);
+    }
+
+    @Override
+    public boolean authorize(final Resource resource,
+                             final User subject) throws UnauthorizedException {
+        checkNotNull("subject", subject);
 
         final FileSystemResourceAdaptor fileSystemResource;
-        if ( resource instanceof FileSystem ) {
-            fileSystemResource = new FileSystemResourceAdaptor( (FileSystem) resource );
+        if (resource instanceof FileSystem) {
+            fileSystemResource = new FileSystemResourceAdaptor((FileSystem) resource);
         } else {
             fileSystemResource = (FileSystemResourceAdaptor) resource;
         }
 
-        final AuthorizationResult finalResult = decisionManager.decide( fileSystemResource, subject, profileDecisionManager );
+        final AuthorizationResult finalResult = decisionManager.decide(fileSystemResource, subject, profileDecisionManager);
 
-        return finalResult.equals( ACCESS_ABSTAIN ) || finalResult.equals( ACCESS_GRANTED );
+        return finalResult.equals(ACCESS_ABSTAIN) || finalResult.equals(ACCESS_GRANTED);
+    }
+
+    @Override
+    public void invalidate(final User user) {
+        decisionManager.invalidate(user);
     }
 }
