@@ -16,32 +16,48 @@
 
 package org.appformer.maven.integration.embedder;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenProjectLoader {
+	   
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
-
+    
+    private static final String DUMMY_POM =
+            "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+            "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
+            "      <modelVersion>4.0.0</modelVersion>\n" +
+            "     \n" +
+            "      <groupId>myGroupId</groupId>\n" +
+            "      <artifactId>myArtifactId</artifactId>\n" +
+            "      <version>1.0-SNAPSHOT</version>\n" +
+            "    </project>";
+ 
     static MavenProject mavenProject;
-
+ 
     public static MavenProject parseMavenPom(File pomFile) {
         return parseMavenPom(pomFile, false);
     }
-
+ 
     public static MavenProject parseMavenPom(File pomFile, boolean offline) {
-        if (!pomFile.exists()) {
-            return null;
-        }
+        boolean hasPom = pomFile.exists();
+ 
         MavenRequest mavenRequest = createMavenRequest(offline);
-        mavenRequest.setPom( pomFile.getAbsolutePath() );
+        if (hasPom) {
+            mavenRequest.setPom( pomFile.getAbsolutePath() );
+        }
         MavenEmbedder mavenEmbedder = null;
         try {
             mavenEmbedder = new MavenEmbedder( mavenRequest );
-            return mavenEmbedder.readProject( pomFile );
+            return hasPom ?
+                    mavenEmbedder.readProject( pomFile ) :
+                    mavenEmbedder.readProject( new ByteArrayInputStream(DUMMY_POM.getBytes( StandardCharsets.UTF_8 )) );
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -50,7 +66,7 @@ public class MavenProjectLoader {
             }
         }
     }
-
+        
     public static MavenProject parseMavenPom(InputStream pomStream) {
         return parseMavenPom(pomStream, false);
     }
