@@ -134,8 +134,8 @@ public class PlaceHistoryHandler {
                 historian.addValueChangeHandler( new ValueChangeHandler<String>() {
                     @Override
                     public void onValueChange( ValueChangeEvent<String> event ) {
-                        String token = event.getValue();
-                        handleHistoryToken( token );
+//                        String token = event.getValue();
+//                        handleHistoryToken( token );
                     }
                 } );
 
