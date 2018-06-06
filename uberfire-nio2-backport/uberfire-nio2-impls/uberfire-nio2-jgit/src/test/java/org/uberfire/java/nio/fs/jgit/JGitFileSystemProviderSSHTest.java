@@ -42,6 +42,7 @@ public class JGitFileSystemProviderSSHTest extends AbstractTestInfra {
     public Map<String, String> getGitPreferences() {
         Map<String, String> gitPrefs = super.getGitPreferences();
 
+        gitPrefs.put( "org.uberfire.nio.git.ssh.algorithm", "RSA" );
         gitPrefs.put( "org.uberfire.nio.git.ssh.enabled", "true" );
         gitSSHPort = findFreePort();
         gitPrefs.put( "org.uberfire.nio.git.ssh.port", String.valueOf( gitSSHPort ) );
