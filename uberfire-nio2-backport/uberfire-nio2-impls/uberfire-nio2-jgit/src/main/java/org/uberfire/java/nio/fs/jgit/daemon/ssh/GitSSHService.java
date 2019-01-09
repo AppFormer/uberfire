@@ -19,11 +19,9 @@ package org.uberfire.java.nio.fs.jgit.daemon.ssh;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.security.InvalidKeyException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +78,8 @@ import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.eclipse.jgit.transport.resolver.ReceivePackFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uberfire.java.nio.fs.jgit.JGitFileSystemProvider;
 import org.uberfire.java.nio.security.FileSystemAuthenticator;
 import org.uberfire.java.nio.security.FileSystemAuthorizer;
@@ -89,9 +89,31 @@ import static org.uberfire.commons.validation.PortablePreconditions.*;
 
 public class GitSSHService {
 
-    private final SshServer sshd = buildSshServer();
+    private static final Logger LOG = LoggerFactory.getLogger(GitSSHService.class);
 
-    public static SshServer buildSshServer() {
+    private final List<NamedFactory<Cipher>> managedCiphers =
+            Collections.unmodifiableList(Arrays.<NamedFactory<Cipher>>asList(
+                new AES128CTR.Factory(),
+                new AES256CTR.Factory(),
+                new ARCFOUR128.Factory(),
+                new ARCFOUR256.Factory(),
+                new AES192CBC.Factory(),
+                new AES256CBC.Factory()));
+
+    private final List<NamedFactory<Mac>> managedMACs =
+            Collections.unmodifiableList(Arrays.<NamedFactory<Mac>>asList(
+                    new HMACSHA256.Factory(),
+                    new HMACSHA512.Factory(),
+                    new HMACSHA1.Factory(),
+                    new HMACMD5.Factory(),
+                    new HMACSHA196.Factory(),
+                    new HMACMD596.Factory())
+            );
+
+    private SshServer sshd ;
+
+    public SshServer buildSshServer(String ciphersConfigured,
+                                    String macsConfigured) {
         SshServer sshd = new SshServer();
         // DHG14 uses 2048 bits key which are not supported by the default JCE provider
         // EC keys are not supported until OpenJDK 8
@@ -137,7 +159,8 @@ public class GitSSHService {
                     new SignatureRSA.Factory()));
             sshd.setRandomFactory(new SingletonRandomFactory(new JceRandom.Factory()));
         }
-        setUpDefaultCiphers(sshd);
+        sshd.setCipherFactories(checkAndSetGitCiphers(ciphersConfigured));
+        sshd.setMacFactories(checkAndSetGitMACs(macsConfigured));
         // Compression is not enabled by default
         // sshd.setCompressionFactories(Arrays.<NamedFactory<Compression>>asList(
         //         new CompressionNone.Factory(),
@@ -145,13 +168,7 @@ public class GitSSHService {
         //         new CompressionDelayedZlib.Factory()));
         sshd.setCompressionFactories(Arrays.<NamedFactory<Compression>>asList(
                 new CompressionNone.Factory()));
-        sshd.setMacFactories(Arrays.<NamedFactory<Mac>>asList(
-                new HMACSHA256.Factory(),
-                new HMACSHA512.Factory(),
-                new HMACSHA1.Factory(),
-                new HMACMD5.Factory(),
-                new HMACSHA196.Factory(),
-                new HMACMD596.Factory()));
+
         sshd.setChannelFactories(Arrays.<NamedFactory<Channel>>asList(
                 new ChannelSession.Factory(),
                 new TcpipServerChannel.DirectTcpipFactory()));
@@ -166,31 +183,61 @@ public class GitSSHService {
         return sshd;
     }
 
-    private static void setUpDefaultCiphers(SshServer sshd) {
-        List<NamedFactory<Cipher>> avail = new LinkedList<NamedFactory<Cipher>>();
-        avail.add(new AES128CTR.Factory());
-        avail.add(new AES256CTR.Factory());
-        avail.add(new ARCFOUR128.Factory());
-        avail.add(new ARCFOUR256.Factory());
-        avail.add(new AES192CBC.Factory());
-        avail.add(new AES256CBC.Factory());
-
-        for (Iterator<NamedFactory<Cipher>> i = avail.iterator(); i.hasNext(); ) {
-            final NamedFactory<Cipher> f = i.next();
-            try {
-                final Cipher c = f.create();
-                final byte[] key = new byte[c.getBlockSize()];
-                final byte[] iv = new byte[c.getIVSize()];
-                c.init(Cipher.Mode.Encrypt,
-                       key,
-                       iv);
-            } catch (InvalidKeyException e) {
-                i.remove();
-            } catch (Exception e) {
-                i.remove();
+    private List<NamedFactory<Cipher>> checkAndSetGitCiphers(String gitSshCiphers) {
+        if (gitSshCiphers == null || gitSshCiphers.isEmpty()) {
+            List<NamedFactory<Cipher>> ciphersRegistered = new ArrayList<>();
+            for(NamedFactory<Cipher> cipher : managedCiphers){
+                addCipher(ciphersRegistered, cipher);
             }
+            return ciphersRegistered;
+        } else {
+            List<NamedFactory<Cipher>> ciphersHandled = new ArrayList<>();
+            List<String> ciphers = Arrays.asList(gitSshCiphers.split(","));
+            for (String cipherCode : ciphers) {
+                NamedFactory<Cipher> cipher =  NamedFactory.Utils.get(managedCiphers, cipherCode.trim().toLowerCase());
+                if (cipher != null && managedCiphers.contains(cipher)) {
+                    addCipher(ciphersHandled, cipher);
+                }else{
+                    LOG.info("Cipher {} not handled in git ssh configuration. ", cipher);
+                }
+            }
+            return ciphersHandled;
         }
-        sshd.setCipherFactories(avail);
+    }
+
+    private void addCipher(List<NamedFactory<Cipher>> ciphersHandled,
+                           NamedFactory<Cipher> cipher) {
+        try {
+            final Cipher c = cipher.create();
+            final byte[] key = new byte[c.getBlockSize()];
+            final byte[] iv = new byte[c.getIVSize()];
+            c.init(Cipher.Mode.Encrypt,
+                   key,
+                   iv);
+            ciphersHandled.add(cipher);
+        } catch (Exception e) {
+            LOG.info("Cipher {} not handled in git ssh configuration, detail:{} ", cipher, e.getMessage());
+        }
+        LOG.info("Added Cipher {} to the git ssh configuration. ", cipher);
+    }
+
+    private List<NamedFactory<Mac>> checkAndSetGitMACs(String gitSshMacs) {
+        if (gitSshMacs == null || gitSshMacs.isEmpty()) {
+            return managedMACs;
+        } else {
+            List<NamedFactory<Mac>> macs = new ArrayList<>();
+            List<String> macsInput = Arrays.asList(gitSshMacs.split(","));
+            for (String macCode : macsInput) {
+                NamedFactory<Mac> mac =  NamedFactory.Utils.get(managedMACs, macCode.trim().toLowerCase());
+                if (mac != null && managedMACs.contains(mac)) {
+                    macs.add(mac);
+                    LOG.info("Added MAC {} to the git ssh configuration. ", mac);
+                }else{
+                    LOG.info("MAC {} not handled in git ssh configuration. ", mac);
+                }
+            }
+            return macs;
+        }
     }
 
     private FileSystemAuthenticator fileSystemAuthenticator;
@@ -201,12 +248,26 @@ public class GitSSHService {
                        final String sshIdleTimeout,
                        final String algorithm,
                        final ReceivePackFactory receivePackFactory,
-                       final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver ) {
+                       final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver) {
+        setup(certDir, inetSocketAddress, sshIdleTimeout, algorithm, receivePackFactory, repositoryResolver,null, null);
+    }
+
+    public void setup( final File certDir,
+                       final InetSocketAddress inetSocketAddress,
+                       final String sshIdleTimeout,
+                       final String algorithm,
+                       final ReceivePackFactory receivePackFactory,
+                       final JGitFileSystemProvider.RepositoryResolverImpl<BaseGitCommand> repositoryResolver,
+                       final String ciphersConfigured,
+                       final String macsConfigured) {
+
         checkNotNull( "certDir", certDir );
         checkNotEmpty( "sshIdleTimeout", sshIdleTimeout );
         checkNotEmpty( "algorithm", algorithm );
         checkNotNull( "receivePackFactory", receivePackFactory );
         checkNotNull( "repositoryResolver", repositoryResolver );
+
+        sshd = buildSshServer(ciphersConfigured, macsConfigured);
 
         sshd.getProperties().put( SshServer.IDLE_TIMEOUT, sshIdleTimeout );
 
@@ -297,5 +358,13 @@ public class GitSSHService {
 
     public void setAuthorizationManager( FileSystemAuthorizer fileSystemAuthorizer ) {
         this.fileSystemAuthorizer = fileSystemAuthorizer;
+    }
+
+    public List<NamedFactory<Cipher>> getManagedCiphers() {
+        return managedCiphers;
+    }
+
+    public List<NamedFactory<Mac>> getManagedMACs() {
+        return managedMACs;
     }
 }

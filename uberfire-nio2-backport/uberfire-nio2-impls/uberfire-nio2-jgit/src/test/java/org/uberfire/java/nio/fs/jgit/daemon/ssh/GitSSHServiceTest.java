@@ -19,9 +19,25 @@ package org.uberfire.java.nio.fs.jgit.daemon.ssh;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.sshd.SshServer;
+import org.apache.sshd.common.Cipher;
+import org.apache.sshd.common.Mac;
+import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.cipher.AES128CTR;
+import org.apache.sshd.common.cipher.AES192CBC;
+import org.apache.sshd.common.cipher.AES256CBC;
+import org.apache.sshd.common.cipher.AES256CTR;
+import org.apache.sshd.common.cipher.ARCFOUR128;
+import org.apache.sshd.common.cipher.ARCFOUR256;
+import org.apache.sshd.common.mac.HMACMD5;
+import org.apache.sshd.common.mac.HMACMD596;
+import org.apache.sshd.common.mac.HMACSHA1;
+import org.apache.sshd.common.mac.HMACSHA196;
+import org.apache.sshd.common.mac.HMACSHA256;
+import org.apache.sshd.common.mac.HMACSHA512;
 import org.eclipse.jgit.transport.resolver.ReceivePackFactory;
 import org.eclipse.jgit.util.FileUtils;
 import org.junit.AfterClass;
@@ -75,7 +91,7 @@ public class GitSSHServiceTest {
                           "10000",
                           "RSA",
                           mock( ReceivePackFactory.class ),
-                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
 
         sshService.start();
         assertTrue( sshService.isRunning() );
@@ -95,7 +111,7 @@ public class GitSSHServiceTest {
                           "10000",
                           "DSA",
                           mock( ReceivePackFactory.class ),
-                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
 
         sshService.start();
         assertTrue( sshService.isRunning() );
@@ -115,7 +131,7 @@ public class GitSSHServiceTest {
                           "10000",
                           "RSA",
                           mock( ReceivePackFactory.class ),
-                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                          mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
 
         sshService.start();
         assertTrue( sshService.isRunning() );
@@ -138,7 +154,7 @@ public class GitSSHServiceTest {
                               "10000",
                               "xxxx",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( final Exception ex ){
             assertThat( ex.getMessage() ).contains( "'xxxx'" );
@@ -156,7 +172,7 @@ public class GitSSHServiceTest {
                               "10000",
                               "RSA",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'certDir'" );
@@ -168,7 +184,8 @@ public class GitSSHServiceTest {
                               null,
                               "RSA",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ),
+                              null, null );
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'sshIdleTimeout'" );
@@ -180,7 +197,7 @@ public class GitSSHServiceTest {
                               "",
                               "RSA",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'sshIdleTimeout'" );
@@ -192,7 +209,7 @@ public class GitSSHServiceTest {
                               "1000",
                               null,
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'algorithm'" );
@@ -204,7 +221,7 @@ public class GitSSHServiceTest {
                               "1000",
                               "",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'algorithm'" );
@@ -216,7 +233,7 @@ public class GitSSHServiceTest {
                               "100",
                               "RSA",
                               null,
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'receivePackFactory'" );
@@ -228,7 +245,7 @@ public class GitSSHServiceTest {
                               "100",
                               "RSA",
                               mock( ReceivePackFactory.class ),
-                              null );
+                              null);
             fail( "has to fail" );
         } catch ( IllegalArgumentException ex ) {
             assertThat( ex.getMessage() ).contains( "'repositoryResolver'" );
@@ -240,9 +257,220 @@ public class GitSSHServiceTest {
                               "10000",
                               "RSA",
                               mock( ReceivePackFactory.class ),
-                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ) );
+                              mock( JGitFileSystemProvider.RepositoryResolverImpl.class ));
         } catch ( IllegalArgumentException ex ) {
             fail( "should not fail" );
         }
     }
+
+    @Test
+    public void testCheckCiphersAndMacs() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+
+        String ciphers = "aes128-ctr, aes256-ctr, arcfour128, arcfour256, aes192-cbc, aes256-cbc";
+        String macs = "hmac-sha2-256, hmac-sha2-512, hmac-sha1, hmac-md5, hmac-sha1-96, hmac-md5-96";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         ciphers,
+                         macs);
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(4);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
+    @Test
+    public void testCheckEmptyCiphers() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+        String macs = "hmac-sha2-256, hmac-sha2-512, hmac-sha1, hmac-md5, hmac-sha1-96, hmac-md5-96";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         "",
+                         macs);
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(4);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
+    @Test
+    public void testCheckEmptyMacs() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+        String ciphers = "aes128-ctr, aes256-ctr, arcfour128, arcfour256, aes192-cbc, aes256-cbc";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         ciphers,
+                         "");
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(4);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
+    @Test
+    public void testCheckEmptyCiphersAndMacs() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         "",
+                         "");
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(4);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
+    @Test
+    public void testCheckNullCiphersAndMacs() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         null,
+                         null);
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(4);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
+    @Test
+    public void testWithWrongCiphersAndMacs() throws Exception {
+        final GitSSHService sshService = new GitSSHService();
+        final File certDir = createTempDirectory();
+
+        String idleTimeout = "10000";
+        String ciphers = "aes126-cbc,aes124-ctr,aes192-cbc,aes192-ctr,aes255-cbc,aes256-ctr,arcfour128,arcfour256,blowfish-cbc,3des-cbc";
+        sshService.setup(certDir,
+                         null,
+                         idleTimeout,
+                         "RSA",
+                         mock(ReceivePackFactory.class),
+                         mock(JGitFileSystemProvider.RepositoryResolverImpl.class),
+                         ciphers,
+                         "");
+
+        sshService.start();
+        assertTrue(sshService.isRunning());
+
+        List<NamedFactory<Cipher>> ciphersReaded = sshService.getSshServer().getCipherFactories();
+        List<NamedFactory<Mac>> macsReaded = sshService.getSshServer().getMacFactories();
+
+        assertThat(ciphersReaded).hasSize(2);
+        assertThat(sshService.getManagedCiphers().containsAll(ciphersReaded));
+
+        assertThat(macsReaded).hasSize(6);
+        assertThat(sshService.getManagedMACs().containsAll(macsReaded));
+
+        assertThat(sshService.getSshServer().getProperties().get(SshServer.IDLE_TIMEOUT)).isEqualTo(idleTimeout);
+
+        sshService.stop();
+
+        assertFalse(sshService.isRunning());
+    }
+
 }
