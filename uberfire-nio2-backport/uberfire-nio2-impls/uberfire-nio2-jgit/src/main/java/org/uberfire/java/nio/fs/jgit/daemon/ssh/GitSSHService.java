@@ -198,7 +198,7 @@ public class GitSSHService {
                 if (cipher != null && managedCiphers.contains(cipher)) {
                     addCipher(ciphersHandled, cipher);
                 }else{
-                    LOG.info("Cipher {} not handled in git ssh configuration. ", cipher);
+                    LOG.warn("Cipher {} not handled in git ssh configuration. ", cipher);
                 }
             }
             return ciphersHandled;
@@ -216,7 +216,7 @@ public class GitSSHService {
                    iv);
             ciphersHandled.add(cipher);
         } catch (Exception e) {
-            LOG.info("Cipher {} not handled in git ssh configuration, detail:{} ", cipher, e.getMessage());
+            LOG.warn("Cipher {} not handled in git ssh configuration, detail:{} ", cipher, e.getMessage());
         }
         LOG.info("Added Cipher {} to the git ssh configuration. ", cipher);
     }
@@ -233,7 +233,7 @@ public class GitSSHService {
                     macs.add(mac);
                     LOG.info("Added MAC {} to the git ssh configuration. ", mac);
                 }else{
-                    LOG.info("MAC {} not handled in git ssh configuration. ", mac);
+                    LOG.warn("MAC {} not handled in git ssh configuration. ", mac);
                 }
             }
             return macs;
