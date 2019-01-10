@@ -215,10 +215,11 @@ public class GitSSHService {
                    key,
                    iv);
             ciphersHandled.add(cipher);
+            LOG.info("Added Cipher {} to the git ssh configuration. ", cipher);
         } catch (Exception e) {
             LOG.warn("Cipher {} not handled in git ssh configuration, detail:{} ", cipher, e.getMessage());
         }
-        LOG.info("Added Cipher {} to the git ssh configuration. ", cipher);
+
     }
 
     private List<NamedFactory<Mac>> checkAndSetGitMACs(String gitSshMacs) {
@@ -232,7 +233,7 @@ public class GitSSHService {
                 if (mac != null && managedMACs.contains(mac)) {
                     macs.add(mac);
                     LOG.info("Added MAC {} to the git ssh configuration. ", mac);
-                }else{
+                } else {
                     LOG.warn("MAC {} not handled in git ssh configuration. ", mac);
                 }
             }

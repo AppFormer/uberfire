@@ -258,7 +258,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         final ConfigProperty httpProxyPasswordProp = config.get( "http.proxyPassword", null );
         final ConfigProperty httpsProxyUserProp = config.get( "https.proxyUser", null );
         final ConfigProperty httpsProxyPasswordProp = config.get( "https.proxyPassword", null );
-        final ConfigProperty gitSshCipersConf = config.get("org.uberfire.nio.git.ssh.cyphers", null );
+        final ConfigProperty gitSshCiphersConf = config.get("org.uberfire.nio.git.ssh.cyphers", null );
         final ConfigProperty gitSshMACsConf = config.get("org.uberfire.nio.git.ssh.macs", null );
 
         if ( LOG.isDebugEnabled() ) {
@@ -298,7 +298,7 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             }
         }
         sshPassphrase = sshPassphraseProp.getValue();
-        gitSshCiphers = gitSshCipersConf.getValue();
+        gitSshCiphers = gitSshCiphersConf.getValue();
         gitSshSMACs = gitSshMACsConf.getValue();
         if ( ( httpProxyUserProp.getValue() != null &&
                 httpProxyPasswordProp.getValue() != null ) ||
