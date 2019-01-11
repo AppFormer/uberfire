@@ -213,6 +213,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
     private String sshAlgorithm;
     private String sshPassphrase;
     private String sshIdleTimeout;
+    private String gitSshCiphers;
+    private String gitSshSMACs;
 
     private final Map<String, JGitFileSystem> fileSystems = new ConcurrentHashMap<String, JGitFileSystem>();
     private final Set<JGitFileSystem> closedFileSystems = new HashSet<JGitFileSystem>();
@@ -256,6 +258,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
         final ConfigProperty httpProxyPasswordProp = config.get( "http.proxyPassword", null );
         final ConfigProperty httpsProxyUserProp = config.get( "https.proxyUser", null );
         final ConfigProperty httpsProxyPasswordProp = config.get( "https.proxyPassword", null );
+        final ConfigProperty gitSshCiphersConf = config.get("org.uberfire.nio.git.ssh.ciphers", null );
+        final ConfigProperty gitSshMACsConf = config.get("org.uberfire.nio.git.ssh.macs", null );
 
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( config.getConfigurationSummary( "Summary of JGit configuration:" ) );
@@ -294,7 +298,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
             }
         }
         sshPassphrase = sshPassphraseProp.getValue();
-
+        gitSshCiphers = gitSshCiphersConf.getValue();
+        gitSshSMACs = gitSshMACsConf.getValue();
         if ( ( httpProxyUserProp.getValue() != null &&
                 httpProxyPasswordProp.getValue() != null ) ||
                 ( httpsProxyUserProp.getValue() != null &&
@@ -605,7 +610,8 @@ public class JGitFileSystemProvider implements SecuredFileSystemProvider,
                              sshIdleTimeout,
                              sshAlgorithm,
                              receivePackFactory,
-                             new RepositoryResolverImpl<BaseGitCommand>() );
+                             new RepositoryResolverImpl<BaseGitCommand>(),
+                             gitSshCiphers, gitSshSMACs);
 
         gitSSHService.start();
     }
